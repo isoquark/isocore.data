@@ -1,0 +1,32 @@
+﻿DataTypeId, DataTypeName, SchemaId, SchemaName, MappedBclType, MappedSqlDbTypeEnum, MaxLength, Precision, Scale, Nullable, IsTableType, IsAssemblyType, IsUserDefined, BaseTypeId
+34,image,4,sys,Byte[],Binary,16,0,0,1,0,0,0,NULL
+35,text,4,sys,String,Text,16,0,0,1,0,0,0,NULL
+36,uniqueidentifier,4,sys,NULL,NULL,16,0,0,1,0,0,0,NULL
+40,date,4,sys,DateTime,Date,3,10,0,1,0,0,0,NULL
+41,time,4,sys,TimeSpan,Time,5,16,7,1,0,0,0,NULL
+42,datetime2,4,sys,DateTime,DateTime2,8,27,7,1,0,0,0,NULL
+43,datetimeoffset,4,sys,DateTimeOffset,DateTimeOffset,10,34,7,1,0,0,0,NULL
+48,tinyint,4,sys,Byte,TinyInt,1,3,0,1,0,0,0,NULL
+52,smallint,4,sys,Int16,SmallInt,2,5,0,1,0,0,0,NULL
+56,int,4,sys,Int32,Int,4,10,0,1,0,0,0,NULL
+58,smalldatetime,4,sys,DateTime,DateTime,4,16,0,1,0,0,0,NULL
+59,real,4,sys,Single,Real,4,24,0,1,0,0,0,NULL
+60,money,4,sys,Decimal,Money,8,19,4,1,0,0,0,NULL
+61,datetime,4,sys,DateTime,DateTime,8,23,3,1,0,0,0,NULL
+62,float,4,sys,Double,Float,8,53,0,1,0,0,0,NULL
+98,sql_variant,4,sys,Object ,Variant,8016,0,0,1,0,0,0,NULL
+99,ntext,4,sys,String,NText,16,0,0,1,0,0,0,NULL
+104,bit,4,sys,Boolean,Bit,1,1,0,1,0,0,0,NULL
+106,decimal,4,sys,Decimal,Decimal,17,38,38,1,0,0,0,NULL
+108,numeric,4,sys,Decimal,Decimal,17,38,38,1,0,0,0,NULL
+122,smallmoney,4,sys,Decimal,SmallMoney,4,10,4,1,0,0,0,NULL
+127,bigint,4,sys,Int64,BigInt,8,19,0,1,0,0,0,NULL
+165,varbinary,4,sys,Byte[],VarBinary,8000,0,0,1,0,0,0,NULL
+167,varchar,4,sys,String,VarChar,8000,0,0,1,0,0,0,NULL
+173,binary,4,sys,Byte[],VarBinary,8000,0,0,1,0,0,0,NULL
+175,char,4,sys,String,Char,8000,0,0,1,0,0,0,NULL
+189,timestamp,4,sys,Byte[],Timestamp,8,0,0,0,0,0,0,NULL
+231,nvarchar,4,sys,String,NVarChar,8000,0,0,1,0,0,0,NULL
+239,nchar,4,sys,String,NChar,8000,0,0,1,0,0,0,NULL
+241,xml,4,sys,Xml,Xml,-1,0,0,1,0,0,0,NULL
+256,sysname,4,sys,NULL,NULL,256,0,0,0,0,0,0,NULL

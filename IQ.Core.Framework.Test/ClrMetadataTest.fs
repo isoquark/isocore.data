@@ -7,7 +7,7 @@ open System.Reflection
 
 
 [<TestFixture>]
-module ClrMetadataTest =
+module ClrRecordTest =
     type private RecordA = {
         Field01 : int
         Field02 : decimal
@@ -59,6 +59,15 @@ module ClrMetadataTest =
         Claim.equal (recordValue.Field02 :> obj) valueArray.[1]
         Claim.equal (recordValue.Field03 :> obj) valueArray.[2]
 
+
+[<TestFixture>]
+module ClrTypeTest =     
+    type private RecordA = {
+        Field01 : int
+        Field02 : decimal
+        Field03 : DateTime
+    }
+
     type private RecordB = {
         Field10 : int option
         Field11 : string
@@ -71,6 +80,15 @@ module ClrMetadataTest =
         recinfo<RecordB>.Fields.[1].FieldType |> ClrType.isOptionType |> Claim.isFalse
         recinfo<RecordB>.Fields.[2].FieldType |> ClrType.isOptionType |> Claim.isTrue        
 
+
+[<TestFixture>]
+module ClrAssemblyTest =
+    [<Test>]
+    let ``Extracted embedded text resource from assembly``() =
+        let text = thisAssembly() |> ClrAssembly.findTextResource "EmbeddedResource01.txt"
+        text |> Claim.isSome
+        text.Value.Trim() |> Claim.equal "This is an embedded text resource"
+        
 
         
         

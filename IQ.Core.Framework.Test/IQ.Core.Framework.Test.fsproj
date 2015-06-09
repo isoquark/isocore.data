@@ -54,6 +54,7 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="Resources\EmbeddedResource01.txt" />
     <Compile Include="ClrMetadataTest.fs" />
   </ItemGroup>
   <ItemGroup>

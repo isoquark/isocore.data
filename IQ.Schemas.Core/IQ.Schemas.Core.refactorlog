@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="ba831c66-523d-4cc6-9be1-f7ed6ed9222b" ChangeDateTime="06/09/2015 13:58:07">
+    <Property Name="ElementName" Value="[Metadata].[IntrinsicTypeMap].[ClrTypeName]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[Metadata].[IntrinsicTypeMap]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="BclTypeName" />
+  </Operation>
+</Operations>

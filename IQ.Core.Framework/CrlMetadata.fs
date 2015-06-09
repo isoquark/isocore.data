@@ -4,11 +4,12 @@ open System
 open System.Reflection
 open System.Data
 open System.Collections.Concurrent
+open System.Linq
+open System.IO
 
 open Microsoft.FSharp.Reflection
 
 
-open IQ.Core.Framework
 
 [<AutoOpen>]
 module ClrMetadataVocabulary =
@@ -53,6 +54,39 @@ module ClrMetadataVocabulary =
     }
 
 /// <summary>
+/// Defines operations for working with CLR members
+/// </summary>
+module ClrMember =
+    /// <summary>
+    /// Retrieves an attribute applied to a member, if present
+    /// </summary>
+    /// <param name="subject">The type to examine</param>
+    let getAttribute<'T when 'T :> Attribute>(subject : MemberInfo) =
+        if Attribute.IsDefined(subject, typeof<'T>) then
+            Attribute.GetCustomAttribute(subject, typeof<'T>) :?> 'T |> Some
+        else
+            None
+    
+/// <summary>
+/// Defines operations for working with CLR assemblies
+/// </summary>
+module ClrAssembly =
+    /// <summary>
+    /// Retrieves a text resource embedded in the subject assembly if found
+    /// </summary>
+    /// <param name="partialName">The partial name of the resource</param>
+    /// <param name="subject"></param>
+    let findTextResource partialName (subject : Assembly) =        
+        match subject.GetManifestResourceNames() |> Array.tryFind(fun name -> name.Contains(partialName)) with
+        | Some(resname) ->
+            use s = resname |> subject.GetManifestResourceStream
+            use r = new StreamReader(s)
+            r.ReadToEnd() |> Some
+        | None ->
+            None
+
+
+/// <summary>
 /// Defines operations for working with CLR types
 /// </summary>
 module ClrType =
@@ -62,6 +96,22 @@ module ClrType =
     /// <param name="t">The type to test</param>
     let isOptionType (t : Type) =
         t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<option<_>>
+      
+
+    /// <summary>
+    /// Retrieves an attribute applied to a type, if present
+    /// </summary>
+    /// <param name="subject">The type to examine</param>
+    let getAttribute<'T when 'T :> Attribute>(subject : Type) =
+        subject |> ClrMember.getAttribute<'T>
+
+/// <summary>
+/// Defines operations for working with CLR properties
+/// </summary>
+module ClrProperty =
+    let getAttribute<'T when 'T :> Attribute>(subject : PropertyInfo) = 
+        subject |> ClrMember.getAttribute<'T>
+        
 
 /// <summary>
 /// Defines operations for working with record instances and metadata

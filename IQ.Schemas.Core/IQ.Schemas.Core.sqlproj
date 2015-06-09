@@ -64,6 +64,7 @@
     <Folder Include="Metadata" />
     <Folder Include="Metadata\Views" />
     <Folder Include="Metadata\Functions" />
+    <Folder Include="Metadata\Tables" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Metadata\Metadata.sql" />
@@ -77,6 +78,7 @@
     <Build Include="Metadata\Views\vObject.sql" />
     <Build Include="Metadata\Views\vDescription.sql" />
     <Build Include="Metadata\Views\vUserColumn.sql" />
+    <Build Include="Metadata\Tables\IntrinsicTypeMap.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">
@@ -84,5 +86,8 @@
       <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
       <DatabaseVariableLiteralValue>master</DatabaseVariableLiteralValue>
     </ArtifactReference>
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="IQ.Schemas.Core.refactorlog" />
   </ItemGroup>
 </Project>

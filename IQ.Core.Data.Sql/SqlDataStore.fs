@@ -30,8 +30,9 @@ module SqlDataStoreVocabulary =
     
     type SqlQueryParameter = SqlParameter of name : string * value : obj
     
+
     type SqlQuery =
-        | TableOrView of tabularName : string
+        | TableOrView of tabularName : string * columnNames : string list
         | TableFunction of  functionName : string * parameters : SqlQueryParameter list
         | Procedure of procedureName : string * parameters : SqlQueryParameter list
     
@@ -54,16 +55,17 @@ module SqlDataStore =
     
     
     type private SqlDataStore(cs : ConnectionString) =
+        let cs = SqlConnectionString(cs.Components)
         interface ISqlDataStore with
             member this.Get q = 
                 match q with
-                | TableOrView(name) ->
+                | TableOrView(name,columnNames) ->
                     []
                 | TableFunction(functionName, parameters) ->
                     []
                 | Procedure(procedureName, parameters) ->
                     []
-            member this.Put items = ()
+            member this.Put items = bcp cs items
             member this.Del q = ()
                  
     /// <summary>

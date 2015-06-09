@@ -58,7 +58,6 @@
     <None Include="packages.config" />
     <Compile Include="ProxyDiscoveryTest.fs" />
     <Compile Include="SqlDataStoreTest.fs" />
-    <Compile Include="DataTableTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IQ.Core.Data.Sql\IQ.Core.Data.Sql.fsproj">
