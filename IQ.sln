@@ -1,0 +1,98 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30501.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "IQ.Schemas.Core", "IQ.Schemas.Core\IQ.Schemas.Core.sqlproj", "{0BFE2F2D-55C4-495C-A59C-C616B19FEEE9}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Framework", "IQ.Core.Framework\IQ.Core.Framework.fsproj", "{8E2497E0-941B-4CA7-AB78-4CA15291C56A}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Framework.Test", "IQ.Core.Framework.Test\IQ.Core.Framework.Test.fsproj", "{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.TestFramework", "IQ.Core.TestFramework\IQ.Core.TestFramework.fsproj", "{F9D5CBBF-94DC-43BE-BFFE-7987D14040B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQ.Docs", "IQ.Docs\IQ.Docs.csproj", "{4D6E425B-2DF7-4ED7-83F1-54B4FB4D9885}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "IQ.Schemas.Test", "IQ.Schemas.Test\IQ.Schemas.Test.sqlproj", "{43C6EBF6-B693-47E5-99F2-A446A96BB4F3}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Data.Sql", "IQ.Core.Data.Sql\IQ.Core.Data.Sql.fsproj", "{29AEDCF6-3187-4C89-AA30-D3D60A8E3379}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Data.Sql.Test", "IQ.Core.Data.Sql.Test\IQ.Core.Data.Sql.Test.fsproj", "{55DA7577-AE7F-4684-9348-9D16E308E070}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 9
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://isoquark.visualstudio.com/defaultcollection
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = IQ.Core.Data.Sql.Test\\IQ.Core.Data.Sql.Test.fsproj
+		SccProjectName1 = IQ.Core.Data.Sql.Test
+		SccLocalPath1 = IQ.Core.Data.Sql.Test
+		SccProjectUniqueName2 = IQ.Core.Data.Sql\\IQ.Core.Data.Sql.fsproj
+		SccProjectName2 = IQ.Core.Data.Sql
+		SccLocalPath2 = IQ.Core.Data.Sql
+		SccProjectUniqueName3 = IQ.Core.Framework.Test\\IQ.Core.Framework.Test.fsproj
+		SccProjectName3 = IQ.Core.Framework.Test
+		SccLocalPath3 = IQ.Core.Framework.Test
+		SccProjectUniqueName4 = IQ.Core.Framework\\IQ.Core.Framework.fsproj
+		SccProjectName4 = IQ.Core.Framework
+		SccLocalPath4 = IQ.Core.Framework
+		SccProjectUniqueName5 = IQ.Core.TestFramework\\IQ.Core.TestFramework.fsproj
+		SccProjectName5 = IQ.Core.TestFramework
+		SccLocalPath5 = IQ.Core.TestFramework
+		SccProjectUniqueName6 = IQ.Docs\\IQ.Docs.csproj
+		SccProjectName6 = IQ.Docs
+		SccLocalPath6 = IQ.Docs
+		SccProjectUniqueName7 = IQ.Schemas.Core\\IQ.Schemas.Core.sqlproj
+		SccProjectName7 = IQ.Schemas.Core
+		SccLocalPath7 = IQ.Schemas.Core
+		SccProjectUniqueName8 = IQ.Schemas.Test\\IQ.Schemas.Test.sqlproj
+		SccProjectName8 = IQ.Schemas.Test
+		SccLocalPath8 = IQ.Schemas.Test
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0BFE2F2D-55C4-495C-A59C-C616B19FEEE9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0BFE2F2D-55C4-495C-A59C-C616B19FEEE9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0BFE2F2D-55C4-495C-A59C-C616B19FEEE9}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{0BFE2F2D-55C4-495C-A59C-C616B19FEEE9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0BFE2F2D-55C4-495C-A59C-C616B19FEEE9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0BFE2F2D-55C4-495C-A59C-C616B19FEEE9}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9D5CBBF-94DC-43BE-BFFE-7987D14040B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9D5CBBF-94DC-43BE-BFFE-7987D14040B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9D5CBBF-94DC-43BE-BFFE-7987D14040B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9D5CBBF-94DC-43BE-BFFE-7987D14040B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D6E425B-2DF7-4ED7-83F1-54B4FB4D9885}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D6E425B-2DF7-4ED7-83F1-54B4FB4D9885}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D6E425B-2DF7-4ED7-83F1-54B4FB4D9885}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D6E425B-2DF7-4ED7-83F1-54B4FB4D9885}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43C6EBF6-B693-47E5-99F2-A446A96BB4F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43C6EBF6-B693-47E5-99F2-A446A96BB4F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43C6EBF6-B693-47E5-99F2-A446A96BB4F3}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{43C6EBF6-B693-47E5-99F2-A446A96BB4F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43C6EBF6-B693-47E5-99F2-A446A96BB4F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43C6EBF6-B693-47E5-99F2-A446A96BB4F3}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{29AEDCF6-3187-4C89-AA30-D3D60A8E3379}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29AEDCF6-3187-4C89-AA30-D3D60A8E3379}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29AEDCF6-3187-4C89-AA30-D3D60A8E3379}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29AEDCF6-3187-4C89-AA30-D3D60A8E3379}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55DA7577-AE7F-4684-9348-9D16E308E070}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55DA7577-AE7F-4684-9348-9D16E308E070}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55DA7577-AE7F-4684-9348-9D16E308E070}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55DA7577-AE7F-4684-9348-9D16E308E070}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
