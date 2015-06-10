@@ -5,9 +5,10 @@ open System.ComponentModel
 open System.Data
 
 open IQ.Core.TestFramework
+open IQ.Core.Data
 open IQ.Core.Data.Sql
 
-[<TestFixture>]
+[<TestContainer>]
 module ``Sql Core Proxy Discovery`` =
 
     module SqlTest =    

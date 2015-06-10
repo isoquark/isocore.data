@@ -1,4 +1,4 @@
-﻿namespace IQ.Core.Data.Sql.Test
+﻿namespace IQ.Core.Data.Test
 
 open IQ.Core.TestFramework
 
@@ -8,7 +8,7 @@ open System.Data
 open IQ.Core.Framework
 open IQ.Core.Data
 
-[<TestFixture>]
+[<TestContainer>]
 module DataTableTest =
     
     type private DataTableRecord = {
@@ -19,7 +19,7 @@ module DataTableTest =
 
     [<Test>]
     let ``Created DataTable from record metadata``() =
-        let dataTable = recinfo<DataTableRecord> |> DataTable.fromRecordDescription
+        let dataTable = recordinfo<DataTableRecord> |> DataTable.fromRecordDescription
         Claim.equal 3 dataTable.Columns.Count
         Claim.equal "Field01" dataTable.Columns.[0].ColumnName
         Claim.equal (typeof<int64>) dataTable.Columns.[0].DataType
@@ -56,7 +56,7 @@ module DataTableTest =
 
     [<Test>]
     let ``Created record values from a DataTable``() =
-        let description = recinfo<DataTableRecord>
+        let description = recordinfo<DataTableRecord>
         
         let src = 
             [

@@ -55,8 +55,11 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
-    <Compile Include="DataTableTest.fs" />
     <None Include="packages.config" />
+    <None Include="app.config" />
+    <Compile Include="DataTableTest.fs" />
+    <Compile Include="CsvReaderTest.fs" />
+    <EmbeddedResource Include="Resources\CsvTestCase1.csv" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

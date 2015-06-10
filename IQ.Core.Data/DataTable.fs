@@ -30,7 +30,7 @@ module DataTable =
     /// Creates a data table based on record type
     /// </summary>
     let fromRecordType<'T> =
-        recinfo<'T> |> fromRecordDescription
+        recordinfo<'T> |> fromRecordDescription
 
     /// <summary>
     /// Creates a <see cref="System.Data.DataTable"/> from a sequence of records
@@ -40,7 +40,7 @@ module DataTable =
         let valueList = values |> List.ofSeq
         if valueList.IsEmpty then
             ArgumentException("Cannot created a DataTable from an empty list of records") |> raise
-        let table =  recinfo<'T> |> fromRecordDescription
+        let table =  recordinfo<'T> |> fromRecordDescription
         valueList |> List.iter(fun item ->
             item |> ClrRecord.toValueArray |> table.Rows.Add |> ignore                        
         )

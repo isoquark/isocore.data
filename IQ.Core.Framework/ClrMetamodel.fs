@@ -12,7 +12,7 @@ open Microsoft.FSharp.Reflection
 
 
 [<AutoOpen>]
-module ClrMetadataVocabulary =
+module ClrMetamodelVocabulary =
     
     /// Specifies the visibility of a CLR element
     type Visibility =
@@ -85,6 +85,8 @@ module ClrAssembly =
         | None ->
             None
 
+        
+        
 
 /// <summary>
 /// Defines operations for working with CLR types
@@ -111,6 +113,9 @@ module ClrType =
 module ClrProperty =
     let getAttribute<'T when 'T :> Attribute>(subject : PropertyInfo) = 
         subject |> ClrMember.getAttribute<'T>
+
+//    let setValue (value : obj) (property : PropertyInfo) =
+//        if value <> null
         
 
 /// <summary>
@@ -134,12 +139,7 @@ module ClrRecord =
          Namespace = t.Namespace
          Fields = FSharpType.GetRecordFields(t,true) 
                |> Array.mapi(fun i p -> 
-                    {Name = p.Name 
-                     Property = p 
-                     FieldType = p.PropertyType 
-                     Position = i
-
-                     }) 
+                     {Name = p.Name; Property = p; FieldType = p.PropertyType; Position = i}) 
                |> List.ofArray
         }
                        
@@ -157,7 +157,7 @@ module ClrRecord =
     /// <param name="info">Describes the record</param>
     let toValueMap (record : obj) =
         let description = record.GetType() |> describe
-        description.Fields |> List.map(fun f -> f.Name, f.Property.GetValue(record)) |> Map.ofList
+        description.Fields |> List.map(fun field -> field.Name, field.Property.GetValue(record)) |> Map.ofList
     
     /// <summary>
     /// Creates a record from a value map
@@ -190,5 +190,51 @@ module ClrRecord =
                   
 [<AutoOpen>]
 module ClrMetadataOperators =
-    let recinfo<'T> =
+    /// <summary>
+    /// Describes the record identified by a supplied type parameter
+    /// </summary>
+    let recordinfo<'T> =
         typeof<'T> |> ClrRecord.describe
+
+    /// <summary>
+    /// Gets the currently executing assembly
+    /// </summary>
+    /// <remarks>
+    /// Note that since the method is designated inline, the call to get the executing
+    /// assembly is injected at the call-site and so works as expected
+    /// </remarks>
+    let inline thisAssembly() = Assembly.GetExecutingAssembly()
+
+    /// <summary>
+    /// Gets the currently executing method
+    /// </summary>
+    /// <remarks>
+    /// Note that since the method is designated inline, the call to get the executing
+    /// method is injected at the call-site and so works as expected
+    /// </remarks>
+    let inline thisMethod() = MethodInfo.GetCurrentMethod()
+
+
+[<AutoOpen>]
+module ClrMetadataExtensions =
+    
+    /// <summary>
+    /// Defines augmentations for the RecordDescription type
+    /// </summary>
+    type RecordDescription
+    with
+        /// <summary>
+        /// Finds a field in the record by name
+        /// </summary>
+        /// <param name="name">The name of the field</param>
+        member this.FindField(name) = this.Fields |> List.find(fun field -> field.Name = name)
+
+    /// <summary>
+    /// Defines augmentations for the Assembly type
+    /// </summary>
+    type Assembly
+    with
+        /// <summary>
+        /// Gets the short name of the assembly without version/culture/security information
+        /// </summary>
+        member this.ShortName = this.GetName().Name

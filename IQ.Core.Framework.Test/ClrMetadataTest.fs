@@ -6,7 +6,7 @@ open System
 open System.Reflection
 
 
-[<TestFixture>]
+[<TestContainer>]
 module ClrRecordTest =
     type private RecordA = {
         Field01 : int
@@ -44,7 +44,7 @@ module ClrRecordTest =
             Field02 = 38.12m
             Field03 = DateTime(2015, 5, 6)
         }
-        let actual =  recinfo<RecordA> |> ClrRecord.fromValueMap values :?> RecordA
+        let actual =  recordinfo<RecordA> |> ClrRecord.fromValueMap values :?> RecordA
         actual |> Claim.equal expect
 
     [<Test>]
@@ -60,7 +60,7 @@ module ClrRecordTest =
         Claim.equal (recordValue.Field03 :> obj) valueArray.[2]
 
 
-[<TestFixture>]
+[<TestContainer>]
 module ClrTypeTest =     
     type private RecordA = {
         Field01 : int
@@ -76,12 +76,12 @@ module ClrTypeTest =
     
     [<Test>]
     let ``Recognized option type``() =
-        recinfo<RecordB>.Fields.[0].FieldType |> ClrType.isOptionType |> Claim.isTrue
-        recinfo<RecordB>.Fields.[1].FieldType |> ClrType.isOptionType |> Claim.isFalse
-        recinfo<RecordB>.Fields.[2].FieldType |> ClrType.isOptionType |> Claim.isTrue        
+        recordinfo<RecordB>.Fields.[0].FieldType |> ClrType.isOptionType |> Claim.isTrue
+        recordinfo<RecordB>.Fields.[1].FieldType |> ClrType.isOptionType |> Claim.isFalse
+        recordinfo<RecordB>.Fields.[2].FieldType |> ClrType.isOptionType |> Claim.isTrue        
 
 
-[<TestFixture>]
+[<TestContainer>]
 module ClrAssemblyTest =
     [<Test>]
     let ``Extracted embedded text resource from assembly``() =

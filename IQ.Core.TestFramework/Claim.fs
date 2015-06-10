@@ -41,3 +41,17 @@ module Claim =
     /// <param name="value">The optional value to examine</param>
     let isNone (value : 'T option) =
         value |> Option.isNone |> isTrue
+
+    /// <summary>
+    /// Asserts that a supplied value is null
+    /// </summary>
+    /// <param name="value">The value to examine</param>
+    let isNull (value : obj) =
+        value = null |> Assert.True
+
+    /// <summary>
+    /// Asserts that a supplied value is not null
+    /// </summary>
+    /// <param name="value">The value to examine</param>
+    let isNotNull (value : obj) =
+        value = null |> Assert.False

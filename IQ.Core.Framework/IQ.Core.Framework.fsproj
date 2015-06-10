@@ -49,7 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Lang.fs" />
-    <Compile Include="CrlMetadata.fs" />
+    <Compile Include="Converter.fs" />
+    <Compile Include="ClrMetamodel.fs" />
+    <Compile Include="Txt.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
