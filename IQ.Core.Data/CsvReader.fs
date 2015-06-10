@@ -11,9 +11,30 @@ open IQ.Core.Framework
 [<AutoOpen>]
 module CsvReaderVocabulary =
     type CsvFormat = {
-        Separators : string
+        Separator : string
         Quote : char
         HasHeaders : bool
+    }
+
+    /// <summary>
+    /// Describes a CSV file
+    /// </summary>
+    type CsvFileDescription ={
+        
+        ///The CSV format
+        Format : CsvFormat
+        
+        ///The filename
+        Filename : string
+        
+        ///The size of the file
+        FileSize : int64
+        
+        ///The number of rows in the file
+        RowCount : int
+        
+        ///The names of the columns listed in ordinal position
+        ColNames : string list
     }
 
 
@@ -24,45 +45,75 @@ module CsvReaderVocabulary =
 module CsvReader =
     
     let private loadFromFile(format : CsvFormat) (path: string) =
-        CsvFile.Load(path, format.Separators, format.Quote, format.HasHeaders, false).Cache()
+        CsvFile.Load(path, format.Separator, format.Quote, format.HasHeaders, false).Cache()
     
-    let getDefaultFormat() = {
-        Separators = ","
-        Quote = '"'
-        HasHeaders = true
-    }
-
-    let readText<'T>(format : CsvFormat) (text : string) =
+    let private read<'T> (file : FSharp.Data.Runtime.CsvFile<CsvRow>) = 
         let record = recordinfo<'T>
-        use reader = new StringReader(text)
-        use file = CsvFile.Load(reader, format.Separators, format.Quote, format.HasHeaders, false).Cache()
-
         let converters =
             match file.Headers with
             | Some(headers) ->
                 headers |> Array.map(fun header -> 
                     let field = record.FindField(header)
                     field.Name, fun (value : string) -> 
-                        Convert.ChangeType(value, field.FieldType)
+                        value |> Converter.convert field.FieldType
                 ) |> Map.ofArray
             | None ->
                 NotSupportedException("CSV file requires headers") |> raise
 
         let colnames = file.Headers |> Option.get
-
+      
+        //The CSV reader treats whitespace as significant but this is usually not desired
+        //so it is eliminated prior to conversion
         let convert fieldName value =
-            value |> converters.[fieldName]
+            value |> Txt.trim |> converters.[fieldName]
 
         let createValueMap (row : CsvRow) =
             row.Columns |> Array.mapi(fun i col -> (col, row.[i] |> convert col )) |> Map.ofArray
 
         let createValueMap2 (row : CsvRow) =
-            colnames |> Array.map(fun colname -> colname, colname|> row.GetColumn |> convert colname) |> Map.ofArray
+            colnames |> Array.map(fun colname -> colname, colname|> row.GetColumn |> convert colname) 
+                     |> ValueMap.fromNamedItems
 
         file.Rows |> Seq.map createValueMap2 
                   |> Seq.map (fun valueMap -> record |> ClrRecord.fromValueMap valueMap :?> 'T)
                   |> List.ofSeq
+
+    let getDefaultFormat() = {
+        Separator = ","
+        Quote = '"'
+        HasHeaders = true
+    }
+
+    /// <summary>
+    /// Describes an identified CSV file
+    /// </summary>
+    /// <param name="format">The CSV format with which the file is aligned</param>
+    /// <param name="path">The path to the file</param>
+    let describeFile (format : CsvFormat) (path : string) = 
+        let fileinfo = FileInfo(path)
+        if fileinfo.Length = 0L then
+            ArgumentException("The file is empty") |> raise
+        
+        let lines = path |> File.ReadLines 
+        let enumerator = lines.GetEnumerator()
+        enumerator.MoveNext() |> ignore
+        let colnames = enumerator.Current |> Txt.split format.Separator |> List.ofArray
+        {   CsvFileDescription.Filename = path     
+            RowCount = lines |> Seq.count
+            ColNames = colnames
+            Format = format
+            FileSize = FileInfo(path).Length
+        }
         
 
+    let readText<'T>(format : CsvFormat) (text : string) =
+        use reader = new StringReader(text)
+        use file = CsvFile.Load(reader, format.Separator, format.Quote, format.HasHeaders, false).Cache()
+        read<'T>  file
+        
+    let readFile<'T>(format : CsvFormat) (path : string) =
+        use file = CsvFile.Load(path, format.Separator, format.Quote, format.HasHeaders, false).Cache()
+        read<'T>  file
+        
                       
                 

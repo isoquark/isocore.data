@@ -3,15 +3,33 @@
 open System
 open System.Reflection
 open System.Diagnostics
+open System.Linq
 
 open Microsoft.FSharp.Reflection
+open Microsoft.FSharp.Quotations.Patterns
 
 [<AutoOpen>]
 module Lang =
+    type ValueMapKey = ValueMapKey of index : int option * name : string option
+    
+    module Seq =
+        let count (items : seq<'T>) = items.Count()
+    
     /// <summary>
-    /// Alias for a KVP map
+    /// Represents an indexed collection of key-value pairs
     /// </summary>
-    type ValueMap = Map<string,obj>
+    type ValueMap = ValueMap of Map<ValueMapKey,obj>
+    with
+        /// <summary>
+        /// Gets the underlying map
+        /// </summary>
+        member this.MappedValues = match this with ValueMap(m) -> m
+        
+        /// <summary>
+        /// Gets a specified value from the map
+        /// </summary>
+        /// <param name="name">The name of the value</param>
+        member this.Item (name : string) = this.MappedValues.[ValueMapKey(None, Some(name))]
 
     /// <summary>
     /// Responsible for identifying a Data Store, Network Address or other resource
@@ -23,71 +41,34 @@ module Lang =
         /// </summary>
         member this.Components = match this with ConnectionString(components) -> components
 
+    /// <summary>
+    /// Raises a debugging assertion if a supplied predicate fails and emits a diagnostic message
+    /// </summary>
+    /// <param name="message">The diagnostic to emit if predicate evaluation fails</param>
+    /// <param name="predicate">The predicate to evaluate</param>
     let _assert message (predicate: unit -> bool)  = 
         Debug.Assert(predicate(), message)
-        
-
-/// <summary>
-/// Defines utility methods for working with options
-/// </summary>
-module Option =
-    /// <summary>
-    /// Determines whether a type is an option type
-    /// </summary>
-    /// <param name="t"></param>
-    let isOptionType (t : Type) =
-        t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<option<_>>        
-    
-    /// <summary>
-    /// Determines whether a value is an option
-    /// </summary>
-    /// <param name="value">The value to examine</param>
-    let isOptionValue (value : obj) =
-        if value <> null then
-            value.GetType() |> isOptionType
-        else
-            false
-    
-    /// <summary>
-    /// Extracts the enclosed value if Some, otherwise yields None
-    /// </summary>
-    /// <param name="value">The option value</param>
-    let unwrapValue (value : obj) =
-        if value = null then 
-            None
-        else
-            _assert "Value is not an option" (fun () -> isOptionValue(value) )
-            let caseInfo, fields = FSharpValue.GetUnionFields(value, value.GetType(),true)
-            if fields.Length = 0 then
-                None
-            else
-                fields.[0] |> Some
 
     /// <summary>
-    /// Encloses a supplied value within Some option
+    /// When supplied a property accessor quotation, retrieves the name of the property
     /// </summary>
-    /// <param name="value">The value to enclose</param>
-    let makeSome (value : obj) =
-        if value = null then
-            ArgumentNullException() |> raise
-        
-        let valueType = value.GetType()
-        let optionType = typedefof<option<_>>.MakeGenericType(valueType)
-        let unionCase = FSharpType.GetUnionCases(optionType,true) |> Array.find(fun c -> c.Name = "Some")
-        FSharpValue.MakeUnion(unionCase, [|value|], true)
+    /// <param name="q">The property accessor quotation</param>
+    /// <remarks>
+    /// Inspired heavily by: http://www.contactandcoil.com/software/dotnet/getting-a-property-name-as-a-string-in-f/
+    /// </remarks>
+    let rec propname q =
+       match q with
+       | PropertyGet(_,p,_) -> p.Name
+       | Lambda(_, expr) -> propname expr
+       | _ -> String.Empty
 
-    /// <summary>
-    /// Creates an option with the case None
-    /// </summary>
-    /// <param name="valueType">The value's type</param>
-    let makeNone (valueType : Type) =
-        let optionType = typedefof<option<_>>.MakeGenericType(valueType)
-        let unionCase = FSharpType.GetUnionCases(optionType,true) |> Array.find(fun c -> c.Name = "None")
-        FSharpValue.MakeUnion(unionCase, [||], true)
 
-    let getValueType (optionType : Type) =
-        optionType.GetGenericArguments().[0]
-        
+    type TimeSpan
+    with
+        static member Sum(timespans : TimeSpan seq) =
+            timespans |> Seq.map(fun x -> x.Ticks) |> Seq.sum |> TimeSpan.FromTicks
             
-
+module ValueMap =
+    let fromNamedItems (items : seq<string*obj>) =
+        items |> Seq.map(fun (name,value) -> ValueMapKey(None, Some(name)), value) |> Map.ofSeq |> ValueMap  
 

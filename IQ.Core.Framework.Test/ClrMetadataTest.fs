@@ -6,58 +6,6 @@ open System
 open System.Reflection
 
 
-[<TestContainer>]
-module ClrRecordTest =
-    type private RecordA = {
-        Field01 : int
-        Field02 : decimal
-        Field03 : DateTime
-    }
-    
-    [<Test>]
-    let ``Discovered record metadata``() =
-        let info = typeof<RecordA> |> ClrRecord.describe
-        info.Fields.Length |> Claim.equal 3         
-
-
-    [<Test>]
-    let ``Retrieved value map for record``() =
-        let value = {
-            Field01 = 16
-            Field02 = 38.12m
-            Field03 = DateTime(2015, 5, 6)
-        }
-        let expect = 
-            [
-            ("Field01", value.Field01 :> obj)
-            ("Field02", value.Field02 :> obj)
-            ("Field03", value.Field03:> obj)
-            ] |> Map.ofList
-        let actual = value |> ClrRecord.toValueMap 
-        actual |> Claim.equal expect
-
-    [<Test>]
-    let ``Created value map from record``() =
-        let values = [("Field01", 16 :> obj); ("Field02", 38.12m :> obj); ("Field03", DateTime(2015, 5, 6) :> obj)] |> Map.ofList
-        let expect = {
-            Field01 = 16
-            Field02 = 38.12m
-            Field03 = DateTime(2015, 5, 6)
-        }
-        let actual =  recordinfo<RecordA> |> ClrRecord.fromValueMap values :?> RecordA
-        actual |> Claim.equal expect
-
-    [<Test>]
-    let ``Created value array from record``() =
-        let recordValue = {
-            Field01 = 16
-            Field02 = 38.12m
-            Field03 = DateTime(2015, 5, 6)
-        }
-        let valueArray = recordValue |> ClrRecord.toValueArray
-        Claim.equal (recordValue.Field01 :> obj) valueArray.[0]
-        Claim.equal (recordValue.Field02 :> obj) valueArray.[1]
-        Claim.equal (recordValue.Field03 :> obj) valueArray.[2]
 
 
 [<TestContainer>]

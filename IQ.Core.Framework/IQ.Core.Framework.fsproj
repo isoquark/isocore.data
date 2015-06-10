@@ -49,8 +49,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Lang.fs" />
+    <Compile Include="ClrModel\ClrModelVocabulary.fs" />
+    <Compile Include="ClrModel\ClrMember.fs" />
+    <Compile Include="ClrModel\ClrAssembly.fs" />
+    <Compile Include="ClrModel\ClrType.fs" />
+    <Compile Include="ClrModel\ClrProperty.fs" />
+    <Compile Include="ClrModel\ClrRecord.fs" />
+    <Compile Include="ClrModel\ClrModelOperators.fs" />
+    <Compile Include="ClrModel\ClrOption.fs" />
     <Compile Include="Converter.fs" />
-    <Compile Include="ClrMetamodel.fs" />
     <Compile Include="Txt.fs" />
   </ItemGroup>
   <PropertyGroup>

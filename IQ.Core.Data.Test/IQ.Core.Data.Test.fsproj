@@ -57,9 +57,10 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="app.config" />
+    <EmbeddedResource Include="Resources\CsvTestCase1.csv" />
+    <EmbeddedResource Include="Resources\CsvTestCase2.csv" />
     <Compile Include="DataTableTest.fs" />
     <Compile Include="CsvReaderTest.fs" />
-    <EmbeddedResource Include="Resources\CsvTestCase1.csv" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

@@ -16,5 +16,4 @@ module ConverterTest =
 
         //Convert option<int64> to int32
         Some(3L) |> Converter.convert (typeof<int>) |> Claim.equal (3 :> obj)
-        let value = option<int>.None |> Converter.convert typeof<int> 
-        ()
+        option<int>.None |> Converter.convert typeof<int> |> Claim.isNull

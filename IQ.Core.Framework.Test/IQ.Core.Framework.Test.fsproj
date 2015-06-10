@@ -57,6 +57,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <EmbeddedResource Include="Resources\EmbeddedResource01.txt" />
+    <Compile Include="ClrModel\ClrRecordTest.fs" />
     <Compile Include="LangTest.fs" />
     <Compile Include="ConverterTest.fs" />
     <Compile Include="ClrMetadataTest.fs" />

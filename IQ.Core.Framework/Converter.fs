@@ -14,17 +14,17 @@ module Converter =
         else if value.GetType() = dstType then
             value
         else
-            if dstType |> Option.isOptionType then
-                if value |> Option.isOptionValue then
+            if dstType |> ClrOption.isOptionType then
+                if value |> ClrOption.isOptionValue then
                     //Convert an option value to an option type
-                    Convert.ChangeType(value |> Option.unwrapValue |> Option.get, dstType |> Option.getValueType) |> Option.makeSome
+                    Convert.ChangeType(value |> ClrOption.unwrapValue |> Option.get, dstType |> ClrOption.getValueType) |> ClrOption.makeSome
                 else
                     //Convert an non-option value to an option type
-                    Convert.ChangeType(value, dstType |> Option.getValueType) |> Option.makeSome
+                    Convert.ChangeType(value, dstType |> ClrOption.getValueType) |> ClrOption.makeSome
             else
-                if value |> Option.isOptionValue then
+                if value |> ClrOption.isOptionValue then
                     //Convert an option value to a non-option type
-                    Convert.ChangeType(value |> Option.unwrapValue |> Option.get, dstType)
+                    Convert.ChangeType(value |> ClrOption.unwrapValue |> Option.get, dstType)
                 else
                    //Convert a non-option value to a non-option type
                     Convert.ChangeType(value, dstType)

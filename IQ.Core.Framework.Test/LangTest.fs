@@ -7,19 +7,19 @@ open IQ.Core.TestFramework
 module LangTest =
     [<Test>]
     let ``Determined whether values were option values``() =
-        Some(3) |> Option.isOptionValue |> Claim.isTrue
-        3 |> Option.isOptionValue |> Claim.isFalse
-        null |> Option.isOptionValue |> Claim.isFalse
+        Some(3) |> ClrOption.isOptionValue |> Claim.isTrue
+        3 |> ClrOption.isOptionValue |> Claim.isFalse
+        null |> ClrOption.isOptionValue |> Claim.isFalse
     
     [<Test>]
     let ``Unwrapped option values``() =
         let x = Some(3)
-        x |> Option.unwrapValue |>Option.get |> Claim.equal (3 :> obj)
+        x |> ClrOption.unwrapValue |>Option.get |> Claim.equal (3 :> obj)
         let y = option<int>.None
-        y |> Option.unwrapValue |> Option.isNone |> Claim.isTrue
+        y |> ClrOption.unwrapValue |> Option.isNone |> Claim.isTrue
         
     [<Test>]
     let ``Created union values via reflection``() =
-        3 |> Option.makeSome |> Claim.equal (Some(3) :> obj)
-        typeof<int> |> Option.makeNone |> Claim.equal (option<int>.None :> obj)
+        3 |> ClrOption.makeSome |> Claim.equal (Some(3) :> obj)
+        typeof<int> |> ClrOption.makeNone |> Claim.equal (option<int>.None :> obj)
 

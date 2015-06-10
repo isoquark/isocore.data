@@ -8,6 +8,7 @@ open System.Data
 
 /// Defines operations for working with Data Tables
 module DataTable =        
+    
     /// <summary>
     /// Gets a value identified by a 0-based row/column indices
     /// </summary>

@@ -25,5 +25,12 @@ module Txt =
     /// <param name="text">The text to trim</param>
     let trim (text : string) =
         text.Trim()
-                       
+    
+    /// <summary>
+    /// Partitions the string as determined by a supplied delimiter
+    /// </summary>
+    /// <param name="delimiter">The delimiter </param>
+    /// <param name="text">The text to be partitioned</param>
+    let split (delimiter : string) (text : string) =
+        text.Split([|delimiter|], StringSplitOptions.None)
 
