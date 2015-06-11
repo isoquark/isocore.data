@@ -110,7 +110,8 @@ module DataAttributes =
         new (storageKind, precision) =
             StorageTypeAttribute(storageKind, UnspecifiedLength, precision, UnspecifiedScale, UnspecifiedType)                
         new (storageKind, precision, scale) =
-            StorageTypeAttribute(storageKind, UnspecifiedLength, precision, scale, UnspecifiedType)                
+            StorageTypeAttribute(storageKind, UnspecifiedLength, precision, scale, UnspecifiedType)
+        new (storageKind, )
 
         /// Indicates the kind of storage
         member this.StorageKind = if storageKind = UnspecifiedStorage then None else Some(storageKind)

@@ -39,9 +39,9 @@ module DataMetamodel =
         | BinaryMax = 42
         | AnsiTextFixed = 50 //char
         | AnsiTextVariable = 51 //varchar
-        | AnsiTextMax = 54
-        | UnicodeTextFixed = 52 //nchar
-        | UnicodeTextVariable = 53 //nvarchar
+        | AnsiTextMax = 52
+        | UnicodeTextFixed = 53 //nchar
+        | UnicodeTextVariable = 54 //nvarchar
         | UnicodeTextMax = 55
         | DateTime32 = 60 //corresponds to smalldatetime
         | DateTime64 = 61 //corresponds to datetime
@@ -56,9 +56,12 @@ module DataMetamodel =
         | Guid = 90 //corresponds to uniqueidentifier
         | Xml = 100
         | Variant = 110 //corresponds to sql_variant
-        | Table = 120 //a custom table data type
-        | Object = 130 //a custom CLR type
-        | DerivedPrimitive = 140 //a custom primitive based on an intrinsic primitive
+        | CustomTable = 150 //a non-intrinsic table data type
+        | CustomObject = 151 //a non-intrinsic CLR type
+        | CustomPrimitive = 152 //a non-intrinsic primitive based on an intrinsic primitive
+        | Geography = 160
+        | Geometry = 161
+        | Hierarchy = 162
 
     /// <summary>
     /// Specifies a storage class together with the information that is required to
@@ -96,9 +99,9 @@ module DataMetamodel =
         | GuidStorage
         | XmlStorage of schema : string
         | VariantStorage
-        | TableStorage of name : DataObjectName
-        | ObjectStorage of name : DataObjectName * clrType : Type
-        | DerivedPrimitiveStorage of name : DataObjectName * basePrimitive : StorageType
+        | CustomTableStorage of name : DataObjectName
+        | CustomObjectStorage of name : DataObjectName * clrType : Type
+        | CustomPrimitiveStorage of name : DataObjectName * basePrimitive : StorageType
 
     
     /// <summary>
