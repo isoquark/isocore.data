@@ -65,6 +65,9 @@
     <Folder Include="Metadata\Views" />
     <Folder Include="Metadata\Functions" />
     <Folder Include="Metadata\Tables" />
+    <Folder Include="Core" />
+    <Folder Include="Core\Tables" />
+    <Folder Include="Core\Data" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Metadata\Metadata.sql" />
@@ -79,6 +82,8 @@
     <Build Include="Metadata\Views\vDescription.sql" />
     <Build Include="Metadata\Views\vUserColumn.sql" />
     <Build Include="Metadata\Tables\IntrinsicTypeMap.sql" />
+    <Build Include="Core\Core.sql" />
+    <Build Include="Core\Tables\StorageType.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">
@@ -89,5 +94,13 @@
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="IQ.Schemas.Core.refactorlog" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Core\Data\Data.sql" />
+    <None Include="Core\Data\StorageType.sql" />
+    <None Include="Core.publish.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="postdeply.sql" />
   </ItemGroup>
 </Project>

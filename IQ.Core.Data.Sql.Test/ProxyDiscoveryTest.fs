@@ -15,7 +15,7 @@ module ``Sql Core Proxy Discovery`` =
         [<Description("SQL Test Table01")>]
         type Table01 = {
             [<Description("Col01 Description Text")>]
-            [<Column(SqlDbType.Int)>]
+            [<Column(StorageKind.Int32)>]
             Col01 : uint16
             [<Description("Col02 Description Text")>]
             Col02 : int64 option

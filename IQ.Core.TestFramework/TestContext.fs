@@ -27,8 +27,7 @@ type TraitAttribute = NUnit.Framework.CategoryAttribute
 type BenchmarkTraitAttribute() =
     inherit TraitAttribute("Benchmark")
 
-module TestContext = 
-    
+module TestContext =     
     [<Literal>]
     let private BaseDirectory = @"C:\Temp\IQ\Tests\"
 

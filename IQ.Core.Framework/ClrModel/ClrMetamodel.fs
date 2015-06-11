@@ -3,10 +3,15 @@
 open System
 open System.Reflection
 
+/// <summary>
+/// Defines the CLR metamodel vocabulary
+/// </summary>
 [<AutoOpen>]
 module ClrMetamodelVocabulary =
     
+    /// <summary>
     /// Specifies the visibility of a CLR element
+    /// </summary>
     type Visibility =
         | Public
         | Protected
@@ -14,7 +19,9 @@ module ClrMetamodelVocabulary =
         | Internal
         | ProtectedInternal
                 
+    /// <summary>
     /// Encapsulates information about a record field
+    /// </summary>
     type RecordFieldDescription = {
         /// The name of the field
         Name : string
@@ -29,7 +36,9 @@ module ClrMetamodelVocabulary =
         Position : int
     }
 
+    /// <summary>
     /// Encapsulates information about a record
+    /// </summary>
     type RecordDescription = {
         /// The name of the record
         Name : string

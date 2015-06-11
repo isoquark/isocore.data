@@ -101,11 +101,15 @@ module ``CsvReader Test`` =
         
     [<Test; BenchmarkTrait>]
     let ``Benchmark - CsvReader 2A``() =
+        //This will eventually be persisted to a data store
+        //that maintains test execution history
         let benchmark = captureBenchmark<CsvTestCase2A> "CsvTestCase2.csv"
         ()
 
     [<Test; BenchmarkTrait>]
     let ``Benchmark - CsvReader 2B``() =
+        //This will eventually be persisted to a data store
+        //that maintains test execution history
         let benchmark = captureBenchmark<CsvTestCase2B> "CsvTestCase2.csv"
         ()
          
@@ -122,8 +126,8 @@ module ``CsvReader Test`` =
         NetWorth : decimal option
     }                
 
-    [<Test>]
-    let ``Hydrated proxies from CSV file - CsvTestCase3``() =
-        let items = resname<CsvTestCase3> |> hydrate<CsvTestCase3> 
-        ()
+//    [<Test>]
+//    let ``Hydrated proxies from CSV file - CsvTestCase3``() =
+//        let items = resname<CsvTestCase3> |> hydrate<CsvTestCase3> 
+//        ()
         

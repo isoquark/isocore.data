@@ -8,15 +8,21 @@ open System.Data
 open IQ.Core.Framework
 
 
-module DataProxyMetadataProvider =
-    
+/// <summary>
+/// Defines operations that populate a Data Proxy Metamodel
+/// </summary>
+module DataProxyMetadataProvider =    
     let private getMemberDescription(m : MemberInfo) =
         if Attribute.IsDefined(m, typeof<DescriptionAttribute>) then
             (Attribute.GetCustomAttribute(m, typeof<DescriptionAttribute>) :?> DescriptionAttribute).Description |> Some
         else
             None        
                                  
-    let describeColumnProxy(field : RecordFieldDescription) =
+    /// <summary>
+    /// Infers a Column Proxy Description
+    /// </summary>
+    /// <param name="field">The field correlated with the proxy</param>
+    let private describeColumnProxy(field : RecordFieldDescription) =
         let column = 
             match field.Property |> ClrProperty.getAttribute<ColumnAttribute> with
             | Some(attrib) ->
@@ -26,22 +32,23 @@ module DataProxyMetadataProvider =
                         | Some(name) -> name
                         | None -> field.Name
                     Position = field.Position |> defaultArg attrib.Position 
-                    DataType = None
+                    StorageType = None
                     Nullable = field.Property.PropertyType |> ClrType.isOptionType
+                    AutoValue = None
                 }
 
             | None ->
                 {
                     ColumnDescription.Name = field.Name
                     Position = field.Position
-                    DataType = None
+                    StorageType = None
                     Nullable = field.Property.PropertyType |> ClrType.isOptionType
-            
+                    AutoValue = None
                 }
         ColumnProxyDescription(field, column)    
     
     /// <summary>
-    /// Infers a table description from a proxy
+    /// Infers a Table Proxy Description
     /// </summary>
     /// <param name="proxyType">The type of proxy</param>
     let describeTable(proxyType : Type) =
@@ -87,7 +94,9 @@ module DataProxyMetadataProvider =
         }
         TableProxyDescription(record, table, columnProxies)
 
-
+/// <summary>
+/// Convenience methods/operators intended to minimize syntactic clutter
+/// </summary>
 [<AutoOpen>]
 module DataProxyOperators =    
     let tableproxy<'T> =

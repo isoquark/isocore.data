@@ -30,9 +30,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{B525A3
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Services", "IQ.Core.Services\IQ.Core.Services.fsproj", "{161A5E68-9C64-44CE-B7FA-C160C7D1B96A}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 11
+		SccNumberOfProjects = 12
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://isoquark.visualstudio.com/defaultcollection
 		SccLocalPath0 = .
@@ -66,6 +68,9 @@ Global
 		SccProjectUniqueName10 = IQ.Core.Data.Test\\IQ.Core.Data.Test.fsproj
 		SccProjectName10 = IQ.Core.Data.Test
 		SccLocalPath10 = IQ.Core.Data.Test
+		SccProjectUniqueName11 = IQ.Core.Services\\IQ.Core.Services.fsproj
+		SccProjectName11 = IQ.Core.Services
+		SccLocalPath11 = IQ.Core.Services
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -116,6 +121,10 @@ Global
 		{C75BF451-5658-4FD3-B4DA-D7D4550FDE05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C75BF451-5658-4FD3-B4DA-D7D4550FDE05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C75BF451-5658-4FD3-B4DA-D7D4550FDE05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{161A5E68-9C64-44CE-B7FA-C160C7D1B96A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{161A5E68-9C64-44CE-B7FA-C160C7D1B96A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{161A5E68-9C64-44CE-B7FA-C160C7D1B96A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{161A5E68-9C64-44CE-B7FA-C160C7D1B96A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

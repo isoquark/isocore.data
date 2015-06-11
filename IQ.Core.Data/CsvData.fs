@@ -8,11 +8,22 @@ open FSharp.Data
 open IQ.Core.Framework
 
 
+/// <summary>
+/// Defines domain vocabulary for working with CSV data/files
+/// </summary>
 [<AutoOpen>]
-module CsvReaderVocabulary =
+module CsvDataVocabulary =
+    /// <summary>
+    /// Describes the format of CSV data
+    /// </summary>
     type CsvFormat = {
+        /// The delimiter
         Separator : string
+        
+        /// The character to use for text quotations
         Quote : char
+        
+        /// Specifies whether headers exist
         HasHeaders : bool
     }
 
@@ -40,13 +51,14 @@ module CsvReaderVocabulary =
 
 
 /// <summary>
-/// Defines operations for working with delimited text data
+/// Defines operations for reading delimited text
 /// </summary>
 module CsvReader =
-    
-    let private loadFromFile(format : CsvFormat) (path: string) =
-        CsvFile.Load(path, format.Separator, format.Quote, format.HasHeaders, false).Cache()
-    
+       
+    /// <summary>
+    /// Hydrates list of records from file content
+    /// </summary>
+    /// <param name="file">Representation of the CSV file</param>
     let private read<'T> (file : FSharp.Data.Runtime.CsvFile<CsvRow>) = 
         let record = recordinfo<'T>
         let converters =
@@ -78,6 +90,9 @@ module CsvReader =
                   |> Seq.map (fun valueMap -> record |> ClrRecord.fromValueMap valueMap :?> 'T)
                   |> List.ofSeq
 
+    /// <summary>
+    /// Gets the default format for CSV files
+    /// </summary>
     let getDefaultFormat() = {
         Separator = ","
         Quote = '"'
@@ -105,12 +120,21 @@ module CsvReader =
             FileSize = FileInfo(path).Length
         }
         
-
+    /// <summary>
+    /// Reads CSV-formatted data from a block of text
+    /// </summary>
+    /// <param name="format">The CSV format</param>
+    /// <param name="text">The formatted text</param>
     let readText<'T>(format : CsvFormat) (text : string) =
         use reader = new StringReader(text)
         use file = CsvFile.Load(reader, format.Separator, format.Quote, format.HasHeaders, false).Cache()
         read<'T>  file
         
+    /// <summary>
+    /// Reads CSV-formatted data from a file
+    /// </summary>
+    /// <param name="format">The CSV format</param>
+    /// <param name="path">The path to the CSV file</param>
     let readFile<'T>(format : CsvFormat) (path : string) =
         use file = CsvFile.Load(path, format.Separator, format.Quote, format.HasHeaders, false).Cache()
         read<'T>  file

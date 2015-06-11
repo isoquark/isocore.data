@@ -26,27 +26,30 @@ module ``DataAttributeReader Test`` =
         let proxy = tableproxy<RecordA>
         
         let expectedTable = {
-            TableDescription.Name = DataObjectName("Proxies", "RecordTypeA")
+            TableDescription.Name = DataObjectName("Proxies", typeof<RecordA>.Name)
             Description = None
             Columns = 
             [
                 { 
                   Name = propname<@ fun (x : RecordA) -> x.AField1 @>
                   Position = 0
-                  DataType = None
-                  Nullable = false                
+                  StorageType = None
+                  Nullable = false  
+                  AutoValue = None              
                 }
                 { 
                   Name = propname<@ fun (x : RecordA) -> x.AField2 @>
                   Position = 1
-                  DataType = None
+                  StorageType = None
                   Nullable = false                
+                  AutoValue = None              
                 }
                 { 
                   Name = propname<@ fun (x : RecordA) -> x.AField3 @>
                   Position = 2
-                  DataType = None
+                  StorageType = None
                   Nullable = true
+                  AutoValue = None              
                 }
             ]
         }

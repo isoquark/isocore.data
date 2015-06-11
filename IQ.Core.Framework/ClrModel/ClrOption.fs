@@ -62,7 +62,11 @@ module ClrOption =
         let optionType = typedefof<option<_>>.MakeGenericType(valueType)
         let unionCase = FSharpType.GetUnionCases(optionType,true) |> Array.find(fun c -> c.Name = "None")
         FSharpValue.MakeUnion(unionCase, [||], true)
-
+    
+    /// <summary>
+    /// Gets the type of the encapsulated value
+    /// </summary>
+    /// <param name="optionType">The option type</param>
     let getValueType (optionType : Type) =
         optionType.GetGenericArguments().[0]
 

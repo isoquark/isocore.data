@@ -8,11 +8,30 @@ open System.Linq
 open Microsoft.FSharp.Reflection
 open Microsoft.FSharp.Quotations.Patterns
 
+/// <summary>
+/// Defines core global operations and types
+/// </summary>
+/// <remarks>
+/// The content here is more-or-less random at the moment
+/// </remarks>
 [<AutoOpen>]
 module Lang =
+    /// <summary>
+    /// Responsible for uniquely identifying a value in a ValueMap
+    /// </summary>
     type ValueMapKey = ValueMapKey of index : int option * name : string option
     
+    /// <summary>
+    /// Defines custom Seq module operations
+    /// </summary>
     module Seq =
+        /// <summary>
+        /// Counts the number of items in the sequence
+        /// </summary>
+        /// <param name="items">The items to count</param>
+        /// <remarks>
+        /// Obviously, this assumes that the sequence is not interminable!
+        /// </remarks>
         let count (items : seq<'T>) = items.Count()
     
     /// <summary>
@@ -62,7 +81,9 @@ module Lang =
        | Lambda(_, expr) -> propname expr
        | _ -> String.Empty
 
-
+    /// <summary>
+    /// Defines augmentations for the TimeSpan type
+    /// </summary>
     type TimeSpan
     with
         static member Sum(timespans : TimeSpan seq) =

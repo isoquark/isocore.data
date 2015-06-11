@@ -5,9 +5,6 @@ open IQ.Core.TestFramework
 open System
 open System.Reflection
 
-
-
-
 [<TestContainer>]
 module ClrTypeTest =     
     type private RecordA = {

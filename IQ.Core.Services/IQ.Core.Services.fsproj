@@ -5,13 +5,13 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>8e2497e0-941b-4ca7-ab78-4ca15291c56a</ProjectGuid>
+    <ProjectGuid>161a5e68-9c64-44ce-b7fa-c160c7d1b96a</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>IQ.Core.Framework</RootNamespace>
-    <AssemblyName>IQ.Core.Framework</AssemblyName>
+    <RootNamespace>IQ.Core.Services</RootNamespace>
+    <AssemblyName>IQ.Core.Services</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
-    <Name>IQ.Core.Framework</Name>
+    <Name>IQ.Core.Services</Name>
     <SccProjectName>SAK</SccProjectName>
     <SccProvider>SAK</SccProvider>
     <SccAuxPath>SAK</SccAuxPath>
@@ -25,7 +25,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Debug\IQ.Core.Framework.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\IQ.Core.Services.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,7 +34,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Release\IQ.Core.Framework.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\IQ.Core.Services.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
@@ -43,22 +43,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Lang.fs" />
-    <Compile Include="ClrModel\ClrMetamodel.fs" />
-    <Compile Include="ClrModel\ClrMember.fs" />
-    <Compile Include="ClrModel\ClrAssembly.fs" />
-    <Compile Include="ClrModel\ClrType.fs" />
-    <Compile Include="ClrModel\ClrProperty.fs" />
-    <Compile Include="ClrModel\ClrRecord.fs" />
-    <Compile Include="ClrModel\ClrModelOperators.fs" />
-    <Compile Include="ClrModel\ClrOption.fs" />
-    <Compile Include="Converter.fs" />
-    <Compile Include="Txt.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

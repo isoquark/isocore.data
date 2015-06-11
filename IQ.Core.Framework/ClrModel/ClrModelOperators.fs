@@ -9,7 +9,10 @@ open System.IO
 
 open Microsoft.FSharp.Reflection
 
-                  
+/// <summary>
+/// Defines operators/operations intended to reduce syntactic clutter when
+/// working with the CLR Model API
+/// </summary>                  
 [<AutoOpen>]
 module ClrModelOperators =
     /// <summary>

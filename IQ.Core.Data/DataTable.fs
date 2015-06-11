@@ -6,7 +6,9 @@ open System
 open System.Reflection
 open System.Data
 
+/// <summary>
 /// Defines operations for working with Data Tables
+/// </summary>
 module DataTable =        
     
     /// <summary>

@@ -101,6 +101,10 @@ module Benchmark =
                 }, detail)
         ]
 
+    /// <summary>
+    /// Summarizes a collection of benchmark results
+    /// </summary>
+    /// <param name="results">The results to summarize</param>
     let summarize (results : BenchmarkResult<_> seq) =
         let results = results  |> Seq.sortBy(fun x -> x.Summary.StartTime) |> List.ofSeq
         let startTime = results.Head.Summary.StartTime

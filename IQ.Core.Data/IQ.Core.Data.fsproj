@@ -65,11 +65,11 @@
     <None Include="packages.config" />
     <None Include="app.config" />
     <Compile Include="DataTable.fs" />
-    <Compile Include="DataAttributes.fs" />
     <Compile Include="DataMetamodel.fs" />
+    <Compile Include="DataAttributes.fs" />
     <Compile Include="DataProxyMetamodel.fs" />
     <Compile Include="DataProxyMetadataProvider.fs" />
-    <Compile Include="CsvReader.fs" />
+    <Compile Include="CsvData.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Data">
