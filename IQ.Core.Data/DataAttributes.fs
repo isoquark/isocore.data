@@ -10,20 +10,42 @@ open System.Data
 [<AutoOpen>]
 module DataAttributes =
     
+    [<Literal>]
+    let private UnspecifiedName = ""
+    [<Literal>]
+    let private UnspecifiedPrecision = -1y
+    [<Literal>]
+    let private UnspecifiedScale = -1y
+    [<Literal>]
+    let private UnspecifiedLength = -1
+    [<Literal>]
+    let private UnspecifiedStorage = StorageKind.Unspecified
+    [<Literal>]
+    let private UnspecifiedType = null
+    [<Literal>]
+    let private UnspecifiedPosition = -1
+    [<Literal>]
+    let private UnspecifiedAutoValue = AutoValueKind.None
     
+    /// <summary>
+    /// Base type for attributes that participate in the data attribution system
+    /// </summary>
+    [<AbstractClass>]
+    type DataAttribute() =
+        inherit Attribute()
 
     /// <summary>
     /// Base type for attributes that identify data elements
     /// </summary>
     [<AbstractClass>]
     type DataElementAttribute(name) =
-        inherit Attribute()
+        inherit DataAttribute()
 
         /// <summary>
         /// Gets the local name of the element, if specified
         /// </summary>
         member this.Name = 
-            if name <> String.Empty then Some(name) else None
+            if name = UnspecifiedName then None else Some(name)
     
     /// <summary>
     /// Base type for attributes that identify data objects
@@ -37,13 +59,13 @@ module DataAttributes =
         /// </summary>
         /// <param name="schemaName">The name of the schema in which the object is defined</param>
         new(schemaName) =
-            DataObjectAttribute(schemaName, String.Empty)
+            DataObjectAttribute(schemaName, UnspecifiedName)
 
         /// <summary>
         /// Gets the name of the schema in which the object resides, if specified
         /// </summary>
         member this.SchemaName = 
-            if schemaName <> String.Empty then Some(schemaName) else None
+            if schemaName = UnspecifiedName then None else Some(schemaName)
         
 
     /// <summary>
@@ -60,7 +82,7 @@ module DataAttributes =
         inherit DataObjectAttribute(schemaName,localName)
 
         new (schemaName) =
-            TableAttribute(schemaName, String.Empty)
+            TableAttribute(schemaName, UnspecifiedName)
 
     /// <summary>
     /// Identifies a view when applied
@@ -73,81 +95,24 @@ module DataAttributes =
         /// </summary>
         /// <param name="schemaName">The name of the schema in which the view is defined</param>
         new (schemaName) =
-            ViewAttribute(schemaName, String.Empty)
-
-
-    [<Literal>]
-    let private UnspecifiedPrecision = -1y
-
-    [<Literal>]
-    let private UnspecifiedScale = -1y
-
-    [<Literal>]
-    let private UnspecifiedLength = -1
-       
-    [<Literal>]
-    let private UnspecifiedPosition = -1
-
-    [<Literal>]
-    let private UnspecifiedName = ""
-
-    [<Literal>]
-    let private UnspecifiedStorage = StorageKind.Unspecified
-
-    [<Literal>]
-    let private UnspecifiedAutoValue = AutoValueKind.None
-
-
+            ViewAttribute(schemaName, UnspecifiedName)
+                   
     /// <summary>
-    /// Identifies a column and specifies selected storage characteristics
+    /// Specifies storage characteristics
     /// </summary>
-    type ColumnAttribute(name, position, autoValueKind, sequenceName, storageKind, length, precision, scale) =
-        inherit DataElementAttribute(name)
+    type StorageTypeAttribute(storageKind, length, precision, scale, clrType) =
+        inherit DataAttribute()
 
-        //Lots of constructors for convenient usage
         new (storageKind) =
-            ColumnAttribute(UnspecifiedName, UnspecifiedPosition, UnspecifiedAutoValue, UnspecifiedName, storageKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale)                
+            StorageTypeAttribute(storageKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale, UnspecifiedType)                
         new (storageKind, length) =
-            ColumnAttribute(UnspecifiedName, UnspecifiedPosition, UnspecifiedAutoValue, UnspecifiedName, storageKind, length, UnspecifiedPrecision, UnspecifiedScale)            
+            StorageTypeAttribute(storageKind, length, UnspecifiedPrecision, UnspecifiedScale, UnspecifiedType)                
         new (storageKind, precision) =
-            ColumnAttribute(UnspecifiedName, UnspecifiedPosition, UnspecifiedAutoValue, UnspecifiedName, storageKind, UnspecifiedLength, precision, UnspecifiedScale)
+            StorageTypeAttribute(storageKind, UnspecifiedLength, precision, UnspecifiedScale, UnspecifiedType)                
         new (storageKind, precision, scale) =
-            ColumnAttribute(UnspecifiedName, UnspecifiedPosition, UnspecifiedAutoValue, UnspecifiedName, storageKind, UnspecifiedLength, precision, scale)
+            StorageTypeAttribute(storageKind, UnspecifiedLength, precision, scale, UnspecifiedType)                
 
-        new(name) =
-            ColumnAttribute(name, UnspecifiedPosition, UnspecifiedAutoValue, UnspecifiedName, UnspecifiedStorage, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale)        
-        new (name, storageKind) =
-            ColumnAttribute(name, UnspecifiedPosition, UnspecifiedAutoValue, UnspecifiedName, storageKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale)
-        new (name, storageKind, length) =
-            ColumnAttribute(name, UnspecifiedPosition, UnspecifiedAutoValue, UnspecifiedName, storageKind, length, UnspecifiedPrecision, UnspecifiedScale)            
-        new (name, storageKind, precision) =
-            ColumnAttribute(name, UnspecifiedPosition, UnspecifiedAutoValue, UnspecifiedName, storageKind, UnspecifiedLength, precision, UnspecifiedScale)            
-        new (name, storageKind, precision, scale) =
-            ColumnAttribute(name, UnspecifiedPosition, UnspecifiedAutoValue, UnspecifiedName, storageKind, UnspecifiedLength, precision, scale)                    
-        
-        new (name, sequenceName) =
-            ColumnAttribute(name, UnspecifiedPosition, UnspecifiedAutoValue, sequenceName, UnspecifiedStorage, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale)                
-        new (name, position, autoValueKind) =
-            ColumnAttribute(name, position, autoValueKind, UnspecifiedName, UnspecifiedStorage, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale)         
-        new (name, position) =
-            ColumnAttribute(name, position, UnspecifiedAutoValue, UnspecifiedName, UnspecifiedStorage, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale)
-        
-        new() =
-            ColumnAttribute(UnspecifiedName, UnspecifiedPosition, UnspecifiedAutoValue, UnspecifiedName, UnspecifiedStorage, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale)
-
-        /// Indicates the name of the represented column if specified
-        member this.Name = if String.IsNullOrWhiteSpace(name) then None else Some(name)
-        
-        /// Indicates the position of the represented column if specified
-        member this.Position = if position = UnspecifiedPosition then None else Some(position)
-
-        /// Indicates the means by which the column is automatically populated if specified
-        member this.AutoValue = if autoValueKind = UnspecifiedAutoValue then None else Some(autoValueKind)
-                
-        /// Indicates the sequence from which the column obtains its value if specified
-        member this.SequenceName = if String.IsNullOrWhiteSpace(sequenceName) then None else Some(sequenceName)
-        
-        /// Indicates the kind of storage needed by the column if specified
+        /// Indicates the kind of storage
         member this.StorageKind = if storageKind = UnspecifiedStorage then None else Some(storageKind)
         
         /// Indicates the length of the data type if specified
@@ -158,6 +123,47 @@ module DataAttributes =
 
         /// Indicates the scale of the data type if specified
         member this.Scale = if precision = UnspecifiedScale then None else Some(scale)
+
+    /// <summary>
+    /// Identifies a column and specifies selected storage characteristics
+    /// </summary>
+    type ColumnAttribute(name, position, autoValueKind) =
+        inherit DataElementAttribute(name)
+
+        new(name) =
+            ColumnAttribute(name, UnspecifiedPosition, UnspecifiedAutoValue)        
+        new (name, position) =
+            ColumnAttribute(name, position, UnspecifiedAutoValue)                
+        new() =
+            ColumnAttribute(UnspecifiedName, UnspecifiedPosition, UnspecifiedAutoValue)
+
+        /// Indicates the name of the represented column if specified
+        member this.Name = if String.IsNullOrWhiteSpace(name) then None else Some(name)
+        
+        /// Indicates the position of the represented column if specified
+        member this.Position = if position = UnspecifiedPosition then None else Some(position)
+
+        /// Indicates the means by which the column is automatically populated if specified
+        member this.AutoValue = if autoValueKind = UnspecifiedAutoValue then None else Some(autoValueKind)
+                
+    /// <summary>
+    /// Identifies a sequence that will yield a value for the element to which
+    /// the attribute is attached
+    /// </summary>
+    type SourceSequenceAttribute(schemaName, localName) =
+        inherit DataAttribute()
+
+        /// <summary>
+        /// Gets the name of the schema in which the sequence resides
+        /// </summary>
+        member this.SchemaName = 
+            if schemaName = UnspecifiedName then None else Some(schemaName)
+
+        /// <summary>
+        /// Gets the local name of the element
+        /// </summary>
+        member this.Name = 
+            if localName = UnspecifiedName then None else Some(localName)
             
 
      
