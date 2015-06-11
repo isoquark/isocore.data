@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Lang.fs" />
+    <Compile Include="Txt.fs" />
     <Compile Include="ClrModel\ClrMetamodel.fs" />
     <Compile Include="ClrModel\ClrMember.fs" />
     <Compile Include="ClrModel\ClrAssembly.fs" />
@@ -58,7 +59,8 @@
     <Compile Include="ClrModel\ClrModelOperators.fs" />
     <Compile Include="ClrModel\ClrOption.fs" />
     <Compile Include="Converter.fs" />
-    <Compile Include="Txt.fs" />
+    <Compile Include="FSharpModel\FSharpVocabulary.fs" />
+    <Compile Include="FSharpModel\FSharpGenerator.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

@@ -42,7 +42,7 @@ module ClrMetamodelVocabulary =
     type RecordDescription = {
         /// The name of the record
         Name : string
-        
+                
         /// The CLR type of the record
         Type : Type
         
