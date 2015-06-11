@@ -1,0 +1,17 @@
+ClrTypeName,StorageTypeName,Length,Precision,Scale
+System.Boolean,BitStorage
+System.Byte,UInt8Storage	
+System.Byte[],BinaryMaxStorage
+System.DateTime,DateTimeStorage,,7
+System.DateTimeOffset,DateTimeOffsetStorage
+System.Decimal,DecimalStorage,,19,4
+System.Double,Float64Storage
+System.Guid,GuidStorage
+System.Int16,Int16Storage
+System.Int32,Int32Storage
+System.Int64,Int64Storage
+System.Object,VariantStorage
+System.Single,Float32Storage
+System.Char,UnicodeTextFixedStorage,1	
+System.String,UnicodeTextVariableStorage,250		
+System.TimeSpan,Int64Storage

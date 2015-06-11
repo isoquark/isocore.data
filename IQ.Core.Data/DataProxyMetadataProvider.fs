@@ -7,7 +7,6 @@ open System.Data
 
 open IQ.Core.Framework
 
-
 /// <summary>
 /// Defines operations that populate a Data Proxy Metamodel
 /// </summary>
@@ -17,6 +16,13 @@ module DataProxyMetadataProvider =
             (Attribute.GetCustomAttribute(m, typeof<DescriptionAttribute>) :?> DescriptionAttribute).Description |> Some
         else
             None        
+
+    let private inferStorageType(field : RecordFieldDescription) =
+        match field.Property |> ClrProperty.getAttribute<StorageTypeAttribute> with
+        | Some(attrib) ->
+            ()
+        | None ->
+            ()
                                  
     /// <summary>
     /// Infers a Column Proxy Description

@@ -20,8 +20,7 @@ module DataAttributes =
     let private UnspecifiedLength = -1
     [<Literal>]
     let private UnspecifiedStorage = StorageKind.Unspecified
-    [<Literal>]
-    let private UnspecifiedType = null
+    let private UnspecifiedType = Unchecked.defaultof<Type>
     [<Literal>]
     let private UnspecifiedPosition = -1
     [<Literal>]
@@ -100,17 +99,30 @@ module DataAttributes =
     /// <summary>
     /// Specifies storage characteristics
     /// </summary>
-    type StorageTypeAttribute(storageKind, length, precision, scale, clrType) =
+    type StorageTypeAttribute(storageKind, length, precision, scale, clrType, customTypeSchemaName, customTypeName) =
         inherit DataAttribute()
 
+        //For any kind of data that doesn't require additional information to instantiate a value, e.g., Int32, Bit and so forth
         new (storageKind) =
-            StorageTypeAttribute(storageKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale, UnspecifiedType)                
+            StorageTypeAttribute(storageKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale, UnspecifiedType, UnspecifiedName, UnspecifiedName)
+        //For variable-length or fixed-length text and binary data types that whose length has a specified upper bound
         new (storageKind, length) =
-            StorageTypeAttribute(storageKind, length, UnspecifiedPrecision, UnspecifiedScale, UnspecifiedType)                
+            StorageTypeAttribute(storageKind, length, UnspecifiedPrecision, UnspecifiedScale, UnspecifiedType, UnspecifiedName, UnspecifiedName)                        
+        //For data types that have a specifiable precision
         new (storageKind, precision) =
-            StorageTypeAttribute(storageKind, UnspecifiedLength, precision, UnspecifiedScale, UnspecifiedType)                
+            StorageTypeAttribute(storageKind, UnspecifiedLength, precision, UnspecifiedScale, UnspecifiedType, UnspecifiedName, UnspecifiedName)                
+        //For data types that have both specifiable precision and scale
         new (storageKind, precision, scale) =
-            StorageTypeAttribute(storageKind, UnspecifiedLength, precision, scale, UnspecifiedType)
+            StorageTypeAttribute(storageKind, UnspecifiedLength, precision, scale, UnspecifiedType, UnspecifiedName, UnspecifiedName)
+        //For Geography, Geometry and Hierarchy types
+        new (storageKind, clrType) =
+            StorageTypeAttribute(storageKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale, clrType, UnspecifiedName, UnspecifiedName)
+        //For CustomObject
+        new (storageKind, clrType, customTypeSchemaName, customTypeName) =
+            StorageTypeAttribute(storageKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale,  clrType, customTypeSchemaName, customTypeName)
+        //For CustomTable | CustomPrimitive
+        new (storageKind, customTypeSchemaName, customTypeName) =
+            StorageTypeAttribute(storageKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale,  UnspecifiedType, customTypeSchemaName, customTypeName)
 
         /// Indicates the kind of storage
         member this.StorageKind = if storageKind = UnspecifiedStorage then None else Some(storageKind)
@@ -123,6 +135,16 @@ module DataAttributes =
 
         /// Indicates the scale of the data type if specified
         member this.Scale = if precision = UnspecifiedScale then None else Some(scale)
+
+        /// Indicates the CLR data type, if specified
+        member this.ClrType = if clrType = UnspecifiedType then None else Some(clrType)
+
+        /// Indicates the name of a custom type, if specified
+        member this.CustomTypeName = 
+            if (customTypeSchemaName = UnspecifiedName || customTypeName = UnspecifiedName) then 
+                None 
+            else
+                DataObjectName(customTypeSchemaName, customTypeName) |> Some
 
     /// <summary>
     /// Identifies a column and specifies selected storage characteristics

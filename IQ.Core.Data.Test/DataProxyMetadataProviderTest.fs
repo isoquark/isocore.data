@@ -9,10 +9,11 @@ open IQ.Core.TestFramework
 open IQ.Core.Data
 
 [<TestContainer>]
-module ``DataAttributeReader Test`` =
+module ``DataProxyMetadataProvider Test`` =
 
     [<AutoOpen>]
     module private Proxies =
+        
         type RecordA = {
             AField1 : int
             AField2 : bool
@@ -25,7 +26,7 @@ module ``DataAttributeReader Test`` =
     let ``Read data proxy metadata - no attribution``() =
         let proxy = tableproxy<RecordA>
         
-        let expectedTable = {
+        let tableExpect = {
             TableDescription.Name = DataObjectName("Proxies", typeof<RecordA>.Name)
             Description = None
             Columns = 
@@ -53,7 +54,19 @@ module ``DataAttributeReader Test`` =
                 }
             ]
         }
-        proxy.Table |> Claim.equal expectedTable
+        let tableActual = proxy.Table
+        tableActual |> Claim.equal tableExpect
+        
+        let recordActual = proxy.ProxyRecord
+        let recordExpect = recordinfo<RecordA>
+        recordActual |> Claim.equal recordExpect
+        
+        let proxyColumnsExpect = 
+            [for i in 0..recordExpect.Fields.Length ->
+                ColumnProxyDescription(recordExpect.[i], tableExpect.[i])]
+        let proxyColumsActual = proxy.ProxyColumns
+        proxyColumsActual |> Claim.equal proxyColumsActual
+        
 
         ()
     

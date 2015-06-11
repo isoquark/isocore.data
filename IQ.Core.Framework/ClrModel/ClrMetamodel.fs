@@ -55,3 +55,25 @@ module ClrMetamodelVocabulary =
     }
 
 
+[<AutoOpen>]
+module ClrMetamodelExtensions =
+    /// <summary>
+    /// Defines augmentations for the RecordDescription type
+    /// </summary>
+    type RecordDescription
+    with
+        /// <summary>
+        /// Retrieves a field identified by its name
+        /// </summary>
+        /// <param name="fieldName">The name of the field</param>
+        member this.Item(fieldName) = 
+            this.Fields |> List.find(fun field -> field.Name = fieldName)
+
+        /// <summary>
+        /// Retrieves a field identified by its position
+        /// </summary>
+        /// <param name="position">The position of the field</param>
+        member this.Item(position) = 
+            //Granted, this could have been done by simply indexing into the
+            //list as it should be ordered correctly
+            this.Fields |> List.find(fun field -> field.Position = position)

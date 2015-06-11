@@ -7,7 +7,6 @@ open FSharp.Data
 
 open IQ.Core.Framework
 
-
 /// <summary>
 /// Defines domain vocabulary for working with CSV data/files
 /// </summary>
@@ -47,8 +46,6 @@ module CsvDataVocabulary =
         ///The names of the columns listed in ordinal position
         ColNames : string list
     }
-
-
 
 /// <summary>
 /// Defines operations for reading delimited text

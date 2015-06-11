@@ -64,6 +64,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="app.config" />
+    <EmbeddedResource Include="Resources\DefaultClrStorageTypeMap.csv" />
     <Compile Include="DataTable.fs" />
     <Compile Include="DataMetamodel.fs" />
     <Compile Include="DataAttributes.fs" />

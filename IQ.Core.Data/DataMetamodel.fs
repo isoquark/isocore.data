@@ -103,7 +103,7 @@ module DataMetamodel =
         | CustomObjectStorage of name : DataObjectName * clrType : Type
         | CustomPrimitiveStorage of name : DataObjectName * basePrimitive : StorageType
 
-    
+
     /// <summary>
     /// Enumerates the available means that lead to a column being automatically populated
     /// with a valid value
@@ -161,9 +161,20 @@ module DatMetamodelExtensions =
     /// <summary>
     /// Defines augmentations for the TableDescription type
     /// </summary>
-    type TableDescription with
-    member
-        this.FindColumn(name) = this.Columns |> List.find(fun column -> column.Name = name)
+    type TableDescription 
+    with
+        /// <summary>
+        /// Finds a column identified by its name
+        /// </summary>
+        /// <param name="name">The name of the column</param>
+        member this.Item(name) = 
+            this.Columns |> List.find(fun column -> column.Name = name)
 
+        /// <summary>
+        /// Finds a column identified by its position
+        /// </summary>
+        /// <param name="position">The position of the column</param>
+        member this.Item(position) = 
+            this.Columns |> List.find(fun column -> column.Position = position)
     
 
