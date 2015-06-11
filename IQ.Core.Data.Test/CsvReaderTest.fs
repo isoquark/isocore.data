@@ -21,12 +21,15 @@ module ``CsvReader Test`` =
 
     let private resname<'T> = typeof<'T>.Name |> sprintf "%s.csv"
 
-    [<Test>]
-    let ``Hydrated proxies from CSV file - CsvTestCase1``() =
-        let resname = resname<CsvTestCase1>
+    let private hydrate<'T>(resname) =
         let text = thisAssembly() |> ClrAssembly.findTextResource resname |> Option.get
         let format = CsvReader.getDefaultFormat()
-        let items = text |> CsvReader.readText<CsvTestCase1> format
+        text |> CsvReader.readText<'T> format
+        
+
+    [<Test>]
+    let ``Hydrated proxies from CSV file - CsvTestCase1``() =
+        let items = resname<CsvTestCase1> |> hydrate<CsvTestCase1> 
 
         let tom_actual = items |> List.find(fun x -> x.FirstName = "Tom")
         let tom_expect = {
@@ -65,7 +68,7 @@ module ``CsvReader Test`` =
         actual |> Claim.equal expect
         
 
-    type CsvTestCase2 = {
+    type CsvTestCase2A = {
         Id : int
         DateId : int
         InstrumentId : int
@@ -76,28 +79,51 @@ module ``CsvReader Test`` =
         V : int64
     }
 
+    type CsvTestCase2B = {
+        Id : int
+        DateId : int
+        InstrumentId : int
+        O : float option
+        H : float option
+        L : float option
+        C : float option
+        V : int64 option    
+    }
 
-//    let calculateBenchmark<'T> count resname=
-//        let path = thisAssembly() |> ClrAssembly.writeTextResource resname (TestContext.getTempDir())        
-//        let format = CsvReader.getDefaultFormat()
-//        let benchmark() =
-//            let items = path |> CsvReader.readFile<'T> format
-//
-//            ()
-
-
-    [<Test; BenchmarkTrait>]
-    let ``Benchmark - CsvReader 1``() =
-        let resname = resname<CsvTestCase2>
+    let private captureBenchmark<'T> resname =
         let path = thisAssembly() |> ClrAssembly.writeTextResource resname (TestContext.getTempDir())
         let format = CsvReader.getDefaultFormat()
         let  description = path |> CsvReader.describeFile format
         let benchmark() =
-            let items = path |> CsvReader.readFile<CsvTestCase2> format
+            let items = path |> CsvReader.readFile<'T> format
             true
-
-        let results = benchmark |> Benchmark.repeat 10 (thisMethod().Name)
+        benchmark |> Benchmark.repeat 10 (thisMethod().Name) |> Benchmark.summarize
+        
+    [<Test; BenchmarkTrait>]
+    let ``Benchmark - CsvReader 2A``() =
+        let benchmark = captureBenchmark<CsvTestCase2A> "CsvTestCase2.csv"
         ()
 
+    [<Test; BenchmarkTrait>]
+    let ``Benchmark - CsvReader 2B``() =
+        let benchmark = captureBenchmark<CsvTestCase2B> "CsvTestCase2.csv"
+        ()
          
-                
+
+    type CsvTestCase3 = {
+        [<Column("ID")>]
+        Id : int
+        [<Column("FIRST_NAME")>]
+        FirstName : string
+        LastName : string
+        [<Column("BDAY")>]
+        Birthday : DateTime
+        [<Column("NET_WORTH")>]
+        NetWorth : decimal option
+    }                
+
+    [<Test>]
+    let ``Hydrated proxies from CSV file - CsvTestCase3``() =
+        let items = resname<CsvTestCase3> |> hydrate<CsvTestCase3> 
+        ()
+        

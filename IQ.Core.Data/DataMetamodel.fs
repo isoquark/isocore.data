@@ -37,26 +37,44 @@ module DataMetamodel =
         /// If applicable, the SqlDbType of the data type
         DbType : SqlDbType option
     }
-
-    /// <summary>
-    /// Represents a data type usage instance, such as when declaring a column to be of a given data type
-    /// </summary>
-    type DataTypeReference = {
-        
-        /// The data type being referenced
-        DataType : DataTypeDescription
-        
-        /// If applicable, the maximum length of a value for variable-length data types or
-        /// the absolute length of a value for fixed length data types
-        MaxLength : int option
-
-        /// If applicable, the precision of the data type reference
-        Precision : uint8 option
-
-        /// If applicable, the scale of the data type reference
-        Scale : uint8 option        
-    }
     
+    type DataType =
+        | IntrinsicPrimitive of name : string 
+        | CustomPrimitive of name : DataObjectName 
+        | IntrinsicClrType of name : DataObjectName * clrType : Type
+        | CustomClrType of name : DataObjectName * clrType : Type
+        | CustomTableType of name : DataObjectName
+
+    type DataTypeReference =
+        | IntrinsicPrimitiveReference of dataType : DataType * length : int option * precision : uint8 option * scale : uint8 option
+        | CustomPrimitive of dataType : DataType
+        | IntrinsicClrType of dataType : DataType
+        | CustomClrType of dataType : DataType
+        | CustomTableType of dataType : DataType
+    with 
+        member this.DataType = 
+            match this with 
+                | IntrinsicPrimitiveReference(dataType=x) 
+                | CustomPrimitive(dataType=x) 
+                | IntrinsicClrType(dataType=x)
+                | CustomClrType(dataType=x)
+                | CustomTableType(dataType=x) -> x
+        
+        member this.Length = 
+            match this with 
+            | IntrinsicPrimitiveReference(length=x) -> x
+            | _ -> None
+    
+        member this.Precision = 
+            match this with 
+            | IntrinsicPrimitiveReference(precision=x) -> x
+            | _ -> None
+
+        member this.Scale = 
+            match this with 
+            | IntrinsicPrimitiveReference(scale=x) -> x
+            | _ -> None
+
     /// <summary>
     /// Describes a column in a table or view
     /// </summary>
@@ -68,7 +86,7 @@ module DataMetamodel =
         Position : int
 
         /// The column's data type
-        DataType : DataTypeReference
+        DataType : DataTypeReference option
         
         /// Specifies whether the column allows null
         Nullable : bool        

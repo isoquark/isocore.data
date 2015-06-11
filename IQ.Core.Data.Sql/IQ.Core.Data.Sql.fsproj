@@ -53,10 +53,11 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
-    <Compile Include="SqlDataStore.fs" />
-    <None Include="SqlSpecs.xlsx" />
-    <EmbeddedResource Include="IntrinsicNativeTypes.csv" />
     <None Include="app.config" />
+    <EmbeddedResource Include="Resources\SqlSpecs.xlsx" />
+    <EmbeddedResource Include="Resources\DefaultClrDataTypeMap.csv" />
+    <EmbeddedResource Include="Resources\IntrinsicPrimitiveTypes.csv" />
+    <Compile Include="SqlDataStore.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

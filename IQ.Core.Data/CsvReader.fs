@@ -97,7 +97,7 @@ module CsvReader =
         let lines = path |> File.ReadLines 
         let enumerator = lines.GetEnumerator()
         enumerator.MoveNext() |> ignore
-        let colnames = enumerator.Current |> Txt.split format.Separator |> List.ofArray
+        let colnames = enumerator.Current |> Txt.split format.Separator |> Array.map Txt.trim |> List.ofArray
         {   CsvFileDescription.Filename = path     
             RowCount = lines |> Seq.count
             ColNames = colnames

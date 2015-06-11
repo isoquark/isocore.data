@@ -32,7 +32,7 @@ module ``Sql Core Proxy Discovery`` =
     
     [<Test>]
     let ``Described table [SqlTest].[Table01] from proxy``() =
-        let actual = tableinfo<SqlTest.Table01>
+        let actual = tableproxy<SqlTest.Table01>
 
         ()
 

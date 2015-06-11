@@ -67,7 +67,8 @@
     <Compile Include="DataTable.fs" />
     <Compile Include="DataAttributes.fs" />
     <Compile Include="DataMetamodel.fs" />
-    <Compile Include="DateAttributeReader.fs" />
+    <Compile Include="DataProxyMetamodel.fs" />
+    <Compile Include="DataProxyMetadataProvider.fs" />
     <Compile Include="CsvReader.fs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,0 +1,17 @@
+ClrTypeName,DataTypeName,Length,Precision,Scale
+System.Boolean,bit
+System.Byte,tinyint	
+System.Byte[],varbinary,-1
+System.DateTime,datetime2,,7
+System.DateTimeOffset,datetimeoffset			
+System.Decimal,decimal,,19,4
+System.Double,float
+System.Guid,uniqueidentifier
+System.Int16,smallint
+System.Int32,int
+System.Int64,bigint
+System.Object,sql_variant
+System.Single,real
+System.Char,nchar	
+System.String,nvarchar,250		
+System.TimeSpan,bigint
