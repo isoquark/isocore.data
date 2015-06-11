@@ -83,7 +83,7 @@
     <Build Include="Metadata\Views\vUserColumn.sql" />
     <Build Include="Metadata\Tables\IntrinsicTypeMap.sql" />
     <Build Include="Core\Core.sql" />
-    <Build Include="Core\Tables\StorageType.sql" />
+    <Build Include="Core\Tables\StorageKind.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">
@@ -97,7 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Core\Data\Data.sql" />
-    <None Include="Core\Data\StorageType.sql" />
+    <None Include="Core\Data\StorageKind.sql" />
     <None Include="Core.publish.xml" />
   </ItemGroup>
   <ItemGroup>

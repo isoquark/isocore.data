@@ -1,1 +1,1 @@
-﻿:r StorageType.sql
+﻿:r StorageKind.sql

@@ -7,4 +7,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="BclTypeName" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="4e04c11c-fedd-4d3d-b0ac-a7dc2b0b83d0" ChangeDateTime="06/11/2015 12:13:17">
+    <Property Name="ElementName" Value="[Core].[StorageType]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[Core]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="StorageKind" />
+  </Operation>
 </Operations>

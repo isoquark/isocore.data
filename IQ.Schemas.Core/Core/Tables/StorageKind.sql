@@ -1,4 +1,4 @@
-﻿CREATE TABLE Core.StorageType
+﻿CREATE TABLE Core.StorageKind
 (
 	Id TINYINT not null,
 	Name nvarchar(50) not null,
