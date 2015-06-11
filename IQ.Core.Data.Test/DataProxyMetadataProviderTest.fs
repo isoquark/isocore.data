@@ -62,7 +62,7 @@ module ``DataProxyMetadataProvider Test`` =
         recordActual |> Claim.equal recordExpect
         
         let proxyColumnsExpect = 
-            [for i in 0..recordExpect.Fields.Length ->
+            [for i in 0..recordExpect.Fields.Length-1 ->
                 ColumnProxyDescription(recordExpect.[i], tableExpect.[i])]
         let proxyColumsActual = proxy.ProxyColumns
         proxyColumsActual |> Claim.equal proxyColumsActual
