@@ -68,7 +68,7 @@ module SqlDataStoreVocabulary =
 module SqlDataStore =    
     let internal bcp (cs : SqlConnectionString) (data : 'T seq) =
         use bcp = new SqlBulkCopy(cs.Text)
-        use dataTable = data |> DataTable.fromRecordValuesT
+        use dataTable = data |> DataTable.fromRecordValues
         dataTable |> bcp.WriteToServer
     
     

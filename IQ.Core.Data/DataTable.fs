@@ -37,33 +37,18 @@ module DataTable =
     let fromRecordType<'T> =
         recordinfo<'T> |> fromRecordDescription
 
-    /// <summary>
-    /// Creates a <see cref="System.Data.DataTable"/> from a sequence of records
-    /// </summary>
-    /// <param name="values">The record values that will be transformed into table rows</param>
-    let fromRecordValuesT<'T>(values : 'T seq) =
-        let valueList = values |> List.ofSeq
-        if valueList.IsEmpty then
-            ArgumentException("Cannot created a DataTable from an empty list of records") |> raise
-        let table =  recordinfo<'T> |> fromRecordDescription
-        valueList |> List.iter(fun item ->
-            item |> ClrRecord.toValueArray |> table.Rows.Add |> ignore                        
-        )
-        table
 
     /// <summary>
     /// Creates a <see cref="System.Data.DataTable"/> from a sequence of records
     /// </summary>
     /// <param name="values">The record values that will be transformed into table rows</param>
-    let fromRecordValues (values : obj seq) =
+    let fromRecordValues (values : 'T seq) =
         let valueList = values |> List.ofSeq
         if valueList.IsEmpty then
             ArgumentException("Cannot created a DataTable from an empty list of records") |> raise
         let recordType = valueList.Head.GetType()
         let table = recordType |> ClrRecord.describe |> fromRecordDescription
         valueList |> List.iter(fun item ->
-            if item.GetType() <> recordType then
-                ArgumentException("List is not homogenous") |> raise
             item |> ClrRecord.toValueArray |> table.Rows.Add |> ignore                        
         )
         table

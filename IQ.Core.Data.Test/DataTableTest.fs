@@ -47,7 +47,7 @@ module DataTableTest =
             {Field01 = 1002L; Field02 = true; Field03 = "FGH"}
         ]
 
-        let dataTable = recordValues |> DataTable.fromRecordValuesT
+        let dataTable = recordValues |> DataTable.fromRecordValues
         Claim.equal 3 dataTable.Columns.Count
         Claim.equal 1000L (dataTable |> DataTable.getValue 0 0)
         Claim.equal true (dataTable |> DataTable.getValue 0 1)
