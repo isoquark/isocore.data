@@ -88,6 +88,44 @@ module Lang =
     with
         static member Sum(timespans : TimeSpan seq) =
             timespans |> Seq.map(fun x -> x.Ticks) |> Seq.sum |> TimeSpan.FromTicks
+
+    /// <summary>
+    /// The default format string to use when applying the DebuggerDisplay attribute
+    /// </summary>
+    [<Literal>]
+    let DebuggerDisplayDefault = "{ToString(),nq}"
+
+    /// <summary>
+    /// Realized by types whose instance that are capable of being faithfully rendered as text.
+    /// </summary>
+    /// <remarks>
+    /// The semantic representation of an instance includes the state necessary to reconstitute the 
+    /// instance from that representation
+    /// </remarks>
+    type ISemanticRepresentation =
+        /// <summary>
+        /// Faithfully renders an instance as text
+        /// </summary>
+        abstract ToSemanticString:unit->string
+
+    /// <summary>
+    /// Identifies a function that can parse the semantic representation of a type instance
+    /// </summary>
+    [<AttributeUsage(AttributeTargets.Method)>]
+    type ParserAttribute(t) = 
+        inherit Attribute()
+        
+        /// <summary>
+        /// The type of element that can be parsed
+        /// </summary>
+        member this.ElementType : Type = t 
+
+    /// <summary>
+    /// Lookup operator to retrieve the value identified by a key in a map
+    /// </summary>
+    /// <param name="map">The map to search</param>
+    /// <param name="key">The value key</param>
+    let (?) (map : Map<string,_>) key = map.[key]
             
 module ValueMap =
     let fromNamedItems (items : seq<string*obj>) =

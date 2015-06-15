@@ -1,5 +1,7 @@
 ﻿namespace IQ.Core.TestFramework
 
+open System
+
 open NUnit.Framework
 
 /// <summary>
@@ -55,3 +57,18 @@ module Claim =
     /// <param name="value">The value to examine</param>
     let isNotNull (value : obj) =
         value = null |> Assert.False
+
+    /// <summary>
+    /// Asserts that executing a supplied function will raise a specific exception
+    /// </summary>
+    /// <param name="f">The function to execute</param>
+    let failWith<'T when 'T :> Exception>(f:unit->unit) =
+        let result = ref (option<'T>.None)
+        try
+            f()
+        with
+            | e ->
+                if e.GetType() = typeof<'T> then
+                    result := Some(e :?> 'T)
+        !result |> Option.isSome |> isTrue
+                

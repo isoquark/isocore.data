@@ -5,6 +5,8 @@ open IQ.Core.Framework
 open System
 open System.Reflection
 open System.Data
+open System.Diagnostics
+
 
 /// <summary>
 /// Defines operations for working with Data Tables
@@ -76,6 +78,6 @@ module DataTable =
             description |> ClrRecord.fromValueArray row.ItemArray
         ]
 
+
+ 
     
-
-

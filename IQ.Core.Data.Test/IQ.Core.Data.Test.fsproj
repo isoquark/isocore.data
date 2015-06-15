@@ -61,8 +61,10 @@
     <EmbeddedResource Include="Resources\CsvTestCase2.csv" />
     <EmbeddedResource Include="Resources\CsvTestCase3.csv" />
     <Compile Include="DataTableTest.fs" />
+    <Compile Include="DataObjectNameTest.fs" />
     <Compile Include="CsvReaderTest.fs" />
     <Compile Include="DataProxyMetadataProviderTest.fs" />
+    <Compile Include="DataStorageTypeTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

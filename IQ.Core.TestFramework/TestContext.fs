@@ -19,13 +19,19 @@ type TestAttribute = NUnit.Framework.TestAttribute
 type TestContainerAttribute = NUnit.Framework.TestFixtureAttribute
 
 /// <summary>
-/// Applies a trait to a test method
+/// Classifies a test method
 /// </summary>
 type TraitAttribute = NUnit.Framework.CategoryAttribute
 
 
 type BenchmarkTraitAttribute() =
     inherit TraitAttribute("Benchmark")
+
+/// <summary>
+/// Classification of a test or test group that verifies an operation failed as expected
+/// </summary>
+type FailureVerificationAttribute() =
+    inherit TraitAttribute("Failure Verification")
 
 module TestContext =     
     [<Literal>]
