@@ -30,3 +30,18 @@ module Converter =
                     Convert.ChangeType(value, dstType)
             
 
+
+
+[<AutoOpen>]
+module ConvertExtensions =
+    
+    type Convert
+    with
+        /// <summary>
+        /// Converts the supplied value to an optional UInt8
+        /// </summary>
+        /// <param name="value">The value to convert</param>
+        static member ToUInt8Option(value : int option) =
+            match value with
+            | Some(v) -> Convert.ToByte(v) |> Some
+            | None -> None

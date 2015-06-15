@@ -28,7 +28,7 @@ module ``CsvReader Test`` =
         
 
     [<Test>]
-    let ``Hydrated proxies from CSV file - CsvTestCase1``() =
+    let ``Hydrated proxies from CSV file - no attribute overrides``() =
         let items = resname<CsvTestCase1> |> hydrate<CsvTestCase1> 
 
         let tom_actual = items |> List.find(fun x -> x.FirstName = "Tom")
@@ -53,7 +53,7 @@ module ``CsvReader Test`` =
         patty_actual |> Claim.equal patty_expect
 
     [<Test>]
-    let ``Desribed CSV file - CsvTestCase1``() =
+    let ``Desribed CSV file - no attribute overrides``() =
         let resname = resname<CsvTestCase1>
         let path = thisAssembly() |> ClrAssembly.writeTextResource resname (TestContext.getTempDir())
         let format = CsvReader.getDefaultFormat()
@@ -126,8 +126,28 @@ module ``CsvReader Test`` =
         NetWorth : decimal option
     }                
 
-//    [<Test>]
-//    let ``Hydrated proxies from CSV file - CsvTestCase3``() =
-//        let items = resname<CsvTestCase3> |> hydrate<CsvTestCase3> 
-//        ()
         
+    [<Test>]
+    let ``Hydrated proxies from CSV file - column name attribute override``() =
+        let items = resname<CsvTestCase3> |> hydrate<CsvTestCase3> 
+
+        let tom_actual = items |> List.find(fun x -> x.FirstName = "Tom")
+        let tom_expect = {
+            Id = 1
+            FirstName = "Tom"
+            LastName = "Thompson"
+            Birthday = DateTime(1962, 5, 12)
+            NetWorth = 380000m |> Some
+        }
+
+        tom_actual |> Claim.equal tom_expect
+        
+        let patty_actual = items |> List.find(fun x -> x.FirstName = "Patty")
+        let patty_expect = {
+            Id = 3
+            FirstName = "Patty"
+            LastName = "Pierce"
+            Birthday = DateTime(1970, 11, 19)
+            NetWorth = 50000m |> Some
+        }
+        patty_actual |> Claim.equal patty_expect

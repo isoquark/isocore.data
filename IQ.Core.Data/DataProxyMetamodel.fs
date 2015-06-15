@@ -48,3 +48,24 @@ module DataProxyMetamodel =
 
         member this.ProxyColumns = 
             match this with TableProxyDescription(columns=x) -> x
+
+/// <summary>
+/// Defines operators and augmentations for the types in the DataProxyMetamodel module
+/// </summary>
+[<AutoOpen>]
+module DataProxyMetamodelExtensions =
+    /// <summary>
+    /// Defines augmentations for the TableProxyDescription type
+    /// </summary>
+    type TableProxyDescription
+    with
+        /// <summary>
+        /// Gets the proxy column description at a supplied ordinal position
+        /// </summary>
+        /// <param name="i">The column's ordinal position</param>
+        member this.Item(i) = this.ProxyColumns.[i]
+
+        /// <summary>
+        /// Gets the name of the table represented by the proxy
+        /// </summary>
+        member this.TableName = this.Table.Name

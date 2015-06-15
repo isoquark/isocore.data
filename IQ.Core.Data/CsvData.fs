@@ -57,14 +57,19 @@ module CsvReader =
     /// </summary>
     /// <param name="file">Representation of the CSV file</param>
     let private read<'T> (file : FSharp.Data.Runtime.CsvFile<CsvRow>) = 
-        let record = recordinfo<'T>
+
+        let proxy = tableproxy<'T>
+
+        let getColumnProxy colName = 
+            proxy.ProxyColumns |> List.find(fun x -> x.Column.Name = colName)
+
         let converters =
             match file.Headers with
             | Some(headers) ->
                 headers |> Array.map(fun header -> 
-                    let field = record.FindField(header)
-                    field.Name, fun (value : string) -> 
-                        value |> Converter.convert field.FieldType
+                    let colproxy = header |> getColumnProxy
+                    colproxy.Column.Name, fun (value : string) -> 
+                        value |> Converter.convert colproxy.ProxyField.FieldType
                 ) |> Map.ofArray
             | None ->
                 NotSupportedException("CSV file requires headers") |> raise
@@ -73,18 +78,15 @@ module CsvReader =
       
         //The CSV reader treats whitespace as significant but this is usually not desired
         //so it is eliminated prior to conversion
-        let convert fieldName value =
-            value |> Txt.trim |> converters.[fieldName]
-
+        let convert colname value =
+            value |> Txt.trim |> converters.[colname]
+        
         let createValueMap (row : CsvRow) =
-            row.Columns |> Array.mapi(fun i col -> (col, row.[i] |> convert col )) |> Map.ofArray
-
-        let createValueMap2 (row : CsvRow) =
-            colnames |> Array.map(fun colname -> colname, colname|> row.GetColumn |> convert colname) 
+            colnames |> Array.map(fun colname -> colname |> getColumnProxy |> fun f -> f.ProxyField.Name, colname|> row.GetColumn |> convert colname) 
                      |> ValueMap.fromNamedItems
 
-        file.Rows |> Seq.map createValueMap2 
-                  |> Seq.map (fun valueMap -> record |> ClrRecord.fromValueMap valueMap :?> 'T)
+        file.Rows |> Seq.map createValueMap 
+                  |> Seq.map (fun valueMap -> proxy.ProxyRecord |> ClrRecord.fromValueMap valueMap :?> 'T)
                   |> List.ofSeq
 
     /// <summary>

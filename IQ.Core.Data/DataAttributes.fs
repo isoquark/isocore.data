@@ -2,6 +2,11 @@
 
 open System
 open System.Data
+open System.Collections.Generic
+
+open FSharp.Data
+
+open IQ.Core.Framework
 
 /// <summary>
 /// Defines attributes that are intended to be applied to proxy elements to specify 
@@ -158,9 +163,7 @@ module DataAttributes =
         /// </summary>
         /// <param name="schemaName">The name of the schema in which the view is defined</param>
         new (schemaName) =
-            ViewAttribute(schemaName, UnspecifiedName)
-                   
-    
+            ViewAttribute(schemaName, UnspecifiedName)                      
     
     /// <summary>
     /// Specifies storage characteristics
@@ -189,7 +192,7 @@ module DataAttributes =
         //For CustomTable | CustomPrimitive
         new (storageKind, customTypeSchemaName, customTypeName) =
             StorageTypeAttribute(storageKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale,  UnspecifiedType, customTypeSchemaName, customTypeName)
-
+        
         /// Indicates the kind of storage
         member this.StorageKind : StorageKind = storageKind
         
@@ -256,5 +259,47 @@ module DataAttributes =
             
 
      
+module StorageKind =
+        [<Literal>]
+        let private DefaultStorageKindAspectsResource = "Resources/DefaultStorageKindAspects.csv"                
+        type private DefaultStorageKindAspects = CsvProvider<DefaultStorageKindAspectsResource, Separators="|", PreferOptionals=true>
+        
+        type private StorageKindAspects = | StorageKindAspects of length : int option * precision : uint8 option * scale : uint8 option
+        with
+            member this.Length = match this with StorageKindAspects(length=x) -> x |> Option.get
+            member this.Precision = match this with StorageKindAspects(precision=x) -> x |> Option.get
+            member this.Scale = match this with StorageKindAspects(scale=x) -> x |> Option.get
 
+        let private defaults : IDictionary<StorageKind, StorageKindAspects> = 
+            [for row in (DefaultStorageKindAspectsResource |> DefaultStorageKindAspects.Load).Cache().Rows ->
+                (StorageKind.Parse row.StorageKindName, StorageKindAspects(row.Length, row.Precision |> Convert.ToUInt8Option , row.Scale |> Convert.ToUInt8Option))
+            ] |> dict        
+        
+        /// <summary>
+        /// Gets the storage kind's default length
+        /// </summary>
+        /// <param name="kind">The kind of storage</param>
+        let getDefaultLength kind =
+            defaults.[kind].Length 
 
+        /// <summary>
+        /// Gets the storage kind's default precision
+        /// </summary>
+        /// <param name="kind">The kind of storage</param>
+        let getDefaultPrecision kind =
+            defaults.[kind].Precision
+
+        /// <summary>
+        /// Gets the storage kind's default scale
+        /// </summary>
+        /// <param name="kind">The kind of storage</param>
+        let getDefaultScale kind =
+            defaults.[kind].Scale
+
+[<AutoOpen>]
+module StorageKindExtensions =
+    type StorageKind
+    with
+        member this.DefaultLength = this |> StorageKind.getDefaultLength
+        member this.DefaultPrecision = this |> StorageKind.getDefaultPrecision
+        member this.DefaultScale = this |> StorageKind.getDefaultScale

@@ -58,7 +58,7 @@
     <Compile Include="ClrModel\ClrOption.fs" />
     <Compile Include="ClrModel\ClrRecord.fs" />
     <Compile Include="ClrModel\ClrModelOperators.fs" />
-    <Compile Include="Converter.fs" />
+    <Compile Include="Conversion.fs" />
     <Compile Include="FSharpModel\FSharpVocabulary.fs" />
     <Compile Include="FSharpModel\FSharpGenerator.fs" />
   </ItemGroup>

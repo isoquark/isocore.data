@@ -6,6 +6,9 @@ open System.Diagnostics
 open System.Text
 open System.Reflection
 open System.Text.RegularExpressions
+open System.Collections.Generic
+
+open FSharp.Data
 
 open IQ.Core.Framework
 
@@ -181,20 +184,68 @@ module DataStorageTypeVocabulary =
         override this.ToString() =
             this.ToSemanticString()
     
-
-             
-        
-
 open StorageTypeNames
 
-module DataStorageType =
+/// <summary>
+/// Defines operations for working with StorageType specifications
+/// </summary>
+module DataStorageType =        
         
+
+
         /// <summary>
         /// Renders the StorageType as a semantic string
         /// </summary>
         /// <param name="storageType">The storage type</param>
         let toSemanticString (storageType : StorageType) =
             storageType.ToSemanticString()            
+        
+        /// <summary>
+        /// Gets the kind of storage required by the data type
+        /// </summary>
+        /// <param name="storageType">The storage type</param>
+        let getKind (storageType : StorageType) =
+            match storageType with
+            | BitStorage -> StorageKind.Bit
+            | UInt8Storage -> StorageKind.UInt8
+            | UInt16Storage -> StorageKind.UInt64
+            | UInt32Storage -> StorageKind.UInt32
+            | UInt64Storage -> StorageKind.UInt64
+            | Int8Storage -> StorageKind.Int8
+            | Int16Storage -> StorageKind.Int16
+            | Int32Storage -> StorageKind.Int32
+            | Int64Storage -> StorageKind.Int64           
+            
+            | BinaryFixedStorage(_) -> StorageKind.BinaryFixed
+            | BinaryVariableStorage(_) -> StorageKind.BinaryVariable
+            | BinaryMaxStorage -> StorageKind.BinaryMax
+            
+            | AnsiTextFixedStorage(length) -> StorageKind.AnsiTextFixed
+            | AnsiTextVariableStorage(length) -> StorageKind.AnsiTextVariable
+            | AnsiTextMaxStorage -> StorageKind.AnsiTextMax
+            
+            | UnicodeTextFixedStorage(length) -> StorageKind.UnicodeTextFixed
+            | UnicodeTextVariableStorage(length) -> StorageKind.UnicodeTextVariable
+            | UnicodeTextMaxStorage -> StorageKind.UnicodeTextMax
+            
+            | DateTime32Storage -> StorageKind.DateTime32
+            | DateTime64Storage -> StorageKind.DateTime64
+            | DateTimeStorage(precision)-> StorageKind.DateTime
+            | DateTimeOffsetStorage -> StorageKind.DateTimeOffset
+            | TimeOfDayStorage -> StorageKind.TimeOfDay
+            | DateStorage -> StorageKind.Date
+            
+            | Float32Storage -> StorageKind.Float32
+            | Float64Storage -> StorageKind.Float64
+            | DecimalStorage(precision,scale) -> StorageKind.Decimal
+            | MoneyStorage -> StorageKind.Money
+            | GuidStorage -> StorageKind.Guid
+            | XmlStorage(schema) -> StorageKind.Xml
+            | VariantStorage -> StorageKind.Variant
+            | CustomTableStorage(name) -> StorageKind.CustomTable
+            | CustomObjectStorage(name,t) -> StorageKind.CustomObject
+            | CustomPrimitiveStorage(name) -> StorageKind.CustomPrimitive
+            
         
         /// <summary>
         /// Infers the storage type from a supplied attribute
@@ -222,19 +273,31 @@ module DataStorageType =
             | StorageKind.TimeOfDay -> TimeOfDayStorage
             | StorageKind.Variant -> VariantStorage
             | StorageKind.UnicodeTextMax -> UnicodeTextMaxStorage
-            | StorageKind.BinaryFixed -> BinaryFixedStorage( defaultArg attrib.Length 250)
-            | StorageKind.BinaryVariable -> BinaryVariableStorage (defaultArg attrib.Length 250)
+            | StorageKind.BinaryFixed -> 
+                BinaryFixedStorage( defaultArg attrib.Length StorageKind.BinaryFixed.DefaultLength)
+            | StorageKind.BinaryVariable -> 
+                BinaryVariableStorage (defaultArg attrib.Length StorageKind.BinaryVariable.DefaultLength)
             | StorageKind.BinaryMax -> BinaryMaxStorage
-            | StorageKind.AnsiTextFixed -> AnsiTextFixedStorage(defaultArg attrib.Length 250)
-            | StorageKind.AnsiTextVariable -> AnsiTextVariableStorage(defaultArg attrib.Length 250)
-            | StorageKind.UnicodeTextFixed -> UnicodeTextFixedStorage(defaultArg attrib.Length 250)
-            | StorageKind.UnicodeTextVariable -> UnicodeTextVariableStorage(defaultArg attrib.Length 250)
-            | StorageKind.DateTime -> DateTimeStorage(defaultArg attrib.Precision 7uy)  
+            | StorageKind.AnsiTextFixed -> 
+                AnsiTextFixedStorage(defaultArg attrib.Length StorageKind.AnsiTextFixed.DefaultLength)
+            | StorageKind.AnsiTextVariable -> 
+                AnsiTextVariableStorage(defaultArg attrib.Length StorageKind.AnsiTextVariable.DefaultLength)
+            | StorageKind.UnicodeTextFixed -> 
+                UnicodeTextFixedStorage(defaultArg attrib.Length StorageKind.UnicodeTextFixed.DefaultLength)
+            | StorageKind.UnicodeTextVariable -> 
+                UnicodeTextVariableStorage(defaultArg attrib.Length StorageKind.UnicodeTextVariable.DefaultLength)
+            | StorageKind.DateTime -> 
+                DateTimeStorage(defaultArg attrib.Precision StorageKind.DateTime.DefaultPrecision)  
             | StorageKind.Date -> DateStorage
-            | StorageKind.Decimal -> DecimalStorage(defaultArg attrib.Precision 19uy, defaultArg attrib.Scale 4uy)
+            | StorageKind.Decimal -> 
+                DecimalStorage(
+                    defaultArg attrib.Precision StorageKind.Decimal.DefaultPrecision, 
+                    defaultArg attrib.Scale StorageKind.Decimal.DefaultScale)
             | StorageKind.Xml -> XmlStorage("")
-            | StorageKind.CustomTable -> CustomTableStorage(attrib.CustomTypeName |> Option.get)
-            | StorageKind.CustomPrimitive -> CustomPrimitiveStorage(attrib.CustomTypeName |> Option.get)
+            | StorageKind.CustomTable -> 
+                CustomTableStorage(attrib.CustomTypeName |> Option.get)
+            | StorageKind.CustomPrimitive -> 
+                CustomPrimitiveStorage(attrib.CustomTypeName |> Option.get)
             | StorageKind.CustomObject | StorageKind.Geography | StorageKind.Geometry | StorageKind.Hierarchy ->          
                 CustomObjectStorage(attrib.CustomTypeName |> Option.get, attrib.ClrType |> Option.get)
             | _ ->
@@ -246,7 +309,7 @@ module DataStorageType =
         /// </summary>
         /// <param name="text">The semantic representation</param>        
         let parse text =        
-            //TODO: Investigate using FParsec for this
+            //TODO: Investigate using FParsec for this sort of thing
             let pattern4() =
                 let parameters = ["StorageName"; "SchemaName"; "LocalName"]
                 let expression = @"(?<StorageName>[a-zA-z]*)\((?<SchemaName>[^,]*),(?<LocalName>[^\)]*)\)"

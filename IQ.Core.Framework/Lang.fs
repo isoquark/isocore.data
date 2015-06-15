@@ -120,6 +120,10 @@ module Lang =
         /// </summary>
         member this.ElementType : Type = t 
 
+    type Enum 
+    with
+        static member Parse<'T when 'T:>Enum >(value) = Enum.Parse(typeof<'T>, value) :?> 'T
+
     /// <summary>
     /// Lookup operator to retrieve the value identified by a key in a map
     /// </summary>
