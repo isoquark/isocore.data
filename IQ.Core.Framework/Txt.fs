@@ -1,6 +1,7 @@
 ﻿namespace IQ.Core.Framework
 
 open System
+open System.Text
 open System.Text.RegularExpressions
 
 
@@ -131,3 +132,32 @@ module Txt =
             
         m |> attemptGroupMatches groupNames
 
+    /// <summary>
+    /// Creates a delimited block of text from supplied components
+    /// </summary>
+    /// <param name="delimiter">The delimiter use to demarcate the components</param>
+    /// <param name="components">The components</param>
+    let toDelimitedText (delimiter : string) (components : string list) =
+        let sb = new StringBuilder()
+        [for i in 0..components.Length-1 ->
+            components.[i] |> sb.Append |> ignore
+            if i <> i - 1 then
+                delimiter |> sb.Append |> ignore
+         ]                
+
+    /// <summary>
+    /// Removes all occurrences of a specified string from the subject string
+    /// </summary>
+    /// <param name="textToRemove">The text that will be removed</param>
+    /// <param name="text">The text that will be searched</param>
+    let remove textToRemove (text : string) =
+        text.Replace(textToRemove, String.Empty)
+
+    /// <summary>
+    /// Removes all occurrences of a specified character from the subject string
+    /// </summary>
+    /// <param name="charToRemove">The character that will be removed</param>
+    /// <param name="text">The text that will be searched</param>
+    let removeChar (charToRemove : char) (text : string) =
+        text |> remove (charToRemove.ToString())
+        

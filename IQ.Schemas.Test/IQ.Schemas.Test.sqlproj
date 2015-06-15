@@ -90,5 +90,6 @@
     <Build Include="SqlTest\SqlTest.sql" />
     <Build Include="SqlTest\Tables\Table01.sql" />
     <Build Include="SqlTest\Types\PhoneNumber.sql" />
+    <Build Include="SqlTest\Tables\Table02.sql" />
   </ItemGroup>
 </Project>

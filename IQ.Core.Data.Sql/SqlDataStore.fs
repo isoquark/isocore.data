@@ -43,6 +43,7 @@ module SqlDataStoreVocabulary =
         | TableFunction of  functionName : string * parameters : SqlQueryParameter list
         | Procedure of procedureName : string * parameters : SqlQueryParameter list
     
+        
     /// <summary>
     /// Defines the contract for a SQL Server Data Store
     /// </summary>
@@ -61,6 +62,11 @@ module SqlDataStoreVocabulary =
         /// Deletes and identified collection of data entities from the store
         /// </summary>
         abstract Del:SqlQuery -> unit
+
+
+        //abstract ExecuteProcedure:'TProxy->'TResult
+
+        
        
 /// <summary>
 /// Provides ISqlDataStore realization
@@ -68,7 +74,7 @@ module SqlDataStoreVocabulary =
 module SqlDataStore =    
     let internal bcp (cs : SqlConnectionString) (data : 'T seq) =
         use bcp = new SqlBulkCopy(cs.Text)
-        use dataTable = data |> DataTable.fromRecordValues
+        use dataTable = data |> DataTable.fromProxyValuesT
         dataTable |> bcp.WriteToServer
     
     
@@ -77,7 +83,7 @@ module SqlDataStore =
         interface ISqlDataStore with
             member this.Get q = 
                 match q with
-                | TableOrView(name,columnNames) ->
+                | TableOrView(tabularName,columnNames) ->
                     []
                 | TableFunction(functionName, parameters) ->
                     []
@@ -85,6 +91,9 @@ module SqlDataStore =
                     []
             member this.Put items = bcp cs items
             member this.Del q = ()
+
+            //member this.ExecuteProcedure proc =
+                
                  
     /// <summary>
     /// Provides access to an identified data store

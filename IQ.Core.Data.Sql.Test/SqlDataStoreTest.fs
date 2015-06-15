@@ -5,5 +5,8 @@ open IQ.Core.Data
 
 [<TestContainer>]
 module SqlDataStoreTest =
-    ()
+    
+    [<Test>]
+    let ``Insert SQL Data Store records``() =
+        ()
 

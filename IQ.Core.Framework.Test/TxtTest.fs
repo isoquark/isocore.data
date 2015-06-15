@@ -18,4 +18,11 @@ module TxtTest =
         values.["StorageName"] |> Claim.equal "AnsiTextVariable"
         values.["Length"] |> Claim.equal "5"
         ()
-        
+
+    [<Test>]
+    let ``Removed character from text``() =
+        let input = "'41816141-0dbd-46c6-ab55-6037a1da8790'"
+        let expect = "41816141-0dbd-46c6-ab55-6037a1da8790"
+        let actual = input |> Txt.removeChar '''
+        expect |> Claim.equal actual
+                    

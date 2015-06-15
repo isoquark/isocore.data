@@ -58,9 +58,10 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="app.config" />
     <Compile Include="ProxyDiscoveryTest.fs" />
     <Compile Include="SqlDataStoreTest.fs" />
-    <None Include="app.config" />
+    <Compile Include="SqlFormatterTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IQ.Core.Data.Sql\IQ.Core.Data.Sql.fsproj">
