@@ -9,13 +9,77 @@ open System.Data
 /// </summary>
 [<AutoOpen>]
 module DataAttributes =
+
+    /// <summary>
+    /// Specifies the available storage classes
+    /// </summary>
+    /// <remarks>
+    /// Note that the storage class is not sufficient to characterize the storage type and
+    /// additional information, such as length or data object name is needed to store/instantiate
+    /// a corresponding value
+    /// </remarks>
+    type StorageKind =
+        | Unspecified = 0uy
+        | Bit = 10uy //bit
+        | UInt8 = 20uy //tinyint
+        | UInt16 = 21uy //no direct map, use int
+        | UInt32 = 22uy // no direct map, use bigint
+        | UInt64 = 23uy // no direct map, use varbinary(8)
+        | Int8 = 30uy //no direct map, use smallint
+        | Int16 = 31uy //smallint
+        | Int32 = 32uy //int
+        | Int64 = 33uy //bigint
+        | BinaryFixed = 40uy //binary 
+        | BinaryVariable = 41uy //varbinary
+        | BinaryMax = 42uy
+        | AnsiTextFixed = 50uy //char
+        | AnsiTextVariable = 51uy //varchar
+        | AnsiTextMax = 52uy
+        | UnicodeTextFixed = 53uy //nchar
+        | UnicodeTextVariable = 54uy //nvarchar
+        | UnicodeTextMax = 55uy
+        | DateTime32 = 60uy //corresponds to smalldatetime
+        | DateTime64 = 61uy //corresponds to datetime
+        | DateTime = 62uy //corresponds to datetime2
+        | DateTimeOffset = 63uy
+        | TimeOfDay = 64uy //corresponds to time
+        | Date = 65uy //corresponds to date
+        | Float32 = 70uy //corresponds to real
+        | Float64 = 71uy //corresponds to float
+        | Decimal = 80uy
+        | Money = 81uy
+        | Guid = 90uy //corresponds to uniqueidentifier
+        | Xml = 100uy
+        | Variant = 110uy //corresponds to sql_variant
+        | CustomTable = 150uy //a non-intrinsic table data type
+        | CustomObject = 151uy //a non-intrinsic CLR type
+        | CustomPrimitive = 152uy //a non-intrinsic primitive based on an intrinsic primitive
+        | Geography = 160uy
+        | Geometry = 161uy
+        | Hierarchy = 162uy
+
+    /// <summary>
+    /// Enumerates the available means that lead to a column being automatically populated
+    /// with a valid value
+    /// </summary>
+    type AutoValueKind =
+        /// Column is not automatically populated
+        | None = 0
+        /// Column is automatically populated with a default value
+        | Default = 1
+        /// Column is automatically populated with an identity value
+        | Identity = 2
+        /// Column is automatically populated with a computed value
+        | Computed = 3
+        /// Column is automatically populated with a value from a sequence
+        | Sequence = 4
     
     [<Literal>]
     let private UnspecifiedName = ""
     [<Literal>]
-    let private UnspecifiedPrecision = -1y
+    let private UnspecifiedPrecision = 201uy
     [<Literal>]
-    let private UnspecifiedScale = -1y
+    let private UnspecifiedScale = 201uy
     [<Literal>]
     let private UnspecifiedLength = -1
     [<Literal>]
@@ -96,6 +160,8 @@ module DataAttributes =
         new (schemaName) =
             ViewAttribute(schemaName, UnspecifiedName)
                    
+    
+    
     /// <summary>
     /// Specifies storage characteristics
     /// </summary>
@@ -125,7 +191,7 @@ module DataAttributes =
             StorageTypeAttribute(storageKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale,  UnspecifiedType, customTypeSchemaName, customTypeName)
 
         /// Indicates the kind of storage
-        member this.StorageKind = if storageKind = UnspecifiedStorage then None else Some(storageKind)
+        member this.StorageKind : StorageKind = storageKind
         
         /// Indicates the length of the data type if specified
         member this.Length = if length = UnspecifiedLength then None else Some(length)
@@ -145,6 +211,7 @@ module DataAttributes =
                 None 
             else
                 DataObjectName(customTypeSchemaName, customTypeName) |> Some
+
 
     /// <summary>
     /// Identifies a column and specifies selected storage characteristics

@@ -28,7 +28,12 @@ module ClrRecord =
             Namespace = t.Namespace
             Fields = FSharpType.GetRecordFields(t,true) 
                |> Array.mapi(fun i p -> 
-                     {Name = p.Name; Property = p; FieldType = p.PropertyType; Position = i}) 
+                     {Name = p.Name 
+                      Property = p 
+                      FieldType = p.PropertyType 
+                      DataType =   if p.PropertyType |> ClrOption.isOptionType then p.PropertyType |> ClrOption.getValueType else p.PropertyType
+                      Position = i
+                      }) 
                |> List.ofArray
         }
                        

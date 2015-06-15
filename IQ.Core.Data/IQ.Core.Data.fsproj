@@ -64,12 +64,15 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="app.config" />
-    <EmbeddedResource Include="Resources\DefaultClrStorageTypeMap.csv" />
+    <None Include="Resources\DefaultClrStorageTypeMap.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <Compile Include="AssemblyInfo.fs" />
     <Compile Include="DataTable.fs" />
     <Compile Include="DataObjectName.fs" />
+    <Compile Include="DataAttributes.fs" />
     <Compile Include="DataStorageType.fs" />
     <Compile Include="DataMetamodel.fs" />
-    <Compile Include="DataAttributes.fs" />
     <Compile Include="DataProxyMetamodel.fs" />
     <Compile Include="DataProxyMetadataProvider.fs" />
     <Compile Include="CsvData.fs" />

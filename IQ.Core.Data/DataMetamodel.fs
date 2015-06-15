@@ -15,21 +15,6 @@ open IQ.Core.Framework
 module DataMetamodel = 
                 
 
-    /// <summary>
-    /// Enumerates the available means that lead to a column being automatically populated
-    /// with a valid value
-    /// </summary>
-    type AutoValueKind =
-        /// Column is not automatically populated
-        | None = 0
-        /// Column is automatically populated with a default value
-        | Default = 1
-        /// Column is automatically populated with an identity value
-        | Identity = 2
-        /// Column is automatically populated with a computed value
-        | Computed = 3
-        /// Column is automatically populated with a value from a sequence
-        | Sequence = 4
     
     /// <summary>
     /// Describes a column in a table or view
@@ -43,8 +28,8 @@ module DataMetamodel =
         Position : int
 
         /// The column's data type
-        StorageType : StorageType option
-        
+        StorageType : StorageType
+                
         /// Specifies whether the column allows null
         Nullable : bool   
         

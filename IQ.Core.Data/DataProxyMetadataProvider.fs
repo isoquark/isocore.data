@@ -5,24 +5,47 @@ open System.ComponentModel
 open System.Reflection
 open System.Data
 
+open FSharp.Data
+
 open IQ.Core.Framework
 
 /// <summary>
 /// Defines operations that populate a Data Proxy Metamodel
 /// </summary>
 module DataProxyMetadataProvider =    
+    [<Literal>]
+    let private DefaultClrTypeMapResource = "Resources/DefaultClrStorageTypeMap.csv"
+    
+    type private DefaultClrTypeMap = CsvProvider<DefaultClrTypeMapResource, Separators="|">
+    
+    let private getDefaultClrStorageTypeMap() =
+        let mapdata = DefaultClrTypeMap.Load(DefaultClrTypeMapResource)
+        [for row in mapdata.Rows ->
+            try
+                Type.GetType(row.ClrTypeName, true), row.StorageType |> DataStorageType.parse |> Option.get
+            with
+                e ->
+                    reraise()
+        ] |> dict
+                    
+    let private defaultClrStorageTypeMap = getDefaultClrStorageTypeMap()
+
     let private getMemberDescription(m : MemberInfo) =
         if Attribute.IsDefined(m, typeof<DescriptionAttribute>) then
             (Attribute.GetCustomAttribute(m, typeof<DescriptionAttribute>) :?> DescriptionAttribute).Description |> Some
         else
             None        
 
+
     let private inferStorageType(field : RecordFieldDescription) =
         match field.Property |> ClrProperty.getAttribute<StorageTypeAttribute> with
         | Some(attrib) ->
-            ()
+            attrib |> DataStorageType.fromAttribute
         | None ->
-            ()
+            if defaultClrStorageTypeMap.ContainsKey(field.DataType) then
+                defaultClrStorageTypeMap.[field.DataType]
+            else
+                NotSupportedException(sprintf "No default mapping exists for the %O type" field.DataType) |> raise
                                  
     /// <summary>
     /// Infers a Column Proxy Description
@@ -38,7 +61,7 @@ module DataProxyMetadataProvider =
                         | Some(name) -> name
                         | None -> field.Name
                     Position = field.Position |> defaultArg attrib.Position 
-                    StorageType = None
+                    StorageType = field |> inferStorageType
                     Nullable = field.Property.PropertyType |> ClrType.isOptionType
                     AutoValue = None
                 }
@@ -47,7 +70,7 @@ module DataProxyMetadataProvider =
                 {
                     ColumnDescription.Name = field.Name
                     Position = field.Position
-                    StorageType = None
+                    StorageType = field |> inferStorageType 
                     Nullable = field.Property.PropertyType |> ClrType.isOptionType
                     AutoValue = None
                 }

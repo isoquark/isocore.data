@@ -13,53 +13,6 @@ open IQ.Core.Framework
 /// Defines the Data Storage Type domain vocabulary
 [<AutoOpen>]
 module DataStorageTypeVocabulary =
-    /// <summary>
-    /// Specifies the available storage classes
-    /// </summary>
-    /// <remarks>
-    /// Note that the storage class is not sufficient to characterize the storage type and
-    /// additional information, such as length or data object name is needed to store/instantiate
-    /// a corresponding value
-    /// </remarks>
-    type StorageKind =
-        | Unspecified = 0uy
-        | Bit = 10uy //bit
-        | UInt8 = 20uy //tinyint
-        | UInt16 = 21uy //no direct map, use int
-        | UInt32 = 22uy // no direct map, use bigint
-        | UInt64 = 23uy // no direct map, use varbinary(8)
-        | Int8 = 30uy //no direct map, use smallint
-        | Int16 = 31uy //smallint
-        | Int32 = 32uy //int
-        | Int64 = 33uy //bigint
-        | BinaryFixed = 40uy //binary 
-        | BinaryVariable = 41uy //varbinary
-        | BinaryMax = 42uy
-        | AnsiTextFixed = 50uy //char
-        | AnsiTextVariable = 51uy //varchar
-        | AnsiTextMax = 52uy
-        | UnicodeTextFixed = 53uy //nchar
-        | UnicodeTextVariable = 54uy //nvarchar
-        | UnicodeTextMax = 55uy
-        | DateTime32 = 60uy //corresponds to smalldatetime
-        | DateTime64 = 61uy //corresponds to datetime
-        | DateTime = 62uy //corresponds to datetime2
-        | DateTimeOffset = 63uy
-        | TimeOfDay = 64uy //corresponds to time
-        | Date = 65uy //corresponds to date
-        | Float32 = 70uy //corresponds to real
-        | Float64 = 71uy //corresponds to float
-        | Decimal = 80uy
-        | Money = 81uy
-        | Guid = 90uy //corresponds to uniqueidentifier
-        | Xml = 100uy
-        | Variant = 110uy //corresponds to sql_variant
-        | CustomTable = 150uy //a non-intrinsic table data type
-        | CustomObject = 151uy //a non-intrinsic CLR type
-        | CustomPrimitive = 152uy //a non-intrinsic primitive based on an intrinsic primitive
-        | Geography = 160uy
-        | Geometry = 161uy
-        | Hierarchy = 162uy
 
     /// <summary>
     /// Defines the literals that specify the semantic names for the StorageType cases
@@ -112,6 +65,8 @@ module DataStorageTypeVocabulary =
         [<Literal>]
         let TimeOfDayStorageName = "TimeOfDay"
         [<Literal>]
+        let DateStorageName = "Date"
+        [<Literal>]
         let Float32StorageName = "Float32"
         [<Literal>]
         let Float64StorageName = "Float64"
@@ -163,6 +118,7 @@ module DataStorageTypeVocabulary =
         | DateTimeStorage of precision : uint8
         | DateTimeOffsetStorage
         | TimeOfDayStorage
+        | DateStorage
         | Float32Storage
         | Float64Storage
         | DecimalStorage of precision : uint8 * scale : uint8
@@ -172,7 +128,7 @@ module DataStorageTypeVocabulary =
         | VariantStorage
         | CustomTableStorage of name : DataObjectName
         | CustomObjectStorage of name : DataObjectName * clrType : Type
-        | CustomPrimitiveStorage of name : DataObjectName * basePrimitive : StorageType
+        | CustomPrimitiveStorage of name : DataObjectName 
     with        
         /// <summary>
         /// Renders a faithful representation of an instance as text
@@ -187,7 +143,7 @@ module DataStorageTypeVocabulary =
             | Int8Storage -> Int8StorageName
             | Int16Storage -> Int16StorageName
             | Int32Storage -> Int32StorageName
-            | Int64Storage -> Int64StorageName
+            | Int64Storage -> Int64StorageName            
             
             | BinaryFixedStorage(length) -> length |> sprintf "%s(%i)" BinaryFixedStorageName
             | BinaryVariableStorage(length) -> length |> sprintf "%s(%i)" BinaryVariableStorageName
@@ -206,6 +162,7 @@ module DataStorageTypeVocabulary =
             | DateTimeStorage(precision)-> precision |> sprintf "%s(%i)" DateTimeStorageName
             | DateTimeOffsetStorage -> DateTimeOffsetStorageName
             | TimeOfDayStorage -> TimeOfDayStorageName
+            | DateStorage -> DateStorageName
             
             | Float32Storage -> Float32StorageName
             | Float64Storage -> Float64StorageName
@@ -216,7 +173,7 @@ module DataStorageTypeVocabulary =
             | VariantStorage -> VariantStorageName
             | CustomTableStorage(name) -> name |> sprintf "%s%O" CustomTableStorageName
             | CustomObjectStorage(name,t) -> sprintf "%s%O:%s" CustomObjectStorageName name t.AssemblyQualifiedName
-            | CustomPrimitiveStorage(name,t) -> sprintf "%s%O:%O" CustomPrimitiveStorageName name t
+            | CustomPrimitiveStorage(name) -> sprintf "%s%O" CustomPrimitiveStorageName name 
 
         /// <summary>
         /// Renders a representation of an instance as text
@@ -228,10 +185,68 @@ module DataStorageTypeVocabulary =
              
         
 
-module DataStorageType =
-    open StorageTypeNames
-        let parse text =        
+open StorageTypeNames
 
+module DataStorageType =
+        
+        /// <summary>
+        /// Renders the StorageType as a semantic string
+        /// </summary>
+        /// <param name="storageType">The storage type</param>
+        let toSemanticString (storageType : StorageType) =
+            storageType.ToSemanticString()            
+        
+        /// <summary>
+        /// Infers the storage type from a supplied attribute
+        /// </summary>
+        /// <param name="attrib">The attribute that describes the type of storage</param>
+        let fromAttribute (attrib : StorageTypeAttribute)=
+            match attrib.StorageKind with
+            | StorageKind.Bit ->BitStorage
+            | StorageKind.UInt8 -> UInt8Storage
+            | StorageKind.UInt16 -> UInt16Storage
+            | StorageKind.UInt32 -> UInt32Storage
+            | StorageKind.UInt64 -> UInt64Storage
+            | StorageKind.Int8 -> Int8Storage
+            | StorageKind.Int16 -> Int16Storage
+            | StorageKind.Int32 -> Int32Storage
+            | StorageKind.Int64 -> Int64Storage
+            | StorageKind.Float32 -> Float32Storage
+            | StorageKind.Float64 -> Float64Storage
+            | StorageKind.Money -> MoneyStorage
+            | StorageKind.Guid -> GuidStorage
+            | StorageKind.AnsiTextMax -> AnsiTextMaxStorage
+            | StorageKind.DateTime32 -> DateTime32Storage
+            | StorageKind.DateTime64 -> DateTime64Storage
+            | StorageKind.DateTimeOffset -> DateTimeOffsetStorage
+            | StorageKind.TimeOfDay -> TimeOfDayStorage
+            | StorageKind.Variant -> VariantStorage
+            | StorageKind.UnicodeTextMax -> UnicodeTextMaxStorage
+            | StorageKind.BinaryFixed -> BinaryFixedStorage( defaultArg attrib.Length 250)
+            | StorageKind.BinaryVariable -> BinaryVariableStorage (defaultArg attrib.Length 250)
+            | StorageKind.BinaryMax -> BinaryMaxStorage
+            | StorageKind.AnsiTextFixed -> AnsiTextFixedStorage(defaultArg attrib.Length 250)
+            | StorageKind.AnsiTextVariable -> AnsiTextVariableStorage(defaultArg attrib.Length 250)
+            | StorageKind.UnicodeTextFixed -> UnicodeTextFixedStorage(defaultArg attrib.Length 250)
+            | StorageKind.UnicodeTextVariable -> UnicodeTextVariableStorage(defaultArg attrib.Length 250)
+            | StorageKind.DateTime -> DateTimeStorage(defaultArg attrib.Precision 7uy)  
+            | StorageKind.Date -> DateStorage
+            | StorageKind.Decimal -> DecimalStorage(defaultArg attrib.Precision 19uy, defaultArg attrib.Scale 4uy)
+            | StorageKind.Xml -> XmlStorage("")
+            | StorageKind.CustomTable -> CustomTableStorage(attrib.CustomTypeName |> Option.get)
+            | StorageKind.CustomPrimitive -> CustomPrimitiveStorage(attrib.CustomTypeName |> Option.get)
+            | StorageKind.CustomObject | StorageKind.Geography | StorageKind.Geometry | StorageKind.Hierarchy ->          
+                CustomObjectStorage(attrib.CustomTypeName |> Option.get, attrib.ClrType |> Option.get)
+            | _ ->
+                NotSupportedException(sprintf "The storage kind %A is not recognized" attrib.StorageKind) |> raise
+            
+
+        /// <summary>
+        /// Parses the semantic representation of a StorageType
+        /// </summary>
+        /// <param name="text">The semantic representation</param>        
+        let parse text =        
+            //TODO: Investigate using FParsec for this
             let pattern4() =
                 let parameters = ["StorageName"; "SchemaName"; "LocalName"]
                 let expression = @"(?<StorageName>[a-zA-z]*)\((?<SchemaName>[^,]*),(?<LocalName>[^\)]*)\)"
@@ -306,6 +321,7 @@ module DataStorageType =
                 | DateTime32StorageName -> DateTime32Storage |> Some
                 | DateTime64StorageName -> DateTime64Storage |> Some
                 | DateTimeOffsetStorageName -> DateTimeOffsetStorage |> Some
+                | DateStorageName -> DateStorage |> Some
                 | TimeOfDayStorageName -> TimeOfDayStorage |> Some
                 | Float32StorageName -> Float32Storage |> Some
                 | Float64StorageName-> Float64Storage |> Some

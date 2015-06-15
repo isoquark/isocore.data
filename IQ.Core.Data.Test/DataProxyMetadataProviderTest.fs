@@ -34,21 +34,21 @@ module ``DataProxyMetadataProvider Test`` =
                 { 
                   Name = propname<@ fun (x : RecordA) -> x.AField1 @>
                   Position = 0
-                  StorageType = None
+                  StorageType = Int32Storage
                   Nullable = false  
                   AutoValue = None              
                 }
                 { 
                   Name = propname<@ fun (x : RecordA) -> x.AField2 @>
                   Position = 1
-                  StorageType = None
+                  StorageType = BitStorage
                   Nullable = false                
                   AutoValue = None              
                 }
                 { 
                   Name = propname<@ fun (x : RecordA) -> x.AField3 @>
                   Position = 2
-                  StorageType = None
+                  StorageType = Int64Storage
                   Nullable = true
                   AutoValue = None              
                 }

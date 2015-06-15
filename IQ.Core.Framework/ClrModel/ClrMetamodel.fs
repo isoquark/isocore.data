@@ -32,6 +32,10 @@ module ClrMetamodelVocabulary =
         /// The CLR Type of the field
         FieldType : Type
         
+        /// If the type is not optional, then the same as the field type. Otherwise, the type encapsulated
+        /// by option
+        DataType : Type
+
         /// The position of the field relative to other fields in the record
         Position : int
     }

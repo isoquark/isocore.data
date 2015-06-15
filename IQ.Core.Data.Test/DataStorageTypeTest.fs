@@ -17,3 +17,8 @@ module ``DataStorageType Test`` =
         "UInt8" |> DataStorageType.parse  |> Option.get |> Claim.equal UInt8Storage
         "BinaryVariable(350)" |>  DataStorageType.parse |> Option.get |> Claim.equal (BinaryVariableStorage(350))
         "BinaryFixed(120)" |>  DataStorageType.parse |> Option.get |> Claim.equal (BinaryFixedStorage(120))
+
+    [<Test>]
+    let ``Rendered semantic representations of DataStorageType``() =       
+        350 |> BinaryVariableStorage |> fun x -> x.ToSemanticString() |> Claim.equal "BinaryVariable(350)"
+        120 |> BinaryFixedStorage |> fun x -> x.ToSemanticString() |> Claim.equal "BinaryFixed(120)"
