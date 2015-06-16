@@ -63,9 +63,7 @@ module SqlDataStoreVocabulary =
         /// </summary>
         abstract Del:SqlQuery -> unit
 
-
-        //abstract ExecuteProcedure:'TProxy->'TResult
-
+        
         
        
 /// <summary>
@@ -91,10 +89,7 @@ module SqlDataStore =
                     []
             member this.Put items = bcp cs items
             member this.Del q = ()
-
-            //member this.ExecuteProcedure proc =
-                
-                 
+                                             
     /// <summary>
     /// Provides access to an identified data store
     /// </summary>

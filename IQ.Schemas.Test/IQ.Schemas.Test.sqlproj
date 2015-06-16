@@ -67,6 +67,8 @@
     <Folder Include="SqlTest" />
     <Folder Include="SqlTest\Tables" />
     <Folder Include="SqlTest\Types" />
+    <Folder Include="SqlTest\Procedures" />
+    <Folder Include="SqlTest\Sequences" />
   </ItemGroup>
   <ItemGroup>
     <None Include="IQ.publish.xml" />
@@ -91,5 +93,7 @@
     <Build Include="SqlTest\Tables\Table01.sql" />
     <Build Include="SqlTest\Types\PhoneNumber.sql" />
     <Build Include="SqlTest\Tables\Table02.sql" />
+    <Build Include="SqlTest\Sequences\Table02Sequence.sql" />
+    <Build Include="SqlTest\Procedures\pTable02Insert.sql" />
   </ItemGroup>
 </Project>

@@ -137,7 +137,7 @@ module DataAttributes =
         
 
     /// <summary>
-    /// Identifies a schema when applied
+    /// Identifies a schema
     /// </summary>
     type SchemaAttribute(schemaName) =
         inherit DataElementAttribute(schemaName)        
@@ -153,7 +153,7 @@ module DataAttributes =
             TableAttribute(schemaName, UnspecifiedName)
 
     /// <summary>
-    /// Identifies a view when applied
+    /// Identifies a view
     /// </summary>
     type ViewAttribute(schemaName, localName) =
         inherit DataObjectAttribute(schemaName,localName)
@@ -238,6 +238,48 @@ module DataAttributes =
         /// Indicates the means by which the column is automatically populated if specified
         member this.AutoValue = if autoValueKind = UnspecifiedAutoValue then None else Some(autoValueKind)
                 
+    
+    /// <summary>
+    /// Identifies a stored procedure
+    /// </summary>
+    type ProcedureAttribute(schemaName, localName) =
+        inherit DataObjectAttribute(schemaName, localName)
+
+        /// <summary>
+        /// Initializes a new instance
+        /// </summary>
+        /// <param name="schemaName">The name of the schema in which the procedure is defined</param>
+        new(schemaName) =
+            ProcedureAttribute(schemaName, UnspecifiedName)
+
+    /// <summary>
+    /// Identifies a table-valued function
+    /// </summary>
+    type TableFunctionAttribute(schemaName, localName) = 
+        inherit DataObjectAttribute(schemaName, localName)
+
+        /// <summary>
+        /// Initializes a new instance
+        /// </summary>
+        /// <param name="schemaName">The name of the schema in which the procedure is defined</param>
+        new(schemaName) =
+            TableFunctionAttribute(schemaName, UnspecifiedName)
+
+
+    /// <summary>
+    /// Identifies a routine parameter
+    /// </summary>
+    type RoutineParameterAttribute(name, direction) =
+        inherit DataElementAttribute(name)
+
+        new (name) =
+            RoutineParameterAttribute(name, ParameterDirection.Input)
+
+        /// <summary>
+        /// Gets the direction of the parameter
+        /// </summary>
+        member this.Direction = direction
+    
     /// <summary>
     /// Identifies a sequence that will yield a value for the element to which
     /// the attribute is attached

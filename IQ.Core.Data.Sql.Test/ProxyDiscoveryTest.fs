@@ -3,6 +3,7 @@
 open System
 open System.ComponentModel
 open System.Data
+open System.Reflection
 
 open IQ.Core.TestFramework
 open IQ.Core.Data
@@ -28,6 +29,25 @@ module ``Sql Core Proxy Discovery`` =
             Col05 : string
         }
     
+
+    [<Schema("SqlTest")>]
+    module SqlTestProcedures =
+        let private dataStore = Unchecked.defaultof<ISqlDataStore>
+        
+        type pTable01InsertInput = {
+            Col02 : DateTime
+            Col03 : int64
+        }
+
+        type pTable01InsertOutput = {
+            Col01 : int
+        }
+
+        [<Schema("SqlTest")>]
+        type ISqlTestRoutines =
+            abstract pTable01Insert:col02 : DateTime -> col03 : int64 -> [<return : RoutineParameter("col01", ParameterDirection.Output)>] int
+            
+           
     
     
     

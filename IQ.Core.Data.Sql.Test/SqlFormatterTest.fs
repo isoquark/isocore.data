@@ -39,3 +39,4 @@ module SqlFormatterTest =
         let expect = "'41816141-0dbd-46c6-ab55-6037a1da8790'"
         let actual = Guid.Parse(expect |> Txt.removeChar ''') |> SqlFormatter.formatValue
         Claim.equal expect actual
+

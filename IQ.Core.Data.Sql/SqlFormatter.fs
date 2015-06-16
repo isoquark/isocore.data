@@ -2,6 +2,9 @@
 
 open System
 open System.Data
+open System.Linq
+open System.Data.Linq
+open System.Reflection
 
 
 open IQ.Core.Framework
@@ -25,5 +28,4 @@ module SqlFormatter =
             | _ -> value.ToString()
         else
             "null"
-        
 

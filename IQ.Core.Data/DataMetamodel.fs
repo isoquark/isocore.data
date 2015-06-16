@@ -13,9 +13,7 @@ open IQ.Core.Framework
 /// </summary>
 [<AutoOpen>]
 module DataMetamodel = 
-                
-
-    
+                    
     /// <summary>
     /// Describes a column in a table or view
     /// </summary>
@@ -50,6 +48,36 @@ module DataMetamodel =
         /// The columns in the table
         Columns : ColumnDescription list
     }
+
+    /// <summary>
+    /// Describes a routine in a function or procedure
+    /// </summary>
+    type RoutineParameter = {
+        /// The parameter's name
+        Name : string
+    
+        /// The column's position relative to the other columns
+        Position : int
+
+        /// The column's data type
+        StorageType : StorageType
+
+        /// The direction of the parameter
+        Direction : ParameterDirection
+
+    }
+
+
+    /// <summary>
+    /// Describes a stored procedure
+    /// </summary>
+    type ProcedureDescription = {
+        /// The name of the procedure
+        Name : DataObjectName
+
+        /// The parameters
+        Parameters : RoutineParameter list
+    }
    
 
 [<AutoOpen>]
@@ -74,8 +102,4 @@ module DataMetamodelExtensions =
             this.Columns |> List.find(fun column -> column.Position = position)
     
 
-//    type StorageType 
-//    with
-//        static member Parse(text) = 
-//            if text |> Txt.containsCharacter '(' then
                 
