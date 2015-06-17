@@ -139,11 +139,11 @@ module Txt =
     /// <param name="components">The components</param>
     let toDelimitedText (delimiter : string) (components : string list) =
         let sb = new StringBuilder()
-        [for i in 0..components.Length-1 ->
+        for i in 0..components.Length-1 do
             components.[i] |> sb.Append |> ignore
-            if i <> i - 1 then
-                delimiter |> sb.Append |> ignore
-         ]                
+            if i <> components.Length - 1 then
+                delimiter |> sb.Append |> ignore         
+        sb.ToString()               
 
     /// <summary>
     /// Removes all occurrences of a specified string from the subject string
@@ -160,4 +160,12 @@ module Txt =
     /// <param name="text">The text that will be searched</param>
     let removeChar (charToRemove : char) (text : string) =
         text |> remove (charToRemove.ToString())
-        
+
+    /// <summary>
+    /// Encloses the text between a left and right marker
+    /// </summary>
+    /// <param name="left">The left marker</param>
+    /// <param name="right">The right marker</param>
+    /// <param name="text">The text to enclose</param>
+    let enclose left right text =
+        sprintf "%s%s%s" left text right      

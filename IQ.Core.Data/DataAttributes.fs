@@ -269,16 +269,36 @@ module DataAttributes =
     /// <summary>
     /// Identifies a routine parameter
     /// </summary>
-    type RoutineParameterAttribute(name, direction) =
+    type RoutineParameterAttribute(name, direction, position) =
         inherit DataElementAttribute(name)
 
         new (name) =
-            RoutineParameterAttribute(name, ParameterDirection.Input)
+            RoutineParameterAttribute(name, ParameterDirection.Input, UnspecifiedPosition)
+
+        new (name, position) =
+            RoutineParameterAttribute(name, ParameterDirection.Input, position)
+
+        new (direction) =
+            RoutineParameterAttribute(UnspecifiedName, direction, UnspecifiedPosition)
+
+        new (direction, position) =
+            RoutineParameterAttribute(UnspecifiedName, direction, position)
+
+        new (position) =
+            RoutineParameterAttribute(UnspecifiedName, ParameterDirection.Input, position)
+
+        new (name,direction) =
+            RoutineParameterAttribute(name, direction, UnspecifiedPosition)
 
         /// <summary>
         /// Gets the direction of the parameter
         /// </summary>
         member this.Direction = direction
+
+        /// <summary>
+        /// Gets the parameter's ordinal position
+        /// </summary>
+        member this.Position = if position = UnspecifiedPosition then None else position |> Some
     
     /// <summary>
     /// Identifies a sequence that will yield a value for the element to which

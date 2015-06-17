@@ -14,4 +14,18 @@
     <Property Name="ParentElementType" Value="SqlSchema" />
     <Property Name="NewName" Value="StorageKind" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="6623a1a3-5879-4e3e-b400-79ece4646cff" ChangeDateTime="06/16/2015 11:06:00">
+    <Property Name="ElementName" Value="[Metadata].[vUserProcedureParameter]" />
+    <Property Name="ElementType" Value="SqlView" />
+    <Property Name="ParentElementName" Value="[Metadata]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="vRoutineParameter" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="bc366aa4-914a-4d18-b3c5-85704413ef38" ChangeDateTime="06/16/2015 11:07:22">
+    <Property Name="ElementName" Value="[Metadata].[vRoutineParameter]" />
+    <Property Name="ElementType" Value="SqlView" />
+    <Property Name="ParentElementName" Value="[Metadata]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="vProcedureParameter" />
+  </Operation>
 </Operations>

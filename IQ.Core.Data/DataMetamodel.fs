@@ -79,6 +79,20 @@ module DataMetamodel =
         Parameters : RoutineParameter list
     }
    
+    /// <summary>
+    /// Describes a table-valued function
+    /// </summary>
+    type TableFunctionDescription = {
+        /// The name of the procedure
+        Name : DataObjectName
+    
+        /// The parameters
+        Parameters : RoutineParameter list
+
+        /// The columns in the result set
+        Columns : ColumnDescription list
+
+    }
 
 [<AutoOpen>]
 module DataMetamodelExtensions =

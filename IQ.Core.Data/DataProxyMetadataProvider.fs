@@ -1,13 +1,15 @@
 ﻿namespace IQ.Core.Data
 
 open System
-open System.ComponentModel
+//open System.ComponentModel
 open System.Reflection
 open System.Data
 
 open FSharp.Data
 
 open IQ.Core.Framework
+
+type DescriptionAttribute = System.ComponentModel.DescriptionAttribute
 
 /// <summary>
 /// Defines operations that populate a Data Proxy Metamodel
@@ -36,24 +38,30 @@ module DataProxyMetadataProvider =
         else
             None        
 
-
-    let private inferStorageType(field : RecordFieldDescription) =
-        match field.Property |> ClrProperty.getAttribute<StorageTypeAttribute> with
-        | Some(attrib) ->
+    let private inferStorageType(element : ClrElement) =
+        match element |> ClrElement.getAttribute<StorageTypeAttribute> with
+        | Some(attrib) -> 
             attrib |> DataStorageType.fromAttribute
-        | None ->
-            if defaultClrStorageTypeMap.ContainsKey(field.DataType) then
-                defaultClrStorageTypeMap.[field.DataType]
+        | None ->            
+            let valueType =
+                match element with
+                | PropertyElement(x) -> x.PropertyType.ValueType
+                | MethodParameterElement(x) -> x.ParameterType.ValueType
+                | PropertyFieldElement(x) -> x.ValueType
+                | _ ->
+                    NotSupportedException() |> raise
+            if defaultClrStorageTypeMap.ContainsKey(valueType) then
+                defaultClrStorageTypeMap.[valueType]
             else
-                NotSupportedException(sprintf "No default mapping exists for the %O type" field.DataType) |> raise
-                                 
+                NotSupportedException(sprintf "No default mapping exists for the %O type" valueType) |> raise
+                                             
     /// <summary>
     /// Infers a Column Proxy Description
     /// </summary>
     /// <param name="field">The field correlated with the proxy</param>
-    let private describeColumnProxy(field : RecordFieldDescription) =
+    let private describeColumnProxy(field : PropertyFieldDescription) =
         let column = 
-            match field.Property |> ClrProperty.getAttribute<ColumnAttribute> with
+            match field.Property |> PropertyInfo.getAttribute<ColumnAttribute> with
             | Some(attrib) ->
                 {
                     ColumnDescription.Name = 
@@ -61,8 +69,8 @@ module DataProxyMetadataProvider =
                         | Some(name) -> name
                         | None -> field.Name
                     Position = field.Position |> defaultArg attrib.Position 
-                    StorageType = field |> inferStorageType
-                    Nullable = field.Property.PropertyType |> ClrType.isOptionType
+                    StorageType = field |> PropertyFieldElement |> inferStorageType
+                    Nullable = field.Property.PropertyType |> Type.isOptionType
                     AutoValue = None
                 }
 
@@ -70,58 +78,152 @@ module DataProxyMetadataProvider =
                 {
                     ColumnDescription.Name = field.Name
                     Position = field.Position
-                    StorageType = field |> inferStorageType 
-                    Nullable = field.Property.PropertyType |> ClrType.isOptionType
+                    StorageType = field |> PropertyFieldElement |> inferStorageType
+                    Nullable = field.Property.PropertyType |> Type.isOptionType
                     AutoValue = None
                 }
         ColumnProxyDescription(field, column)    
+
+    
+
+    let private describeParameterProxy i (proxy : MethodParameterDescription) =
+        let name, direction, position = 
+            match proxy.Parameter |> ParameterInfo.getAttribute<RoutineParameterAttribute> with
+            | Some(attrib) ->
+                let position =  match attrib.Position with |Some(p) -> p |None -> i
+                match attrib.Name with
+                |Some(name) ->
+                    name, attrib.Direction, position
+                | None ->
+                    proxy.Name, attrib.Direction, position                
+            | None ->
+                (proxy.Name, ParameterDirection.Input, i)
+        let parameter = {
+            RoutineParameter.Name = name
+            Direction = direction
+            Position = position
+            StorageType = proxy |> MethodParameterElement |> inferStorageType 
+        }
+        ParameterProxyDescription(proxy, parameter)
+            
+
+    let private getSchemaName(proxy : ClrElement) =
+        match proxy |> ClrElement.getAttribute<SchemaAttribute> with
+        | Some(a) ->
+            match a.Name with
+            | Some(name) -> 
+                name
+            | None -> 
+                proxy.Name
+        | None ->
+            proxy.Name
+            
+
+    let private getObjectName(proxy : ClrElement) =
+        match proxy |> ClrElement.getAttribute<DataObjectAttribute> with
+                | Some(a) -> 
+                    let schemaName = 
+                        match a.SchemaName with
+                        | Some(x) -> 
+                            x
+                        | None ->
+                            proxy |> ClrElement.getDeclaringElement |> Option.get |> getSchemaName
+                    let localName = 
+                        match a.Name with
+                        | Some(x) -> 
+                            x
+                        | None ->
+                            proxy.Name
+                    DataObjectName(schemaName, localName)
+                    
+                | None ->
+                    let localName = proxy.Name
+                    let schemaName = proxy |> ClrElement.getDeclaringElement |> Option.get |> getSchemaName
+                    DataObjectName(schemaName, localName)
+
+    let describeProcedureProxy(proxy : ClrElement) =
+        let objectName = proxy |> getObjectName
+        match proxy with
+        | MethodElement(m) ->        
+            let parameters = m.Parameters |> List.mapi describeParameterProxy
+            let procedure = {
+                ProcedureDescription.Name = objectName
+                Parameters = parameters |> List.map(fun p -> p.DataElement)
+            }            
+            ProcedureProxyDescription(m, procedure, parameters)
+
+        | _ ->
+            NotSupportedException() |> raise
+                    
+
     
     /// <summary>
     /// Infers a Table Proxy Description
     /// </summary>
     /// <param name="proxyType">The type of proxy</param>
-    let describeTable(proxyType : Type) =
-        let getSchemaName(declaringType) =
-            match declaringType |> ClrType.getAttribute<SchemaAttribute> with
+    let describeTable(proxy : Type) =
+        let getSchemaName2(t : Type) =
+            match t |> Type.getAttribute<SchemaAttribute> with
             | Some(a) ->
                 match a.Name with
                 | Some(name) -> 
                     name
                 | None -> 
-                    declaringType.Name
+                    t.Name
             | None ->
-                declaringType.Name
+                t.Name
             
         let objectName = 
-            match proxyType |>  ClrType.getAttribute<TableAttribute> with
+            match proxy |>  Type.getAttribute<DataObjectAttribute> with
                 | Some(a) -> 
                     let schemaName = 
                         match a.SchemaName with
-                        | Some(schemaName) -> 
-                            schemaName
+                        | Some(x) -> 
+                            x
                         | None ->
-                            proxyType.DeclaringType |> getSchemaName
-                    let tableName = 
+                            proxy.DeclaringType |> getSchemaName2
+                    let localName = 
                         match a.Name with
-                        | Some(tableName) -> 
-                            tableName
+                        | Some(x) -> 
+                            x
                         | None ->
-                            proxyType.Name
-                    DataObjectName(schemaName, tableName)
+                            proxy.Name
+                    DataObjectName(schemaName, localName)
                     
                 | None ->
-                    let tableName = proxyType.Name
-                    let schemaName = proxyType.DeclaringType |> getSchemaName
-                    DataObjectName(schemaName, tableName)
+                    let localName = proxy.Name
+                    let schemaName = proxy.DeclaringType |> getSchemaName2
+                    DataObjectName(schemaName, localName)
         
-        let record = proxyType |> ClrRecord.describe
+        let record = proxy |> ClrRecord.describe
         let columnProxies = record.Fields |> List.map(fun field -> field |> describeColumnProxy)
         let table = {
             TableDescription.Name = objectName
-            Description = proxyType |> getMemberDescription
-            Columns = columnProxies |> List.map(fun p -> p.Column)
+            Description = proxy |> getMemberDescription
+            Columns = columnProxies |> List.map(fun p -> p.DataElement)
         }
         TableProxyDescription(record, table, columnProxies)
+    
+
+//    let rec private getSchemaAttribute(t : Type) =
+//        match t |> Type.getAttribute<SchemaAttribute> with
+//        | Some(attrib) -> attrib |> Some
+//        | None ->
+//            if t.DeclaringType <> null then
+//                t.DeclaringType |> getSchemaAttribute
+//            else
+//                None
+
+    //let getSchemaName(proxy : MethodDescription) =
+        
+            
+
+//    let describeProcedure(proxy : MethodDescription) =
+//        match proxy.Method |> MethodInfo.getAttribute<ProcedureAttribute> with
+//        | Some(procAttrib) ->
+//           
+//        | None ->
+//            ()
 
 /// <summary>
 /// Convenience methods/operators intended to minimize syntactic clutter
@@ -129,7 +231,21 @@ module DataProxyMetadataProvider =
 [<AutoOpen>]
 module DataProxyOperators =    
     let tableproxy<'T> =
-        typeof<'T> |> DataProxyMetadataProvider.describeTable        
+        typeof<'T> |> DataProxyMetadataProvider.describeTable
+       
+    let procproxy(m : MethodInfo) =
+        m |> ClrMethod.describe |> MethodElement |> DataProxyMetadataProvider.describeProcedureProxy
+    
+    let procproxies<'T> =
+        [for m in  (typeof<'T> |> ClrInterface.describe |> fun x -> x.Members) do
+            match m with
+            | InterfaceMethod(m) ->
+                yield m.Method |> procproxy
+            | _ ->
+                ()
+        ]
+           
+
 
 
         

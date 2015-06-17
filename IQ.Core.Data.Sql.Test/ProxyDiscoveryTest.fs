@@ -43,17 +43,14 @@ module ``Sql Core Proxy Discovery`` =
             Col01 : int
         }
 
-        [<Schema("SqlTest")>]
-        type ISqlTestRoutines =
-            abstract pTable01Insert:col02 : DateTime -> col03 : int64 -> [<return : RoutineParameter("col01", ParameterDirection.Output)>] int
-            
-           
-    
-    
+    [<Schema("SqlTest")>]
+    type ISqlTestRoutines =
+        abstract pTable01Insert:col02 : DateTime -> col03 : int64 -> [<return : RoutineParameter("col01", ParameterDirection.Output)>] int
+                              
     
     [<Test>]
-    let ``Described table [SqlTest].[Table01] from proxy``() =
-        let actual = tableproxy<SqlTest.Table01>
+    let ``Described [SqlTest].[pTable01Insert] procedure``() =
+        let proxies = procproxies<ISqlTestRoutines>
 
         ()
 

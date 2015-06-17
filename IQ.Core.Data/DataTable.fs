@@ -28,7 +28,7 @@ module DataTable =
     /// <param name="description">The proxy description</param>
     let fromProxyDescription (description : TableProxyDescription) =
         let table = new DataTable(description.TableName.ToSemanticString())
-        description.ProxyColumns |> List.iter(fun f -> table.Columns.Add(f.Column.Name, f.ProxyField.FieldType) |> ignore)
+        description.Columns |> List.iter(fun f -> table.Columns.Add(f.DataElement.Name, f.ProxyElement.FieldType) |> ignore)
         table
 
     let fromProxyType<'T> =

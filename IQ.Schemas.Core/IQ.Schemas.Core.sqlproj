@@ -87,7 +87,7 @@
     <Build Include="Metadata\Functions\fGetParameters.sql" />
     <Build Include="Metadata\Views\vUserProcedure.sql" />
     <Build Include="Metadata\Views\vProcedure.sql" />
-    <Build Include="Metadata\Views\vUserProcedureParameter.sql" />
+    <Build Include="Metadata\Views\vProcedureParameter.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">

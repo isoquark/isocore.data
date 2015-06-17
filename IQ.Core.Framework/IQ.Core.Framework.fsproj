@@ -50,14 +50,18 @@
   <ItemGroup>
     <Compile Include="Lang.fs" />
     <Compile Include="Txt.fs" />
-    <Compile Include="ClrModel\ClrMetamodel.fs" />
-    <Compile Include="ClrModel\ClrMember.fs" />
+    <Compile Include="Reflection.fs" />
+    <Compile Include="ClrModel\ClrVocabulary.fs" />
+    <Compile Include="ClrModel\ClrTypeIndex.fs" />
     <Compile Include="ClrModel\ClrAssembly.fs" />
-    <Compile Include="ClrModel\ClrType.fs" />
-    <Compile Include="ClrModel\ClrProperty.fs" />
     <Compile Include="ClrModel\ClrOption.fs" />
+    <Compile Include="ClrModel\ClrMethod.fs" />
+    <Compile Include="ClrModel\ClrProperty.fs" />
     <Compile Include="ClrModel\ClrRecord.fs" />
-    <Compile Include="ClrModel\ClrModelOperators.fs" />
+    <Compile Include="ClrModel\ClrUnion.fs" />
+    <Compile Include="ClrModel\ClrInterface.fs" />
+    <Compile Include="ClrModel\ClrType.fs" />
+    <Compile Include="ClrModel\ClrElement.fs" />
     <Compile Include="Conversion.fs" />
     <Compile Include="FSharpModel\FSharpVocabulary.fs" />
     <Compile Include="FSharpModel\FSharpGenerator.fs" />

@@ -8,10 +8,15 @@ open System.Reflection
 /// </summary>
 module ClrProperty =
     /// <summary>
-    /// Retrieves an attribute applied to a property, if present
+    /// Describes the identified property
     /// </summary>
-    /// <param name="subject">The type to examine</param>
-    let getAttribute<'T when 'T :> Attribute>(subject : PropertyInfo) = 
-        subject |> ClrMember.getAttribute<'T>
+    /// <param name="p">The property</param>
+    let describe(p : PropertyInfo) = 
+        {
+            PropertyDescription.Name = p.Name
+            Property = p
+            ValueType = p.PropertyType.ValueType
+            PropertyType = p.PropertyType
+        }
 
 

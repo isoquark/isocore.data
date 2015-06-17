@@ -25,4 +25,8 @@ module TxtTest =
         let expect = "41816141-0dbd-46c6-ab55-6037a1da8790"
         let actual = input |> Txt.removeChar '''
         expect |> Claim.equal actual
-                    
+
+    [<Test>]
+    let ``Created delimited list``() =
+        ["1"; "2"; "3"] |> Txt.toDelimitedText "," |> Claim.equal "1,2,3"
+        ["1"; "2"; "3"] |> Txt.toDelimitedText "**" |> Claim.equal "1**2**3"

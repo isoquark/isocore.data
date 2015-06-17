@@ -9,12 +9,6 @@ open Microsoft.FSharp.Reflection
 /// Defines utility methods for working with options
 /// </summary>
 module ClrOption =
-    /// <summary>
-    /// Determines whether a type is an option type
-    /// </summary>
-    /// <param name="t"></param>
-    let isOptionType (t : Type) =
-        t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<option<_>>        
     
     /// <summary>
     /// Determines whether a value is an option
@@ -22,7 +16,7 @@ module ClrOption =
     /// <param name="value">The value to examine</param>
     let isOptionValue (value : obj) =
         if value <> null then
-            value.GetType() |> isOptionType
+            value.GetType() |> Type.isOptionType
         else
             false
     
@@ -63,11 +57,4 @@ module ClrOption =
         let unionCase = FSharpType.GetUnionCases(optionType,true) |> Array.find(fun c -> c.Name = "None")
         FSharpValue.MakeUnion(unionCase, [||], true)
     
-    /// <summary>
-    /// Gets the type of the encapsulated value
-    /// </summary>
-    /// <param name="optionType">The option type</param>
-    let getValueType (optionType : Type) =
-        optionType.GetGenericArguments().[0]
-
 

@@ -63,6 +63,8 @@ module SqlDataStoreVocabulary =
         /// </summary>
         abstract Del:SqlQuery -> unit
 
+        abstract Select:unit->'T list
+
         
         
        
@@ -89,6 +91,11 @@ module SqlDataStore =
                     []
             member this.Put items = bcp cs items
             member this.Del q = ()
+
+            member this.Select() = 
+                //let ptype = tableproxy<'T>
+                []
+                
                                              
     /// <summary>
     /// Provides access to an identified data store

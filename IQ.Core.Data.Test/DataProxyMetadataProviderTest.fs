@@ -51,17 +51,17 @@ module ``DataProxyMetadataProvider Test`` =
                 }
             ]
         }
-        let tableActual = proxy.Table
+        let tableActual = proxy.DataElement
         tableActual |> Claim.equal tableExpect
         
-        let recordActual = proxy.ProxyRecord
+        let recordActual = proxy.ProxyElement
         let recordExpect = recordinfo<RecordA>
         recordActual |> Claim.equal recordExpect
         
         let proxyColumnsExpect = 
             [for i in 0..recordExpect.Fields.Length-1 ->
                 ColumnProxyDescription(recordExpect.[i], tableExpect.[i])]
-        let proxyColumsActual = proxy.ProxyColumns
+        let proxyColumsActual = proxy.Columns
         proxyColumsActual |> Claim.equal proxyColumsActual
         
     
@@ -78,22 +78,22 @@ module ``DataProxyMetadataProvider Test`` =
     [<Test>]
     let ``Read DateTimeStorage from table proxy metadata - attribute overrides``() =
         let proxy = tableproxy<RecordB>
-        proxy.ProxyColumns.Length |> Claim.equal 4
+        proxy.Columns.Length |> Claim.equal 4
 
-        proxy.[0].Column.StorageType |> Claim.equal (DateTimeStorage(5uy))
-        proxy.[1].Column.StorageType |> Claim.equal (DateTimeStorage(4uy))
-        proxy.[2].Column.StorageType |> Claim.equal (DateTimeStorage(StorageKind.DateTime.DefaultPrecision))
-        proxy.[3].Column.StorageType |> Claim.equal (DateTimeStorage(StorageKind.DateTime.DefaultPrecision))
+        proxy.[0].DataElement.StorageType |> Claim.equal (DateTimeStorage(5uy))
+        proxy.[1].DataElement.StorageType |> Claim.equal (DateTimeStorage(4uy))
+        proxy.[2].DataElement.StorageType |> Claim.equal (DateTimeStorage(StorageKind.DateTime.DefaultPrecision))
+        proxy.[3].DataElement.StorageType |> Claim.equal (DateTimeStorage(StorageKind.DateTime.DefaultPrecision))
 
 
     [<Test>]
     let ``Read Column names from table proxy metadata - attribute overrides``() =
         let proxy = tableproxy<RecordB>
-        proxy.ProxyColumns.Length |> Claim.equal 4
+        proxy.Columns.Length |> Claim.equal 4
         
-        proxy.[0].Column.Name |> Claim.equal "BField_1"
-        proxy.[1].Column.Name |> Claim.equal "BField2"
-        proxy.[2].Column.Name |> Claim.equal "BField_3"
-        proxy.[3].Column.Name |> Claim.equal "BField4"
+        proxy.[0].DataElement.Name |> Claim.equal "BField_1"
+        proxy.[1].DataElement.Name |> Claim.equal "BField2"
+        proxy.[2].DataElement.Name |> Claim.equal "BField_3"
+        proxy.[3].DataElement.Name |> Claim.equal "BField4"
     
 

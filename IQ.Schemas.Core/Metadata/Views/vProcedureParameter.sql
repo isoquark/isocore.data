@@ -1,4 +1,4 @@
-﻿create view Metadata.vUserProcedureParameter as
+﻿create view Metadata.vProcedureParameter as
 	select 
 		[x].[SchemaId], 
 		[x].[SchemaName], 
@@ -15,5 +15,5 @@
 		p.Precision,
 		p.Scale		
 	from 
-		Metadata.vUserProcedure x
+		Metadata.vProcedure x
 	cross apply Metadata.fGetParameters(x.ProcedureId) p

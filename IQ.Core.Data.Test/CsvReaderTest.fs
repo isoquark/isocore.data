@@ -22,7 +22,7 @@ module ``CsvReader Test`` =
     let private resname<'T> = typeof<'T>.Name |> sprintf "%s.csv"
 
     let private hydrate<'T>(resname) =
-        let text = thisAssembly() |> ClrAssembly.findTextResource resname |> Option.get
+        let text = thisAssembly() |> Assembly.findTextResource resname |> Option.get
         let format = CsvReader.getDefaultFormat()
         text |> CsvReader.readText<'T> format
         
@@ -55,7 +55,7 @@ module ``CsvReader Test`` =
     [<Test>]
     let ``Desribed CSV file - no attribute overrides``() =
         let resname = resname<CsvTestCase1>
-        let path = thisAssembly() |> ClrAssembly.writeTextResource resname (TestContext.getTempDir())
+        let path = thisAssembly() |> Assembly.writeTextResource resname (TestContext.getTempDir())
         let format = CsvReader.getDefaultFormat()
         let actual = path |> CsvReader.describeFile format
         let expect = {
@@ -91,7 +91,7 @@ module ``CsvReader Test`` =
     }
 
     let private captureBenchmark<'T> resname =
-        let path = thisAssembly() |> ClrAssembly.writeTextResource resname (TestContext.getTempDir())
+        let path = thisAssembly() |> Assembly.writeTextResource resname (TestContext.getTempDir())
         let format = CsvReader.getDefaultFormat()
         let  description = path |> CsvReader.describeFile format
         let benchmark() =

@@ -7,10 +7,9 @@ open System.Collections.Concurrent
 open Microsoft.FSharp.Reflection
 
 /// <summary>
-/// Defines operations for working with record instances and metadata
+/// Defines operations for working with record values and metadata
 /// </summary>
 module ClrRecord =     
-    let private recordidx = ConcurrentDictionary<Type, RecordDescription>()    
     let private recordfac = ConcurrentDictionary<Type, obj[]->obj>()
 
     let private createFactory (t : Type) =
@@ -25,24 +24,36 @@ module ClrRecord =
         {
             Name = t.Name
             Type = t
-            Namespace = t.Namespace
             Fields = FSharpType.GetRecordFields(t,true) 
                |> Array.mapi(fun i p -> 
                      {Name = p.Name 
                       Property = p 
                       FieldType = p.PropertyType 
-                      DataType =   if p.PropertyType |> ClrOption.isOptionType then p.PropertyType |> ClrOption.getValueType else p.PropertyType
+                      ValueType =   p.ValueType
                       Position = i
                       }) 
                |> List.ofArray
         }
+
+    /// <summary>
+    /// Determines whether a supplied type is a record type
+    /// </summary>
+    /// <param name="t">The candidate type</param>
+    let isRecordType(t : Type) =
+        FSharpType.IsRecord(t, true)
+
+    /// <summary>
+    /// Determines whether a supplied type is a record type
+    /// </summary>
+    let isRecord<'T>() =
+        typeof<'T> |> isRecordType
                        
     /// <summary>
     /// Gets the record information for the supplied type which, presumably, is a record
     /// </summary>
     /// <param name="t">The type</param>
     let describe(t : Type) =
-        recordidx.GetOrAdd(t, fun t -> t |> createDescription) 
+        createDescription |> ClrTypeIndex.getOrAddRecord t
 
     /// <summary>
     /// Retrieves record field values indexed by field name
@@ -85,6 +96,12 @@ module ClrRecord =
 [<AutoOpen>]
 module ClrRecordExtensions =    
     /// <summary>
+    /// Describes the record identified by a supplied type parameter
+    /// </summary>
+    let recordinfo<'T> =
+        typeof<'T> |> ClrRecord.describe
+
+    /// <summary>
     /// Defines augmentations for the RecordDescription type
     /// </summary>
     type RecordDescription
@@ -94,4 +111,17 @@ module ClrRecordExtensions =
         /// </summary>
         /// <param name="name">The name of the field</param>
         member this.FindField(name) = this.Fields |> List.find(fun field -> field.Name = name)
+        
+        /// <summary>
+        /// Indexer that fields a field in the record by name
+        /// </summary>
+        /// <param name="name">The name of the field</param>
+        member this.Item(name) = name |> this.FindField
+
+        /// <summary>
+        /// Indexer that fields a field in the record by position
+        /// </summary>
+        /// <param name="position">The ordinal position of the field</param>
+        member this.Item(position) = this.Fields.[position]
+        
 

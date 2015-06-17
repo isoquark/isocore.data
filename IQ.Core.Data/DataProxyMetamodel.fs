@@ -15,39 +15,120 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a column proxy
     /// </summary>
-    type ColumnProxyDescription = ColumnProxyDescription of field : RecordFieldDescription * column : ColumnDescription
+    type ColumnProxyDescription = ColumnProxyDescription of field : PropertyFieldDescription * dataElement : ColumnDescription
     with
         /// <summary>
         /// Specifies the proxy record field
         /// </summary>
-        member this.ProxyField = 
+        member this.ProxyElement = 
             match this with ColumnProxyDescription(field=x) -> x
+        
         /// <summary>
         /// Specifies the data column
         /// </summary>
-        member this.Column = 
-            match this with ColumnProxyDescription(column=x) -> x
-    
+        member this.DataElement = 
+            match this with ColumnProxyDescription(dataElement=x) -> x
+
     /// <summary>
-    /// Describes a table proxy
+    /// Describes a proxy for a tabular result set
     /// </summary>
-    type TableProxyDescription = TableProxyDescription of record : RecordDescription * table : TableDescription * columns : ColumnProxyDescription list
+    type TabularResultProxyDescription = TabularResultProxyDescription of proxy : RecordDescription  * dataElement : TableFunctionDescription * columns : ColumnProxyDescription list
     with
         /// <summary>
         /// Specifies the proxy record
         /// </summary>
-        member this.ProxyRecord = 
-            match this with TableProxyDescription(record=x) -> x
+        member this.ProxyElement = 
+            match this with TabularResultProxyDescription(proxy=x) -> x
 
         /// <summary>
         /// Specifies the data table
         /// </summary>
-        member this.Table =
-            match this with TableProxyDescription(table=x) -> x
+        member this.DataElement =
+            match this with TabularResultProxyDescription(dataElement=x) -> x
 
+        /// <summary>
+        /// Specifies the column proxies
+        /// </summary>
+        member this.Columns = 
+            match this with TabularResultProxyDescription(columns=x) -> x
 
-        member this.ProxyColumns = 
+    /// <summary>
+    /// Describes a table proxy
+    /// </summary>
+    type TableProxyDescription = TableProxyDescription of proxy : RecordDescription * dataElement : TableDescription * columns : ColumnProxyDescription list
+    with
+        /// <summary>
+        /// Specifies the proxy record
+        /// </summary>
+        member this.ProxyElement = 
+            match this with TableProxyDescription(proxy=x) -> x
+
+        /// <summary>
+        /// Specifies the data table
+        /// </summary>
+        member this.DataElement =
+            match this with TableProxyDescription(dataElement=x) -> x
+
+        /// <summary>
+        /// Specifies the column proxies
+        /// </summary>
+        member this.Columns = 
             match this with TableProxyDescription(columns=x) -> x
+
+    /// <summary>
+    /// Describes a proxy for a routine parameter
+    /// </summary>
+    type ParameterProxyDescription = ParameterProxyDescription of proxy : MethodParameterDescription * dataElement : RoutineParameter
+    with
+        /// <summary>
+        /// Specifies  the CLR proxy element
+        /// </summary>
+        member this.ProxyElement = 
+            match this  with ParameterProxyDescription(proxy=x) -> x
+
+        /// <summary>
+        /// Specifies  the data element that the proxy represents
+        /// </summary>
+        member this.DataElement = 
+            match this with ParameterProxyDescription(dataElement=x) -> x
+
+    
+    /// <summary>
+    /// Describes a proxy for a stored procedure
+    /// </summary>
+    type ProcedureProxyDescription = ProcedureProxyDescription of proxy : MethodDescription * dataElement : ProcedureDescription * parameters : ParameterProxyDescription list
+    with
+        /// <summary>
+        /// Specifies  the CLR proxy element
+        /// </summary>
+        member this.ProxyElement = match this  with ProcedureProxyDescription(proxy=x) -> x
+
+        /// <summary>
+        /// Specifies  the data element that the proxy represents
+        /// </summary>
+        member this.DataElement = match this with ProcedureProxyDescription(dataElement=x) -> x
+
+        /// <summary>
+        /// Specifies the parameter proxies
+        /// </summary>
+        member this.Parameters = 
+            match this with ProcedureProxyDescription(parameters=x) -> x
+
+    /// <summary>
+    /// Describes a proxy for a stored procedure
+    /// </summary>
+    type TableFunctionProxyDescription = TableFunctionProxyDescription of proxy : MethodDescription * dataElement : TableFunctionDescription * parameters : ParameterProxyDescription list
+    
+    /// <summary>
+    /// Unifies all proxy description types
+    /// </summary>
+    type ProxyDescription =
+    | ColumnProxy of ColumnProxyDescription
+    | TableProxy of TableProxyDescription
+    | ParameterProxy of ParameterProxyDescription
+    | ProcedureProxy of ProcedureProxyDescription
+    | TableFunctionProxy of TableFunctionProxyDescription
+    | TableFunctionResultProxy of TabularResultProxyDescription
 
 /// <summary>
 /// Defines operators and augmentations for the types in the DataProxyMetamodel module
@@ -63,9 +144,9 @@ module DataProxyMetamodelExtensions =
         /// Gets the proxy column description at a supplied ordinal position
         /// </summary>
         /// <param name="i">The column's ordinal position</param>
-        member this.Item(i) = this.ProxyColumns.[i]
+        member this.Item(i) = this.Columns.[i]
 
         /// <summary>
         /// Gets the name of the table represented by the proxy
         /// </summary>
-        member this.TableName = this.Table.Name
+        member this.TableName = this.DataElement.Name

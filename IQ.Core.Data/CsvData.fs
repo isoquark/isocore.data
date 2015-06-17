@@ -61,15 +61,15 @@ module CsvReader =
         let proxy = tableproxy<'T>
 
         let getColumnProxy colName = 
-            proxy.ProxyColumns |> List.find(fun x -> x.Column.Name = colName)
+            proxy.Columns |> List.find(fun x -> x.DataElement.Name = colName)
 
         let converters =
             match file.Headers with
             | Some(headers) ->
                 headers |> Array.map(fun header -> 
                     let colproxy = header |> getColumnProxy
-                    colproxy.Column.Name, fun (value : string) -> 
-                        value |> Converter.convert colproxy.ProxyField.FieldType
+                    colproxy.DataElement.Name, fun (value : string) -> 
+                        value |> Converter.convert colproxy.ProxyElement.FieldType
                 ) |> Map.ofArray
             | None ->
                 NotSupportedException("CSV file requires headers") |> raise
@@ -82,11 +82,11 @@ module CsvReader =
             value |> Txt.trim |> converters.[colname]
         
         let createValueMap (row : CsvRow) =
-            colnames |> Array.map(fun colname -> colname |> getColumnProxy |> fun f -> f.ProxyField.Name, colname|> row.GetColumn |> convert colname) 
+            colnames |> Array.map(fun colname -> colname |> getColumnProxy |> fun f -> f.ProxyElement.Name, colname|> row.GetColumn |> convert colname) 
                      |> ValueMap.fromNamedItems
 
         file.Rows |> Seq.map createValueMap 
-                  |> Seq.map (fun valueMap -> proxy.ProxyRecord |> ClrRecord.fromValueMap valueMap :?> 'T)
+                  |> Seq.map (fun valueMap -> proxy.ProxyElement |> ClrRecord.fromValueMap valueMap :?> 'T)
                   |> List.ofSeq
 
     /// <summary>
