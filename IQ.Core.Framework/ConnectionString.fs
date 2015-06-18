@@ -22,3 +22,9 @@ module ConnectionString =
     let parse text =
         text |> Txt.split ";" |> List.ofArray |> ConnectionString    
 
+    /// <summary>
+    /// Renders the instance as semantic text that can subsequently be parsed
+    /// </summary>
+    /// <param name="cs">The connection string to format</param>
+    let format (cs : ConnectionString) =
+        cs.Components |> Txt.toDelimitedText ";"

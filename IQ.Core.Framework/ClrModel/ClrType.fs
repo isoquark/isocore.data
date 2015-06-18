@@ -18,25 +18,27 @@ module ClrType =
         | InterfaceTypeReference(i) -> i.Name
 
 
-    let describe (t : Type) =
+    let reference (t : Type) =
         if FSharpType.IsRecord(t, true) then
-            t |> ClrRecord.describe |> RecordTypeReference
+            t |> ClrRecord.reference |> RecordTypeReference
         else if FSharpType.IsUnion(t, true) then
-            t |> ClrUnion.describe |> UnionTypeReference
+            t |> ClrUnion.reference |> UnionTypeReference
         else if t.IsInterface then
-            t |> ClrInterface.describe |> InterfaceTypeReference
+            t |> ClrInterface.reference |> InterfaceTypeReference
         else
             NotImplementedException() |> raise
 
                 
 
-
+/// <summary>
+/// Defines type-related augmentations and operators
+/// </summary>
 [<AutoOpen>]
 module ClrTypeExtensions =
     /// <summary>
-    /// Describes the type identified by the supplied type parameter
+    /// Creats a reference to the type identified by the supplied type parameter
     /// </summary>
-    let typeinfo<'T> = typeof<'T> |> ClrType.describe
+    let typeref<'T> = typeof<'T> |> ClrType.reference
 
     type ClrTypeReference 
     with

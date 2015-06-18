@@ -11,21 +11,30 @@ open Microsoft.FSharp.Reflection
 /// </summary>
 module ClrUnion =
     
-    let private describeField i (p : PropertyInfo) = 
+    /// <summary>
+    /// Creates a reference to a property field
+    /// </summary>
+    /// <param name="i">The field's position within the case</param>
+    /// <param name="p">The propery that represents the field</param>
+    let private referenceField i (p : PropertyInfo) = 
         {
-            PropertyFieldReference.Name = p.Name
+            PropertyReference.Name = p.Name
             Property = p
             Position = i
-            FieldType = p.PropertyType
+            PropertyType = p.PropertyType
             ValueType = p.ValueType
         }
 
-    let private describeCase(c : UnionCaseInfo) =
+    /// <summary>
+    /// Creates a reference to a union case
+    /// </summary>
+    /// <param name="c">The case information</param>
+    let private referenceCase(c : UnionCaseInfo) =
         {
             UnionCaseReference.Name = c.Name
             Case = c
             Position = c.Tag
-            Fields = c.GetFields() |> List.ofArray |> List.mapi describeField
+            Fields = c.GetFields() |> List.ofArray |> List.mapi referenceField
         }
     
     /// <summary>
@@ -33,7 +42,7 @@ module ClrUnion =
     /// </summary>
     /// <param name="t">The union type</param>
     let private describeCases(t : Type) =
-        FSharpType.GetUnionCases(t, true) |> List.ofArray |> List.map describeCase
+        FSharpType.GetUnionCases(t, true) |> List.ofArray |> List.map referenceCase
 
     /// <summary>
     /// Determines whether a supplied type is a union type
@@ -53,7 +62,7 @@ module ClrUnion =
     /// Creates a union description
     /// </summary>
     /// <param name="t">The union type</param>
-    let private createDescription(t : Type) =      
+    let private createReference(t : Type) =      
         {
             UnionReference.Name = t.Name
             Type = t
@@ -64,20 +73,23 @@ module ClrUnion =
     /// Describes the union represented by the type
     /// </summary>
     /// <param name="t"></param>
-    let describe(t : Type) =
-        createDescription |> ClrTypeIndex.getOrAddUnion t
+    let reference(t : Type) =
+        if t |> isUnionType |> not then
+            ArgumentException(sprintf "The type %O is not a record type" t) |> raise
+        
+        createReference |> ClrTypeReferenceIndex.getOrAddUnion t
 
 
 /// <summary>
-/// Defines union-related augmentations
+/// Defines union-related augmentations and operators
 /// </summary>
 [<AutoOpen>]
 module ClrUnionExtensions =    
     /// <summary>
     /// Describes the union identified by a supplied type parameter
     /// </summary>
-    let unioninfo<'T> =
-        typeof<'T> |> ClrUnion.describe
+    let unionref<'T> =
+        typeof<'T> |> ClrUnion.reference
 
 
     /// <summary>

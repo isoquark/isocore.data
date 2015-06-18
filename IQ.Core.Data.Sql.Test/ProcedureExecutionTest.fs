@@ -11,12 +11,6 @@ open IQ.Core.Data
 open IQ.Core.Data.Sql
 open IQ.Core.Framework
 
-
-
-                           
-
-
-
 [<TestContainer; DataStoreTrait>]
 module ``Procedure Execution`` =
     let private config = Root.Resolve<IConfigurationManager>()

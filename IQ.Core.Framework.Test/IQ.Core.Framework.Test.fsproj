@@ -58,10 +58,13 @@
     <None Include="packages.config" />
     <EmbeddedResource Include="Resources\EmbeddedResource01.txt" />
     <Compile Include="ClrModel\ClrRecordTest.fs" />
+    <Compile Include="ClrModel\ClrInterfaceTest.fs" />
+    <Compile Include="ClrModel\ClrPropertyTest.fs" />
     <Compile Include="LangTest.fs" />
     <Compile Include="ConverterTest.fs" />
     <Compile Include="ClrMetadataTest.fs" />
     <Compile Include="TxtTest.fs" />
+    <Compile Include="ConnectionStringTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

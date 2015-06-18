@@ -69,7 +69,7 @@ module CsvReader =
                 headers |> Array.map(fun header -> 
                     let colproxy = header |> getColumnProxy
                     colproxy.DataElement.Name, fun (value : string) -> 
-                        value |> Converter.convert colproxy.ProxyElement.FieldType
+                        value |> Converter.convert colproxy.ProxyElement.PropertyType
                 ) |> Map.ofArray
             | None ->
                 NotSupportedException("CSV file requires headers") |> raise

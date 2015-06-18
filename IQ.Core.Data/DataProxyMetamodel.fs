@@ -16,7 +16,7 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a column proxy
     /// </summary>
-    type ColumnProxyDescription = ColumnProxyDescription of field : PropertyFieldReference * dataElement : ColumnDescription
+    type ColumnProxyDescription = ColumnProxyDescription of field : PropertyReference * dataElement : ColumnDescription
     with
         /// <summary>
         /// Specifies the proxy record field

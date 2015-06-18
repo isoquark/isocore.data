@@ -8,7 +8,7 @@ open System.Reflection
 /// Defines utility methods for working with method metadata
 /// </summary>
 module ClrMethod =
-    let private describeParameter (p : ParameterInfo) =
+    let private referenceParameter (p : ParameterInfo) =
         {
             MethodParameterReference.Name = p.Name
             ParameterType = p.ParameterType
@@ -21,10 +21,10 @@ module ClrMethod =
         }
 
     /// <summary>
-    /// Describes a specified method
+    /// Creates a method reference
     /// </summary>
-    /// <param name="m">The CLR method information</param>
-    let describe(m : MethodInfo) =
+    /// <param name="m">The method</param>
+    let reference(m : MethodInfo) =
         let returnType = if m.ReturnType  = typeof<Void> then None else m.ReturnType |> Some
         {
             MethodReference.Name = m.Name
@@ -37,9 +37,15 @@ module ClrMethod =
                                 | None -> None
                                 
                 }
-            Parameters = m.GetParameters() |> Array.map describeParameter |> List.ofArray
+            Parameters = m.GetParameters() |> Array.map referenceParameter |> List.ofArray
             Method = m
         }    
 
+/// <summary>
+/// Defines method-related operators and extensions 
+/// </summary>
+[<AutoOpen>]
+module ClrMethodExtensions =
+    let methodref(m : MethodInfo) = m |> ClrMethod.reference
     
 

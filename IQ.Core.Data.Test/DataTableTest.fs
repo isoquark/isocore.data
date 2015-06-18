@@ -56,7 +56,7 @@ module DataTableTest =
 
     [<Test>]
     let ``Created record values from a DataTable - weakly  typed``() =
-        let description = recordinfo<DataTableRecord>
+        let description = recordref<DataTableRecord>
         
         let src = 
             [

@@ -55,7 +55,7 @@ module ``DataProxyMetadataProvider Test`` =
         tableActual |> Claim.equal tableExpect
         
         let recordActual = proxy.ProxyElement
-        let recordExpect = recordinfo<RecordA>
+        let recordExpect = recordref<RecordA>
         recordActual |> Claim.equal recordExpect
         
         let proxyColumnsExpect = 

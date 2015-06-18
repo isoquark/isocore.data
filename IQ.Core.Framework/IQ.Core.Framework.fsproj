@@ -68,7 +68,7 @@
     <Compile Include="Reflection.fs" />
     <Compile Include="ValueIndex.fs" />
     <Compile Include="ClrModel\ClrVocabulary.fs" />
-    <Compile Include="ClrModel\ClrTypeIndex.fs" />
+    <Compile Include="ClrModel\ClrTypeReferenceIndex.fs" />
     <Compile Include="ClrModel\ClrAssembly.fs" />
     <Compile Include="ClrModel\ClrOption.fs" />
     <Compile Include="ClrModel\ClrMethod.fs" />

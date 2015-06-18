@@ -20,6 +20,8 @@ module ``Proxy Discovery`` =
                                               
     [<Test>]
     let ``Described [SqlTest].[pTable02Insert] procedure from proxy``() =
+        let description = interfaceref<ISqlTestRoutines>
+        
         let procName = thisMethod() |> SqlTestCaseMethod.getDbObjectName
         let proxies = procproxies<SqlTestProxies.ISqlTestProcs>
         let proxy = proxies |> List.find(fun x -> x.DataElement.Name = procName)

@@ -252,6 +252,9 @@ module DataAttributes =
         new(schemaName) =
             ProcedureAttribute(schemaName, UnspecifiedName)
 
+        new() =
+            ProcedureAttribute(UnspecifiedName, UnspecifiedName)
+
     /// <summary>
     /// Identifies a table-valued function
     /// </summary>
@@ -264,6 +267,9 @@ module DataAttributes =
         /// <param name="schemaName">The name of the schema in which the procedure is defined</param>
         new(schemaName) =
             TableFunctionAttribute(schemaName, UnspecifiedName)
+
+        new() =
+            TableFunctionAttribute(UnspecifiedName, UnspecifiedName)
 
 
     /// <summary>

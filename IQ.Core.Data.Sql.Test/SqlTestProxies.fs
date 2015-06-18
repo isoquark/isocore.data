@@ -14,6 +14,13 @@ open IQ.Core.Framework
 [<AutoOpen>]
 module SqlTestProxies =
     
+    type Table04FunctionResult = {
+        Id : int
+        Code : string
+        StartDate : DateTime
+        EndDate : DateTime        
+    }
+
     /// <summary>
     /// Defines stored procedure proxy contracts for testing purposes
     /// </summary>
@@ -26,7 +33,9 @@ module SqlTestProxies =
         /// </summary>
         /// <param name="col02">The value of Col02</param>
         /// <param name="col03">The Value of Col03</param>
+        [<Procedure>]
         abstract pTable02Insert:col02 : DateTime -> col03 : int64 -> [<return : RoutineParameter("col01", 0)>] int
+        
         /// <summary>
         /// Inserts a record into the [SqlTest].[Table03] table and returns the integral
         /// result to the caller
@@ -35,7 +44,18 @@ module SqlTestProxies =
         /// <param name="col02">The Value of Col02</param>
         /// <param name="col03">The value of Col03</param>
         /// <param name="col04">The Value of Col04</param>
+        [<Procedure>]
         abstract pTable03Insert: Col01:uint8->Col02:int16->Col03:int32->Col04:int64->int
+
+    [<Schema("SqlTest")>]
+    type ISqlTestFunctions =
+        [<TableFunction>]
+        abstract fTable04Before: startDate:DateTime-> Table04FunctionResult list
+
+
+    type ISqlTestRoutines =
+        inherit ISqlTestProcs
+        inherit ISqlTestFunctions
 
     [<Description("SQL Test Table01")>]
     type Table01 = {

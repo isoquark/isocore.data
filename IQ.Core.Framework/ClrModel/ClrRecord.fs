@@ -16,10 +16,10 @@ module ClrRecord =
         FSharpValue.PreComputeRecordConstructor(t, true)
 
     /// <summary>
-    /// Creates a record description
+    /// Creates a record reference
     /// </summary>
     /// <param name="t">The CLR type of the record</param>
-    let private createDescription (t : Type) =
+    let private createReference (t : Type) =
         recordfac.[t] <- t |> createFactory
         {
             Name = t.Name
@@ -28,7 +28,7 @@ module ClrRecord =
                |> Array.mapi(fun i p -> 
                      {Name = p.Name 
                       Property = p 
-                      FieldType = p.PropertyType 
+                      PropertyType = p.PropertyType 
                       ValueType =   p.ValueType
                       Position = i
                       }) 
@@ -49,11 +49,14 @@ module ClrRecord =
         typeof<'T> |> isRecordType
                        
     /// <summary>
-    /// Gets the record information for the supplied type which, presumably, is a record
+    /// Create a record reference
     /// </summary>
     /// <param name="t">The type</param>
-    let describe(t : Type) =
-        createDescription |> ClrTypeIndex.getOrAddRecord t
+    let reference(t : Type) =
+        if t |> isRecordType |> not then
+            ArgumentException(sprintf "The type %O is not a record type" t) |> raise
+        
+        createReference |> ClrTypeReferenceIndex.getOrAddRecord t
 
     /// <summary>
     /// Retrieves record field values indexed by field name
@@ -61,7 +64,7 @@ module ClrRecord =
     /// <param name="record">The record whose values will be retrieved</param>
     /// <param name="info">Describes the record</param>
     let toValueMap (record : obj) =
-        let description = record.GetType() |> describe
+        let description = record.GetType() |> reference
         description.Fields |> List.map(fun field -> field.Name, field.Property.GetValue(record)) |> ValueIndex.fromNamedItems
     
     /// <summary>
@@ -77,7 +80,7 @@ module ClrRecord =
     /// </summary>
     /// <param name="record"></param>
     let toValueArray (record : obj) =
-        let description = record.GetType() |> describe
+        let description = record.GetType() |> reference
         [|for i in 0..description.Fields.Length - 1 ->
             record |> description.Fields.[i].Property.GetValue
         |]        
@@ -98,8 +101,8 @@ module ClrRecordExtensions =
     /// <summary>
     /// Describes the record identified by a supplied type parameter
     /// </summary>
-    let recordinfo<'T> =
-        typeof<'T> |> ClrRecord.describe
+    let recordref<'T> =
+        typeof<'T> |> ClrRecord.reference
 
     /// <summary>
     /// Defines augmentations for the RecordDescription type

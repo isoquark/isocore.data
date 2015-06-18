@@ -30,8 +30,6 @@ module ClrElement =
             x.Case |> UnionCaseInfo.getAttribute
         | RecordElement(x) ->
             x.Type |> Type.getAttribute<'T>
-        | PropertyFieldElement(x) ->
-            x.Property |> PropertyInfo.getAttribute
 
     /// <summary>
     /// Gets the name of the element
@@ -52,8 +50,6 @@ module ClrElement =
         | UnionCaseElement(x) -> 
             x.Name
         | RecordElement(x) ->
-            x.Name
-        | PropertyFieldElement(x) ->
             x.Name
 
     /// <summary>
@@ -79,10 +75,8 @@ module ClrElement =
                 x.Case.DeclaringType |> declarer
             | RecordElement(x) ->
                 x.Type.DeclaringType |> declarer
-            | PropertyFieldElement(x) ->
-                x.Property.DeclaringType |> declarer
         match declaringType with
-        |Some(x) -> x |> ClrType.describe |> Some
+        |Some(x) -> x |> ClrType.reference |> Some
         | None -> None
 
     /// <summary>
@@ -105,7 +99,7 @@ module ClrElement =
     let getDeclaringElement(element : ClrElementReference) =
         match element with
         | MethodParameterElement(x) ->
-            x.Method |>ClrMethod.describe |> MethodElement |> Some
+            x.Method |>ClrMethod.reference |> MethodElement |> Some
         | _ ->
             match element |> getDeclaringType with
             | Some(x) -> 
@@ -127,10 +121,10 @@ module ClrElementExtensions =
         member this.GetAttribute<'T when 'T :> Attribute>(element) = element |> ClrElement.getAttribute<'T>
     
     /// <summary>
-    /// Describes the type identified by the supplied type parameter
+    /// Creates a reference to a CLR element
     /// </summary>
-    let clrinfo(o : obj) =
-        match o with 
+    let clrref(element : obj) =
+        match element with 
         | :? Type as x -> ()
         | _ -> 
             NotSupportedException() |> raise

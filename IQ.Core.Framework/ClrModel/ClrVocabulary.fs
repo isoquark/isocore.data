@@ -18,33 +18,71 @@ module ClrVocabulary =
     /// Specifies the visibility of a CLR element
     /// </summary>
     type Visibility =
+        /// Indicates that the target is visible everywhere 
         | Public
+        /// Indicates that the target is visible only to subclasses
+        /// Not supported in F#
         | Protected
+        /// Indicates that the target is not visible outside its defining scope
         | Private
+        /// Indicates that the target is visible throughout the assembly in which it is defined
         | Internal
+        /// Indicates that the target is visible to subclasses and the defining assembly
+        /// Not supported in F#
         | ProtectedInternal
-                
+               
     /// <summary>
-    /// Refers to an F#-specific field, either for a record or for a union case element, 
-    /// that is  associated with a CLR property
+    /// The name of a type
     /// </summary>
-    type PropertyFieldReference = {
-        /// The name of the field
-        Name : string
-        
-        /// The CLR property that defines the field
-        Property : PropertyInfo
-        
-        /// The CLR Type of the field
-        FieldType : Type
-        
-        /// If the type is not optional, then the same as the field type. Otherwise, the type encapsulated
-        /// by option
-        ValueType : Type
+    type ClrTypeName = 
+        ///The local name of the type; does not include enclosing type names or namespace
+        | SimpleTypeName of string
+        ///The namespace and nested type-qualified name of the type
+        | FullTypeName of string
+        ///The assembly-qualified full type name
+        | AssemblyTypeName of string
 
-        /// The position of the field relative to other fields in the declaring type
+    /// <summary>
+    /// References a property
+    /// </summary>
+    type PropertyReference = {
+        /// The name of the property
+        Name : string
+
+        /// The CLR property being described
+        Property : PropertyInfo
+
+        /// The CLR type of the property
+        PropertyType : Type
+
+        /// If the type is of option type (or actually optional) then the enclosed type; otherwise, same as PropertyType
+        ValueType : Type
+    
+        /// The position of the property relative to some declaration context
         Position : int
+
     }
+        
+
+    /// <summary>
+    /// Describes a property
+    /// </summary>
+    type PropertyDescription = {
+        /// The name of the property
+        Name : string 
+
+        /// The name of the CLR property type
+        PropertyType : ClrTypeName       
+    
+        /// Specifies whether the property has a get accessor
+        CanRead : bool
+
+        /// Specifies whether the property has a set accessor
+        CanWrite : bool
+    }
+
+   
+
 
     /// <summary>
     /// Describes an F#-specific record
@@ -57,7 +95,7 @@ module ClrVocabulary =
         Type : Type
                 
         /// The fields defined by the record
-        Fields : PropertyFieldReference list
+        Fields : PropertyReference list
     }
 
     /// <summary>
@@ -74,7 +112,7 @@ module ClrVocabulary =
         Position : int
 
         /// The fields defined by the case
-        Fields : PropertyFieldReference list
+        Fields : PropertyReference list
     }
     
     /// <summary>
@@ -159,22 +197,6 @@ module ClrVocabulary =
         Parameters : MethodParameterReference list
     }
 
-    /// <summary>
-    /// Represents a CLR property
-    /// </summary>
-    type PropertyReference = {
-        /// The name of the property
-        Name : string
-
-        /// The CLR property being described
-        Property : PropertyInfo
-
-        /// If the type is of option type (or actually optional) then the enclosed type; otherwise, same as PropertyType
-        ValueType : Type
-
-        /// The CLR type of the property
-        PropertyType : Type
-    }
  
 
     
@@ -197,7 +219,12 @@ module ClrVocabulary =
 
         /// The members that belong to the interface
         Members : InterfaceMemberReference list
+    
+        /// The interfaces from which the subject inherits
+        Bases : InterfaceReference list
     }
+
+
 
     /// <summary>
     /// Represents a CLR type
@@ -207,13 +234,8 @@ module ClrVocabulary =
     | RecordTypeReference of RecordReference
     | InterfaceTypeReference of InterfaceReference
 
-//    type ClrTypeDescription =
-//    | UnionTypeDescription of UnionDescription
-//    | RecordTypeDescription of RecordDescription
-//    
-//    type ClrType2 =
-//    | TypeDescription 
-//    | TypeReference
+
+
 
     /// <summary>
     /// Unifies the CLR element description hierarchy
@@ -226,7 +248,6 @@ module ClrVocabulary =
     | UnionElement of UnionReference
     | UnionCaseElement of UnionCaseReference
     | RecordElement of RecordReference
-    | PropertyFieldElement of PropertyFieldReference
 
 
 

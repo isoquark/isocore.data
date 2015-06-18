@@ -8,15 +8,23 @@ open System.Reflection
 /// </summary>
 module ClrProperty =
     /// <summary>
-    /// Describes the identified property
+    /// Creates a property reference
     /// </summary>
-    /// <param name="p">The property</param>
-    let describe(p : PropertyInfo) = 
+    /// <param name="p">The property to be referenced</param>
+    let reference i (p : PropertyInfo) = 
         {
             PropertyReference.Name = p.Name
             Property = p
             ValueType = p.PropertyType.ValueType
             PropertyType = p.PropertyType
+            Position = i
         }
 
 
+/// <summary>
+/// Defines ClrProperty-related operators and extensions 
+/// </summary>
+[<AutoOpen>]
+module ClrPropertyExtensions =
+    let propref  i (p : PropertyInfo) =
+        p |> ClrProperty.reference i

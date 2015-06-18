@@ -56,6 +56,9 @@ module DataMetamodel =
         /// The parameter's name
         Name : string
     
+        /// The parameter's position relative to the other columns
+        Position : int
+
         /// The column's data type
         StorageType : StorageType
 
@@ -88,8 +91,14 @@ module DataMetamodel =
 
         /// The columns in the result set
         Columns : ColumnDescription list
-
     }
+
+    /// <summary>
+    /// Describes a routine
+    /// </summary>
+    type RoutineDescription = 
+    | Procedure of ProcedureDescription
+    | TableFunction of TableFunctionDescription
 
 module ProcedureDescription =
     /// <summary>
@@ -99,6 +108,23 @@ module ProcedureDescription =
     /// <param name="proc">The procedure</param>
     let findParameter name (proc : ProcedureDescription) =
         proc.Parameters |> List.find(fun p -> p.Name = name)
+
+module TableFunctionDescription =
+    /// <summary>
+    /// Finds a procedure's named parameter
+    /// </summary>
+    /// <param name="name">The name of the parameter</param>
+    /// <param name="proc">The function</param>
+    let findParameter name (f : TableFunctionDescription) =
+        f.Parameters |> List.find(fun p -> p.Name = name)
+
+module RoutineDescription =
+    let findParameter name routine =
+        match routine with
+        |Procedure(x)  -> 
+            x |> ProcedureDescription.findParameter name
+        |TableFunction(x) -> 
+            x |> TableFunctionDescription.findParameter name
 
 [<AutoOpen>]
 module DataMetamodelExtensions =
@@ -130,4 +156,16 @@ module DataMetamodelExtensions =
     with
         member this.FindParameter(name) =
             this |> ProcedureDescription.findParameter name
-                
+
+    /// <summary>
+    /// Defines augmentations for the TableFunctionDescription type
+    /// </summary>
+    type TableFunctionDescription
+    with
+        member this.FindParameter(name) =
+            this |> TableFunctionDescription.findParameter name
+
+    type RoutineDescription 
+    with
+        member this.FindParameter(name) =
+            this |> RoutineDescription.findParameter name                       

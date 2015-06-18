@@ -190,10 +190,10 @@ module Assembly =
     let rec loadReferences (filter : string option) (subject : Assembly) =
         let references = subject.GetReferencedAssemblies()
         let filtered = match filter with
-                    | Some(filter) -> 
-                        references |> Array.filter(fun x -> x.Name.StartsWith(filter)) 
-                    | None ->
-                        references
+                        | Some(filter) -> 
+                            references |> Array.filter(fun x -> x.Name.StartsWith(filter)) 
+                        | None ->
+                            references
 
         filtered |> Array.iter(fun name ->
             if name |> isLoaded |>not then

@@ -29,27 +29,27 @@ module ClrRecordTest =
     
     [<Test>]
     let ``Discovered record metadata - with no optional fields``() =
-        let info = typeof<RecordA> |> ClrRecord.describe
+        let info = typeof<RecordA> |> ClrRecord.reference
         info.Fields.Length |> Claim.equal 3  
         info.Fields.[0].Name |> Claim.equal AField01Name
-        info.Fields.[0].FieldType |> Claim.equal typeof<int>
+        info.Fields.[0].PropertyType |> Claim.equal typeof<int>
         info.Fields.[0].Position |> Claim.equal 0
 
     [<Test>]
     let ``Discovered record metadata - with optional fields``() =
-        let info = recordinfo<RecordB>
+        let info = recordref<RecordB>
         info.Fields.Length |> Claim.equal 3  
         
         info.Fields.[0].Name |> Claim.equal BField01Name
-        info.Fields.[0].FieldType |> Claim.equal typeof<int>
+        info.Fields.[0].PropertyType |> Claim.equal typeof<int>
         info.Fields.[0].Position |> Claim.equal 0
 
         info.Fields.[1].Name |> Claim.equal BField02Name
-        info.Fields.[1].FieldType |> Claim.equal typeof<decimal>
+        info.Fields.[1].PropertyType |> Claim.equal typeof<decimal>
         info.Fields.[1].Position |> Claim.equal 1
 
         info.Fields.[2].Name |> Claim.equal BField03Name
-        info.Fields.[2].FieldType |> Claim.equal typeof<option<DateTime>>
+        info.Fields.[2].PropertyType |> Claim.equal typeof<option<DateTime>>
         info.Fields.[2].Position |> Claim.equal 2
 
 
@@ -116,7 +116,7 @@ module ClrRecordTest =
             AField02 = 38.12m
             AField03 = DateTime(2015, 5, 6)
         }
-        let actual =  recordinfo<RecordA> |> ClrRecord.fromValueMap valueMap :?> RecordA
+        let actual =  recordref<RecordA> |> ClrRecord.fromValueMap valueMap :?> RecordA
         actual |> Claim.equal expect
 
     [<Test>]
@@ -132,7 +132,7 @@ module ClrRecordTest =
             BField02 = 38.12m
             BField03 = DateTime(2015, 5, 6) |> Some
         }
-        let actual1 =  recordinfo<RecordB> |> ClrRecord.fromValueMap valueMap1 :?> RecordB
+        let actual1 =  recordref<RecordB> |> ClrRecord.fromValueMap valueMap1 :?> RecordB
         actual1 |> Claim.equal expect1
 
         let valueMap2 = 
@@ -146,7 +146,7 @@ module ClrRecordTest =
             BField02 = 38.12m
             BField03 = None
         }
-        let actual2 =  recordinfo<RecordB> |> ClrRecord.fromValueMap valueMap2 :?> RecordB
+        let actual2 =  recordref<RecordB> |> ClrRecord.fromValueMap valueMap2 :?> RecordB
         actual2 |> Claim.equal expect2
 
 

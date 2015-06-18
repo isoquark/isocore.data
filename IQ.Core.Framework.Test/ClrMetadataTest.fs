@@ -22,15 +22,15 @@ module ClrTypeTest =
     
     [<Test>]
     let ``Recognized option type``() =
-        recordinfo<RecordB>.Fields.[0].FieldType.IsOptionType |> Claim.isTrue
-        recordinfo<RecordB>.Fields.[1].FieldType.IsOptionType |> Claim.isFalse
-        recordinfo<RecordB>.Fields.[2].FieldType.IsOptionType |> Claim.isTrue        
+        recordref<RecordB>.Fields.[0].PropertyType.IsOptionType |> Claim.isTrue
+        recordref<RecordB>.Fields.[1].PropertyType.IsOptionType |> Claim.isFalse
+        recordref<RecordB>.Fields.[2].PropertyType.IsOptionType |> Claim.isTrue        
 
     type private UnionA = UnionA of field01 : int * field02 : decimal * field03 : DateTime
 
     [<Test>]
     let ``Described single-case discriminated union``() =
-        let u = unioninfo<UnionA>
+        let u = unionref<UnionA>
         u.Name |> Claim.equal "UnionA"
         u.Cases.Length |> Claim.equal 1
         u.Type |> Claim.equal typeof<UnionA>
@@ -65,7 +65,7 @@ module ClrMethodTest =
     [<Test>]
     let ``Described non-tupled method - variation 1``() =
         let m = typeof<IInterfaceA>.GetMethod("Method01")
-        let description = m |> ClrMethod.describe
+        let description = m |> ClrMethod.reference
         description.Name |> Claim.equal "Method01"
         description.Parameters.Length |> Claim.equal 2
         description.Parameters.[0].IsRequired |> Claim.isTrue
@@ -81,7 +81,7 @@ module ClrMethodTest =
 
     [<Test>]
     let ``Described non-tupled method - variation 2``() =
-        let description = typeof<IInterfaceA>.GetMethod("Method04") |> ClrMethod.describe
+        let description = typeof<IInterfaceA>.GetMethod("Method04") |> ClrMethod.reference
         description.Name |> Claim.equal "Method04"
         description.Parameters.Length |> Claim.equal 2
         description.Parameters.[0].IsRequired |> Claim.isTrue
@@ -97,7 +97,7 @@ module ClrMethodTest =
 
     [<Test>]
     let ``Described tupled method - type 1``() =
-        let description = typeof<IInterfaceA>.GetMethod("Method02") |> ClrMethod.describe
+        let description = typeof<IInterfaceA>.GetMethod("Method02") |> ClrMethod.reference
         description.Name |> Claim.equal "Method02"        
         description.Parameters.Length |> Claim.equal 2
         description.Return.ReturnType |> Claim.isNone
@@ -105,7 +105,7 @@ module ClrMethodTest =
 
     [<Test>]
     let ``Described tupled method - type 2``() =
-        let description = typeof<IInterfaceA>.GetMethod("Method03") |> ClrMethod.describe
+        let description = typeof<IInterfaceA>.GetMethod("Method03") |> ClrMethod.reference
         description.Name |> Claim.equal "Method03"
         description.Parameters.Length |> Claim.equal 1
         ()
@@ -117,7 +117,7 @@ module ClrMethodTest =
 
     [<Test>]
     let ``Described methods with optional parameters``() =
-        let description = typeof<ClassA> |> Type.getMethod "Method01" |> ClrMethod.describe
+        let description = typeof<ClassA> |> Type.getMethod "Method01" |> ClrMethod.reference
         description.Name |> Claim.equal "Method01"
         description.Parameters.Length |> Claim.equal 2
         description.Parameters.[1].IsRequired |> Claim.isFalse
@@ -135,29 +135,6 @@ module ClrAssemblyTest =
     
 
         
-[<TestContainer>]
-module ClrInterfaceTest =
-    type private IMyInterfaceA =
-        abstract Method01:unit->unit
-        abstract Method02:int->unit
-        abstract Method03:int->int
-        abstract Property01:DateTime
-        abstract Property02:DateTime with get,set
-
-    [<Test>]
-    let ``Described interface methods``() =
-        let description = interfaceinfo<IMyInterfaceA>
-        let methods = [for m in description.Members do  match m with | InterfaceMethodReference(x) -> yield x | _ -> ()]
-        methods.Length |> Claim.equal 3
-        let m1 = methods |> List.find(fun x -> x.Name = "Method01")
-        m1.Return.ReturnType |> Claim.isNone
-        m1.Parameters.Length |> Claim.equal 0
-
-        let m2 = methods |> List.find(fun x -> x.Name = "Method02")
-        m2.Return.ReturnType |> Claim.isNone
-        m2.Parameters.Length |> Claim.equal 1
-        m2.Parameters.[0].Name |> String.IsNullOrWhiteSpace |> Claim.isTrue
-        m2.Parameters.[0].ParameterType |> Claim.equal typeof<int>
 
         
 

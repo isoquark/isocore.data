@@ -11,7 +11,7 @@ open Microsoft.FSharp.Reflection
 /// <summary>
 /// Defines internal reflection cache for efficiency
 /// </summary>
-module internal ClrTypeIndex =
+module internal ClrTypeReferenceIndex =
     let private types =  ConcurrentDictionary<Type, ClrTypeReference>()
 
     /// <summary>

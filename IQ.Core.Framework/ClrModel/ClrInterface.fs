@@ -12,31 +12,42 @@ open Microsoft.FSharp.Reflection
 /// </summary>
 module ClrInterface =
         
-    let private describeMember(m : MemberInfo) =
+    let private describeMember i (m : MemberInfo) =
         match m with
         | :? MethodInfo as x ->
-            x |> ClrMethod.describe |> InterfaceMethodReference
+            x |> ClrMethod.reference |> InterfaceMethodReference
         | :? PropertyInfo as x ->
-            x |> ClrProperty.describe |> InterfacePropertyReference
+            x |> ClrProperty.reference i |> InterfacePropertyReference
         | _ ->
             NotSupportedException() |> raise
 
-
-    let private createDescription(t : Type) =
+    /// <summary>
+    /// Creates an interface reference
+    /// </summary>
+    /// <param name="t">The type of the interface to reference</param>
+    let rec private createReference(t : Type) =
         {
             InterfaceReference.Type = t
             Name = t.Name 
             Members = 
-                (t |> Type.getPureMethods |> List.map describeMember ) 
-                |> List.append (t.GetProperties() |> Array.map describeMember |> List.ofArray)
+                (t |> Type.getPureMethods |> List.mapi describeMember ) 
+                |> List.append (t.GetProperties() |> Array.mapi describeMember |> List.ofArray)
+            Bases = [for b in t.GetInterfaces() ->
+                        createReference |> ClrTypeReferenceIndex.getOrAddInterface b   
+                    ]
         }
 
     /// <summary>
-    /// Gets the interface information for the supplied type which, presumably, is an interface
+    /// Gets an interface reference
     /// </summary>
-    /// <param name="t">The type</param>
-    let describe(t : Type) =
-        createDescription |> ClrTypeIndex.getOrAddInterface t
+    /// <param name="t">The type that defines the type</param>
+    let reference (t : Type) =
+        if t.IsInterface |> not then
+            ArgumentException(sprintf "The type %O is not an interface type" t) |> raise
+        
+        createReference |> ClrTypeReferenceIndex.getOrAddInterface t
+
+
 
 module ClrInterfaceMember =
     let getAttribute<'T when 'T :> Attribute> m  =
@@ -46,9 +57,12 @@ module ClrInterfaceMember =
         | InterfacePropertyReference(p) -> 
             p.Property |> PropertyInfo.getAttribute<'T>
 
+/// <summary>
+/// Defines interface-related augmentations and operators
+/// </summary>
 [<AutoOpen>]
 module ClrInterfaceExtensions =
-    let interfaceinfo<'T> = typeof<'T> |> ClrInterface.describe
+    let interfaceref<'T> = typeof<'T> |> ClrInterface.reference
 
     /// <summary>
     /// Defines augmentations for the InterfaceMemberDescription type

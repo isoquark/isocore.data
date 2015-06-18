@@ -69,6 +69,7 @@
     <Folder Include="SqlTest\Types" />
     <Folder Include="SqlTest\Procedures" />
     <Folder Include="SqlTest\Sequences" />
+    <Folder Include="SqlTest\Functions" />
   </ItemGroup>
   <ItemGroup>
     <None Include="IQ.publish.xml" />
@@ -97,5 +98,10 @@
     <Build Include="SqlTest\Procedures\pTable02Insert.sql" />
     <Build Include="SqlTest\Tables\Table03.sql" />
     <Build Include="SqlTest\Procedures\pTable03Insert.sql" />
+    <Build Include="SqlTest\Tables\Table04.sql" />
+    <Build Include="SqlTest\Sequences\Table04Sequence.sql" />
+    <Build Include="SqlTest\Procedures\pTable04Insert.sql" />
+    <Build Include="SqlTest\Functions\fTable04Before.sql" />
+    <Build Include="SqlTest\Procedures\pTable04Truncate.sql" />
   </ItemGroup>
 </Project>
