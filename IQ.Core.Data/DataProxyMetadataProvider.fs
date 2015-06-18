@@ -24,7 +24,7 @@ module DataProxyMetadataProvider =
         let mapdata = DefaultClrTypeMap.Load(DefaultClrTypeMapResource)
         [for row in mapdata.Rows ->
             try
-                Type.GetType(row.ClrTypeName, true), row.StorageType |> DataStorageType.parse |> Option.get
+                Type.GetType(row.ClrTypeName, true), row.StorageType |> StorageType.parse |> Option.get
             with
                 e ->
                     reraise()
@@ -38,28 +38,36 @@ module DataProxyMetadataProvider =
         else
             None        
 
-    let private inferStorageType(element : ClrElement) =
+    let private inferStorageTypeFromClrType (t : Type) =
+        if defaultClrStorageTypeMap.ContainsKey(t.ValueType) then
+            defaultClrStorageTypeMap.[t.ValueType]
+        else
+            NotSupportedException(sprintf "No default mapping exists for the %O type" t.ValueType) |> raise
+
+    let private inferStorageTypeFromClrElement(element : ClrElementReference) =
+        let valueType =
+            match element with
+            | PropertyElement(x) -> x.PropertyType
+            | MethodParameterElement(x) -> x.ParameterType
+            | PropertyFieldElement(x) -> x.FieldType
+            | _ ->
+                NotSupportedException() |> raise
+        valueType |> inferStorageTypeFromClrType
+        
+    let private inferStorageTypeFromAttribute (attrib : StorageTypeAttribute) =
+        attrib |> StorageType.fromAttribute
+
+    let private inferStorageType(element : ClrElementReference) =
         match element |> ClrElement.getAttribute<StorageTypeAttribute> with
         | Some(attrib) -> 
-            attrib |> DataStorageType.fromAttribute
+            attrib |> inferStorageTypeFromAttribute
         | None ->            
-            let valueType =
-                match element with
-                | PropertyElement(x) -> x.PropertyType.ValueType
-                | MethodParameterElement(x) -> x.ParameterType.ValueType
-                | PropertyFieldElement(x) -> x.ValueType
-                | _ ->
-                    NotSupportedException() |> raise
-            if defaultClrStorageTypeMap.ContainsKey(valueType) then
-                defaultClrStorageTypeMap.[valueType]
-            else
-                NotSupportedException(sprintf "No default mapping exists for the %O type" valueType) |> raise
-                                             
+            element |> inferStorageTypeFromClrElement                                             
     /// <summary>
     /// Infers a Column Proxy Description
     /// </summary>
     /// <param name="field">The field correlated with the proxy</param>
-    let private describeColumnProxy(field : PropertyFieldDescription) =
+    let private describeColumnProxy(field : PropertyFieldReference) =
         let column = 
             match field.Property |> PropertyInfo.getAttribute<ColumnAttribute> with
             | Some(attrib) ->
@@ -86,28 +94,52 @@ module DataProxyMetadataProvider =
 
     
 
-    let private describeParameterProxy i (proxy : MethodParameterDescription) =
-        let name, direction, position = 
-            match proxy.Parameter |> ParameterInfo.getAttribute<RoutineParameterAttribute> with
-            | Some(attrib) ->
-                let position =  match attrib.Position with |Some(p) -> p |None -> i
-                match attrib.Name with
-                |Some(name) ->
-                    name, attrib.Direction, position
+    let private describeParameterProxy i (proxy : MethodInputOutputReference) =
+        match proxy with
+        | MethodInputReference(inputref) ->
+            let name, direction, position = 
+                match inputref.Parameter |> ParameterInfo.getAttribute<RoutineParameterAttribute> with
+                | Some(attrib) ->
+                    let position =  match attrib.Position with |Some(p) -> p |None -> i
+                    match attrib.Name with
+                    |Some(name) ->
+                        name, attrib.Direction, position
+                    | None ->
+                        inputref.Name, attrib.Direction, position                
                 | None ->
-                    proxy.Name, attrib.Direction, position                
+                    (inputref.Name, ParameterDirection.Input, i)
+            let parameter = {
+                RoutineParameter.Name = name
+                Direction = direction
+                StorageType = inputref |> MethodParameterElement |> inferStorageType 
+            }
+            ParameterProxyDescription(proxy, parameter)
+        | MethodOutputReference(outputref) ->
+            let storageType = match outputref.Method |> MethodInfo.getReturnAttribute<StorageTypeAttribute> with
+                                  | Some(attrib) -> 
+                                        attrib |> inferStorageTypeFromAttribute
+                                  | None -> 
+                                        outputref.ReturnType |> Option.get |> inferStorageTypeFromClrType
+            match outputref.Method |> MethodInfo.getReturnAttribute<RoutineParameterAttribute> with            
+            |Some(attrib) ->
+                let parameter = {
+                    RoutineParameter.Name = attrib.Name |> Option.get                   
+                    Direction = ParameterDirection.Output //Must always be output so value in attribute can be ignored
+                    StorageType = storageType
+                }
+                ParameterProxyDescription(proxy, parameter)
             | None ->
-                (proxy.Name, ParameterDirection.Input, i)
-        let parameter = {
-            RoutineParameter.Name = name
-            Direction = direction
-            Position = position
-            StorageType = proxy |> MethodParameterElement |> inferStorageType 
-        }
-        ParameterProxyDescription(proxy, parameter)
-            
+                //No attribute, so assume stored procedure return value
+                let parameter = {
+                    RoutineParameter.Name = "Return"
+                    Direction = ParameterDirection.ReturnValue
+                    StorageType = storageType
+                }
+                ParameterProxyDescription(proxy, parameter)
+                
 
-    let private getSchemaName(proxy : ClrElement) =
+
+    let private getSchemaName(proxy : ClrElementReference) =
         match proxy |> ClrElement.getAttribute<SchemaAttribute> with
         | Some(a) ->
             match a.Name with
@@ -119,7 +151,7 @@ module DataProxyMetadataProvider =
             proxy.Name
             
 
-    let private getObjectName(proxy : ClrElement) =
+    let private getObjectName(proxy : ClrElementReference) =
         match proxy |> ClrElement.getAttribute<DataObjectAttribute> with
                 | Some(a) -> 
                     let schemaName = 
@@ -141,11 +173,18 @@ module DataProxyMetadataProvider =
                     let schemaName = proxy |> ClrElement.getDeclaringElement |> Option.get |> getSchemaName
                     DataObjectName(schemaName, localName)
 
-    let describeProcedureProxy(proxy : ClrElement) =
+    let describeProcedureProxy(proxy : ClrElementReference) =
         let objectName = proxy |> getObjectName
         match proxy with
         | MethodElement(m) ->        
-            let parameters = m.Parameters |> List.mapi describeParameterProxy
+            let parameters = 
+                [for p in m.Parameters do
+                    yield p |> MethodInputReference
+                 
+                 if m.Return.ReturnType |> Option.isSome then
+                    yield m.Return |> MethodOutputReference                     
+                ]  |> List.mapi describeParameterProxy
+            
             let procedure = {
                 ProcedureDescription.Name = objectName
                 Parameters = parameters |> List.map(fun p -> p.DataElement)
@@ -205,26 +244,6 @@ module DataProxyMetadataProvider =
         TableProxyDescription(record, table, columnProxies)
     
 
-//    let rec private getSchemaAttribute(t : Type) =
-//        match t |> Type.getAttribute<SchemaAttribute> with
-//        | Some(attrib) -> attrib |> Some
-//        | None ->
-//            if t.DeclaringType <> null then
-//                t.DeclaringType |> getSchemaAttribute
-//            else
-//                None
-
-    //let getSchemaName(proxy : MethodDescription) =
-        
-            
-
-//    let describeProcedure(proxy : MethodDescription) =
-//        match proxy.Method |> MethodInfo.getAttribute<ProcedureAttribute> with
-//        | Some(procAttrib) ->
-//           
-//        | None ->
-//            ()
-
 /// <summary>
 /// Convenience methods/operators intended to minimize syntactic clutter
 /// </summary>
@@ -239,7 +258,7 @@ module DataProxyOperators =
     let procproxies<'T> =
         [for m in  (typeof<'T> |> ClrInterface.describe |> fun x -> x.Members) do
             match m with
-            | InterfaceMethod(m) ->
+            | InterfaceMethodReference(m) ->
                 yield m.Method |> procproxy
             | _ ->
                 ()

@@ -66,7 +66,7 @@ module ClrRecordTest =
             (AField01Name, value.AField01 :> obj)
             (AField02Name, value.AField02 :> obj)
             (AField03Name, value.AField03:> obj)
-            ] |> ValueMap.fromNamedItems
+            ] |> ValueIndex.fromNamedItems
         let actual = value |> ClrRecord.toValueMap 
         actual |> Claim.equal expect
 
@@ -82,7 +82,7 @@ module ClrRecordTest =
             (BField01Name, value1.BField01 :> obj)
             (BField02Name, value1.BField02 :> obj)
             (BField03Name, value1.BField03:> obj)
-            ] |> ValueMap.fromNamedItems
+            ] |> ValueIndex.fromNamedItems
 
         let actual1 = value1 |> ClrRecord.toValueMap 
         actual1 |> Claim.equal expect1
@@ -97,7 +97,7 @@ module ClrRecordTest =
             (BField01Name, value1.BField01 :> obj)
             (BField02Name, value1.BField02 :> obj)
             (BField03Name, value1.BField03:> obj)
-            ] |> ValueMap.fromNamedItems
+            ] |> ValueIndex.fromNamedItems
 
         let actual2 = value1 |> ClrRecord.toValueMap 
         actual2 |> Claim.equal expect2
@@ -109,7 +109,7 @@ module ClrRecordTest =
             [(AField01Name, 16 :> obj)
              (AField02Name, 38.12m :> obj)
              (AField03Name, DateTime(2015, 5, 6) :> obj)
-            ]|> ValueMap.fromNamedItems
+            ]|> ValueIndex.fromNamedItems
         
         let expect = {
             AField01 = 16
@@ -125,7 +125,7 @@ module ClrRecordTest =
             [(BField01Name, 16 :> obj)
              (BField02Name, 38.12m :> obj)
              (BField03Name, DateTime(2015, 5, 6) |> Some :> obj)
-            ]|> ValueMap.fromNamedItems
+            ]|> ValueIndex.fromNamedItems
         
         let expect1 = {
             BField01 = 16
@@ -139,7 +139,7 @@ module ClrRecordTest =
             [(BField01Name, 16 :> obj)
              (BField02Name, 38.12m :> obj)
              (BField03Name, option<DateTime>.None :> obj)
-            ]|> ValueMap.fromNamedItems
+            ]|> ValueIndex.fromNamedItems
         
         let expect2 = {
             BField01 = 16

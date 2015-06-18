@@ -83,7 +83,7 @@ module CsvReader =
         
         let createValueMap (row : CsvRow) =
             colnames |> Array.map(fun colname -> colname |> getColumnProxy |> fun f -> f.ProxyElement.Name, colname|> row.GetColumn |> convert colname) 
-                     |> ValueMap.fromNamedItems
+                     |> ValueIndex.fromNamedItems
 
         file.Rows |> Seq.map createValueMap 
                   |> Seq.map (fun valueMap -> proxy.ProxyElement |> ClrRecord.fromValueMap valueMap :?> 'T)

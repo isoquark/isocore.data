@@ -189,10 +189,7 @@ open StorageTypeNames
 /// <summary>
 /// Defines operations for working with StorageType specifications
 /// </summary>
-module DataStorageType =        
-        
-
-
+module StorageType =                
         /// <summary>
         /// Renders the StorageType as a semantic string
         /// </summary>
@@ -204,7 +201,7 @@ module DataStorageType =
         /// Gets the kind of storage required by the data type
         /// </summary>
         /// <param name="storageType">The storage type</param>
-        let getKind (storageType : StorageType) =
+        let toKind (storageType : StorageType) =
             match storageType with
             | BitStorage -> StorageKind.Bit
             | UInt8Storage -> StorageKind.UInt8
@@ -245,7 +242,49 @@ module DataStorageType =
             | CustomTableStorage(name) -> StorageKind.CustomTable
             | CustomObjectStorage(name,t) -> StorageKind.CustomObject
             | CustomPrimitiveStorage(name) -> StorageKind.CustomPrimitive
+
+        let toSqlDbType (storageType : StorageType) =
+            match storageType with
+            | BitStorage -> SqlDbType.Bit
+            | UInt8Storage -> SqlDbType.TinyInt
+            | UInt16Storage -> SqlDbType.Int
+            | UInt32Storage -> SqlDbType.BigInt
+            | UInt64Storage -> SqlDbType.VarBinary //8
+            | Int8Storage -> SqlDbType.SmallInt
+            | Int16Storage -> SqlDbType.SmallInt
+            | Int32Storage -> SqlDbType.Int
+            | Int64Storage -> SqlDbType.BigInt
+                        
+            | BinaryFixedStorage(_) -> SqlDbType.Binary
+            | BinaryVariableStorage(_) -> SqlDbType.VarBinary
+            | BinaryMaxStorage -> SqlDbType.VarBinary
             
+            | AnsiTextFixedStorage(length) -> SqlDbType.Char
+            | AnsiTextVariableStorage(length) -> SqlDbType.VarChar
+            | AnsiTextMaxStorage -> SqlDbType.VarChar
+            
+            | UnicodeTextFixedStorage(length) -> SqlDbType.NChar
+            | UnicodeTextVariableStorage(length) -> SqlDbType.NVarChar
+            | UnicodeTextMaxStorage -> SqlDbType.NVarChar
+            
+            | DateTime32Storage -> SqlDbType.SmallDateTime
+            | DateTime64Storage -> SqlDbType.DateTime
+            | DateTimeStorage(precision)-> SqlDbType.DateTime2
+            | DateTimeOffsetStorage -> SqlDbType.DateTimeOffset
+            | TimeOfDayStorage -> SqlDbType.Time
+            | DateStorage -> SqlDbType.Date
+            
+            | Float32Storage -> SqlDbType.Real
+            | Float64Storage -> SqlDbType.Float
+            | DecimalStorage(precision,scale) -> SqlDbType.Decimal
+            | MoneyStorage -> SqlDbType.Money
+            | GuidStorage -> SqlDbType.UniqueIdentifier
+            | XmlStorage(schema) -> SqlDbType.UniqueIdentifier
+            | VariantStorage -> SqlDbType.Variant
+            | CustomTableStorage(name) -> SqlDbType.Structured
+            | CustomObjectStorage(name,t) -> SqlDbType.VarBinary //not sure about this
+            | CustomPrimitiveStorage(name) -> SqlDbType.Udt
+                        
         
         /// <summary>
         /// Infers the storage type from a supplied attribute

@@ -10,7 +10,7 @@ open System.Reflection
 module ClrMethod =
     let private describeParameter (p : ParameterInfo) =
         {
-            MethodParameterDescription.Name = p.Name
+            MethodParameterReference.Name = p.Name
             ParameterType = p.ParameterType
             ValueType = p.ParameterType.ValueType
             Parameter = p
@@ -27,7 +27,7 @@ module ClrMethod =
     let describe(m : MethodInfo) =
         let returnType = if m.ReturnType  = typeof<Void> then None else m.ReturnType |> Some
         {
-            MethodDescription.Name = m.Name
+            MethodReference.Name = m.Name
             Return = 
                 {
                     ReturnType = returnType

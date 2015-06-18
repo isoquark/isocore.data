@@ -56,9 +56,6 @@ module DataMetamodel =
         /// The parameter's name
         Name : string
     
-        /// The column's position relative to the other columns
-        Position : int
-
         /// The column's data type
         StorageType : StorageType
 
@@ -94,8 +91,18 @@ module DataMetamodel =
 
     }
 
+module ProcedureDescription =
+    /// <summary>
+    /// Finds a procedure's named parameter
+    /// </summary>
+    /// <param name="name">The name of the parameter</param>
+    /// <param name="proc">The procedure</param>
+    let findParameter name (proc : ProcedureDescription) =
+        proc.Parameters |> List.find(fun p -> p.Name = name)
+
 [<AutoOpen>]
 module DataMetamodelExtensions =
+    
     /// <summary>
     /// Defines augmentations for the TableDescription type
     /// </summary>
@@ -116,4 +123,11 @@ module DataMetamodelExtensions =
             this.Columns |> List.find(fun column -> column.Position = position)
     
 
+    /// <summary>
+    /// Defines augmentations for the ProcedureDescription type
+    /// </summary>
+    type ProcedureDescription
+    with
+        member this.FindParameter(name) =
+            this |> ProcedureDescription.findParameter name
                 

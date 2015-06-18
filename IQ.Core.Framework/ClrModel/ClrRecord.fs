@@ -62,14 +62,14 @@ module ClrRecord =
     /// <param name="info">Describes the record</param>
     let toValueMap (record : obj) =
         let description = record.GetType() |> describe
-        description.Fields |> List.map(fun field -> field.Name, field.Property.GetValue(record)) |> ValueMap.fromNamedItems
+        description.Fields |> List.map(fun field -> field.Name, field.Property.GetValue(record)) |> ValueIndex.fromNamedItems
     
     /// <summary>
     /// Creates a record from a value map
     /// </summary>
     /// <param name="valueMap">The value map</param>
     /// <param name="info"></param>
-    let fromValueMap (valueMap : ValueMap) (info : RecordDescription) =
+    let fromValueMap (valueMap : ValueIndex) (info : RecordReference) =
         info.Fields |> List.map(fun field -> valueMap.[field.Name]) |> Array.ofList |> recordfac.[info.Type]
     
     /// <summary>
@@ -87,7 +87,7 @@ module ClrRecord =
     /// </summary>
     /// <param name="valueArray">An array of values in declaration order</param>
     /// <param name="description">The record description</param>
-    let fromValueArray (valueArray : obj[]) (description : RecordDescription) =
+    let fromValueArray (valueArray : obj[]) (description : RecordReference) =
         valueArray |> recordfac.[description.Type]    
 
 /// <summary>
@@ -104,7 +104,7 @@ module ClrRecordExtensions =
     /// <summary>
     /// Defines augmentations for the RecordDescription type
     /// </summary>
-    type RecordDescription
+    type RecordReference
     with
         /// <summary>
         /// Finds a field in the record by name

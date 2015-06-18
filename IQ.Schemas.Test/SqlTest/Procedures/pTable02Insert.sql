@@ -4,4 +4,5 @@ begin
 	set @Col01 = next value for SqlTest.Table02Sequence
 	insert SqlTest.Table02(Col01, Col02, Col03) values (@Col01, @Col02, @Col03)
 	set nocount off
+	return @Col01
 end

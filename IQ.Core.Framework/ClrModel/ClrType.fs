@@ -11,20 +11,20 @@ module ClrType =
     /// Gets the name of the type
     /// </summary>
     /// <param name="t">The type description</param>
-    let getName(t : ClrType) =
+    let getName(t : ClrTypeReference) =
         match t with
-        | UnionType(u) -> u.Name
-        | RecordType(r) -> r.Name
-        | InterfaceType(i) -> i.Name
+        | UnionTypeReference(u) -> u.Name
+        | RecordTypeReference(r) -> r.Name
+        | InterfaceTypeReference(i) -> i.Name
 
 
     let describe (t : Type) =
         if FSharpType.IsRecord(t, true) then
-            t |> ClrRecord.describe |> RecordType
+            t |> ClrRecord.describe |> RecordTypeReference
         else if FSharpType.IsUnion(t, true) then
-            t |> ClrUnion.describe |> UnionType
+            t |> ClrUnion.describe |> UnionTypeReference
         else if t.IsInterface then
-            t |> ClrInterface.describe |> InterfaceType
+            t |> ClrInterface.describe |> InterfaceTypeReference
         else
             NotImplementedException() |> raise
 
@@ -38,7 +38,7 @@ module ClrTypeExtensions =
     /// </summary>
     let typeinfo<'T> = typeof<'T> |> ClrType.describe
 
-    type ClrType 
+    type ClrTypeReference 
     with
         member this.Name = this |> ClrType.getName
         

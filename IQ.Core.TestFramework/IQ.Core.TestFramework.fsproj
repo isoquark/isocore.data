@@ -57,6 +57,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <Compile Include="TestContext.fs" />
+    <Compile Include="Traits.fs" />
     <Compile Include="Claim.fs" />
     <Compile Include="Benchmark.fs" />
   </ItemGroup>

@@ -14,7 +14,7 @@ module ClrElement =
     /// Reads an identified attribute from the element if applied
     /// </summary>
     /// <param name="element">The potentially attributed element</param>
-    let getAttribute<'T when 'T :> Attribute>(element : ClrElement) =
+    let getAttribute<'T when 'T :> Attribute>(element : ClrElementReference) =
         match element with
         | InterfaceElement(x) -> 
             x.Type |> Type.getAttribute<'T>
@@ -37,7 +37,7 @@ module ClrElement =
     /// Gets the name of the element
     /// </summary>
     /// <param name="element">The element</param>
-    let getName(element : ClrElement) =
+    let getName(element : ClrElementReference) =
         match element with
         | InterfaceElement(x) -> 
             x.Name
@@ -60,7 +60,7 @@ module ClrElement =
     /// Gets the type that declares the element, if applicable
     /// </summary>
     /// <param name="element">The element</param>
-    let getDeclaringType(element : ClrElement) =
+    let getDeclaringType(element : ClrElementReference) =
         let declarer (t : Type) =
             if t = null then None else t |> Some
         let declaringType = 
@@ -89,20 +89,20 @@ module ClrElement =
     /// Gets the element from a supplied type
     /// </summary>
     /// <param name="t">The type to be expressed as an element</param>
-    let fromType(t : ClrType) =
+    let fromType(t : ClrTypeReference) =
         match t with
-        | UnionType(x) -> 
+        | UnionTypeReference(x) -> 
             x |> UnionElement
-        | RecordType(x) -> 
+        | RecordTypeReference(x) -> 
             x |> RecordElement
-        | InterfaceType(x) -> 
+        | InterfaceTypeReference(x) -> 
             x |> InterfaceElement
     
     /// <summary>
     /// Gets the element that declares a specified element, if any
     /// </summary>
     /// <param name="element">The element whose declaring element should be returned</param>
-    let getDeclaringElement(element : ClrElement) =
+    let getDeclaringElement(element : ClrElementReference) =
         match element with
         | MethodParameterElement(x) ->
             x.Method |>ClrMethod.describe |> MethodElement |> Some
@@ -120,7 +120,7 @@ module ClrElement =
 [<AutoOpen>]
 module ClrElementExtensions =
     
-    type ClrElement
+    type ClrElementReference
     with
         member this.DeclaringType = this |> ClrElement.getDeclaringType
         member this.Name = this |> ClrElement.getName

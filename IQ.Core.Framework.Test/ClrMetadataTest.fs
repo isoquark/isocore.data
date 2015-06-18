@@ -147,7 +147,7 @@ module ClrInterfaceTest =
     [<Test>]
     let ``Described interface methods``() =
         let description = interfaceinfo<IMyInterfaceA>
-        let methods = [for m in description.Members do  match m with | InterfaceMethod(x) -> yield x | _ -> ()]
+        let methods = [for m in description.Members do  match m with | InterfaceMethodReference(x) -> yield x | _ -> ()]
         methods.Length |> Claim.equal 3
         let m1 = methods |> List.find(fun x -> x.Name = "Method01")
         m1.Return.ReturnType |> Claim.isNone

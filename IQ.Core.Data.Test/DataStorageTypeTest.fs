@@ -13,22 +13,22 @@ module ``DataStorageType Test`` =
 
     [<Test>]
     let ``Parsed semantic representations of DataStorageType``() =
-        "Bit" |> DataStorageType.parse  |> Option.get |> Claim.equal BitStorage
-        "UInt8" |> DataStorageType.parse  |> Option.get |> Claim.equal UInt8Storage
-        "BinaryVariable(350)" |>  DataStorageType.parse |> Option.get |> Claim.equal (BinaryVariableStorage(350))
-        "BinaryFixed(120)" |>  DataStorageType.parse |> Option.get |> Claim.equal (BinaryFixedStorage(120))
+        "Bit" |> StorageType.parse  |> Option.get |> Claim.equal BitStorage
+        "UInt8" |> StorageType.parse  |> Option.get |> Claim.equal UInt8Storage
+        "BinaryVariable(350)" |>  StorageType.parse |> Option.get |> Claim.equal (BinaryVariableStorage(350))
+        "BinaryFixed(120)" |>  StorageType.parse |> Option.get |> Claim.equal (BinaryFixedStorage(120))
 
     [<Test>]
     let ``Rendered semantic representations of DataStorageType``() =       
-        122 |> AnsiTextFixedStorage |> DataStorageType.toSemanticString |> Claim.equal "AnsiTextFixed(122)"
-        122 |> AnsiTextVariableStorage |> DataStorageType.toSemanticString |> Claim.equal "AnsiTextVariable(122)"
-        AnsiTextMaxStorage |> DataStorageType.toSemanticString |> Claim.equal "AnsiTextMax"
-        120 |> BinaryFixedStorage |> DataStorageType.toSemanticString |> Claim.equal "BinaryFixed(120)"
-        350 |> BinaryVariableStorage |> DataStorageType.toSemanticString |> Claim.equal "BinaryVariable(350)"
-        BinaryMaxStorage |> DataStorageType.toSemanticString |> Claim.equal "BinaryMax"
+        122 |> AnsiTextFixedStorage |> StorageType.toSemanticString |> Claim.equal "AnsiTextFixed(122)"
+        122 |> AnsiTextVariableStorage |> StorageType.toSemanticString |> Claim.equal "AnsiTextVariable(122)"
+        AnsiTextMaxStorage |> StorageType.toSemanticString |> Claim.equal "AnsiTextMax"
+        120 |> BinaryFixedStorage |> StorageType.toSemanticString |> Claim.equal "BinaryFixed(120)"
+        350 |> BinaryVariableStorage |> StorageType.toSemanticString |> Claim.equal "BinaryVariable(350)"
+        BinaryMaxStorage |> StorageType.toSemanticString |> Claim.equal "BinaryMax"
     
     let private verifyAttribute storageTypeExpect (attribute : StorageTypeAttribute) =
-        attribute |> DataStorageType.fromAttribute |> Claim.equal storageTypeExpect
+        attribute |> StorageType.fromAttribute |> Claim.equal storageTypeExpect
 
 
     [<Test>]

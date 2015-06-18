@@ -59,7 +59,10 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="app.config" />
+    <Compile Include="AssemblyInit.fs" />
+    <Compile Include="SqlTestProxies.fs" />
     <Compile Include="ProxyDiscoveryTest.fs" />
+    <Compile Include="ProcedureExecutionTest.fs" />
     <Compile Include="SqlDataStoreTest.fs" />
     <Compile Include="SqlFormatterTest.fs" />
   </ItemGroup>
@@ -96,6 +99,7 @@
       <Project>{f9d5cbbf-94dc-43be-bffe-7987d14040b8}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />

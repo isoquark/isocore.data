@@ -141,14 +141,9 @@ module TypeExtensions =
         /// If optional type, gets the type of the underlying value; otherwise, the type itself
         /// </summary>
         member this.ValueType = this |> Type.getValueType
-
-        
-
-
-
-
+       
 /// <summary>
-/// Defines System.Asselby helpers
+/// Defines System.Assembly helpers
 /// </summary>
 module Assembly =
     /// <summary>
@@ -179,6 +174,32 @@ module Assembly =
             ArgumentException(sprintf "Resource %s not found" shortName) |> raise
         path
 
+    /// <summary>
+    /// Determines whether a named assembly has been loaded
+    /// </summary>
+    /// <param name="name">The name of the assembly</param>
+    let isLoaded (name : AssemblyName) =
+        AppDomain.CurrentDomain.GetAssemblies() 
+            |> Array.map(fun a -> a.GetName()) 
+            |> Array.exists (fun n -> n = name)
+    
+    /// <summary>
+    /// Recursively loads assembly references into the application domain
+    /// </summary>
+    /// <param name="subject">The staring assembly</param>
+    let rec loadReferences (filter : string option) (subject : Assembly) =
+        let references = subject.GetReferencedAssemblies()
+        let filtered = match filter with
+                    | Some(filter) -> 
+                        references |> Array.filter(fun x -> x.Name.StartsWith(filter)) 
+                    | None ->
+                        references
+
+        filtered |> Array.iter(fun name ->
+            if name |> isLoaded |>not then
+                name |> AppDomain.CurrentDomain.Load |> loadReferences filter
+        )
+
 /// <summary>
 /// Defines System.Assembly helpers
 /// </summary>
@@ -204,8 +225,6 @@ module AssemblyExtensions =
         /// </summary>
         member this.ShortName = this.GetName().Name    
 
-
-    
 
 module PropertyInfo =
     /// <summary>

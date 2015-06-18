@@ -3,6 +3,7 @@
 open System
 open System.Data
 open System.Reflection
+open System.Diagnostics
 
 open IQ.Core.Framework
 
@@ -15,7 +16,7 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a column proxy
     /// </summary>
-    type ColumnProxyDescription = ColumnProxyDescription of field : PropertyFieldDescription * dataElement : ColumnDescription
+    type ColumnProxyDescription = ColumnProxyDescription of field : PropertyFieldReference * dataElement : ColumnDescription
     with
         /// <summary>
         /// Specifies the proxy record field
@@ -32,7 +33,7 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a proxy for a tabular result set
     /// </summary>
-    type TabularResultProxyDescription = TabularResultProxyDescription of proxy : RecordDescription  * dataElement : TableFunctionDescription * columns : ColumnProxyDescription list
+    type TabularResultProxyDescription = TabularResultProxyDescription of proxy : RecordReference  * dataElement : TableFunctionDescription * columns : ColumnProxyDescription list
     with
         /// <summary>
         /// Specifies the proxy record
@@ -55,7 +56,7 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a table proxy
     /// </summary>
-    type TableProxyDescription = TableProxyDescription of proxy : RecordDescription * dataElement : TableDescription * columns : ColumnProxyDescription list
+    type TableProxyDescription = TableProxyDescription of proxy : RecordReference * dataElement : TableDescription * columns : ColumnProxyDescription list
     with
         /// <summary>
         /// Specifies the proxy record
@@ -74,12 +75,14 @@ module DataProxyMetamodel =
         /// </summary>
         member this.Columns = 
             match this with TableProxyDescription(columns=x) -> x
+    
 
     /// <summary>
     /// Describes a proxy for a routine parameter
     /// </summary>
-    type ParameterProxyDescription = ParameterProxyDescription of proxy : MethodParameterDescription * dataElement : RoutineParameter
-    with
+    [<DebuggerDisplay("{DebuggerDisplay,nq}")>]
+    type ParameterProxyDescription = ParameterProxyDescription of proxy : MethodInputOutputReference * dataElement : RoutineParameter
+    with   
         /// <summary>
         /// Specifies  the CLR proxy element
         /// </summary>
@@ -92,11 +95,18 @@ module DataProxyMetamodel =
         member this.DataElement = 
             match this with ParameterProxyDescription(dataElement=x) -> x
 
+        /// <summary>
+        /// Formats the element for presentation in the debugger
+        /// </summary>
+        member private this.DebuggerDisplay = 
+            sprintf "@%s %O" this.DataElement.Name this.DataElement.StorageType
+            
+
     
     /// <summary>
     /// Describes a proxy for a stored procedure
     /// </summary>
-    type ProcedureProxyDescription = ProcedureProxyDescription of proxy : MethodDescription * dataElement : ProcedureDescription * parameters : ParameterProxyDescription list
+    type ProcedureProxyDescription = ProcedureProxyDescription of proxy : MethodReference * dataElement : ProcedureDescription * parameters : ParameterProxyDescription list
     with
         /// <summary>
         /// Specifies  the CLR proxy element
@@ -117,7 +127,7 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a proxy for a stored procedure
     /// </summary>
-    type TableFunctionProxyDescription = TableFunctionProxyDescription of proxy : MethodDescription * dataElement : TableFunctionDescription * parameters : ParameterProxyDescription list
+    type TableFunctionProxyDescription = TableFunctionProxyDescription of proxy : MethodReference * dataElement : TableFunctionDescription * parameters : ParameterProxyDescription list
     
     /// <summary>
     /// Unifies all proxy description types

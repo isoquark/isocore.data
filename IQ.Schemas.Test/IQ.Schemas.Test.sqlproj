@@ -95,5 +95,7 @@
     <Build Include="SqlTest\Tables\Table02.sql" />
     <Build Include="SqlTest\Sequences\Table02Sequence.sql" />
     <Build Include="SqlTest\Procedures\pTable02Insert.sql" />
+    <Build Include="SqlTest\Tables\Table03.sql" />
+    <Build Include="SqlTest\Procedures\pTable03Insert.sql" />
   </ItemGroup>
 </Project>

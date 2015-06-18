@@ -16,11 +16,7 @@ open Microsoft.FSharp.Quotations.Patterns
 /// </remarks>
 [<AutoOpen>]
 module Lang =
-    /// <summary>
-    /// Responsible for uniquely identifying a value in a ValueMap
-    /// </summary>
-    type ValueMapKey = ValueMapKey of index : int option * name : string option
-    
+                                            
     /// <summary>
     /// Defines custom Seq module operations
     /// </summary>
@@ -34,31 +30,6 @@ module Lang =
         /// </remarks>
         let count (items : seq<'T>) = items.Count()
     
-    /// <summary>
-    /// Represents an indexed collection of key-value pairs
-    /// </summary>
-    type ValueMap = ValueMap of Map<ValueMapKey,obj>
-    with
-        /// <summary>
-        /// Gets the underlying map
-        /// </summary>
-        member this.MappedValues = match this with ValueMap(m) -> m
-        
-        /// <summary>
-        /// Gets a specified value from the map
-        /// </summary>
-        /// <param name="name">The name of the value</param>
-        member this.Item (name : string) = this.MappedValues.[ValueMapKey(None, Some(name))]
-
-    /// <summary>
-    /// Responsible for identifying a Data Store, Network Address or other resource
-    /// </summary>
-    type ConnectionString = ConnectionString of string list
-    with
-        /// <summary>
-        /// The components of the connection string
-        /// </summary>
-        member this.Components = match this with ConnectionString(components) -> components
 
     /// <summary>
     /// Raises a debugging assertion if a supplied predicate fails and emits a diagnostic message
@@ -132,7 +103,4 @@ module Lang =
     let (?) (map : Map<string,_>) key = map.[key]
 
             
-module ValueMap =
-    let fromNamedItems (items : seq<string*obj>) =
-        items |> Seq.map(fun (name,value) -> ValueMapKey(None, Some(name)), value) |> Map.ofSeq |> ValueMap  
-
+        

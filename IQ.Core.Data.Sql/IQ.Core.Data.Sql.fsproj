@@ -56,7 +56,9 @@
     <None Include="app.config" />
     <EmbeddedResource Include="Resources\SqlSpecs.xlsx" />
     <EmbeddedResource Include="Resources\IntrinsicPrimitiveTypes.csv" />
+    <Compile Include="AssemblyInfo.fs" />
     <Compile Include="SqlFormatter.fs" />
+    <Compile Include="Procedure.fs" />
     <Compile Include="SqlDataStore.fs" />
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +71,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Transactions" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>

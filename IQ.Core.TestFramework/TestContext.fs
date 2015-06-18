@@ -18,20 +18,38 @@ type TestAttribute = NUnit.Framework.TestAttribute
 /// </summary>
 type TestContainerAttribute = NUnit.Framework.TestFixtureAttribute
 
-/// <summary>
-/// Classifies a test method
-/// </summary>
-type TraitAttribute = NUnit.Framework.CategoryAttribute
-
-
-type BenchmarkTraitAttribute() =
-    inherit TraitAttribute("Benchmark")
 
 /// <summary>
-/// Classification of a test or test group that verifies an operation failed as expected
+/// Identifies a type that defines the per-assembly initialization
 /// </summary>
-type FailureVerificationAttribute() =
-    inherit TraitAttribute("Failure Verification")
+/// <remarks>
+/// In NUnit, for some bizarre reason this initialization actually 
+/// executes once per namespace/per assembly
+/// </remarks>
+type TestAssemblyInitAttribute = NUnit.Framework.SetUpFixtureAttribute
+
+type TestInitAttribute = NUnit.Framework.SetUpAttribute
+
+type TestCleanupAttribute = NUnit.Framework.TearDownAttribute
+
+/// <summary>
+/// Defines base type for test assembly initializers
+/// </summary>
+[<AbstractClass>]
+type TestAssemblyInitializer() =
+    [<TestInit>]
+    abstract member Initialize:unit->unit
+
+    [<TestCleanup>]
+    abstract member Dispose:unit->unit
+    
+    default this.Dispose() = ()
+
+    interface IDisposable with
+        member this.Dispose() = this.Dispose()
+
+    
+        
 
 module TestContext =     
     [<Literal>]
@@ -42,5 +60,8 @@ module TestContext =
         if dir |> Directory.Exists |> not then
             dir |> Directory.CreateDirectory |> ignore
         dir
+
+    
+    
 
 

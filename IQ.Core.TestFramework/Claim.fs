@@ -71,4 +71,37 @@ module Claim =
                 if e.GetType() = typeof<'T> then
                     result := Some(e :?> 'T)
         !result |> Option.isSome |> isTrue
-                
+
+    /// <summary>
+    /// Assert that the left value is greater than the right value
+    /// </summary>
+    /// <param name="l">The left value</param>
+    /// <param name="r">The right value</param>
+    let greater l r =
+        (>) l r |> isTrue
+
+
+    /// <summary>
+    /// Assert that the left value is greater or equal than the right value
+    /// </summary>
+    /// <param name="l">The left value</param>
+    /// <param name="r">The right value</param>
+    let greaterOrEqual l r =
+        (>=) l r |> isTrue
+
+    /// <summary>
+    /// Assert that the left value is less than the right value
+    /// </summary>
+    /// <param name="l">The left value</param>
+    /// <param name="r">The right value</param>
+    let less l r =
+        (<) l r |> isTrue
+
+
+    /// <summary>
+    /// Assert that the left value is less or equal than the right value
+    /// </summary>
+    /// <param name="l">The left value</param>
+    /// <param name="r">The right value</param>
+    let lessOrEqual l r =
+        (<=) l r |> isTrue

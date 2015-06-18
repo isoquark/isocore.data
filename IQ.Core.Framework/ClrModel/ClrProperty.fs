@@ -13,7 +13,7 @@ module ClrProperty =
     /// <param name="p">The property</param>
     let describe(p : PropertyInfo) = 
         {
-            PropertyDescription.Name = p.Name
+            PropertyReference.Name = p.Name
             Property = p
             ValueType = p.PropertyType.ValueType
             PropertyType = p.PropertyType

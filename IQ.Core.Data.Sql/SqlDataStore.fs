@@ -36,7 +36,7 @@ with
 [<AutoOpen>]
 module SqlDataStoreVocabulary =
     
-    type SqlQueryParameter = SqlParameter of name : string * value : obj    
+    type SqlQueryParameter = SqlQueryParameter of name : string * value : obj    
 
     type SqlQuery =
         | TableOrView of tabularName : string * columnNames : string list
@@ -65,6 +65,8 @@ module SqlDataStoreVocabulary =
 
         abstract Select:unit->'T list
 
+        abstract GetContract: unit -> 'TContract when 'TContract : not struct
+
         
         
        
@@ -76,10 +78,9 @@ module SqlDataStore =
         use bcp = new SqlBulkCopy(cs.Text)
         use dataTable = data |> DataTable.fromProxyValuesT
         dataTable |> bcp.WriteToServer
-    
-    
-    type private SqlDataStore(cs : ConnectionString) =
-        let cs = SqlConnectionString(cs.Components)
+        
+    type private SqlDataStore(csSqlDataStore : ConnectionString) =
+        let cs = SqlConnectionString(csSqlDataStore.Components)
         interface ISqlDataStore with
             member this.Get q = 
                 match q with
@@ -93,8 +94,10 @@ module SqlDataStore =
             member this.Del q = ()
 
             member this.Select() = 
-                //let ptype = tableproxy<'T>
                 []
+
+            member this.GetContract() =
+                ProcedureContract.get<'TContract>(cs.Text)
                 
                                              
     /// <summary>

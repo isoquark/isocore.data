@@ -25,10 +25,10 @@ module ClrVocabulary =
         | ProtectedInternal
                 
     /// <summary>
-    /// Describes an F#-specific field, either for a record or for a union case element, 
+    /// Refers to an F#-specific field, either for a record or for a union case element, 
     /// that is  associated with a CLR property
     /// </summary>
-    type PropertyFieldDescription = {
+    type PropertyFieldReference = {
         /// The name of the field
         Name : string
         
@@ -49,7 +49,7 @@ module ClrVocabulary =
     /// <summary>
     /// Describes an F#-specific record
     /// </summary>
-    type RecordDescription = {
+    type RecordReference = {
         /// The name of the record
         Name : string
                 
@@ -57,13 +57,13 @@ module ClrVocabulary =
         Type : Type
                 
         /// The fields defined by the record
-        Fields : PropertyFieldDescription list
+        Fields : PropertyFieldReference list
     }
 
     /// <summary>
     /// Describes an F#-specific union case
     /// </summary>
-    type UnionCaseDescription = {
+    type UnionCaseReference = {
         /// The name of the case
         Name : string
 
@@ -74,13 +74,13 @@ module ClrVocabulary =
         Position : int
 
         /// The fields defined by the case
-        Fields : PropertyFieldDescription list
+        Fields : PropertyFieldReference list
     }
     
     /// <summary>
     /// Describes an F#-specific union
     /// </summary>
-    type UnionDescription = {
+    type UnionReference = {
         /// The name of the record
         Name : string
     
@@ -88,14 +88,14 @@ module ClrVocabulary =
         Type : Type
         
         /// The cases defined by the union
-        Cases : UnionCaseDescription list
+        Cases : UnionCaseReference list
     }
 
     /// <summary>
     /// Describes a CLR method parameter
     /// </summary>
     [<DebuggerDisplay("{Name, nq} : {ParameterType.Name, nq}")>]
-    type MethodParameterDescription = {
+    type MethodParameterReference = {
         /// The name of the parameter
         Name : string
                 
@@ -122,7 +122,7 @@ module ClrVocabulary =
     /// <summary>
     /// Describes a CLR method return
     /// </summary>
-    type MethodReturnDescription = {
+    type MethodReturnReference = {
         /// The return type of the method, if applicable
         ReturnType : Type option
         
@@ -130,33 +130,39 @@ module ClrVocabulary =
         /// not an option type; otherwise, the encapsulated type
         ValueType : Type option
 
-        /// The method 
+        /// The method with which the reference is associated
         Method : MethodInfo
     }
 
+    /// <summary>
+    /// References a method parameter or return
+    /// </summary>
+    type MethodInputOutputReference =
+    | MethodInputReference of MethodParameterReference
+    | MethodOutputReference of MethodReturnReference
 
 
     /// <summary>
-    /// Describes a CLR method
+    /// Represents a CLR method
     /// </summary>
-    type MethodDescription = {
+    type MethodReference = {
         /// The name of the method
         Name : string
 
-        /// The CLR method being described
+        /// The referenced method
         Method : MethodInfo
 
         /// Description of the method return
-        Return : MethodReturnDescription
+        Return : MethodReturnReference
 
         /// The parameters accepted by the method
-        Parameters : MethodParameterDescription list
+        Parameters : MethodParameterReference list
     }
 
     /// <summary>
-    /// Describes a CLR property
+    /// Represents a CLR property
     /// </summary>
-    type PropertyDescription = {
+    type PropertyReference = {
         /// The name of the property
         Name : string
 
@@ -175,14 +181,14 @@ module ClrVocabulary =
     /// <summary>
     /// Describes a CLR interface member
     /// </summary>
-    type InterfaceMemberDescription =
-        | InterfaceMethod of MethodDescription
-        | InterfaceProperty of PropertyDescription
+    type InterfaceMemberReference =
+        | InterfaceMethodReference of MethodReference
+        | InterfacePropertyReference of PropertyReference
 
     /// <summary>
     /// Describes a CLR interface
     /// </summary>
-    type InterfaceDescription = {
+    type InterfaceReference = {
         /// The name of the interface
         Name : string
 
@@ -190,30 +196,37 @@ module ClrVocabulary =
         Type : Type
 
         /// The members that belong to the interface
-        Members : InterfaceMemberDescription list
+        Members : InterfaceMemberReference list
     }
 
     /// <summary>
     /// Represents a CLR type
     /// </summary>
-    type ClrType =
-    | UnionType of UnionDescription
-    | RecordType of RecordDescription
-    | InterfaceType of InterfaceDescription
+    type ClrTypeReference =
+    | UnionTypeReference of UnionReference
+    | RecordTypeReference of RecordReference
+    | InterfaceTypeReference of InterfaceReference
 
+//    type ClrTypeDescription =
+//    | UnionTypeDescription of UnionDescription
+//    | RecordTypeDescription of RecordDescription
+//    
+//    type ClrType2 =
+//    | TypeDescription 
+//    | TypeReference
 
     /// <summary>
     /// Unifies the CLR element description hierarchy
     /// </summary>
-    type ClrElement =
-    | InterfaceElement of InterfaceDescription
-    | PropertyElement of PropertyDescription
-    | MethodElement of MethodDescription
-    | MethodParameterElement of MethodParameterDescription
-    | UnionElement of UnionDescription
-    | UnionCaseElement of UnionCaseDescription
-    | RecordElement of RecordDescription
-    | PropertyFieldElement of PropertyFieldDescription
+    type ClrElementReference =
+    | InterfaceElement of InterfaceReference
+    | PropertyElement of PropertyReference
+    | MethodElement of MethodReference
+    | MethodParameterElement of MethodParameterReference
+    | UnionElement of UnionReference
+    | UnionCaseElement of UnionCaseReference
+    | RecordElement of RecordReference
+    | PropertyFieldElement of PropertyFieldReference
 
 
 
@@ -222,7 +235,7 @@ module ClrVocabularyExtensions =
     /// <summary>
     /// Defines augmentations for the RecordDescription type
     /// </summary>
-    type RecordDescription
+    type RecordReference
     with
         /// <summary>
         /// Retrieves a field identified by its name

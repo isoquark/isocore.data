@@ -13,7 +13,7 @@ module ClrUnion =
     
     let private describeField i (p : PropertyInfo) = 
         {
-            PropertyFieldDescription.Name = p.Name
+            PropertyFieldReference.Name = p.Name
             Property = p
             Position = i
             FieldType = p.PropertyType
@@ -22,7 +22,7 @@ module ClrUnion =
 
     let private describeCase(c : UnionCaseInfo) =
         {
-            UnionCaseDescription.Name = c.Name
+            UnionCaseReference.Name = c.Name
             Case = c
             Position = c.Tag
             Fields = c.GetFields() |> List.ofArray |> List.mapi describeField
@@ -55,7 +55,7 @@ module ClrUnion =
     /// <param name="t">The union type</param>
     let private createDescription(t : Type) =      
         {
-            UnionDescription.Name = t.Name
+            UnionReference.Name = t.Name
             Type = t
             Cases =  t |> describeCases
         }
@@ -83,7 +83,7 @@ module ClrUnionExtensions =
     /// <summary>
     /// Defines augmentations for the RecordDescription type
     /// </summary>
-    type UnionDescription
+    type UnionReference
     with
         /// <summary>
         /// Indexer that finds a union case by its position
@@ -100,7 +100,7 @@ module ClrUnionExtensions =
     /// <summary>
     /// Defines augmentations for the UnionCaseDescription type
     /// </summary>
-    type UnionCaseDescription
+    type UnionCaseReference
     with
         /// <summary>
         /// Indexer that finds a case field by its position

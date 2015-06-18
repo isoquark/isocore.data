@@ -8,6 +8,10 @@ open System.Diagnostics
 /// Defines generally-applicable conversion utilities
 /// </summary>
 module Converter =
+    /// <summary>
+    /// Converts a value to specified type
+    /// </summary>
+    /// <param name="value">The value to convert</param>
     let convert (dstType : Type) (value : obj) =
         if value = null then
             null                   
@@ -29,7 +33,13 @@ module Converter =
                 else
                    //Convert a non-option value to a non-option type
                     Convert.ChangeType(value, valueType)
-            
+
+    /// <summary>
+    /// Converts a value to generically-specified type
+    /// </summary>
+    /// <param name="value">The value to convert</param>
+    let convertT<'T> (value : obj) =
+        value |> convert typeof<'T> :?> 'T
 
 
 

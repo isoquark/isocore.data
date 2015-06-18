@@ -16,6 +16,8 @@
     <SccProvider>SAK</SccProvider>
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
+    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
+    <RestorePackages>true</RestorePackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -36,36 +38,6 @@
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\Release\IQ.Core.Framework.XML</DocumentationFile>
   </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Numerics" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Lang.fs" />
-    <Compile Include="Txt.fs" />
-    <Compile Include="Reflection.fs" />
-    <Compile Include="ClrModel\ClrVocabulary.fs" />
-    <Compile Include="ClrModel\ClrTypeIndex.fs" />
-    <Compile Include="ClrModel\ClrAssembly.fs" />
-    <Compile Include="ClrModel\ClrOption.fs" />
-    <Compile Include="ClrModel\ClrMethod.fs" />
-    <Compile Include="ClrModel\ClrProperty.fs" />
-    <Compile Include="ClrModel\ClrRecord.fs" />
-    <Compile Include="ClrModel\ClrUnion.fs" />
-    <Compile Include="ClrModel\ClrInterface.fs" />
-    <Compile Include="ClrModel\ClrType.fs" />
-    <Compile Include="ClrModel\ClrElement.fs" />
-    <Compile Include="Conversion.fs" />
-    <Compile Include="FSharpModel\FSharpVocabulary.fs" />
-    <Compile Include="FSharpModel\FSharpGenerator.fs" />
-  </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
   </PropertyGroup>
@@ -82,6 +54,58 @@
     </Otherwise>
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
+  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
+  </Target>
+  <ItemGroup>
+    <Compile Include="Lang.fs" />
+    <Compile Include="Txt.fs" />
+    <Compile Include="ConnectionString.fs" />
+    <Compile Include="Reflection.fs" />
+    <Compile Include="ValueIndex.fs" />
+    <Compile Include="ClrModel\ClrVocabulary.fs" />
+    <Compile Include="ClrModel\ClrTypeIndex.fs" />
+    <Compile Include="ClrModel\ClrAssembly.fs" />
+    <Compile Include="ClrModel\ClrOption.fs" />
+    <Compile Include="ClrModel\ClrMethod.fs" />
+    <Compile Include="ClrModel\ClrProperty.fs" />
+    <Compile Include="ClrModel\ClrRecord.fs" />
+    <Compile Include="ClrModel\ClrUnion.fs" />
+    <Compile Include="ClrModel\ClrInterface.fs" />
+    <Compile Include="ClrModel\ClrType.fs" />
+    <Compile Include="ClrModel\ClrElement.fs" />
+    <Compile Include="Conversion.fs" />
+    <Compile Include="FSharpModel\FSharpVocabulary.fs" />
+    <Compile Include="FSharpModel\FSharpGenerator.fs" />
+    <Compile Include="Configuration.fs" />
+    <None Include="packages.config" />
+    <Compile Include="CompositionRoot.fs" />
+    <Compile Include="DynamicContract.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Autofac">
+      <HintPath>..\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Castle.Core">
+      <HintPath>..\packages\Castle.Core.3.3.3\lib\net45\Castle.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="mscorlib" />
+    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

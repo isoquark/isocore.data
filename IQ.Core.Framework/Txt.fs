@@ -37,18 +37,60 @@ module Txt =
         [<Literal>]
         [<RegexExample("System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")>]
         let FullAssemblyName = @"[(?<ShortAssemblyName>[^,]*),[\s?]Version=(?<Version>[^,]*),[\s?]Culture=(?<Culture>[^,]*),[\s?]PublicKeyToken=(?<PublicKeyToken>(.)*)"
+
+        [<Literal>]
+        [<RegexExample("[CatalogName].[SchemaName].[ObjectName]")>]
+        let QualifiedDataObjectName = @"(((\[?(?<Catalog>[\w]+)\]?)?\.)?(\[?(?<Schema>[\w]+)\]?)?\.)?\[?(?<Name>[\w]+)\]?"
     
     /// <summary>
-    /// Retrieves all text to the right of a specified marker; if no marker is found, returns the empty string
+    /// Finds all text to the right of the first occurrence of a specified marker; if no marker is found, returns the empty string
     /// </summary>
     /// <param name="marker">The marker to search for</param>
     /// <param name="text">The text to search</param>
-    let rightOf (marker : string) (text : string) =
+    let rightOfFirst (marker : string) (text : string) =
         let idx = text.IndexOf(marker) 
         if idx <> -1 then
             (idx + marker.Length) |> text.Substring
         else
             String.Empty
+
+    /// <summary>
+    /// Finds all text to the right of the last occurrence of a specified marker; if no marker is found, returns the empty string
+    /// </summary>
+    /// <param name="marker">The marker to search for</param>
+    /// <param name="text">The text to search</param>
+    let rightOfLast (marker : string) (text : string) =
+        let idx = marker |> text.LastIndexOf
+        if idx <> -1 then
+            (idx + marker.Length) |> text.Substring
+        else
+            String.Empty
+
+    /// <summary>
+    /// Finds text positioned between two character indices
+    /// </summary>
+    /// <param name="leftidx">The left character index</param>
+    /// <param name="rightidx">The right character index</param>
+    /// <param name="inclusive">Whether the returned text includes the characters living at the respective indices</param>
+    /// <param name="text">The text to search</param>
+    let betweenIndices (leftidx : int) (rightidx : int) (inclusive : bool) (text : string) =
+        let startidx = if inclusive then leftidx else leftidx + 1
+        let endidx = if inclusive then rightidx else rightidx - 1
+        text.Substring(startidx, endidx - startidx + 1)
+
+    /// <summary>
+    /// Finds text positioned between the first occurrence of a left marker and the last occurrence of a right marker
+    /// </summary>
+    /// <param name="leftMarker">The left marker</param>
+    /// <param name="rightMarker">The right marker</param>
+    /// <param name="inclusive">Whether to include the markers in the resulting text</param>
+    /// <param name="text"></param>
+    let betweenMarkers (leftMarker : string) (rightMarker : string) (inclusive : bool) (text : string) =
+        let leftMarkerIdx = leftMarker |> text.IndexOf
+        let startidx = if inclusive then leftMarkerIdx else leftMarkerIdx + leftMarker.Length
+        let rightMarkerIdx = rightMarker |> text.LastIndexOf
+        let endidx = if inclusive then rightMarkerIdx + rightMarker.Length - 1 else rightMarkerIdx - 1
+        text |> betweenIndices startidx endidx true        
 
     /// <summary>
     /// Removes leading and trailing whitespace
@@ -169,3 +211,11 @@ module Txt =
     /// <param name="text">The text to enclose</param>
     let enclose left right text =
         sprintf "%s%s%s" left text right      
+
+    /// <summary>
+    /// Determine whether text starts with a specified substring
+    /// </summary>
+    /// <param name="start">The text to search form</param>
+    /// <param name="text">The text to search</param>
+    let startsWith start (text : string) =
+        start |> text.StartsWith

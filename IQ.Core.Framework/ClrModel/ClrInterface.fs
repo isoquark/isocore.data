@@ -15,16 +15,16 @@ module ClrInterface =
     let private describeMember(m : MemberInfo) =
         match m with
         | :? MethodInfo as x ->
-            x |> ClrMethod.describe |> InterfaceMethod
+            x |> ClrMethod.describe |> InterfaceMethodReference
         | :? PropertyInfo as x ->
-            x |> ClrProperty.describe |> InterfaceProperty
+            x |> ClrProperty.describe |> InterfacePropertyReference
         | _ ->
             NotSupportedException() |> raise
 
 
     let private createDescription(t : Type) =
         {
-            InterfaceDescription.Type = t
+            InterfaceReference.Type = t
             Name = t.Name 
             Members = 
                 (t |> Type.getPureMethods |> List.map describeMember ) 
@@ -41,9 +41,9 @@ module ClrInterface =
 module ClrInterfaceMember =
     let getAttribute<'T when 'T :> Attribute> m  =
         match m with
-        | InterfaceMethod(m) -> 
+        | InterfaceMethodReference(m) -> 
             m.Method |> MethodInfo.getAttribute<'T>
-        | InterfaceProperty(p) -> 
+        | InterfacePropertyReference(p) -> 
             p.Property |> PropertyInfo.getAttribute<'T>
 
 [<AutoOpen>]
@@ -53,6 +53,6 @@ module ClrInterfaceExtensions =
     /// <summary>
     /// Defines augmentations for the InterfaceMemberDescription type
     /// </summary>
-    type InterfaceMemberDescription
+    type InterfaceMemberReference
     with
         member this.GetAttribute<'T when 'T :> Attribute>() = this |> ClrInterfaceMember.getAttribute<'T>
