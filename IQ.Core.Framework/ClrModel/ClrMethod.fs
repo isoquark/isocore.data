@@ -10,11 +10,9 @@ open System.Reflection
 module ClrMethod =
     let private referenceParameter (p : ParameterInfo) =
         {
-            MethodParameterReference.Name = p.Name
+            ClrMethodParameterReference.Subject = ClrSubjectReference(p.ElementName , p.Position, p)
             ParameterType = p.ParameterType
             ValueType = p.ParameterType.ValueType
-            Parameter = p
-            Position = p.Position 
             IsRequired = (p.IsOptional || p.IsDefined(typeof<OptionalArgumentAttribute>)) |> not   
             Method = p.Member :?> MethodInfo         
            
@@ -24,10 +22,10 @@ module ClrMethod =
     /// Creates a method reference
     /// </summary>
     /// <param name="m">The method</param>
-    let reference(m : MethodInfo) =
+    let internal reference pos (m : MethodInfo) =
         let returnType = if m.ReturnType  = typeof<Void> then None else m.ReturnType |> Some
         {
-            MethodReference.Name = m.Name
+            Subject = ClrSubjectReference(m.ElementName, pos, m)
             Return = 
                 {
                     ReturnType = returnType
@@ -38,7 +36,6 @@ module ClrMethod =
                                 
                 }
             Parameters = m.GetParameters() |> Array.map referenceParameter |> List.ofArray
-            Method = m
         }    
 
 /// <summary>
@@ -46,6 +43,11 @@ module ClrMethod =
 /// </summary>
 [<AutoOpen>]
 module ClrMethodExtensions =
-    let methodref(m : MethodInfo) = m |> ClrMethod.reference
+
+    /// <summary>
+    /// Gets the methods defined by a type
+    /// </summary>
+    let methodrefmap<'T> = 
+        typeof<'T> |> Type.getPureMethods |> List.mapi ClrMethod.reference |> List.map(fun m -> m.Subject.Name, m) |> Map.ofList
     
 

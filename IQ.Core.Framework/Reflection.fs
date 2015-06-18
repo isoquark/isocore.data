@@ -126,13 +126,30 @@ module Type =
     let getMethod name (subject : Type) =
             subject.GetMethod(name, DefaultBindingFlags)        
 
+    /// <summary>
+    /// Gets methods that aren't implemented to serve as property getters/setters
+    /// </summary>
+    /// <param name="subject">The type</param>
     let getPureMethods (subject : Type) =
         let isGetOrSet (m : MethodInfo) =
             (m.IsSpecialName && m.Name.StartsWith "get_") || (m.IsSpecialName && m.Name.StartsWith "set_")
         subject.GetMethods(DefaultBindingFlags) |> Array.filter(fun x -> x |> isGetOrSet |> not) |> List.ofArray
 
+    /// <summary>
+    /// Gets the properties defined by the type
+    /// </summary>
+    /// <param name="subject">The type</param>
+    let getProperties  (subject : Type) =
+        subject.GetProperties(DefaultBindingFlags) |> List.ofArray
+
 [<AutoOpen>]
 module TypeExtensions =
+    /// <summary>
+    /// Gets the properties defined by the type
+    /// </summary>
+    let props<'T> = typeof<'T> |> Type.getProperties
+
+    
     type Type
     with
         member this.IsOptionType = this |> Type.isOptionType

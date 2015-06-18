@@ -39,18 +39,6 @@ module Lang =
     let _assert message (predicate: unit -> bool)  = 
         Debug.Assert(predicate(), message)
 
-    /// <summary>
-    /// When supplied a property accessor quotation, retrieves the name of the property
-    /// </summary>
-    /// <param name="q">The property accessor quotation</param>
-    /// <remarks>
-    /// Inspired heavily by: http://www.contactandcoil.com/software/dotnet/getting-a-property-name-as-a-string-in-f/
-    /// </remarks>
-    let rec propname q =
-       match q with
-       | PropertyGet(_,p,_) -> p.Name
-       | Lambda(_, expr) -> propname expr
-       | _ -> String.Empty
 
     /// <summary>
     /// Defines augmentations for the TimeSpan type

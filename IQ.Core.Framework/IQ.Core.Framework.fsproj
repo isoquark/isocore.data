@@ -69,10 +69,11 @@
     <Compile Include="ValueIndex.fs" />
     <Compile Include="ClrModel\ClrVocabulary.fs" />
     <Compile Include="ClrModel\ClrTypeReferenceIndex.fs" />
+    <Compile Include="ClrModel\ClrElementName.fs" />
     <Compile Include="ClrModel\ClrAssembly.fs" />
+    <Compile Include="ClrModel\ClrProperty.fs" />
     <Compile Include="ClrModel\ClrOption.fs" />
     <Compile Include="ClrModel\ClrMethod.fs" />
-    <Compile Include="ClrModel\ClrProperty.fs" />
     <Compile Include="ClrModel\ClrRecord.fs" />
     <Compile Include="ClrModel\ClrUnion.fs" />
     <Compile Include="ClrModel\ClrInterface.fs" />

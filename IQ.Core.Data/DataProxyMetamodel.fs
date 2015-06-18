@@ -14,9 +14,16 @@ open IQ.Core.Framework
 module DataProxyMetamodel = 
 
     /// <summary>
+    /// References a method parameter or return
+    /// </summary>
+    type MethodInputOutputReference =
+    | MethodInputReference of ClrMethodParameterReference
+    | MethodOutputReference of ClrMethodReturnReference
+    
+    /// <summary>
     /// Describes a column proxy
     /// </summary>
-    type ColumnProxyDescription = ColumnProxyDescription of field : PropertyReference * dataElement : ColumnDescription
+    type ColumnProxyDescription = ColumnProxyDescription of field : ClrPropertyReference * dataElement : ColumnDescription
     with
         /// <summary>
         /// Specifies the proxy record field
@@ -33,7 +40,7 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a proxy for a tabular result set
     /// </summary>
-    type TabularResultProxyDescription = TabularResultProxyDescription of proxy : RecordReference  * dataElement : TableFunctionDescription * columns : ColumnProxyDescription list
+    type TabularResultProxyDescription = TabularResultProxyDescription of proxy : ClrRecordReference  * dataElement : TableFunctionDescription * columns : ColumnProxyDescription list
     with
         /// <summary>
         /// Specifies the proxy record
@@ -56,7 +63,7 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a table proxy
     /// </summary>
-    type TableProxyDescription = TableProxyDescription of proxy : RecordReference * dataElement : TableDescription * columns : ColumnProxyDescription list
+    type TableProxyDescription = TableProxyDescription of proxy : ClrRecordReference * dataElement : TableDescription * columns : ColumnProxyDescription list
     with
         /// <summary>
         /// Specifies the proxy record
@@ -106,7 +113,7 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a proxy for a stored procedure
     /// </summary>
-    type ProcedureProxyDescription = ProcedureProxyDescription of proxy : MethodReference * dataElement : ProcedureDescription * parameters : ParameterProxyDescription list
+    type ProcedureProxyDescription = ProcedureProxyDescription of proxy : ClrMethodReference * dataElement : ProcedureDescription * parameters : ParameterProxyDescription list
     with
         /// <summary>
         /// Specifies  the CLR proxy element
@@ -127,7 +134,7 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a proxy for a stored procedure
     /// </summary>
-    type TableFunctionProxyDescription = TableFunctionProxyDescription of proxy : MethodReference * dataElement : TableFunctionDescription * parameters : ParameterProxyDescription list
+    type TableFunctionProxyDescription = TableFunctionProxyDescription of proxy : ClrMethodReference * dataElement : TableFunctionDescription * parameters : ParameterProxyDescription list
     
     /// <summary>
     /// Unifies all proxy description types

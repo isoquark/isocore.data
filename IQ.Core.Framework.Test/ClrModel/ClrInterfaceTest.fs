@@ -15,7 +15,7 @@ module ClrInterfaceTest =
 
     let ``Described interface with non-tupled parameters and no inheritance``() =
         let info = interfaceref<IInterfaceA>
-        info.Name |> Claim.equal typeof<IInterfaceA>.Name
+        info.Name |> Claim.equal typeof<IInterfaceA>.ElementName
         info.Members
 
     type private IInterfaceB =
@@ -30,12 +30,12 @@ module ClrInterfaceTest =
         let description = interfaceref<IInterfaceB>
         let methods = [for m in description.Members do  match m with | InterfaceMethodReference(x) -> yield x | _ -> ()]
         methods.Length |> Claim.equal 3
-        let m1 = methods |> List.find(fun x -> x.Name = "Method01")
+        let m1 = methods |> List.find(fun x -> x.Name.Text = "Method01")
         m1.Return.ReturnType |> Claim.isNone
         m1.Parameters.Length |> Claim.equal 0
 
-        let m2 = methods |> List.find(fun x -> x.Name = "Method02")
+        let m2 = methods |> List.find(fun x -> x.Name.Text = "Method02")
         m2.Return.ReturnType |> Claim.isNone
         m2.Parameters.Length |> Claim.equal 1
-        m2.Parameters.[0].Name |> String.IsNullOrWhiteSpace |> Claim.isTrue
+        m2.Parameters.[0].Subject.Name.Text |> String.IsNullOrWhiteSpace |> Claim.isTrue
         m2.Parameters.[0].ParameterType |> Claim.equal typeof<int>

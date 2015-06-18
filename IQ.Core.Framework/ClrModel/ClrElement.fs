@@ -42,9 +42,9 @@ module ClrElement =
         | PropertyElement(x) -> 
             x.Name
         | MethodElement(x) -> 
-            x.Name
+            x.Subject.Name
         | MethodParameterElement(x) ->
-            x.Name
+            x.Subject.Name
         | UnionElement(x) ->
             x.Name
         | UnionCaseElement(x) -> 
@@ -99,7 +99,7 @@ module ClrElement =
     let getDeclaringElement(element : ClrElementReference) =
         match element with
         | MethodParameterElement(x) ->
-            x.Method |>ClrMethod.reference |> MethodElement |> Some
+            x.Method |>ClrMethod.reference 0 |> MethodElement |> Some
         | _ ->
             match element |> getDeclaringType with
             | Some(x) -> 

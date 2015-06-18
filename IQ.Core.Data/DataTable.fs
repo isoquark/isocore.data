@@ -63,7 +63,7 @@ module DataTable =
     /// </summary>
     /// <param name="description">Describes the record</param>
     /// <param name="dataTable">The data table</param>
-    let toProxyValues (description : RecordReference) (dataTable : DataTable) =
+    let toProxyValues (description : ClrRecordReference) (dataTable : DataTable) =
         [for row in dataTable.Rows ->
             description |> ClrRecord.fromValueArray row.ItemArray
         ]

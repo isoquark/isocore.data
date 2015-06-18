@@ -16,11 +16,9 @@ module ClrUnion =
     /// </summary>
     /// <param name="i">The field's position within the case</param>
     /// <param name="p">The propery that represents the field</param>
-    let private referenceField i (p : PropertyInfo) = 
+    let private referenceField pos (p : PropertyInfo) = 
         {
-            PropertyReference.Name = p.Name
-            Property = p
-            Position = i
+            Subject = ClrSubjectReference(p.ElementName, pos, p)
             PropertyType = p.PropertyType
             ValueType = p.ValueType
         }
@@ -31,9 +29,7 @@ module ClrUnion =
     /// <param name="c">The case information</param>
     let private referenceCase(c : UnionCaseInfo) =
         {
-            UnionCaseReference.Name = c.Name
-            Case = c
-            Position = c.Tag
+            ClrUnionCaseReference.Subject = ClrSubjectReference(c.ElementName, c.Tag, c)            
             Fields = c.GetFields() |> List.ofArray |> List.mapi referenceField
         }
     
@@ -41,7 +37,7 @@ module ClrUnion =
     /// Describes the cases defined by a supplied union type
     /// </summary>
     /// <param name="t">The union type</param>
-    let private describeCases(t : Type) =
+    let private referenceCases(t : Type) =
         FSharpType.GetUnionCases(t, true) |> List.ofArray |> List.map referenceCase
 
     /// <summary>
@@ -64,9 +60,8 @@ module ClrUnion =
     /// <param name="t">The union type</param>
     let private createReference(t : Type) =      
         {
-            UnionReference.Name = t.Name
-            Type = t
-            Cases =  t |> describeCases
+            ClrUnionReference.Subject = ClrSubjectReference(t.ElementName, -1, t)
+            Cases =  t |> referenceCases
         }
 
     /// <summary>
@@ -95,7 +90,7 @@ module ClrUnionExtensions =
     /// <summary>
     /// Defines augmentations for the RecordDescription type
     /// </summary>
-    type UnionReference
+    type ClrUnionReference
     with
         /// <summary>
         /// Indexer that finds a union case by its position
@@ -112,7 +107,7 @@ module ClrUnionExtensions =
     /// <summary>
     /// Defines augmentations for the UnionCaseDescription type
     /// </summary>
-    type UnionCaseReference
+    type ClrUnionCaseReference
     with
         /// <summary>
         /// Indexer that finds a case field by its position

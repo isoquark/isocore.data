@@ -12,12 +12,12 @@ open Microsoft.FSharp.Reflection
 /// </summary>
 module ClrInterface =
         
-    let private describeMember i (m : MemberInfo) =
+    let private describeMember pos (m : MemberInfo) =
         match m with
         | :? MethodInfo as x ->
-            x |> ClrMethod.reference |> InterfaceMethodReference
+            x |> ClrMethod.reference pos |> InterfaceMethodReference
         | :? PropertyInfo as x ->
-            x |> ClrProperty.reference i |> InterfacePropertyReference
+            x |> ClrProperty.reference pos |> InterfacePropertyReference
         | _ ->
             NotSupportedException() |> raise
 
@@ -27,8 +27,7 @@ module ClrInterface =
     /// <param name="t">The type of the interface to reference</param>
     let rec private createReference(t : Type) =
         {
-            InterfaceReference.Type = t
-            Name = t.Name 
+            ClrInterfaceReference.Subject = ClrSubjectReference(t.ElementName, -1, t)
             Members = 
                 (t |> Type.getPureMethods |> List.mapi describeMember ) 
                 |> List.append (t.GetProperties() |> Array.mapi describeMember |> List.ofArray)
@@ -53,7 +52,7 @@ module ClrInterfaceMember =
     let getAttribute<'T when 'T :> Attribute> m  =
         match m with
         | InterfaceMethodReference(m) -> 
-            m.Method |> MethodInfo.getAttribute<'T>
+            m.Subject.Element |> MethodInfo.getAttribute<'T>
         | InterfacePropertyReference(p) -> 
             p.Property |> PropertyInfo.getAttribute<'T>
 
@@ -67,6 +66,6 @@ module ClrInterfaceExtensions =
     /// <summary>
     /// Defines augmentations for the InterfaceMemberDescription type
     /// </summary>
-    type InterfaceMemberReference
+    type ClrInterfaceMemberReference
     with
         member this.GetAttribute<'T when 'T :> Attribute>() = this |> ClrInterfaceMember.getAttribute<'T>

@@ -22,15 +22,12 @@ module ClrRecord =
     let private createReference (t : Type) =
         recordfac.[t] <- t |> createFactory
         {
-            Name = t.Name
-            Type = t
+            ClrRecordReference.Subject = ClrSubjectReference(t.ElementName, 0, t)
             Fields = FSharpType.GetRecordFields(t,true) 
                |> Array.mapi(fun i p -> 
-                     {Name = p.Name 
-                      Property = p 
+                     {Subject = ClrSubjectReference(p.ElementName, i, p)
                       PropertyType = p.PropertyType 
                       ValueType =   p.ValueType
-                      Position = i
                       }) 
                |> List.ofArray
         }
@@ -65,15 +62,15 @@ module ClrRecord =
     /// <param name="info">Describes the record</param>
     let toValueMap (record : obj) =
         let description = record.GetType() |> reference
-        description.Fields |> List.map(fun field -> field.Name, field.Property.GetValue(record)) |> ValueIndex.fromNamedItems
+        description.Fields |> List.map(fun field -> field.Name.Text, field.Property.GetValue(record)) |> ValueIndex.fromNamedItems
     
     /// <summary>
     /// Creates a record from a value map
     /// </summary>
     /// <param name="valueMap">The value map</param>
     /// <param name="info"></param>
-    let fromValueMap (valueMap : ValueIndex) (info : RecordReference) =
-        info.Fields |> List.map(fun field -> valueMap.[field.Name]) |> Array.ofList |> recordfac.[info.Type]
+    let fromValueMap (valueMap : ValueIndex) (info : ClrRecordReference) =
+        info.Fields |> List.map(fun field -> valueMap.[field.Name.Text]) |> Array.ofList |> recordfac.[info.Type]
     
     /// <summary>
     /// Creates an array of field values, in declaration order, for a specified record value
@@ -90,7 +87,7 @@ module ClrRecord =
     /// </summary>
     /// <param name="valueArray">An array of values in declaration order</param>
     /// <param name="description">The record description</param>
-    let fromValueArray (valueArray : obj[]) (description : RecordReference) =
+    let fromValueArray (valueArray : obj[]) (description : ClrRecordReference) =
         valueArray |> recordfac.[description.Type]    
 
 /// <summary>
@@ -107,7 +104,7 @@ module ClrRecordExtensions =
     /// <summary>
     /// Defines augmentations for the RecordDescription type
     /// </summary>
-    type RecordReference
+    type ClrRecordReference
     with
         /// <summary>
         /// Finds a field in the record by name

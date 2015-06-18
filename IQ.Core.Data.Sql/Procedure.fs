@@ -51,7 +51,7 @@ module internal ProcedureContract =
         | ParameterProxyDescription(proxy=x) ->
             match x with
             | MethodInputReference(m) ->
-                m.Name 
+                m.Subject.Name.Text
             | MethodOutputReference(m) ->
                 "Return" 
 
@@ -72,7 +72,7 @@ module internal ProcedureContract =
         let proxies = procproxies<'TContract> 
         
         let tryDescribe(m) =
-            proxies |> List.tryFind(fun p -> p.ProxyElement.Method = m)
+            proxies |> List.tryFind(fun p -> p.ProxyElement.Subject.Element = m)
 
         fun (cs : string) (targetMethod : MethodInfo) (args : obj[]) ->
             let methodParamValues = args|> indexMethodParameterValues targetMethod

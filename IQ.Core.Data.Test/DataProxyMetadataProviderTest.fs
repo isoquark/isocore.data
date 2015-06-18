@@ -29,21 +29,21 @@ module ``DataProxyMetadataProvider Test`` =
             Columns = 
             [
                 { 
-                  Name = propname<@ fun (x : RecordA) -> x.AField1 @>
+                  Name = (propname<@ fun (x : RecordA) -> x.AField1 @>).Text
                   Position = 0
                   StorageType = Int32Storage
                   Nullable = false  
                   AutoValue = None              
                 }
                 { 
-                  Name = propname<@ fun (x : RecordA) -> x.AField2 @>
+                  Name = (propname<@ fun (x : RecordA) -> x.AField2 @>).Text
                   Position = 1
                   StorageType = BitStorage
                   Nullable = false                
                   AutoValue = None              
                 }
                 { 
-                  Name = propname<@ fun (x : RecordA) -> x.AField3 @>
+                  Name = (propname<@ fun (x : RecordA) -> x.AField3 @>).Text
                   Position = 2
                   StorageType = Int64Storage
                   Nullable = true

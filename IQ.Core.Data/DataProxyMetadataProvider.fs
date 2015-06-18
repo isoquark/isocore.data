@@ -66,7 +66,7 @@ module DataProxyMetadataProvider =
     /// Infers a Column Proxy Description
     /// </summary>
     /// <param name="field">The field correlated with the proxy</param>
-    let private describeColumnProxy(field : PropertyReference) =
+    let private describeColumnProxy(field : ClrPropertyReference) =
         let column = 
             match field.Property |> PropertyInfo.getAttribute<ColumnAttribute> with
             | Some(attrib) ->
@@ -74,7 +74,7 @@ module DataProxyMetadataProvider =
                     ColumnDescription.Name = 
                         match attrib.Name with 
                         | Some(name) -> name
-                        | None -> field.Name
+                        | None -> field.Name.Text
                     Position = field.Position |> defaultArg attrib.Position 
                     StorageType = field |> PropertyElement |> inferStorageType
                     Nullable = field.Property.PropertyType |> Type.isOptionType
@@ -83,7 +83,7 @@ module DataProxyMetadataProvider =
 
             | None ->
                 {
-                    ColumnDescription.Name = field.Name
+                    ColumnDescription.Name = field.Name.Text
                     Position = field.Position
                     StorageType = field |> PropertyElement |> inferStorageType
                     Nullable = field.Property.PropertyType |> Type.isOptionType
@@ -91,22 +91,22 @@ module DataProxyMetadataProvider =
                 }
         ColumnProxyDescription(field, column)    
 
-    
+            
 
-    let private describeParameterProxy i (proxy : MethodInputOutputReference) =
+    let private describeIOProxy i (proxy : MethodInputOutputReference) =
         match proxy with
         | MethodInputReference(inputref) ->
             let name, direction, position = 
-                match inputref.Parameter |> ParameterInfo.getAttribute<RoutineParameterAttribute> with
+                match inputref.Subject.Element |> ParameterInfo.getAttribute<RoutineParameterAttribute> with
                 | Some(attrib) ->
                     let position =  match attrib.Position with |Some(p) -> p |None -> i
                     match attrib.Name with
                     |Some(name) ->
                         name, attrib.Direction, position
                     | None ->
-                        inputref.Name, attrib.Direction, position                
+                        inputref.Subject.Name.Text, attrib.Direction, position                
                 | None ->
-                    (inputref.Name, ParameterDirection.Input, i)
+                    (inputref.Subject.Name.Text, ParameterDirection.Input, i)
             let parameter = {
                 RoutineParameter.Name = name
                 Position = position
@@ -149,9 +149,9 @@ module DataProxyMetadataProvider =
             | Some(name) -> 
                 name
             | None -> 
-                proxy.Name
+                proxy.Name.Text
         | None ->
-            proxy.Name
+            proxy.Name.Text
             
 
     let private getObjectName(proxy : ClrElementReference) =
@@ -168,11 +168,11 @@ module DataProxyMetadataProvider =
                         | Some(x) -> 
                             x
                         | None ->
-                            proxy.Name
+                            proxy.Name.Text
                     DataObjectName(schemaName, localName)
                     
                 | None ->
-                    let localName = proxy.Name
+                    let localName = proxy.Name.Text
                     let schemaName = proxy |> ClrElement.getDeclaringElement |> Option.get |> getSchemaName
                     DataObjectName(schemaName, localName)
 
@@ -186,7 +186,7 @@ module DataProxyMetadataProvider =
                  
                  if m.Return.ReturnType |> Option.isSome then
                     yield m.Return |> MethodOutputReference                     
-                ]  |> List.mapi describeParameterProxy
+                ]  |> List.mapi describeIOProxy
             
             let procedure = {
                 ProcedureDescription.Name = objectName
@@ -255,18 +255,19 @@ module DataProxyOperators =
     let tableproxy<'T> =
         typeof<'T> |> DataProxyMetadataProvider.describeTable
        
-    let procproxy(m : MethodInfo) =
-        m |> ClrMethod.reference |> MethodElement |> DataProxyMetadataProvider.describeProcedureProxy
     
-    let procproxies<'T> =
-        [for m in  (typeof<'T> |> ClrInterface.reference |> fun x -> x.Members) do
+    let procproxies<'T> =        
+        
+        interfaceref<'T>.Members |> List.mapi (fun i m ->  
             match m with
             | InterfaceMethodReference(m) ->
-                yield m.Method |> procproxy
+                 m |> MethodElement |> DataProxyMetadataProvider.describeProcedureProxy
             | _ ->
-                ()
-        ]
-           
+                NotSupportedException() |> raise                
+        )
+        
+        
+                  
 
 
 

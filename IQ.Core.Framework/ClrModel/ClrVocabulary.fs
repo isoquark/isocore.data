@@ -17,22 +17,22 @@ module ClrVocabulary =
     /// <summary>
     /// Specifies the visibility of a CLR element
     /// </summary>
-    type Visibility =
+    type ClrAccess =
         /// Indicates that the target is visible everywhere 
-        | Public
+        | PublicAccess
         /// Indicates that the target is visible only to subclasses
         /// Not supported in F#
-        | Protected
+        | ProtectedAcces
         /// Indicates that the target is not visible outside its defining scope
-        | Private
+        | PrivateAccess
         /// Indicates that the target is visible throughout the assembly in which it is defined
-        | Internal
+        | InternalAccess
         /// Indicates that the target is visible to subclasses and the defining assembly
         /// Not supported in F#
-        | ProtectedInternal
+        | ProtectedInternalAccess
                
     /// <summary>
-    /// The name of a type
+    /// Represents a type name
     /// </summary>
     type ClrTypeName = 
         ///The local name of the type; does not include enclosing type names or namespace
@@ -43,111 +43,43 @@ module ClrVocabulary =
         | AssemblyTypeName of string
 
     /// <summary>
-    /// References a property
+    /// Represents an assembly name
     /// </summary>
-    type PropertyReference = {
-        /// The name of the property
-        Name : string
-
-        /// The CLR property being described
-        Property : PropertyInfo
-
-        /// The CLR type of the property
-        PropertyType : Type
-
-        /// If the type is of option type (or actually optional) then the enclosed type; otherwise, same as PropertyType
-        ValueType : Type
-    
-        /// The position of the property relative to some declaration context
-        Position : int
-
-    }
-        
+    type ClrAssemblyName =
+        | SimpleAssemblyName of string
+        | FullAssemblyName of string
 
     /// <summary>
-    /// Describes a property
+    /// Represents the name of a CLR element
     /// </summary>
-    type PropertyDescription = {
-        /// The name of the property
-        Name : string 
+    type ClrElementName =
+        | AssemblyElementName of ClrAssemblyName
+        | TypeElementName of ClrTypeName
+        | BasicElementName of string
 
-        /// The name of the CLR property type
-        PropertyType : ClrTypeName       
-    
-        /// Specifies whether the property has a get accessor
-        CanRead : bool
+    type ClrSubjectReference<'T> = ClrSubjectReference of name : ClrElementName * position : int * element : 'T
+    with
+        member this.Name = match this with ClrSubjectReference(name=x) -> x
+        member this.Position = match this with ClrSubjectReference(position=x) -> x
+        member this.Element = match this with ClrSubjectReference(element=x) -> x
 
-        /// Specifies whether the property has a set accessor
-        CanWrite : bool
-    }
-
-   
-
-
-    /// <summary>
-    /// Describes an F#-specific record
-    /// </summary>
-    type RecordReference = {
-        /// The name of the record
-        Name : string
-                
-        /// The CLR type of the record
-        Type : Type
-                
-        /// The fields defined by the record
-        Fields : PropertyReference list
-    }
-
-    /// <summary>
-    /// Describes an F#-specific union case
-    /// </summary>
-    type UnionCaseReference = {
-        /// The name of the case
-        Name : string
-
-        /// The case being described
-        Case : UnionCaseInfo
-        
-        /// The position of the case relative to other cases in the union
-        Position : int
-
-        /// The fields defined by the case
-        Fields : PropertyReference list
-    }
-    
-    /// <summary>
-    /// Describes an F#-specific union
-    /// </summary>
-    type UnionReference = {
-        /// The name of the record
-        Name : string
-    
-        /// The CLR type of the union
-        Type : Type
-        
-        /// The cases defined by the union
-        Cases : UnionCaseReference list
-    }
+    type ClrSubjectDescription = ClrSubjectDescription of name : ClrElementName * position : int
+    with
+        member this.Name = match this with ClrSubjectDescription(name=x) -> x
+        member this.Position = match this with ClrSubjectDescription(position=x) -> x
 
     /// <summary>
     /// Describes a CLR method parameter
     /// </summary>
-    [<DebuggerDisplay("{Name, nq} : {ParameterType.Name, nq}")>]
-    type MethodParameterReference = {
-        /// The name of the parameter
-        Name : string
-                
-        /// The CLR parameter being described
-        Parameter : ParameterInfo
+    type ClrMethodParameterReference = {
+        /// The CLR element being referenced
+        Subject : ClrSubjectReference<ParameterInfo>
        
         /// The CLR type of the parameter
         ParameterType : Type
        
         /// If the type is of option type (or actually optional) then the enclosed type; otherwise, same as ParameterType
         ValueType : Type
-
-        /// The ordinal position of the parameter
-        Position : int
 
         /// Whether the parameter is required
         IsRequired : bool
@@ -160,7 +92,7 @@ module ClrVocabulary =
     /// <summary>
     /// Describes a CLR method return
     /// </summary>
-    type MethodReturnReference = {
+    type ClrMethodReturnReference = {
         /// The return type of the method, if applicable
         ReturnType : Type option
         
@@ -172,92 +104,234 @@ module ClrVocabulary =
         Method : MethodInfo
     }
 
-    /// <summary>
-    /// References a method parameter or return
-    /// </summary>
-    type MethodInputOutputReference =
-    | MethodInputReference of MethodParameterReference
-    | MethodOutputReference of MethodReturnReference
 
 
     /// <summary>
     /// Represents a CLR method
     /// </summary>
-    type MethodReference = {
-        /// The name of the method
-        Name : string
-
-        /// The referenced method
-        Method : MethodInfo
+    type ClrMethodReference = {
+        /// The CLR element being referenced
+        Subject : ClrSubjectReference<MethodInfo>
 
         /// Description of the method return
-        Return : MethodReturnReference
+        Return : ClrMethodReturnReference
 
         /// The parameters accepted by the method
-        Parameters : MethodParameterReference list
+        Parameters : ClrMethodParameterReference list
+    }
+    
+    /// <summary>
+    /// References a property
+    /// </summary>
+    type ClrPropertyReference = {
+        /// The CLR element being referenced
+        Subject : ClrSubjectReference<PropertyInfo>
+
+        /// The CLR type of the property
+        PropertyType : Type
+
+        /// If the type is of option type (or actually optional) then the enclosed type; otherwise, same as PropertyType
+        ValueType : Type    
+    }
+        
+
+    /// <summary>
+    /// Describes a property
+    /// </summary>
+    type ClrPropertyDescription = {
+        /// The name of the property
+        Name : ClrElementName 
+
+        /// The position of the property relative to its declaration context
+        Position : int
+
+        /// The name of the type that declares the property
+        DeclaringType : ClrTypeName       
+    
+        /// The type of the property value
+        ValueType : ClrTypeName
+
+        /// Specifies whether the property is of option<> type
+        IsOptional : bool
+
+        /// Specifies whether the property has a get accessor
+        CanRead : bool
+
+        /// Specifies the access of the get accessor if applicable
+        ReadAccess : ClrAccess option
+
+        /// Specifies whether the property has a set accessor
+        CanWrite : bool
+
+        /// Specifies the access of the set accessor if applicable
+        WriteAccess : ClrAccess option
     }
 
- 
+    /// <summary>
+    /// Represents a described or referenced CLR property
+    /// </summary>
+    type ClrProperty =
+    | PropertyDescription of ClrPropertyDescription
+    | PropertyReference of ClrPropertyReference
+
+
+    /// <summary>
+    /// Describes an F#-specific record
+    /// </summary>
+    type ClrRecordReference = {
+        /// The CLR element being referenced
+        Subject : ClrSubjectReference<Type>
+                
+        /// The fields defined by the record
+        Fields : ClrPropertyReference list
+    }
+
+    /// <summary>
+    /// Describes an F#-specific union case
+    /// </summary>
+    type ClrUnionCaseReference = {
+        /// The CLR element being referenced        
+        Subject : ClrSubjectReference<UnionCaseInfo>
+
+        /// The fields defined by the case
+        Fields : ClrPropertyReference list
+    }
+    
+    /// <summary>
+    /// Describes an F#-specific union
+    /// </summary>
+    type ClrUnionReference = {
+        /// The CLR element being referenced        
+        Subject : ClrSubjectReference<Type>        
+
+
+        /// The cases defined by the union
+        Cases : ClrUnionCaseReference list
+    }
 
     
     /// <summary>
     /// Describes a CLR interface member
     /// </summary>
-    type InterfaceMemberReference =
-        | InterfaceMethodReference of MethodReference
-        | InterfacePropertyReference of PropertyReference
+    type ClrInterfaceMemberReference =
+        | InterfaceMethodReference of ClrMethodReference
+        | InterfacePropertyReference of ClrPropertyReference
 
     /// <summary>
     /// Describes a CLR interface
     /// </summary>
-    type InterfaceReference = {
-        /// The name of the interface
-        Name : string
-
-        /// The CLR type of the interface
-        Type : Type
+    type ClrInterfaceReference = {
+        /// The CLR element being referenced        
+        Subject : ClrSubjectReference<Type>        
 
         /// The members that belong to the interface
-        Members : InterfaceMemberReference list
+        Members : ClrInterfaceMemberReference list
     
         /// The interfaces from which the subject inherits
-        Bases : InterfaceReference list
+        Bases : ClrInterfaceReference list
     }
 
-
-
     /// <summary>
-    /// Represents a CLR type
+    /// Unifies the CLR type reference taxonomy
     /// </summary>
     type ClrTypeReference =
-    | UnionTypeReference of UnionReference
-    | RecordTypeReference of RecordReference
-    | InterfaceTypeReference of InterfaceReference
-
-
+    | UnionTypeReference of ClrUnionReference
+    | RecordTypeReference of ClrRecordReference
+    | InterfaceTypeReference of ClrInterfaceReference
 
 
     /// <summary>
-    /// Unifies the CLR element description hierarchy
+    /// Unifies the CLR element reference taxonomy
     /// </summary>
     type ClrElementReference =
-    | InterfaceElement of InterfaceReference
-    | PropertyElement of PropertyReference
-    | MethodElement of MethodReference
-    | MethodParameterElement of MethodParameterReference
-    | UnionElement of UnionReference
-    | UnionCaseElement of UnionCaseReference
-    | RecordElement of RecordReference
+    | InterfaceElement of ClrInterfaceReference
+    | PropertyElement of ClrPropertyReference
+    | MethodElement of ClrMethodReference
+    | MethodParameterElement of ClrMethodParameterReference
+    | UnionElement of ClrUnionReference
+    | UnionCaseElement of ClrUnionCaseReference
+    | RecordElement of ClrRecordReference
 
 
+
+module ClrAccess =
+    /// <summary>
+    /// Gets the method's access level
+    /// </summary>
+    /// <param name="m">The method</param>
+    let getMethodAccess(m : MethodInfo) =
+        if m.IsPublic then
+            PublicAccess
+        else if m.IsPrivate then
+            PrivateAccess 
+        else if m.IsAssembly then
+            InternalAccess
+        else if m.IsFamilyOrAssembly then
+            ProtectedInternalAccess
+        else
+            NotSupportedException("Cannot deduce the access level of the method") |> raise
 
 [<AutoOpen>]
 module ClrVocabularyExtensions =
     /// <summary>
-    /// Defines augmentations for the RecordDescription type
+    /// Defines augmentations for the <see cref="ClrMethodReference"/> type
     /// </summary>
-    type RecordReference
+    type ClrMethodReference 
     with
+        /// <summary>
+        /// The name of the method
+        /// </summary>
+        member this.Name = this.Subject.Name
+        member this.Position = this.Subject.Position
+        member this.Method = this.Subject.Element
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrPropertyReference"/> type
+    /// </summary>
+    type ClrPropertyReference    
+    with
+        /// <summary>
+        /// The name of the property
+        /// </summary>
+        member this.Name = this.Subject.Name
+        member this.Position = this.Subject.Position
+        member this.Property = this.Subject.Element
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrMethodParameterReference"/> type
+    /// </summary>
+    type ClrMethodParameterReference
+    with
+        /// <summary>
+        /// The name of the parameter
+        /// </summary>
+        member this.Name = this.Subject.Name
+        member this.Position = this.Subject.Position
+        member this.Parameter = this.Subject.Element
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrUnionCaseReference"/> type
+    /// </summary>
+    type ClrUnionCaseReference
+    with
+        /// <summary>
+        /// The name of the union case
+        /// </summary>
+        member this.Name = this.Subject.Name
+        member this.Position = this.Subject.Position
+        member this.Case = this.Subject.Element
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrRecordReference"/> type
+    /// </summary>
+    type ClrRecordReference
+    with
+        /// <summary>
+        /// The name of the record
+        /// </summary>
+        member this.Name = this.Subject.Name
+        member this.Position = this.Subject.Position
+        member this.Type = this.Subject.Element
         /// <summary>
         /// Retrieves a field identified by its name
         /// </summary>
@@ -274,3 +348,26 @@ module ClrVocabularyExtensions =
             //list as it should be ordered correctly
             this.Fields |> List.find(fun field -> field.Position = position)
 
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrRecordReference"/> type
+    /// </summary>
+    type ClrUnionReference
+    with
+        /// <summary>
+        /// The name of the record
+        /// </summary>
+        member this.Name = this.Subject.Name
+        member this.Position = this.Subject.Position
+        member this.Type = this.Subject.Element
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrRecordReference"/> type
+    /// </summary>
+    type ClrInterfaceReference
+    with
+        /// <summary>
+        /// The name of the record
+        /// </summary>
+        member this.Name = this.Subject.Name
+        member this.Position = this.Subject.Position
+        member this.Type = this.Subject.Element

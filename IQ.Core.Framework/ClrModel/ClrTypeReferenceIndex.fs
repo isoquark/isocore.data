@@ -19,7 +19,7 @@ module internal ClrTypeReferenceIndex =
     /// </summary>
     /// <param name="t">The record type</param>
     /// <param name="f">The description factory</param>
-    let getOrAddRecord (t : Type) (f:Type->RecordReference) =
+    let getOrAddRecord (t : Type) (f:Type->ClrRecordReference) =
         match types.GetOrAdd(t, fun t -> f(t) |> RecordTypeReference)  with | RecordTypeReference(x) -> x | _ -> failwith "Should never happen"
 
     /// <summary>
@@ -27,7 +27,7 @@ module internal ClrTypeReferenceIndex =
     /// </summary>
     /// <param name="t">The record type</param>
     /// <param name="f">The description factory</param>
-    let getOrAddUnion (t : Type) (f:Type->UnionReference) =
+    let getOrAddUnion (t : Type) (f:Type->ClrUnionReference) =
         match types.GetOrAdd(t, fun t -> f(t) |> UnionTypeReference)  with | UnionTypeReference(x) -> x | _ -> failwith "Should never happen"
 
     /// <summary>
@@ -35,5 +35,5 @@ module internal ClrTypeReferenceIndex =
     /// </summary>
     /// <param name="t">The record type</param>
     /// <param name="f">The description factory</param>
-    let getOrAddInterface(t : Type) (f:Type->InterfaceReference) =
+    let getOrAddInterface(t : Type) (f:Type->ClrInterfaceReference) =
         match types.GetOrAdd(t, fun t -> f(t) |> InterfaceTypeReference)  with | InterfaceTypeReference(x) -> x | _ -> failwith "Should never happen"

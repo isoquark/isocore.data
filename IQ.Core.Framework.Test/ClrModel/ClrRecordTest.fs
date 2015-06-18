@@ -63,9 +63,9 @@ module ClrRecordTest =
         }
         let expect = 
             [
-            (AField01Name, value.AField01 :> obj)
-            (AField02Name, value.AField02 :> obj)
-            (AField03Name, value.AField03:> obj)
+            (AField01Name.Text, value.AField01 :> obj)
+            (AField02Name.Text, value.AField02 :> obj)
+            (AField03Name.Text, value.AField03:> obj)
             ] |> ValueIndex.fromNamedItems
         let actual = value |> ClrRecord.toValueMap 
         actual |> Claim.equal expect
@@ -79,9 +79,9 @@ module ClrRecordTest =
         }
         let expect1 = 
             [
-            (BField01Name, value1.BField01 :> obj)
-            (BField02Name, value1.BField02 :> obj)
-            (BField03Name, value1.BField03:> obj)
+            (BField01Name.Text, value1.BField01 :> obj)
+            (BField02Name.Text, value1.BField02 :> obj)
+            (BField03Name.Text, value1.BField03:> obj)
             ] |> ValueIndex.fromNamedItems
 
         let actual1 = value1 |> ClrRecord.toValueMap 
@@ -94,9 +94,9 @@ module ClrRecordTest =
         }
         let expect2 = 
             [
-            (BField01Name, value1.BField01 :> obj)
-            (BField02Name, value1.BField02 :> obj)
-            (BField03Name, value1.BField03:> obj)
+            (BField01Name.Text, value1.BField01 :> obj)
+            (BField02Name.Text, value1.BField02 :> obj)
+            (BField03Name.Text, value1.BField03:> obj)
             ] |> ValueIndex.fromNamedItems
 
         let actual2 = value1 |> ClrRecord.toValueMap 
@@ -106,9 +106,9 @@ module ClrRecordTest =
     [<Test>]
     let ``Created record from value map - with no optional fields``() =
         let valueMap = 
-            [(AField01Name, 16 :> obj)
-             (AField02Name, 38.12m :> obj)
-             (AField03Name, DateTime(2015, 5, 6) :> obj)
+            [(AField01Name.Text, 16 :> obj)
+             (AField02Name.Text, 38.12m :> obj)
+             (AField03Name.Text, DateTime(2015, 5, 6) :> obj)
             ]|> ValueIndex.fromNamedItems
         
         let expect = {
@@ -122,9 +122,9 @@ module ClrRecordTest =
     [<Test>]
     let ``Created record from value map - with optional fields``() =
         let valueMap1 = 
-            [(BField01Name, 16 :> obj)
-             (BField02Name, 38.12m :> obj)
-             (BField03Name, DateTime(2015, 5, 6) |> Some :> obj)
+            [(BField01Name.Text, 16 :> obj)
+             (BField02Name.Text, 38.12m :> obj)
+             (BField03Name.Text, DateTime(2015, 5, 6) |> Some :> obj)
             ]|> ValueIndex.fromNamedItems
         
         let expect1 = {
@@ -136,9 +136,9 @@ module ClrRecordTest =
         actual1 |> Claim.equal expect1
 
         let valueMap2 = 
-            [(BField01Name, 16 :> obj)
-             (BField02Name, 38.12m :> obj)
-             (BField03Name, option<DateTime>.None :> obj)
+            [(BField01Name.Text, 16 :> obj)
+             (BField02Name.Text, 38.12m :> obj)
+             (BField03Name.Text, option<DateTime>.None :> obj)
             ]|> ValueIndex.fromNamedItems
         
         let expect2 = {
