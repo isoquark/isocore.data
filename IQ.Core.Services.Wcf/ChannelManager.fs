@@ -12,12 +12,26 @@ open Channel
 open Helpers
 
 module ChannelAdapter =
+    //TODO: 
+    //1. Type names are almost always CamelCased
+    //2. This type looks like it should be private to the module
+    //3. I often use single case DU's for this purpose because they are more convenient to 
+    //construct, e.g.,
+    //type ContractKey = ContractKey of endpointName : string option * contractType : string
+    //but this is just a personal preference
     type contractKey = 
         { 
         endpointName : string option;
         contractType : string
         }
+
+    
+    
         
+    //TODO: I would not use this combination of functional data structures (Map) and 
+    //mutable state. Instead, I would use a container which is itself mutable
+    //ConcurrentDictionary would be perfect for this
+
     let mutable private _endpointMap : Map<contractKey, obj> = Map.empty //map by endpoint name (when supporting multiple endpoints for same type)
     let mutable private _mapByType : Map<string,int> = Map.empty    //bucket/map by contract type name with tuples of counts of endpoints and channels; 
                                                                 //if count > 1, then obj will be null, as it would be ambiguous to go by contract type; 

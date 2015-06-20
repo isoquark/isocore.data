@@ -8,6 +8,7 @@ open System.Threading.Tasks;
 module Channel =
    
     type internal GenericChannel<'T> (endpointName0 : string option) =
+        //TODO: Why does this exist? 
         let mutable endpointName = endpointName0
      
         let msgFct e t = 
@@ -16,6 +17,7 @@ module Channel =
                 | Some(x) -> msgRoot (sprintf "endpoint %s" x) t
                 | _ -> msgRoot "" t
 
+        //TODO: Why is this mutable?
         //The channel factory instance whose lifcycle coincides with that of the containing class instance
         let mutable fact =
                 try

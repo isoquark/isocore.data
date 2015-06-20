@@ -60,3 +60,32 @@ module Helpers =
                              ) |> Seq.distinct
 
 
+//TODO: For your getOptionFromString helper, I would do something like this to make usage a little
+//smoother and more natural (In the core library, there is a Txt module this would fit into;
+//this is just illustrative rather than prescriptive. In fact, the reason I use the name Txt instead
+//"String" is to avoid mixing my api terminology with the .Net api because the different naming/casing
+//conventions. For idiomatic F# modules such as List and Seq, it's very natural
+//to "extend" them with your own functions):
+
+//Create a String module...
+module String =
+    let asOption s =
+        match String.IsNullOrEmpty(s) with
+                | true -> None
+                | _ -> Some s
+
+//...or augment the string type (note that for static methods I wouldn't do both as it's a little awkward
+//but for "instance" methods its a pretty good pattern because it gives the consumer more flexibility
+[<AutoOpen>]
+module StringExtensions =
+    type String
+    with
+        static member AsOption s = s |> String.asOption
+    
+module StringExamples =
+    let example() =
+        let o1 = "MyString" |> String.asOption
+        let o2 = String.Empty |> String.AsOption
+        let o3 = null |> String.AsOption
+        ()
+        
