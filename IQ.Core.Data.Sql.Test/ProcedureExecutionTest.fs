@@ -8,8 +8,10 @@ open System.Reflection
 
 open IQ.Core.TestFramework
 open IQ.Core.Data
+open IQ.Core.Data.Test.ProxyTestCases
 open IQ.Core.Data.Sql
 open IQ.Core.Framework
+
 
 [<TestContainer; DataStoreTrait>]
 module ``Procedure Execution`` =
@@ -19,8 +21,8 @@ module ``Procedure Execution`` =
         
     [<Test>]
     let ``Executed [SqlTest].[pTable02Insert] procedure - Direct``() =
-        let procName = thisMethod() |> SqlTestCaseMethod.getDbObjectName
-        let procProxy = procproxies<SqlTestProxies.ISqlTestProcs> |> List.find(fun x -> x.DataElement.Name = procName)
+        let procName = thisMethod() |> ProxyTestCaseMethod.getDbObjectName
+        let procProxy = procproxies<ISqlTestProcs> |> List.find(fun x -> x.DataElement.Name = procName)
         let proc = procProxy.DataElement
         let inputValues = ValueIndex.fromNamedItems [("col01", DBNull.Value :> obj); ("col02", DateTime(2015, 5, 16) :> obj); ("col03", 507L :> obj);]
         let outputvalues = proc |> Procedure.execute cs inputValues
@@ -36,8 +38,8 @@ module ``Procedure Execution`` =
 
     [<Test>]
     let ``Executed [SqlTest].[pTable03Insert] procedure - Direct``() =
-        let procName = thisMethod() |> SqlTestCaseMethod.getDbObjectName
-        let procProxy = procproxies<SqlTestProxies.ISqlTestProcs> |> List.find(fun x -> x.DataElement.Name = procName)
+        let procName = thisMethod() |> ProxyTestCaseMethod.getDbObjectName
+        let procProxy = procproxies<ISqlTestProcs> |> List.find(fun x -> x.DataElement.Name = procName)
         let proc = procProxy.DataElement
         let inputValues = ValueIndex.fromNamedItems [("Col01", 5uy :> obj); ("Col02", 10s :> obj); ("Col03", 15 :> obj); ("Col04", 20L :> obj)]
         let outputValues = proc |> Procedure.execute cs inputValues

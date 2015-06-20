@@ -16,7 +16,7 @@ module ClrTypeName =
     /// <param name="typeName">The typename</param>
     let format typeName =
         match typeName with
-        | SimpleTypeName(n) | FullTypeName(n) | AssemblyTypeName(n) -> n
+        | SimpleTypeName(n) | FullTypeName(n) | AssemblyQualifiedTypeName(n) -> n
     
 module ClrAssemblyName =
     let format assname =
@@ -48,7 +48,7 @@ module ClrElementNameExtensions =
 
     type Type 
     with
-        member this.ElementName = this.AssemblyQualifiedName |> AssemblyTypeName |> TypeElementName
+        member this.ElementName = this.AssemblyQualifiedName |> AssemblyQualifiedTypeName |> TypeElementName
     
     type Assembly
     with

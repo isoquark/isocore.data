@@ -18,7 +18,7 @@ module Converter =
         else if value.GetType() = dstType then
             value
         else
-            let valueType = dstType.ValueType
+            let valueType = dstType.ItemValueType
             if dstType |> Type.isOptionType then
                 if value |> ClrOption.isOptionValue then
                     //Convert an option value to an option type

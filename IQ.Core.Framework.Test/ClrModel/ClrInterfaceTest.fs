@@ -28,7 +28,7 @@ module ClrInterfaceTest =
     [<Test>]
     let ``Described interface with both property and method declarations``() =
         let description = interfaceref<IInterfaceB>
-        let methods = [for m in description.Members do  match m with | InterfaceMethodReference(x) -> yield x | _ -> ()]
+        let methods = [for m in description.Members do  match m with | MethodReference(x) -> yield x | _ -> ()]
         methods.Length |> Claim.equal 3
         let m1 = methods |> List.find(fun x -> x.Name.Text = "Method01")
         m1.Return.ReturnType |> Claim.isNone

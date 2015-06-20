@@ -16,7 +16,7 @@ module ClrProperty =
     let internal reference pos (p : PropertyInfo) = 
         {
             Subject = ClrSubjectReference(p.ElementName, pos, p)
-            ValueType = p.PropertyType.ValueType
+            ValueType = p.PropertyType.ItemValueType
             PropertyType = p.PropertyType
         }
 
@@ -27,10 +27,9 @@ module ClrProperty =
     /// <param name="p">The property to be referenced</param>
     let internal describe pos (p : PropertyInfo) =
         {
-            ClrPropertyDescription.Name = p.ElementName
-            Position = pos
+            Subject = ClrSubjectDescription(p.ElementName, pos)
             DeclaringType  = p.DeclaringType.FullName |> FullTypeName
-            ValueType = p.PropertyType.ValueType.FullName |> FullTypeName
+            ValueType = p.PropertyType.ItemValueType.FullName |> FullTypeName
             IsOptional = p.PropertyType.IsOptionType
             CanRead = p.CanRead
             ReadAccess = if p.CanRead then p.GetMethod |> ClrAccess.getMethodAccess |> Some else None

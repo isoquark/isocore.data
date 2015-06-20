@@ -40,7 +40,7 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a proxy for a tabular result set
     /// </summary>
-    type TabularResultProxyDescription = TabularResultProxyDescription of proxy : ClrRecordReference  * dataElement : TableFunctionDescription * columns : ColumnProxyDescription list
+    type RoutineResultProxyDescription = TabularResultProxyDescription of proxy : ClrTypeReference  * dataElement : RoutineDescription * columns : ColumnProxyDescription list
     with
         /// <summary>
         /// Specifies the proxy record
@@ -63,7 +63,7 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a table proxy
     /// </summary>
-    type TableProxyDescription = TableProxyDescription of proxy : ClrRecordReference * dataElement : TableDescription * columns : ColumnProxyDescription list
+    type TableProxyDescription = TableProxyDescription of proxy : ClrTypeReference * dataElement : TableDescription * columns : ColumnProxyDescription list
     with
         /// <summary>
         /// Specifies the proxy record
@@ -88,7 +88,7 @@ module DataProxyMetamodel =
     /// Describes a proxy for a routine parameter
     /// </summary>
     [<DebuggerDisplay("{DebuggerDisplay,nq}")>]
-    type ParameterProxyDescription = ParameterProxyDescription of proxy : MethodInputOutputReference * dataElement : RoutineParameter
+    type ParameterProxyDescription = ParameterProxyDescription of proxy : MethodInputOutputReference * dataElement : RoutineParameterDescription
     with   
         /// <summary>
         /// Specifies  the CLR proxy element
@@ -113,28 +113,35 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a proxy for a stored procedure
     /// </summary>
-    type ProcedureProxyDescription = ProcedureProxyDescription of proxy : ClrMethodReference * dataElement : ProcedureDescription * parameters : ParameterProxyDescription list
+    type ProcedureCallProxyDescription = ProcedureCallProxyDescription of proxy : ClrMethodReference * dataElement : ProcedureDescription * parameters : ParameterProxyDescription list
     with
         /// <summary>
         /// Specifies  the CLR proxy element
         /// </summary>
-        member this.ProxyElement = match this  with ProcedureProxyDescription(proxy=x) -> x
+        member this.ProxyElement = match this  with ProcedureCallProxyDescription(proxy=x) -> x
 
         /// <summary>
         /// Specifies  the data element that the proxy represents
         /// </summary>
-        member this.DataElement = match this with ProcedureProxyDescription(dataElement=x) -> x
+        member this.DataElement = match this with ProcedureCallProxyDescription(dataElement=x) -> x
 
         /// <summary>
         /// Specifies the parameter proxies
         /// </summary>
         member this.Parameters = 
-            match this with ProcedureProxyDescription(parameters=x) -> x
+            match this with ProcedureCallProxyDescription(parameters=x) -> x
 
     /// <summary>
     /// Describes a proxy for a stored procedure
     /// </summary>
-    type TableFunctionProxyDescription = TableFunctionProxyDescription of proxy : ClrMethodReference * dataElement : TableFunctionDescription * parameters : ParameterProxyDescription list
+    type TableFunctionCallProxyDescription = TableFunctionCallProxyDescription of proxy : ClrMethodReference * dataElement : TableFunctionDescription * parameters : ParameterProxyDescription list
+    
+    
+    type TableFunctionProxy = TableFunctionProxy of call : TableFunctionCallProxyDescription * result : RoutineResultProxyDescription
+    with
+        member this.CallProxy = match this with TableFunctionProxy(call=x) -> x
+        member this.ResultProxy = match this with TableFunctionProxy(result=x) ->x
+    
     
     /// <summary>
     /// Unifies all proxy description types
@@ -143,9 +150,9 @@ module DataProxyMetamodel =
     | ColumnProxy of ColumnProxyDescription
     | TableProxy of TableProxyDescription
     | ParameterProxy of ParameterProxyDescription
-    | ProcedureProxy of ProcedureProxyDescription
-    | TableFunctionProxy of TableFunctionProxyDescription
-    | TableFunctionResultProxy of TabularResultProxyDescription
+    | ProcedureCallProxy of ProcedureCallProxyDescription
+    | TableFunctionCallProxy of TableFunctionCallProxyDescription
+    | TableFunctionResultProxy of RoutineResultProxyDescription
 
 /// <summary>
 /// Defines operators and augmentations for the types in the DataProxyMetamodel module

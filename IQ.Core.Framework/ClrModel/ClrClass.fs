@@ -6,11 +6,10 @@ open System.Collections.Concurrent
 
 open Microsoft.FSharp.Reflection
 
-
 /// <summary>
 /// Defines operations for working with interface instances and metadata
 /// </summary>
-module ClrInterface =
+module ClrClass =
         
     let private describeMember pos (m : MemberInfo) =
         match m with
@@ -27,13 +26,10 @@ module ClrInterface =
     /// <param name="t">The type of the interface to reference</param>
     let rec private createReference(t : Type) =
         {
-            ClrInterfaceReference.Subject = ClrSubjectReference(t.ElementName, -1, t)
+            ClrClassReference.Subject = ClrSubjectReference(t.ElementName, -1, t)
             Members = 
                 (t |> Type.getPureMethods |> List.mapi describeMember ) 
                 |> List.append (t.GetProperties() |> Array.mapi describeMember |> List.ofArray)
-            Bases = [for b in t.GetInterfaces() ->
-                        createReference |> ClrTypeReferenceIndex.getOrAddInterface b   
-                    ]
         }
 
     /// <summary>
@@ -41,27 +37,20 @@ module ClrInterface =
     /// </summary>
     /// <param name="t">The type that defines the type</param>
     let reference (t : Type) =
-        if t.IsInterface |> not then
+        if t.IsClass |> not then
             ArgumentException(sprintf "The type %O is not an interface type" t) |> raise
         
-        createReference |> ClrTypeReferenceIndex.getOrAddInterface t
+        createReference |> ClrTypeReferenceIndex.getOrAddClass t
 
 
 
-module ClrMember =
-    let getAttribute<'T when 'T :> Attribute> m  =
-        match m with
-        | MethodReference(m) -> 
-            m.Subject.Element |> MethodInfo.getAttribute<'T>
-        | PropertyReference(p) -> 
-            p.Property |> PropertyInfo.getAttribute<'T>
 
 /// <summary>
 /// Defines interface-related augmentations and operators
 /// </summary>
 [<AutoOpen>]
-module ClrInterfaceExtensions =
-    let interfaceref<'T> = typeof<'T> |> ClrInterface.reference
+module ClrClassExtensions =
+    let classref<'T> = typeof<'T> |> ClrClass.reference
 
     /// <summary>
     /// Defines augmentations for the InterfaceMemberDescription type
@@ -69,3 +58,5 @@ module ClrInterfaceExtensions =
     type ClrMemberReference
     with
         member this.GetAttribute<'T when 'T :> Attribute>() = this |> ClrMember.getAttribute<'T>
+
+

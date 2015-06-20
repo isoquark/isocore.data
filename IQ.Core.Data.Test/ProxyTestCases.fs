@@ -1,4 +1,4 @@
-﻿namespace IQ.Core.Data.Sql.Test
+﻿namespace IQ.Core.Data.Test
 
 open System
 open System.ComponentModel
@@ -8,11 +8,9 @@ open System.Reflection
 
 open IQ.Core.TestFramework
 open IQ.Core.Data
-open IQ.Core.Data.Sql
 open IQ.Core.Framework
 
-[<AutoOpen>]
-module SqlTestProxies =
+module ProxyTestCases =
     
     type Table04FunctionResult = {
         Id : int
@@ -73,12 +71,9 @@ module SqlTestProxies =
         Col05 : string
     }
 
-module SqlTestCaseMethod =
-    let getDbObjectName (testMethod : MethodBase) =
-        let values = testMethod.Name 
-                   |> Txt.betweenMarkers "[" "]" true 
-                   |> Txt.matchRegexGroups ["Schema"; "Name"] Txt.StockRegularExpressions.QualifiedDataObjectName
-        DataObjectName(values.["Schema"], values.["Name"])
-    
-
-
+    module ProxyTestCaseMethod =
+        let getDbObjectName (testMethod : MethodBase) =
+            let values = testMethod.Name 
+                       |> Txt.betweenMarkers "[" "]" true 
+                       |> Txt.matchRegexGroups ["Schema"; "Name"] Txt.StockRegularExpressions.QualifiedDataObjectName
+            DataObjectName(values.["Schema"], values.["Name"])

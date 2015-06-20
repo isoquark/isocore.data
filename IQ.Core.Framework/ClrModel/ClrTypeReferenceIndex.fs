@@ -37,3 +37,6 @@ module internal ClrTypeReferenceIndex =
     /// <param name="f">The description factory</param>
     let getOrAddInterface(t : Type) (f:Type->ClrInterfaceReference) =
         match types.GetOrAdd(t, fun t -> f(t) |> InterfaceTypeReference)  with | InterfaceTypeReference(x) -> x | _ -> failwith "Should never happen"
+
+    let getOrAddClass(t : Type) (f:Type->ClrClassReference) =
+        match types.GetOrAdd(t, fun t -> f(t) |> ClassTypeReference)  with | ClassTypeReference(x) -> x | _ -> failwith "Should never happen"

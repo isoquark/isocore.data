@@ -5,6 +5,7 @@ open IQ.Core.Framework
 
 open System
 open System.Reflection
+open System.Collections.Generic
 
 [<TestContainer>]
 module ClrTypeTest =     
@@ -45,4 +46,15 @@ module ClrTypeTest =
         field01Case.Name.Text |> Claim.equal "field01"
         
 
+    [<Test>]
+    let ``Determined whether a type realizes the generic IEnumerable interface``() =
+        [1;2;2].GetType() |> Type.isGenericEnumerable |> Claim.isTrue
 
+
+
+    [<Test>]
+    let ``Determined the item value type of a type``() =        
+        typeof<List<string>>.ItemValueType |> Claim.equal typeof<string>
+        typeof<option<string>>.ItemValueType |> Claim.equal typeof<string>
+        typeof<option<List<string>>>.ItemValueType |> Claim.equal typeof<string>
+        typeof<string>.ItemValueType |> Claim.equal typeof<string>

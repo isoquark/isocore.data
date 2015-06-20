@@ -90,5 +90,15 @@ module Lang =
     /// <param name="key">The value key</param>
     let (?) (map : Map<string,_>) key = map.[key]
 
+    /// <summary>
+    /// Specifies the range of allowable values for a given element
+    /// </summary>
+    type Multiplicity = 
+        | ExactlyZero
+        | ZeroOrOne
+        | ZeroOrMore
+        | ExactlyOne
+        | OneOrMore
+        | BoundedRange of min : uint32 * max : uint32
             
         

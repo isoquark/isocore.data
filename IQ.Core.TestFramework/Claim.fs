@@ -59,6 +59,12 @@ module Claim =
         value = null |> Assert.False
 
     /// <summary>
+    /// Asserts unconditional failure
+    /// </summary>
+    let assertFail() =
+        Assert.True false
+    
+    /// <summary>
     /// Asserts that executing a supplied function will raise a specific exception
     /// </summary>
     /// <param name="f">The function to execute</param>

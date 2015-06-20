@@ -30,6 +30,8 @@ module ClrVocabulary =
         /// Indicates that the target is visible to subclasses and the defining assembly
         /// Not supported in F#
         | ProtectedInternalAccess
+
+
                
     /// <summary>
     /// Represents a type name
@@ -40,7 +42,7 @@ module ClrVocabulary =
         ///The namespace and nested type-qualified name of the type
         | FullTypeName of string
         ///The assembly-qualified full type name
-        | AssemblyTypeName of string
+        | AssemblyQualifiedTypeName of string
 
     /// <summary>
     /// Represents an assembly name
@@ -139,11 +141,7 @@ module ClrVocabulary =
     /// Describes a property
     /// </summary>
     type ClrPropertyDescription = {
-        /// The name of the property
-        Name : ClrElementName 
-
-        /// The position of the property relative to its declaration context
-        Position : int
+        Subject : ClrSubjectDescription
 
         /// The name of the type that declares the property
         DeclaringType : ClrTypeName       
@@ -173,6 +171,27 @@ module ClrVocabulary =
     type ClrProperty =
     | PropertyDescription of ClrPropertyDescription
     | PropertyReference of ClrPropertyReference
+
+    /// <summary>
+    /// Represents a CLR member reference
+    /// </summary>
+    type ClrMemberReference =
+        | MethodReference of ClrMethodReference
+        | PropertyReference of ClrPropertyReference
+    with
+        member this.Name =
+            match this with
+            | MethodReference(x) -> x.Subject.Name
+            | PropertyReference(x) -> x.Subject.Name
+
+    type ClrTypeSubjectReference =
+        {
+            Subject : ClrSubjectReference<Type>
+        }
+    with
+        member this.Name = this.Subject.Name
+        member this.Position = this.Subject.Position
+        member this.Type = this.Subject.Element
 
 
     /// <summary>
@@ -210,12 +229,6 @@ module ClrVocabulary =
     }
 
     
-    /// <summary>
-    /// Describes a CLR interface member
-    /// </summary>
-    type ClrInterfaceMemberReference =
-        | InterfaceMethodReference of ClrMethodReference
-        | InterfacePropertyReference of ClrPropertyReference
 
     /// <summary>
     /// Describes a CLR interface
@@ -225,11 +238,23 @@ module ClrVocabulary =
         Subject : ClrSubjectReference<Type>        
 
         /// The members that belong to the interface
-        Members : ClrInterfaceMemberReference list
+        Members : ClrMemberReference list
     
         /// The interfaces from which the subject inherits
         Bases : ClrInterfaceReference list
     }
+
+    /// <summary>
+    /// Describes a CLR interface
+    /// </summary>
+    type ClrClassReference = {
+        /// The CLR element being referenced        
+        Subject : ClrSubjectReference<Type>        
+        /// The members that belong to the class
+        Members : ClrMemberReference list
+
+    }
+
 
     /// <summary>
     /// Unifies the CLR type reference taxonomy
@@ -238,6 +263,7 @@ module ClrVocabulary =
     | UnionTypeReference of ClrUnionReference
     | RecordTypeReference of ClrRecordReference
     | InterfaceTypeReference of ClrInterfaceReference
+    | ClassTypeReference of ClrClassReference
 
 
     /// <summary>
@@ -251,6 +277,8 @@ module ClrVocabulary =
     | UnionElement of ClrUnionReference
     | UnionCaseElement of ClrUnionCaseReference
     | RecordElement of ClrRecordReference
+    | ClassElement of ClrClassReference
+
 
 
 
@@ -273,6 +301,15 @@ module ClrAccess =
 
 [<AutoOpen>]
 module ClrVocabularyExtensions =
+    type ClrPropertyDescription
+    with
+        /// <summary>
+        /// The name of the property
+        /// </summary>
+        member this.Name = this.Subject.Name
+        member this.Position = this.Subject.Position
+        
+    
     /// <summary>
     /// Defines augmentations for the <see cref="ClrMethodReference"/> type
     /// </summary>
@@ -371,3 +408,17 @@ module ClrVocabularyExtensions =
         member this.Name = this.Subject.Name
         member this.Position = this.Subject.Position
         member this.Type = this.Subject.Element
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrClassReference"/> type
+    /// </summary>
+    type ClrClassReference
+    with
+        /// <summary>
+        /// The name of the class
+        /// </summary>
+        member this.Name = this.Subject.Name
+        member this.Position = this.Subject.Position
+        member this.Type = this.Subject.Element
+
+

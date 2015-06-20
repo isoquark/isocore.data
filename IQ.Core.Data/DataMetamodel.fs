@@ -52,7 +52,7 @@ module DataMetamodel =
     /// <summary>
     /// Describes a routine in a function or procedure
     /// </summary>
-    type RoutineParameter = {
+    type RoutineParameterDescription = {
         /// The parameter's name
         Name : string
     
@@ -76,7 +76,7 @@ module DataMetamodel =
         Name : DataObjectName
 
         /// The parameters
-        Parameters : RoutineParameter list
+        Parameters : RoutineParameterDescription list
     }
    
     /// <summary>
@@ -87,7 +87,7 @@ module DataMetamodel =
         Name : DataObjectName
     
         /// The parameters
-        Parameters : RoutineParameter list
+        Parameters : RoutineParameterDescription list
 
         /// The columns in the result set
         Columns : ColumnDescription list

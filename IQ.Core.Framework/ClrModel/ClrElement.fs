@@ -30,6 +30,9 @@ module ClrElement =
             x.Case |> UnionCaseInfo.getAttribute
         | RecordElement(x) ->
             x.Type |> Type.getAttribute<'T>
+        | ClassElement(x) ->
+            x.Type |> Type.getAttribute<'T>
+
 
     /// <summary>
     /// Gets the name of the element
@@ -50,6 +53,8 @@ module ClrElement =
         | UnionCaseElement(x) -> 
             x.Name
         | RecordElement(x) ->
+            x.Name
+        | ClassElement(x) ->
             x.Name
 
     /// <summary>
@@ -75,6 +80,9 @@ module ClrElement =
                 x.Case.DeclaringType |> declarer
             | RecordElement(x) ->
                 x.Type.DeclaringType |> declarer
+            | ClassElement(x) ->
+                x.Type.DeclaringType |> declarer
+
         match declaringType with
         |Some(x) -> x |> ClrType.reference |> Some
         | None -> None
@@ -83,7 +91,7 @@ module ClrElement =
     /// Gets the element from a supplied type
     /// </summary>
     /// <param name="t">The type to be expressed as an element</param>
-    let fromType(t : ClrTypeReference) =
+    let fromTypeRef(t : ClrTypeReference) =
         match t with
         | UnionTypeReference(x) -> 
             x |> UnionElement
@@ -91,7 +99,14 @@ module ClrElement =
             x |> RecordElement
         | InterfaceTypeReference(x) -> 
             x |> InterfaceElement
-    
+        | ClassTypeReference(x) ->
+            x |> ClassElement
+    /// <summary>
+    /// Creates a CLR element reference from the type identified by the type parameter
+    /// </summary>
+    let fromType<'T> =
+        typeref<'T> |> fromTypeRef
+
     /// <summary>
     /// Gets the element that declares a specified element, if any
     /// </summary>
@@ -103,7 +118,7 @@ module ClrElement =
         | _ ->
             match element |> getDeclaringType with
             | Some(x) -> 
-                x |> fromType |> Some
+                x |> fromTypeRef |> Some
             | None -> 
                 None
 

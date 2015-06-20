@@ -12,7 +12,7 @@ module ClrMethod =
         {
             ClrMethodParameterReference.Subject = ClrSubjectReference(p.ElementName , p.Position, p)
             ParameterType = p.ParameterType
-            ValueType = p.ParameterType.ValueType
+            ValueType = p.ParameterType.ItemValueType
             IsRequired = (p.IsOptional || p.IsDefined(typeof<OptionalArgumentAttribute>)) |> not   
             Method = p.Member :?> MethodInfo         
            
@@ -31,7 +31,7 @@ module ClrMethod =
                     ReturnType = returnType
                     Method = m
                     ValueType = match returnType with
-                                | Some(x) -> x.ValueType |> Some
+                                | Some(x) -> x.ItemValueType |> Some
                                 | None -> None
                                 
                 }

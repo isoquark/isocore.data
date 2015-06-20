@@ -86,7 +86,7 @@ module CsvReader =
                      |> ValueIndex.fromNamedItems
 
         file.Rows |> Seq.map createValueMap 
-                  |> Seq.map (fun valueMap -> proxy.ProxyElement |> ClrRecord.fromValueMap valueMap :?> 'T)
+                  |> Seq.map (fun valueMap -> proxy.ProxyElement |> ClrType.fromValueMap valueMap :?> 'T)
                   |> List.ofSeq
 
     /// <summary>

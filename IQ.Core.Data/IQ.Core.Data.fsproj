@@ -76,7 +76,7 @@
     <Compile Include="DataStorageType.fs" />
     <Compile Include="DataMetamodel.fs" />
     <Compile Include="DataProxyMetamodel.fs" />
-    <Compile Include="DataProxyMetadataProvider.fs" />
+    <Compile Include="DataProxyMetadata.fs" />
     <Compile Include="DataTable.fs" />
     <Compile Include="CsvData.fs" />
   </ItemGroup>

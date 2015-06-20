@@ -55,7 +55,7 @@ module internal ProcedureContract =
             | MethodOutputReference(m) ->
                 "Return" 
 
-    let private indexRoutineParameterValues (proxy : ProcedureProxyDescription) (methodParameterValues : ValueIndex)  =
+    let private indexRoutineParameterValues (proxy : ProcedureCallProxyDescription) (methodParameterValues : ValueIndex)  =
         [for p in proxy.Parameters do
             let key = p |> getMethodParameterName  |> NameKey
             match methodParameterValues |> ValueIndex.tryFindValue key  with
@@ -93,3 +93,5 @@ module internal ProcedureContract =
 
     let get<'TContract when 'TContract : not struct>(cs : string) =        
         invoke<'TContract,string> |> DynamicContract.realize<'TContract,string> cs
+
+
