@@ -73,7 +73,7 @@ module ClrRecordTest =
             (AField02Name.Text, value.AField02 :> obj)
             (AField03Name.Text, value.AField03:> obj)
             ] |> ValueIndex.fromNamedItems
-        let actual = value |> ClrType.recordToValueMap 
+        let actual = value |> ClrType.toValueMap 
         actual |> Claim.equal expect
 
     [<Test>]
@@ -90,7 +90,7 @@ module ClrRecordTest =
             (BField03Name.Text, value1.BField03:> obj)
             ] |> ValueIndex.fromNamedItems
 
-        let actual1 = value1 |> ClrType.recordToValueMap 
+        let actual1 = value1 |> ClrType.toValueMap 
         actual1 |> Claim.equal expect1
 
         let value2 = {
@@ -105,7 +105,7 @@ module ClrRecordTest =
             (BField03Name.Text, value1.BField03:> obj)
             ] |> ValueIndex.fromNamedItems
 
-        let actual2 = value1 |> ClrType.recordToValueMap 
+        let actual2 = value1 |> ClrType.toValueMap 
         actual2 |> Claim.equal expect2
 
     
@@ -122,7 +122,7 @@ module ClrRecordTest =
             AField02 = 38.12m
             AField03 = DateTime(2015, 5, 6)
         }
-        let actual =  recordref<RecordA> |> ClrType.recordFromValueMap valueMap :?> RecordA
+        let actual =  typeref<RecordA> |> ClrType.fromValueMap valueMap :?> RecordA
         actual |> Claim.equal expect
 
     [<Test>]
@@ -138,7 +138,7 @@ module ClrRecordTest =
             BField02 = 38.12m
             BField03 = DateTime(2015, 5, 6) |> Some
         }
-        let actual1 =  recordref<RecordB> |> ClrType.recordFromValueMap valueMap1 :?> RecordB
+        let actual1 =  typeref<RecordB> |> ClrType.fromValueMap valueMap1 :?> RecordB
         actual1 |> Claim.equal expect1
 
         let valueMap2 = 
@@ -152,7 +152,7 @@ module ClrRecordTest =
             BField02 = 38.12m
             BField03 = None
         }
-        let actual2 =  recordref<RecordB> |> ClrType.recordFromValueMap valueMap2 :?> RecordB
+        let actual2 =  typeref<RecordB> |> ClrType.fromValueMap valueMap2 :?> RecordB
         actual2 |> Claim.equal expect2
 
 
@@ -163,7 +163,7 @@ module ClrRecordTest =
             AField02 = 38.12m
             AField03 = DateTime(2015, 5, 6)
         }
-        let valueArray = recordValue |> ClrType.recordToValueArray
+        let valueArray = recordValue |> ClrType.toValueArray
         Claim.equal (recordValue.AField01 :> obj) valueArray.[0]
         Claim.equal (recordValue.AField02 :> obj) valueArray.[1]
         Claim.equal (recordValue.AField03 :> obj) valueArray.[2]

@@ -58,7 +58,7 @@ module ``Proxy Discovery`` =
         tableActual |> Claim.equal tableExpect
         
         let recordActual = proxy.ProxyElement
-        let recordExpect = recordref<RecordA>
+        let recordExpect = typeref<RecordA>
         recordActual |> Claim.equal typeref<RecordA>
         
         let proxyColumnsExpect = 

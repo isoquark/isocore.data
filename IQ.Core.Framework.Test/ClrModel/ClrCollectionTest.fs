@@ -12,8 +12,8 @@ module ClrCollectionTest =
 
     [<Test>]
     let ``Determined whether type is a collection type``() =
-        [1;2;3].GetType() |> ClrType.isCollectionType|> Claim.isTrue                      
-        [|1;2;3|].GetType() |> ClrType.isCollectionType |> Claim.isTrue
+        [1;2;3].GetType() |> ClrType.getKind|> Claim.equal ClrTypeKind.Collection                    
+        [|1;2;3|].GetType() |> ClrType.getKind|> Claim.equal ClrTypeKind.Collection
 
     [<Test>]
     let ``Determined collection kind``() =

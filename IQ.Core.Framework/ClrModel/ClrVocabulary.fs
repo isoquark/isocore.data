@@ -215,6 +215,15 @@ module ClrVocabulary =
         | Array = 2
 
 
+    type ClrTypeKind =
+        | Unknown = 0
+        | Union = 1
+        | Record = 2
+        | Interface = 3
+        | Class = 4 
+        | Collection = 5
+        | Struct = 6
+
     /// <summary>
     /// Represents a reference to a CLR type
     /// </summary>

@@ -35,7 +35,7 @@ module ClrTypeTest =
 
     [<Test>]
     let ``Described single-case discriminated union``() =
-        let u = unionref<UnionA>
+        let u = typeref<UnionA>
         let unionName = typeof<UnionA>.ElementName
         match typeref<UnionA> with
         | UnionTypeReference(subject,cases) ->

@@ -14,7 +14,7 @@ module ClrType =
     /// <summary>
     /// Defines internal reflection cache for efficiency
     /// </summary>
-    module internal ClrTypeReferenceIndex =
+    module private ClrTypeReferenceIndex =
         let private types =  ConcurrentDictionary<Type, ClrTypeReference>()
         /// <summary>
         /// Retrieves an existing reference if present or constructs a new one and adds it to the index
@@ -28,7 +28,7 @@ module ClrType =
     /// Determines whether a type is a generic enumerable
     /// </summary>
     /// <param name="t">The type to examine</param>
-    let internal isNonOptionalCollectionType (t : Type) =
+    let private isNonOptionalCollectionType (t : Type) =
         let isEnumerable = t.GetInterfaces() |> Array.exists(fun x -> x.IsGenericType && x.GetGenericTypeDefinition() = typedefof<IEnumerable<_>>)
         if t.IsArray |> not then
             t.IsGenericType && isEnumerable
@@ -39,16 +39,42 @@ module ClrType =
     /// Determines whether the type is of the form option<IEnumerable<_>>
     /// </summary>
     /// <param name="t">The type to examine</param>
-    let internal isOptionalCollectionType (t : Type) =
+    let private isOptionalCollectionType (t : Type) =
         t |> ClrOption.isOptionType && t |> ClrOption.getOptionValueType |> Option.get |> (fun x -> x |> isNonOptionalCollectionType)
 
     /// <summary>
     /// Determines whether a type represents a collection (optional or not)
     /// </summary>
     /// <param name="t">The type to examine</param>
-    let isCollectionType (t : Type) =
+    let private isCollectionType (t : Type) =
         t |> isNonOptionalCollectionType || t |> isOptionalCollectionType
                 
+    /// <summary>
+    /// Determines whether a supplied type is a record type
+    /// </summary>
+    /// <param name="t">The candidate type</param>
+    let private isRecordType(t : Type) =
+        FSharpType.IsRecord(t, true)
+
+    /// <summary>
+    /// Determines whether a supplied type is a record type
+    /// </summary>
+    let private isRecord<'T>() =
+        typeof<'T> |> isRecordType
+
+    /// <summary>
+    /// Determines whether a supplied type is a union type
+    /// </summary>
+    /// <param name="t">The candidate type</param>
+    let private isUnionType (t : Type) =
+        FSharpType.IsUnion(t, true)
+
+    /// <summary>
+    /// Determines whether a supplied type is a union type
+    /// </summary>
+    let private isUnion<'T>() =
+        typeof<'T> |> isUnionType
+    
     let getCollectionValueType (t : Type) =
         //This is far from bullet-proof
         let colltype =
@@ -73,7 +99,46 @@ module ClrType =
             | Some(t) -> t
             | None ->
                 t
+    
+    /// <summary>
+    /// Determines the collection kind
+    /// </summary>
+    /// <param name="t">The type to examine</param>
+    let getCollectionKind t =
+        let collType = if t |> ClrOption.isOptionType then t |> ClrOption.getOptionValueType |> Option.get else t
+        if collType |> Type.isArray then
+            ClrCollectionKind.Array
+            //This is not the best way to do this...but probably is the fastest
+        else if collType.FullName.StartsWith("Microsoft.FSharp.Collections.FSharpList") then        
+            ClrCollectionKind.FSharpList            
+        else
+            ClrCollectionKind.Unknown
 
+    /// <summary>
+    /// Classifies a type
+    /// </summary>
+    /// <param name="t">The type to classify</param>
+    let getKind t =
+        if t |> isCollectionType then
+            ClrTypeKind.Collection
+        else if t |> isRecordType then
+            ClrTypeKind.Record
+        else if t |> isUnionType then
+            ClrTypeKind.Union 
+        else if t.IsInterface then
+            ClrTypeKind.Interface
+        else if t.IsClass then
+            ClrTypeKind.Class
+        else if t.IsValueType then
+            ClrTypeKind.Struct
+        else
+            NotSupportedException() |> raise
+
+
+    /// <summary>
+    /// Creates a reference to a method parameter
+    /// </summary>
+    /// <param name="p">The parameter to reference</param>
     let private referenceMethodParameter(p : ParameterInfo) =
         {
             ClrMethodParameterReference.Subject = ClrSubjectReference(p.ElementName , p.Position, p)
@@ -134,7 +199,12 @@ module ClrType =
             PropertyType = p.PropertyType
         }
 
-    let private describeMember pos (m : MemberInfo) =
+    /// <summary>
+    /// Creates a reference to a member
+    /// </summary>
+    /// <param name="pos">The position of the member</param>
+    /// <param name="m">The member</param>
+    let private referenceMember pos (m : MemberInfo) =
         match m with
         | :? MethodInfo as x ->
             x |> referenceMethod pos |> MethodReference
@@ -150,8 +220,8 @@ module ClrType =
     let private createClassReference(t : Type) =
             ClassTypeReference(
                 {Subject = ClrSubjectReference(t.ElementName, -1, t)}, 
-                (t |> Type.getPureMethods |> List.mapi describeMember ) 
-                |> List.append (t.GetProperties() |> Array.mapi describeMember |> List.ofArray))
+                (t |> Type.getPureMethods |> List.mapi referenceMember ) 
+                |> List.append (t.GetProperties() |> Array.mapi referenceMember |> List.ofArray))
 
     /// <summary>
     /// Gets an interface reference
@@ -166,8 +236,8 @@ module ClrType =
     let private createStructReference(t : Type) =
         StructTypeReference(
             {Subject = ClrSubjectReference(t.ElementName, -1, t)},
-                (t |> Type.getPureMethods |> List.mapi describeMember ) 
-                |> List.append (t.GetProperties() |> Array.mapi describeMember |> List.ofArray))
+                (t |> Type.getPureMethods |> List.mapi referenceMember ) 
+                |> List.append (t.GetProperties() |> Array.mapi referenceMember |> List.ofArray))
     
     let private referenceStruct (t : Type) =
         if t.IsValueType |> not then
@@ -183,8 +253,8 @@ module ClrType =
     let private createInterfaceReference(t : Type) =
         InterfaceTypeReference(
             {Subject = ClrSubjectReference(t.ElementName, -1, t)},
-                (t |> Type.getPureMethods |> List.mapi describeMember ) 
-                |> List.append (t.GetProperties() |> Array.mapi describeMember |> List.ofArray))
+                (t |> Type.getPureMethods |> List.mapi referenceMember ) 
+                |> List.append (t.GetProperties() |> Array.mapi referenceMember |> List.ofArray))
 
     /// <summary>
     /// Gets an interface reference
@@ -218,18 +288,6 @@ module ClrType =
                |> List.ofArray
         )
 
-    /// <summary>
-    /// Determines whether a supplied type is a record type
-    /// </summary>
-    /// <param name="t">The candidate type</param>
-    let isRecordType(t : Type) =
-        FSharpType.IsRecord(t, true)
-
-    /// <summary>
-    /// Determines whether a supplied type is a record type
-    /// </summary>
-    let isRecord<'T>() =
-        typeof<'T> |> isRecordType
                        
     /// <summary>
     /// Create a record reference
@@ -245,30 +303,19 @@ module ClrType =
     /// Retrieves record field values indexed by field name
     /// </summary>
     /// <param name="record">The record whose values will be retrieved</param>
-    let recordToValueMap (record : obj) =
+    let toValueMap (record : obj) =
         match record.GetType() |> referenceRecord with
         | RecordTypeReference(subject, fields) ->
             fields |> List.map(fun field -> field.Name.Text, field.Property.GetValue(record)) |> ValueIndex.fromNamedItems
         | _ -> 
             NotSupportedException() |> raise
     
-    /// <summary>
-    /// Creates a record from a value map
-    /// </summary>
-    /// <param name="valueMap">The value map</param>
-    /// <param name="tref"></param>
-    let recordFromValueMap (valueMap : ValueIndex) (tref : ClrTypeReference) =
-        match tref with
-        | RecordTypeReference(subject, fields) ->
-            fields |> List.map(fun field -> valueMap.[field.Name.Text]) |> Array.ofList |> recordFactory.[subject.Type]
-        | _ -> 
-            NotSupportedException() |> raise
     
     /// <summary>
     /// Creates an array of field values, in declaration order, for a specified record value
     /// </summary>
     /// <param name="record"></param>
-    let recordToValueArray (record : obj) =
+    let toValueArray (record : obj) =
         match record.GetType() |> referenceRecord with
         | RecordTypeReference(subject, fields) ->
             [|for i in 0..fields.Length - 1 ->
@@ -276,14 +323,25 @@ module ClrType =
             |]        
         | _ -> 
             NotSupportedException() |> raise
-
                 
+    /// <summary>
+    /// Instantiates a type using the data supplied in a value map
+    /// </summary>
+    /// <param name="valueMap">The value map</param>
+    /// <param name="tref"></param>
+    let fromValueMap (valueMap : ValueIndex) (tref : ClrTypeReference) =
+        match tref with
+        | RecordTypeReference(subject, fields) ->
+            fields |> List.map(fun field -> valueMap.[field.Name.Text]) |> Array.ofList |> recordFactory.[subject.Type]
+        | _ -> 
+            NotSupportedException() |> raise
+
     /// <summary>
     /// Creates a record from an array of values that are specified in declaration order
     /// </summary>
     /// <param name="valueArray">An array of values in declaration order</param>
     /// <param name="tref">Reference to type</param>
-    let recordFromValueArray (valueArray : obj[]) (tref : ClrTypeReference) =
+    let fromValueArray (valueArray : obj[]) (tref : ClrTypeReference) =
         match tref with
         | RecordTypeReference(subject, fields) ->
             valueArray |> recordFactory.[subject.Type]    
@@ -320,18 +378,6 @@ module ClrType =
     let private referenceCases(t : Type) =
         FSharpType.GetUnionCases(t, true) |> List.ofArray |> List.map referenceUnionCase
 
-    /// <summary>
-    /// Determines whether a supplied type is a union type
-    /// </summary>
-    /// <param name="t">The candidate type</param>
-    let isUnionType (t : Type) =
-        FSharpType.IsUnion(t, true)
-
-    /// <summary>
-    /// Determines whether a supplied type is a union type
-    /// </summary>
-    let isUnion<'T>() =
-        typeof<'T> |> isUnionType
 
 
     /// <summary>
@@ -355,19 +401,6 @@ module ClrType =
         createUnionReference |> ClrTypeReferenceIndex.getOrAdd t
 
 
-    /// <summary>
-    /// Determines the collection kind
-    /// </summary>
-    /// <param name="t">The type to examine</param>
-    let getCollectionKind t =
-        let collType = if t |> ClrOption.isOptionType then t |> ClrOption.getOptionValueType |> Option.get else t
-        if collType |> Type.isArray then
-            ClrCollectionKind.Array
-            //This is not the best way to do this...but probably is the fastest
-        else if collType.FullName.StartsWith("Microsoft.FSharp.Collections.FSharpList") then        
-            ClrCollectionKind.FSharpList            
-        else
-            ClrCollectionKind.Unknown
 
     /// <summary>
     /// Creates a reference to a CLR type
@@ -380,27 +413,18 @@ module ClrType =
                 {Subject = ClrSubjectReference(t.ElementName, -1, t)},
                 itemValueType,
                 t |> getCollectionKind)
-        if t |> isCollectionType then
-            referenceCollection |> ClrTypeReferenceIndex.getOrAdd t
-        else if FSharpType.IsRecord(t, true) then
-            t |> referenceRecord 
-        else if FSharpType.IsUnion(t, true) then
-            t |> referenceUnion 
-        else if t.IsInterface then
-            t |> referenceInterface 
-        else if t.IsClass then
-            t |> referenceClass 
-        else if t.IsValueType then
-            t |> referenceStruct
-        else
-            NotImplementedException() |> raise
+        
+        match t |> getKind with
+            | ClrTypeKind.Collection -> referenceCollection |> ClrTypeReferenceIndex.getOrAdd t
+            | ClrTypeKind.Record -> t |> referenceRecord
+            | ClrTypeKind.Union  -> t |> referenceUnion 
+            | ClrTypeKind.Interface -> t |> referenceInterface
+            | ClrTypeKind.Class -> t |> referenceClass
+            | ClrTypeKind.Struct -> t |> referenceStruct
+            | _ ->
+                NotSupportedException() |> raise                
 
    
-
-
-
-
-
 module ClrTypeReference =     
     let private getSubject tref =
         match tref with
@@ -434,8 +458,6 @@ module ClrTypeReference =
     let getDeclaringType(tref : ClrTypeReference) =
         tref |> getSubject |> fun s -> s.Type.DeclaringType    
     
-    let fromValueMap (valueMap : ValueIndex) (tref : ClrTypeReference) =
-        tref |> ClrType.recordFromValueMap valueMap
 
 
 /// <summary>
@@ -452,22 +474,6 @@ module ClrTypeExtensions =
     /// Gets the properties defined by the type
     /// </summary>
     let props<'T> = typeof<'T> |> Type.getProperties
-
-
-    /// <summary>
-    /// References the union identified by the type parameter
-    /// </summary>
-    let unionref<'T> =
-        typeof<'T> |> ClrType.referenceUnion
-
-    /// <summary>
-    /// References the record identified by the type parameter
-    /// </summary>
-    let recordref<'T> =
-        typeof<'T> |> ClrType.referenceRecord
-
-    let interfaceref<'T> =
-        typeof<'T> |> ClrType.referenceInterface
 
     /// <summary>
     /// Creates a property reference
@@ -499,16 +505,6 @@ module ClrTypeExtensions =
     type Type
     with
         member this.IsOptionType = this |> ClrOption.isOptionType
-
-        /// <summary>
-        /// Returns true if type realizes IEnumerable<_>
-        /// </summary>
-        member this.IsGenericEnumerable = this |> ClrType.isNonOptionalCollectionType
-        
-        /// <summary>
-        /// Returns true if type is of the form option<IEnumerable<_>>
-        /// </summary>
-        member this.IsOptionalEnumerable = this |> ClrType.isOptionalCollectionType
 
         /// <summary>
         /// If optional type, gets the type of the underlying value; otherwise, the type itself
