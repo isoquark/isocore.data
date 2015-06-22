@@ -75,7 +75,7 @@ module DataProxyMetadata =
         let inferFromDeclaringType() =
                 match clrElement.DeclaringType with
                 | Some(t) ->
-                    match t |> ClrType.getAttribute<SchemaAttribute> with
+                    match t |> ClrTypeReference.getAttribute<SchemaAttribute> with
                     | Some(a) ->
                         match a.Name with
                         | Some(n) ->
@@ -112,14 +112,29 @@ module DataProxyMetadata =
     /// <param name="clrElement">The CLR element from which the object name will be inferred</param>
     let inferDataObjectName(clrElement : ClrElementReference) =        
         
-        let inferFromElementName() =
-            match clrElement with
-            | InterfaceElement(x) -> x.Type.Name
-            | MethodElement(x) -> x.Method.Name
-            | UnionElement(x) -> x.Type.Name
-            | RecordElement(x) -> x.Type.Name
-            | _ -> NotSupportedException(sprintf "I don't know how to infer the data object name for %O" clrElement) |> raise
-        
+        let getInnerName (simpleName) =
+            if simpleName |> Txt.containsCharacter '+' then simpleName |> Txt.rightOfLast "+" else simpleName
+            
+
+        let getElementName() =
+            match clrElement |> ClrElement.getName with
+            | BasicElementName(n) -> n
+            | TypeElementName(n) ->
+                match n with
+                | SimpleTypeName(n) -> 
+                    n
+                | FullTypeName(n) -> 
+                    n |> Txt.rightOfLast "."
+                      |> getInnerName
+                | AssemblyQualifiedTypeName(n) ->
+                        n   |> Txt.matchRegexGroups ["TypeName"]  Txt.StockRegularExpressions.AssemblyQualifiedTypeName
+                            |> fun m -> m.["TypeName"]
+                            |> Txt.rightOfLast "."
+                            |> getInnerName
+                    
+            | AssemblyElementName(n) ->
+                NotSupportedException() |> raise
+
         match clrElement |> ClrElement.getAttribute<DataObjectAttribute> with
         | Some(a) -> 
             let schemaName = clrElement |> inferSchemaName
@@ -128,11 +143,11 @@ module DataProxyMetadata =
                 | Some(x) -> 
                     x
                 | None ->
-                    inferFromElementName()
+                    getElementName()
             DataObjectName(schemaName, localName)
                     
         | None ->
-            let localName = inferFromElementName()
+            let localName = getElementName()
             let schemaName = clrElement |> inferSchemaName
             DataObjectName(schemaName, localName)
 
@@ -151,7 +166,7 @@ module DataProxyMetadata =
                     | None -> clrElement.Name.Text
                 Position = clrElement.Position |> defaultArg attrib.Position 
                 StorageType = clrElement |> PropertyElement |> inferStorageType
-                Nullable = clrElement.Property.PropertyType |> Type.isOptionType
+                Nullable = clrElement.Property.PropertyType |> ClrOption.isOptionType
                 AutoValue = None
             }
 
@@ -160,7 +175,7 @@ module DataProxyMetadata =
                 ColumnDescription.Name = clrElement.Name.Text
                 Position = clrElement.Position
                 StorageType = clrElement |> PropertyElement |> inferStorageType
-                Nullable = clrElement.Property.PropertyType |> Type.isOptionType
+                Nullable = clrElement.Property.PropertyType |> ClrOption.isOptionType
                 AutoValue = None
             }
 
@@ -172,34 +187,41 @@ module DataProxyMetadata =
     /// Infers a collection of <see cref="ClrColumnProxyDescription"/> instances from a CLR type element
     /// </summary>
     /// <param name="clrElement">The CLR element from which the column descriptions will be inferred</param>
-    let private describeColumnProxies(clrType : ClrTypeReference) =
-        let properties =
-            match clrType with
-            | RecordTypeReference(x) ->
-                x.Fields 
-            | InterfaceTypeReference(x) ->
-                x.Members |> List.map(fun m -> 
+    let  private describeColumnProxies(clrType : ClrTypeReference) =
+        
+        let rec getProperties(tref : ClrTypeReference) =
+            match tref with
+            | RecordTypeReference(subject,fields) ->
+                fields
+            | InterfaceTypeReference(subject, members) ->
+                members |> List.map(fun m -> 
                     match m with
                     | PropertyReference(p) -> p
                     | _ -> NotSupportedException() |> raise
                 )
-            | ClassTypeReference(x) ->
-                x.Members |> List.map(fun m -> 
+            | ClassTypeReference(subject, members) ->
+                members |> List.map(fun m -> 
                     match m with
                     | PropertyReference(p) -> p
                     | _ -> NotSupportedException() |> raise
                 )
-            | UnionTypeReference(x) ->
-                if x.Cases.Length = 1 then
+            | UnionTypeReference(subject, cases) ->
+                if cases.Length = 1 then
                     //Assume that the columns are defined by the case fields
-                    x.Cases.[0].Fields
+                    cases.[0].Fields
                 else
                     //Assume that the columns are defined by the case labels
-                    [for case in x.Cases ->
+                    [for case in cases ->
                         if case.Fields.Length <> 1 then
                             NotSupportedException() |> raise
                         case.Fields.[0]
                     ]
+            | CollectionTypeReference(subject,itemType,collectionKind) ->
+                itemType |> getProperties
+            | StructTypeReference(subject, members) ->
+                NotSupportedException() |> raise
+
+        let properties = clrType |> getProperties
         if properties.Length = 0 then
             NotSupportedException(sprintf "No columns were able to be inferred from the type %O" clrType) |> raise
         properties |> List.map describeColumnProxy
@@ -344,17 +366,19 @@ module DataProxyMetadata =
 module DataProxyOperators =    
     let tableproxy<'T> =
         typeref<'T> |> DataProxyMetadata.describeTableProxy
+           
+    let procproxies<'T> =                
+        match typeref<'T> with
+        | InterfaceTypeReference(subject, members) ->
+            members |> List.mapi (fun i m ->  
+                match m with
+                | MethodReference(m) ->
+                     m |> MethodElement |> DataProxyMetadata.describeProcedureCallProxy
+                | _ ->
+                    NotSupportedException() |> raise  )   
+        | _ -> 
+             NotSupportedException() |> raise           
        
-    
-    let procproxies<'T> =        
-        
-        interfaceref<'T>.Members |> List.mapi (fun i m ->  
-            match m with
-            | MethodReference(m) ->
-                 m |> MethodElement |> DataProxyMetadata.describeProcedureCallProxy
-            | _ ->
-                NotSupportedException() |> raise                
-        )
         
         
                   

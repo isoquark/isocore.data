@@ -63,6 +63,7 @@
     <Compile Include="ClrModel\ClrTypeTest.fs" />
     <Compile Include="ClrModel\ClrAssemblyTest.fs" />
     <Compile Include="ClrModel\ClrMethodTest.fs" />
+    <Compile Include="ClrModel\ClrCollectionTest.fs" />
     <Compile Include="LangTest.fs" />
     <Compile Include="ConverterTest.fs" />
     <Compile Include="TxtTest.fs" />

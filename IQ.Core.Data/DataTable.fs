@@ -45,7 +45,7 @@ module DataTable =
             ArgumentException("Cannot create a DataTable from an empty list of records") |> raise
         let table = proxyDescription |> fromProxyDescription
         valueList |> List.iter(fun item ->
-            item |> ClrRecord.toValueArray |> table.Rows.Add |> ignore                        
+            item |> ClrType.recordToValueArray |> table.Rows.Add |> ignore                        
         )
         table
 
@@ -63,9 +63,9 @@ module DataTable =
     /// </summary>
     /// <param name="description">Describes the record</param>
     /// <param name="dataTable">The data table</param>
-    let toProxyValues (description : ClrRecordReference) (dataTable : DataTable) =
+    let toProxyValues (description : ClrTypeReference) (dataTable : DataTable) =
         [for row in dataTable.Rows ->
-            description |> ClrRecord.fromValueArray row.ItemArray
+            description |> ClrType.recordFromValueArray row.ItemArray
         ]
 
 

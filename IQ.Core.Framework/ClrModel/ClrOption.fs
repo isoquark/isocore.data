@@ -11,14 +11,30 @@ open Microsoft.FSharp.Reflection
 module ClrOption =
     
     /// <summary>
+    /// Determines whether a type is an option type
+    /// </summary>
+    /// <param name="t">The type to examine</param>
+    let isOptionType (t : Type) =
+        t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<option<_>>        
+
+    /// <summary>
     /// Determines whether a value is an option
     /// </summary>
     /// <param name="value">The value to examine</param>
     let isOptionValue (value : obj) =
         if value <> null then
-            value.GetType() |> Type.isOptionType
+            value.GetType() |> isOptionType
         else
             false
+
+
+    /// <summary>
+    /// Gets the type of the encapsulated value
+    /// </summary>
+    /// <param name="optionType">The option type</param>
+    let getOptionValueType (t : Type) =
+        if t |> isOptionType  then t.GetGenericArguments().[0] |> Some else None
+
     
     /// <summary>
     /// Extracts the enclosed value if Some, otherwise yields None

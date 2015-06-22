@@ -112,7 +112,7 @@ module Txt =
     /// </summary>
     /// <param name="c">The character for which to search</param>
     /// <param name="text">The text to search</param>
-    let containsCharacter (c : string) (text : string) =
+    let containsCharacter (c : char) (text : string) =
         text.IndexOf c <> -1
 
     /// <summary>

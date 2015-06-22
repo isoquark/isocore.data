@@ -195,17 +195,6 @@ module ClrVocabulary =
 
 
     /// <summary>
-    /// Describes an F#-specific record
-    /// </summary>
-    type ClrRecordReference = {
-        /// The CLR element being referenced
-        Subject : ClrTypeSubjectReference
-                
-        /// The fields defined by the record
-        Fields : ClrPropertyReference list
-    }
-
-    /// <summary>
     /// Describes an F#-specific union case
     /// </summary>
     type ClrUnionCaseReference = {
@@ -216,71 +205,37 @@ module ClrVocabulary =
         Fields : ClrPropertyReference list
     }
     
+
     /// <summary>
-    /// Describes an F#-specific union
+    /// Enumerates the supported collection types
     /// </summary>
-    type ClrUnionReference = {
-        /// The CLR element being referenced        
-        Subject : ClrTypeSubjectReference
-
-
-        /// The cases defined by the union
-        Cases : ClrUnionCaseReference list
-    }
-
-    
-
-    /// <summary>
-    /// Describes a CLR interface
-    /// </summary>
-    type ClrInterfaceReference = {
-        /// The CLR element being referenced        
-        Subject : ClrTypeSubjectReference
-
-        /// The members that belong to the interface
-        Members : ClrMemberReference list
-    
-        /// The interfaces from which the subject inherits
-        Bases : ClrInterfaceReference list
-    }
-
-    /// <summary>
-    /// Describes a CLR interface
-    /// </summary>
-    type ClrClassReference = {
-        /// The CLR element being referenced        
-        Subject : ClrTypeSubjectReference
-        /// The members that belong to the class
-        Members : ClrMemberReference list
-
-    }
+    type ClrCollectionKind = 
+        | Unknown = 0
+        | FSharpList = 1
+        | Array = 2
 
 
     /// <summary>
-    /// Unifies the CLR type reference taxonomy
+    /// Represents a reference to a CLR type
     /// </summary>
     type ClrTypeReference =
-    | UnionTypeReference of ClrUnionReference
-    | RecordTypeReference of ClrRecordReference
-    | InterfaceTypeReference of ClrInterfaceReference
-    | ClassTypeReference of ClrClassReference
+    | UnionTypeReference of subject : ClrTypeSubjectReference * cases : ClrUnionCaseReference list
+    | RecordTypeReference of subject : ClrTypeSubjectReference * fields : ClrPropertyReference list
+    | InterfaceTypeReference of subject : ClrTypeSubjectReference * members : ClrMemberReference list
+    | ClassTypeReference of subject : ClrTypeSubjectReference * members : ClrMemberReference list
+    | CollectionTypeReference of subject : ClrTypeSubjectReference * itemType : ClrTypeReference * collectionKind : ClrCollectionKind
+    | StructTypeReference of subject : ClrTypeSubjectReference * members : ClrMemberReference list
 
 
     /// <summary>
     /// Unifies the CLR element reference taxonomy
     /// </summary>
     type ClrElementReference =
-    | InterfaceElement of ClrInterfaceReference
     | PropertyElement of ClrPropertyReference
     | MethodElement of ClrMethodReference
     | MethodParameterElement of ClrMethodParameterReference
-    | UnionElement of ClrUnionReference
     | UnionCaseElement of ClrUnionCaseReference
-    | RecordElement of ClrRecordReference
-    | ClassElement of ClrClassReference
-
-
-
+    | TypeElement of ClrTypeReference
 
 module ClrAccess =
     /// <summary>
@@ -298,6 +253,7 @@ module ClrAccess =
             ProtectedInternalAccess
         else
             NotSupportedException("Cannot deduce the access level of the method") |> raise
+       
 
 [<AutoOpen>]
 module ClrVocabularyExtensions =
@@ -357,68 +313,5 @@ module ClrVocabularyExtensions =
         member this.Name = this.Subject.Name
         member this.Position = this.Subject.Position
         member this.Case = this.Subject.Element
-
-    /// <summary>
-    /// Defines augmentations for the <see cref="ClrRecordReference"/> type
-    /// </summary>
-    type ClrRecordReference
-    with
-        /// <summary>
-        /// The name of the record
-        /// </summary>
-        member this.Name = this.Subject.Name
-        member this.Position = this.Subject.Position
-        member this.Type = this.Subject.Subject.Element
-        /// <summary>
-        /// Retrieves a field identified by its name
-        /// </summary>
-        /// <param name="fieldName">The name of the field</param>
-        member this.Item(fieldName) = 
-            this.Fields |> List.find(fun field -> field.Name = fieldName)
-
-        /// <summary>
-        /// Retrieves a field identified by its position
-        /// </summary>
-        /// <param name="position">The position of the field</param>
-        member this.Item(position) = 
-            //Granted, this could have been done by simply indexing into the
-            //list as it should be ordered correctly
-            this.Fields |> List.find(fun field -> field.Position = position)
-
-    /// <summary>
-    /// Defines augmentations for the <see cref="ClrRecordReference"/> type
-    /// </summary>
-    type ClrUnionReference
-    with
-        /// <summary>
-        /// The name of the record
-        /// </summary>
-        member this.Name = this.Subject.Name
-        member this.Position = this.Subject.Position
-        member this.Type = this.Subject.Type
-
-    /// <summary>
-    /// Defines augmentations for the <see cref="ClrRecordReference"/> type
-    /// </summary>
-    type ClrInterfaceReference
-    with
-        /// <summary>
-        /// The name of the record
-        /// </summary>
-        member this.Name = this.Subject.Name
-        member this.Position = this.Subject.Position
-        member this.Type = this.Subject.Type
-
-    /// <summary>
-    /// Defines augmentations for the <see cref="ClrClassReference"/> type
-    /// </summary>
-    type ClrClassReference
-    with
-        /// <summary>
-        /// The name of the class
-        /// </summary>
-        member this.Name = this.Subject.Name
-        member this.Position = this.Subject.Position
-        member this.Type = this.Subject.Type
 
 

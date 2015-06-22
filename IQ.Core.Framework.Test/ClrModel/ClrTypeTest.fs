@@ -23,9 +23,13 @@ module ClrTypeTest =
     
     [<Test>]
     let ``Recognized option type``() =
-        recordref<RecordB>.Fields.[0].PropertyType.IsOptionType |> Claim.isTrue
-        recordref<RecordB>.Fields.[1].PropertyType.IsOptionType |> Claim.isFalse
-        recordref<RecordB>.Fields.[2].PropertyType.IsOptionType |> Claim.isTrue        
+        match typeref<RecordB> with
+        | RecordTypeReference(subject, fields) ->
+            fields.[0].PropertyType.IsOptionType |> Claim.isTrue
+            fields.[1].PropertyType.IsOptionType |> Claim.isFalse
+            fields.[2].PropertyType.IsOptionType |> Claim.isTrue  
+        | _ ->
+            Claim.assertFail()
 
     type private UnionA = UnionA of field01 : int * field02 : decimal * field03 : DateTime
 
@@ -33,22 +37,21 @@ module ClrTypeTest =
     let ``Described single-case discriminated union``() =
         let u = unionref<UnionA>
         let unionName = typeof<UnionA>.ElementName
-        u.Name |> Claim.equal unionName
-        u.Cases.Length |> Claim.equal 1
-        u.Type |> Claim.equal typeof<UnionA>
-        u.[0] |> Claim.equal u.[BasicElementName(typeof<UnionA>.Name)]
-
-        let field01Case = u.[0].[0]        
-        let fieldCaseName = field01Case.Name
-        u.[0].[fieldCaseName] |> Claim.equal field01Case
-        field01Case.Position |> Claim.equal 0
-        field01Case.ValueType |> Claim.equal typeof<int>
-        field01Case.Name.Text |> Claim.equal "field01"
+        match typeref<UnionA> with
+        | UnionTypeReference(subject,cases) ->
+            subject.Name |> Claim.equal unionName
+            cases.Length |> Claim.equal 1
+            subject.Type |> Claim.equal typeof<UnionA>
+            
+            let field01Case = cases.[0].[0]        
+            let fieldCaseName = field01Case.Name
+            cases.[0].[fieldCaseName] |> Claim.equal field01Case
+            field01Case.Position |> Claim.equal 0
+            field01Case.ValueType |> Claim.equal typeof<int>
+            field01Case.Name.Text |> Claim.equal "field01"
+        | _ ->
+            Claim.assertFail()
         
-
-    [<Test>]
-    let ``Determined whether a type realizes the generic IEnumerable interface``() =
-        [1;2;2].GetType() |> Type.isGenericEnumerable |> Claim.isTrue
 
 
 

@@ -89,12 +89,6 @@ module MethodInfoExtensions =
 /// Defines Sytem.Type helpers
 /// </summary>
 module Type =
-    /// <summary>
-    /// Determines whether a type is an option type
-    /// </summary>
-    /// <param name="t">The type to examine</param>
-    let isOptionType (t : Type) =
-        t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<option<_>>        
 
     /// <summary>
     /// Determines whether a type is a nullable type
@@ -102,53 +96,13 @@ module Type =
     /// <param name="t">The type to examine</param>
     let isNullableType (t : Type) =
         t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<Nullable<_>>
-    
+        
     /// <summary>
-    /// Determines whether a type is a generic enumerable
+    /// Determines whether a type is an array type
     /// </summary>
     /// <param name="t">The type to examine</param>
-    let isGenericEnumerable (t : Type) =
-        t.IsGenericType && t.GetInterfaces() |> Array.exists(fun x -> x.IsGenericType && x.GetGenericTypeDefinition() = typedefof<IEnumerable<_>>)
-
-    /// <summary>
-    /// Gets the type of the encapsulated value
-    /// </summary>
-    /// <param name="optionType">The option type</param>
-    let getOptionValueType (t : Type) =
-        if t |> isOptionType  then t.GetGenericArguments().[0] |> Some else None
-
-    /// <summary>
-    /// Determines whether the type is of the form option<IEnumerable<_>>
-    /// </summary>
-    /// <param name="t"></param>
-    let isOptionalEnumerable (t : Type) =
-        t |> isOptionType && t |> getOptionValueType |> Option.get |> (fun x -> x |> isGenericEnumerable)
-
-    let getEnumerableValueType (t : Type) =
-        //This is far from bullet-proof
-        let colltype =
-            if t |> isOptionalEnumerable then
-                t |> getOptionValueType 
-            else if t |> isGenericEnumerable then
-                t |> Some
-            else
-                None
-        match colltype with
-        | Some(t) ->
-            let i = t.GetInterfaces() |> Array.find(fun i -> i.IsGenericType && i.GetGenericTypeDefinition() = typedefof<IEnumerable<_>>)    
-            i.GetGenericArguments().[0] |> Some
-        | None ->
-            None
-
-    let getItemValueType (t : Type)  =
-        match t |> getEnumerableValueType with
-        | Some(t) -> t
-        | None ->
-            match t |> getOptionValueType with
-            | Some(t) -> t
-            | None ->
-                t
-
+    let isArray(t : Type) =
+        t.IsArray
             
     /// <summary>
     /// Retrieves an attribute applied to a type, if present
@@ -184,32 +138,6 @@ module Type =
     let getProperties  (subject : Type) =
         subject.GetProperties(DefaultBindingFlags) |> List.ofArray
 
-[<AutoOpen>]
-module TypeExtensions =
-    /// <summary>
-    /// Gets the properties defined by the type
-    /// </summary>
-    let props<'T> = typeof<'T> |> Type.getProperties
-
-    
-    type Type
-    with
-        member this.IsOptionType = this |> Type.isOptionType
-
-        /// <summary>
-        /// Returns true if type realizes IEnumerable<_>
-        /// </summary>
-        member this.IsGenericEnumerable = this |> Type.isGenericEnumerable
-        
-        /// <summary>
-        /// Returns true if type is of the form option<IEnumerable<_>>
-        /// </summary>
-        member this.IsOptionalEnumerable = this |> Type.isOptionalEnumerable
-
-        /// <summary>
-        /// If optional type, gets the type of the underlying value; otherwise, the type itself
-        /// </summary>
-        member this.ItemValueType = this |> Type.getItemValueType
 
 
        
@@ -297,24 +225,4 @@ module AssemblyExtensions =
         member this.ShortName = this.GetName().Name    
 
 
-module PropertyInfo =
-    /// <summary>
-    /// Retrieves an attribute applied to a property, if present
-    /// </summary>
-    /// <param name="subject">The type to examine</param>
-    let getAttribute<'T when 'T :> Attribute>(subject : PropertyInfo) = 
-        subject |> MemberInfo.getAttribute<'T>
-
-    /// <summary>
-    /// Gets the data type of the property, ignoring whether the property is optional
-    /// </summary>
-    /// <param name="p">The property</param>
-    let getValueType (p : PropertyInfo) =
-        p.PropertyType.ItemValueType
-
-[<AutoOpen>]
-module PropertyExtensions =
-    type PropertyInfo
-    with
-        member this.ValueType = this |> PropertyInfo.getValueType
 
