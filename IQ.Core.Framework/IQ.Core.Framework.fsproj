@@ -62,11 +62,14 @@
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
   <ItemGroup>
-    <Compile Include="Lang.fs" />
-    <Compile Include="Txt.fs" />
-    <Compile Include="ConnectionString.fs" />
-    <Compile Include="Reflection.fs" />
-    <Compile Include="ValueIndex.fs" />
+    <Compile Include="Framework\Txt.fs" />
+    <Compile Include="Framework\Configuration.fs" />
+    <Compile Include="Framework\ConnectionString.fs" />
+    <Compile Include="Framework\DynamicContract.fs" />
+    <Compile Include="Framework\Lang.fs" />
+    <Compile Include="Framework\Reflection.fs" />
+    <Compile Include="Framework\CompositionRoot.fs" />
+    <Compile Include="Framework\ValueIndex.fs" />
     <Compile Include="ClrModel\ClrVocabulary.fs" />
     <Compile Include="ClrModel\ClrTypeReferenceIndex.fs" />
     <Compile Include="ClrModel\ClrElementName.fs" />
@@ -80,13 +83,9 @@
     <Compile Include="ClrModel\ClrClass.fs" />
     <Compile Include="ClrModel\ClrType.fs" />
     <Compile Include="ClrModel\ClrElement.fs" />
-    <Compile Include="Conversion.fs" />
+    <Compile Include="ClrModel\Conversion.fs" />
     <Compile Include="FSharpModel\FSharpVocabulary.fs" />
-    <Compile Include="FSharpModel\FSharpGenerator.fs" />
-    <Compile Include="Configuration.fs" />
     <None Include="packages.config" />
-    <Compile Include="CompositionRoot.fs" />
-    <Compile Include="DynamicContract.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Autofac">
