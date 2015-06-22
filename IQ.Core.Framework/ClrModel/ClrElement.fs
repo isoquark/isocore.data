@@ -29,7 +29,7 @@ module ClrElement =
         | UnionCaseElement(x) -> 
             x.Case |> UnionCaseInfo.getAttribute
         | RecordElement(x) ->
-            x.Type |> Type.getAttribute<'T>
+            x.Subject.Type |> Type.getAttribute<'T>
         | ClassElement(x) ->
             x.Type |> Type.getAttribute<'T>
 
@@ -79,7 +79,7 @@ module ClrElement =
             | UnionCaseElement(x) -> 
                 x.Case.DeclaringType |> declarer
             | RecordElement(x) ->
-                x.Type.DeclaringType |> declarer
+                x.Subject.Type.DeclaringType |> declarer
             | ClassElement(x) ->
                 x.Type.DeclaringType |> declarer
 

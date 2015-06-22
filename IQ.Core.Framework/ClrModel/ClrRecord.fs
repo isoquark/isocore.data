@@ -22,7 +22,7 @@ module ClrRecord =
     let private createReference (t : Type) =
         recordfac.[t] <- t |> createFactory
         {
-            ClrRecordReference.Subject = ClrSubjectReference(t.ElementName, 0, t)
+            ClrRecordReference.Subject = {Subject = ClrSubjectReference(t.ElementName, 0, t)}
             Fields = FSharpType.GetRecordFields(t,true) 
                |> Array.mapi(fun i p -> 
                      {Subject = ClrSubjectReference(p.ElementName, i, p)
@@ -70,7 +70,7 @@ module ClrRecord =
     /// <param name="valueMap">The value map</param>
     /// <param name="info"></param>
     let fromValueMap (valueMap : ValueIndex) (info : ClrRecordReference) =
-        info.Fields |> List.map(fun field -> valueMap.[field.Name.Text]) |> Array.ofList |> recordfac.[info.Type]
+        info.Fields |> List.map(fun field -> valueMap.[field.Name.Text]) |> Array.ofList |> recordfac.[info.Subject.Type]
     
     /// <summary>
     /// Creates an array of field values, in declaration order, for a specified record value
@@ -88,7 +88,7 @@ module ClrRecord =
     /// <param name="valueArray">An array of values in declaration order</param>
     /// <param name="description">The record description</param>
     let fromValueArray (valueArray : obj[]) (description : ClrRecordReference) =
-        valueArray |> recordfac.[description.Type]    
+        valueArray |> recordfac.[description.Subject.Type]    
 
 /// <summary>
 /// Defines record-related augmentations

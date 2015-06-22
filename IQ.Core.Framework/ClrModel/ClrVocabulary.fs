@@ -199,7 +199,7 @@ module ClrVocabulary =
     /// </summary>
     type ClrRecordReference = {
         /// The CLR element being referenced
-        Subject : ClrSubjectReference<Type>
+        Subject : ClrTypeSubjectReference
                 
         /// The fields defined by the record
         Fields : ClrPropertyReference list
@@ -221,7 +221,7 @@ module ClrVocabulary =
     /// </summary>
     type ClrUnionReference = {
         /// The CLR element being referenced        
-        Subject : ClrSubjectReference<Type>        
+        Subject : ClrTypeSubjectReference
 
 
         /// The cases defined by the union
@@ -235,7 +235,7 @@ module ClrVocabulary =
     /// </summary>
     type ClrInterfaceReference = {
         /// The CLR element being referenced        
-        Subject : ClrSubjectReference<Type>        
+        Subject : ClrTypeSubjectReference
 
         /// The members that belong to the interface
         Members : ClrMemberReference list
@@ -249,7 +249,7 @@ module ClrVocabulary =
     /// </summary>
     type ClrClassReference = {
         /// The CLR element being referenced        
-        Subject : ClrSubjectReference<Type>        
+        Subject : ClrTypeSubjectReference
         /// The members that belong to the class
         Members : ClrMemberReference list
 
@@ -368,7 +368,7 @@ module ClrVocabularyExtensions =
         /// </summary>
         member this.Name = this.Subject.Name
         member this.Position = this.Subject.Position
-        member this.Type = this.Subject.Element
+        member this.Type = this.Subject.Subject.Element
         /// <summary>
         /// Retrieves a field identified by its name
         /// </summary>
@@ -395,7 +395,7 @@ module ClrVocabularyExtensions =
         /// </summary>
         member this.Name = this.Subject.Name
         member this.Position = this.Subject.Position
-        member this.Type = this.Subject.Element
+        member this.Type = this.Subject.Type
 
     /// <summary>
     /// Defines augmentations for the <see cref="ClrRecordReference"/> type
@@ -407,7 +407,7 @@ module ClrVocabularyExtensions =
         /// </summary>
         member this.Name = this.Subject.Name
         member this.Position = this.Subject.Position
-        member this.Type = this.Subject.Element
+        member this.Type = this.Subject.Type
 
     /// <summary>
     /// Defines augmentations for the <see cref="ClrClassReference"/> type
@@ -419,6 +419,6 @@ module ClrVocabularyExtensions =
         /// </summary>
         member this.Name = this.Subject.Name
         member this.Position = this.Subject.Position
-        member this.Type = this.Subject.Element
+        member this.Type = this.Subject.Type
 
 

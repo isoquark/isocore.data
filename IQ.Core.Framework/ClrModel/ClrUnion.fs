@@ -15,7 +15,7 @@ module ClrUnion =
     /// Creates a reference to a property field
     /// </summary>
     /// <param name="i">The field's position within the case</param>
-    /// <param name="p">The propery that represents the field</param>
+    /// <param name="p">The property that represents the field</param>
     let private referenceField pos (p : PropertyInfo) = 
         {
             Subject = ClrSubjectReference(p.ElementName, pos, p)
@@ -60,7 +60,7 @@ module ClrUnion =
     /// <param name="t">The union type</param>
     let private createReference(t : Type) =      
         {
-            ClrUnionReference.Subject = ClrSubjectReference(t.ElementName, -1, t)
+            ClrUnionReference.Subject = {Subject = ClrSubjectReference(t.ElementName, -1, t)}
             Cases =  t |> referenceCases
         }
 

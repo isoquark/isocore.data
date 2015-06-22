@@ -26,7 +26,7 @@ module ClrClass =
     /// <param name="t">The type of the interface to reference</param>
     let rec private createReference(t : Type) =
         {
-            ClrClassReference.Subject = ClrSubjectReference(t.ElementName, -1, t)
+            ClrClassReference.Subject = {Subject = ClrSubjectReference(t.ElementName, -1, t)}
             Members = 
                 (t |> Type.getPureMethods |> List.mapi describeMember ) 
                 |> List.append (t.GetProperties() |> Array.mapi describeMember |> List.ofArray)
