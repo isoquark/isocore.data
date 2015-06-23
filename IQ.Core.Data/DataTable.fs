@@ -10,40 +10,10 @@ open System.Collections
 open System.Collections.Generic
 
 
-
-module DataTypeConverter =
-    let private stripOption (o : obj) =
-        if o = null then
-            o
-        else if o |> ClrOption.isOptionValue then
-            match o |> ClrOption.unwrapValue with
-            | Some(x) -> x 
-            | None -> DBNull.Value :> obj
-        else
-             o
-    
-
-
-    let toClrStorageValue storageType  (value : obj) =
-        let value = value |> stripOption
-        if value = null then
-            DBNull.Value :> obj
-        else
-            let clrType = storageType |> StorageType.toClrType
-            value |> Converter.convert clrType
-    
-    let toClrStorageType storageType =
-        storageType |> StorageType.toClrType
-            
-            
-    
-                  
 /// <summary>
 /// Defines operations for working with Data Tables
 /// </summary>
-module DataTable =        
-    
-
+module DataTable =            
     /// <summary>
     /// Gets a value identified by a 0-based row/column indices
     /// </summary>
