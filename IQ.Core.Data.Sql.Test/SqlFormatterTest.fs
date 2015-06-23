@@ -50,7 +50,7 @@ module SqlFormatterTest =
     [<Test>]
     let ``Formatted tabular select statement``() =
         let expect = "select [Field 01],[Field 02],[Field 03] from [MySchema].[RecordA]"     
-        let actual = SqlFormatter.formatTabularSelect<RecordA>()
+        let actual = SqlFormatter.formatTabularSelectT<RecordA>()
         actual |> Claim.equal expect
 
 

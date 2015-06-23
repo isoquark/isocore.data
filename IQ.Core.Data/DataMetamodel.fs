@@ -36,9 +36,9 @@ module DataMetamodel =
     }
 
     /// <summary>
-    /// Describes a table
+    /// Describes a table or view
     /// </summary>
-    type TableDescription = {
+    type TabularDescription = {
         /// The name of the table
         Name : DataObjectName
         
@@ -66,15 +66,6 @@ module DataMetamodel =
         Direction : ParameterDirection
 
     }
-
-    /// <summary>
-    /// Represents the value passed to a routine parameters
-    /// </summary>
-    type RoutineParameterValue = RoutineParameterValue of  name : string * position : int * value : obj
-    with
-        member this.Position = match this with RoutineParameterValue(position=x) -> x
-        member this.Name = match this with RoutineParameterValue(name=x) -> x
-        member this.Value = match this with RoutineParameterValue(value=x) -> x
 
     /// <summary>
     /// Describes a stored procedure
@@ -105,7 +96,17 @@ module DataMetamodel =
     type DataObjectDescription =
     | TableFunctionObject of TableFunctionDescription
     | ProcedureObject of ProcedureDescription
-    | TableObject of TableDescription
+    | TablularObject of TabularDescription
+
+
+    /// <summary>
+    /// Represents a data parameter value
+    /// </summary>
+    type DataParameterValue = DataParameterValue of  name : string * position : int * value : obj
+    with
+        member this.Position = match this with DataParameterValue(position=x) -> x
+        member this.Name = match this with DataParameterValue(name=x) -> x
+        member this.Value = match this with DataParameterValue(value=x) -> x
 
 
 module DataObjectDescription =
@@ -115,7 +116,7 @@ module DataObjectDescription =
             x.Name
         | ProcedureObject(x) -> 
             x.Name
-        | TableObject(x) ->
+        | TablularObject(x) ->
             x.Name
 
     let getParameters (subject : DataObjectDescription) =
@@ -124,7 +125,7 @@ module DataObjectDescription =
             x.Parameters
         | ProcedureObject(x) -> 
             x.Parameters
-        | TableObject(x) ->
+        | TablularObject(x) ->
             []
     
     let tryFindParameter name (subject : DataObjectDescription) =
@@ -133,7 +134,7 @@ module DataObjectDescription =
             x.Parameters |> List.tryFind(fun p -> p.Name = name)
         | ProcedureObject(x) -> 
             x.Parameters |> List.tryFind(fun p -> p.Name = name)
-        | TableObject(x) ->
+        | TablularObject(x) ->
             None
 
     let findParameter name (subject : DataObjectDescription) =
@@ -149,9 +150,9 @@ module DataObjectDescription =
         | ProcedureObject(x) -> x
         | _ -> ArgumentException() |> raise
 
-    let unwrapTable (subject : DataObjectDescription) =
+    let unwrapTabular (subject : DataObjectDescription) =
         match subject with
-        | TableObject(x) -> x
+        | TablularObject(x) -> x
         | _ -> ArgumentException() |> raise
 
 [<AutoOpen>]
@@ -160,7 +161,7 @@ module DataMetamodelExtensions =
     /// <summary>
     /// Defines augmentations for the TableDescription type
     /// </summary>
-    type TableDescription 
+    type TabularDescription 
     with
         /// <summary>
         /// Finds a column identified by its name

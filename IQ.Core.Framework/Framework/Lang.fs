@@ -39,6 +39,11 @@ module Lang =
     let _assert message (predicate: unit -> bool)  = 
         Debug.Assert(predicate(), message)
 
+    /// <summary>
+    /// Raises a <see cref="System.NotSupportedException"/>
+    /// </summary>
+    /// <param name="description"></param>
+    let inline nosupport()  = NotSupportedException() |> raise
 
     /// <summary>
     /// Defines augmentations for the TimeSpan type

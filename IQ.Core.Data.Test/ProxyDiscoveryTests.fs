@@ -24,10 +24,10 @@ module ``Proxy Discovery`` =
 
     [<Test>]
     let ``Read table proxy description - no attribution``() =
-        let proxy = tableproxy<RecordA> |> DataObjectProxy.unwrapTableProxy
+        let proxy = tabularproxy<RecordA> |> DataObjectProxy.unwrapTableProxy
         
         let tableExpect = {
-            TableDescription.Name = DataObjectName("Proxies", typeof<RecordA>.Name)
+            TabularDescription.Name = DataObjectName("Proxies", typeof<RecordA>.Name)
             Description = None
             Columns = 
             [
@@ -85,7 +85,7 @@ module ``Proxy Discovery`` =
 
     [<Test>]
     let ``Read DateTimeStorage from table proxy metadata - attribute overrides``() =
-        let proxy = tableproxy<RecordB> |> DataObjectProxy.unwrapTableProxy
+        let proxy = tabularproxy<RecordB> |> DataObjectProxy.unwrapTableProxy
         proxy.Columns.Length |> Claim.equal 4
 
         proxy.[0].DataElement.StorageType |> Claim.equal (DateTimeStorage(5uy))
@@ -96,7 +96,7 @@ module ``Proxy Discovery`` =
 
     [<Test>]
     let ``Read Column names from table proxy metadata - attribute overrides``() =
-        let proxy = tableproxy<RecordB> |> DataObjectProxy.unwrapTableProxy
+        let proxy = tabularproxy<RecordB> |> DataObjectProxy.unwrapTableProxy
         proxy.Columns.Length |> Claim.equal 4
         
         proxy.[0].DataElement.Name |> Claim.equal "BField_1"

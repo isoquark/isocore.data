@@ -330,15 +330,15 @@ module DataProxyMetadata =
     /// Infers a Table Proxy Description
     /// </summary>
     /// <param name="proxyType">The type of proxy</param>
-    let describeTableProxy(proxyref : ClrTypeReference) =
+    let describeTablularProxy(proxyref : ClrTypeReference) =
         let objectName = proxyref |> ClrElement.fromTypeRef |> inferDataObjectName
         let columnProxies = proxyref |> describeColumnProxies
         let table = {
-            TableDescription.Name = objectName
+            TabularDescription.Name = objectName
             Description = proxyref.Type |> getMemberDescription
             Columns = columnProxies |> List.map(fun p -> p.DataElement)
         }
-        TableProxyDescription(proxyref, table, columnProxies) |> TableProxy
+        TablularProxyDescription(proxyref, table, columnProxies) |> TabularProxy
     
     let describeTableFunctionProxy(proxyref : ClrElementReference) =
         let objectName = proxyref |> inferDataObjectName
@@ -408,8 +408,8 @@ module DataProxyMetadata =
 /// </summary>
 [<AutoOpen>]
 module DataProxyOperators =    
-    let tableproxy<'T> =
-        typeref<'T> |> DataProxyMetadata.describeTableProxy
+    let tabularproxy<'T> =
+        typeref<'T> |> DataProxyMetadata.describeTablularProxy
 
 
     let routineproxies<'T> =

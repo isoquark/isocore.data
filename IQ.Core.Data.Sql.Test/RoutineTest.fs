@@ -14,7 +14,7 @@ open IQ.Core.Framework
 
 
 [<TestContainer; DataStoreTrait>]
-module ``Procedure Execution`` =
+module ``Routine Execution`` =
     let private config = Root.Resolve<IConfigurationManager>()
     let private cs = ConfigSettingNames.SqlTestDb |> config.GetValue 
     let store = Root.Resolve<ISqlDataStore>(ConfigSettingNames.SqlTestDb, cs |> ConnectionString.parse)
@@ -26,7 +26,7 @@ module ``Procedure Execution`` =
         let proc = procProxy.DataElement |> DataObjectDescription.unwrapProcedure
         let inputValues =  
             [("col01", 0, DBNull.Value :> obj); ("col02", 1, DateTime(2015, 5, 16) :> obj); ("col03", 2, 507L :> obj);]
-            |> List.map RoutineParameterValue
+            |> List.map DataParameterValue
         let outputvalues = proc |> Routine.executeProcedure cs inputValues
         let col01Value = outputvalues.["col01"] :?> int
         Claim.greater col01Value 1
@@ -45,7 +45,7 @@ module ``Procedure Execution`` =
         let proc = procProxy.DataElement |> DataObjectDescription.unwrapProcedure
         let inputValues =
             [("Col01", 0, 5uy :> obj); ("Col02", 1, 10s :> obj); ("Col03", 2, 15 :> obj); ("Col04", 3, 20L :> obj)]
-            |> List.map RoutineParameterValue
+            |> List.map DataParameterValue
 
         let outputValues = proc |> Routine.executeProcedure cs inputValues
         ()

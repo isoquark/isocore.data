@@ -34,7 +34,7 @@ module DataTable =
         table
 
     let fromProxyType<'T> =
-        tableproxy<'T> |> fromProxyDescription
+        tabularproxy<'T> |> fromProxyDescription
 
     /// <summary>
     /// Creates a <see cref="System.Data.DataTable"/> from a sequence of proxy records
@@ -57,7 +57,7 @@ module DataTable =
     /// </summary>
     /// <param name="values">The record values that will be transformed into table rows</param>
     let fromProxyValuesT (values : 'T seq) =
-         values |> Seq.map(fun x -> x :> obj) |> fromProxyValues tableproxy<'T>
+         values |> Seq.map(fun x -> x :> obj) |> fromProxyValues tabularproxy<'T>
         
                 
     /// <summary>

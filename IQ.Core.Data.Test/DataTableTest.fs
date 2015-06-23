@@ -19,7 +19,7 @@ module DataTableTest =
 
     [<Test>]
     let ``Created DataTable from record metadata - strongly typed``() =
-        let dataTable = tableproxy<DataTableRecord> |> DataTable.fromProxyDescription
+        let dataTable = tabularproxy<DataTableRecord> |> DataTable.fromProxyDescription
         Claim.equal 3 dataTable.Columns.Count
         Claim.equal "Field01" dataTable.Columns.[0].ColumnName
         Claim.equal (typeof<int64>) dataTable.Columns.[0].DataType
@@ -33,7 +33,7 @@ module DataTableTest =
             {Field01 = 1002L; Field02 = true; Field03 = "FGH"} :> obj
         ]
 
-        let dataTable = recordValues |> DataTable.fromProxyValues tableproxy<DataTableRecord>
+        let dataTable = recordValues |> DataTable.fromProxyValues tabularproxy<DataTableRecord>
         Claim.equal 3 dataTable.Columns.Count
         Claim.equal 1000L (dataTable |> DataTable.getValue 0 0)
         Claim.equal true (dataTable |> DataTable.getValue 0 1)
@@ -65,7 +65,7 @@ module DataTableTest =
                 {Field01 = 1002L; Field02 = true; Field03 = "FGH"} :> obj
             ] 
 
-        let dst =  src |> DataTable.fromProxyValues tableproxy<DataTableRecord> 
+        let dst =  src |> DataTable.fromProxyValues tabularproxy<DataTableRecord> 
                        |> DataTable.toProxyValuesT<obj> description
                        |> List.ofSeq
         Claim.equal src.[0] dst.[0]

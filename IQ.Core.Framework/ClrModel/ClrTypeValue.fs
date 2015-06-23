@@ -31,20 +31,7 @@ module ClrTypeValue =
             |]        
         | _ -> 
             NotSupportedException() |> raise
-                
-    /// <summary>
-    /// Instantiates a type using the data supplied in a value map
-    /// </summary>
-    /// <param name="valueMap">The value map</param>
-    /// <param name="tref"></param>
-    let fromValueIndex (valueMap : ValueIndex) (tref : ClrTypeReference) =
-        match tref with
-        | RecordTypeReference(subject, fields) ->
-            fields |> List.map(fun field -> valueMap.[field.Name.Text]) 
-                   |> Array.ofList 
-                   |> ClrType.getRecordFactory(subject.Type)
-        | _ -> 
-            NotSupportedException() |> raise
+
 
     /// <summary>
     /// Creates a record from an array of values that are specified in declaration order
@@ -54,8 +41,27 @@ module ClrTypeValue =
     let fromValueArray (valueArray : obj[]) (tref : ClrTypeReference) =
         match tref with
         | RecordTypeReference(subject, fields) ->
-            valueArray |> ClrType.getRecordFactory(subject.Type)
+            let types = fields |> List.map(fun field -> field.PropertyType) |> Array.ofList
+            valueArray |> Converter.convertArray types 
+                       |> ClrType.getRecordFactory(subject.Type)
         | _ -> 
             NotSupportedException() |> raise
+                
+    /// <summary>
+    /// Instantiates a type using the data supplied in a value map
+    /// </summary>
+    /// <param name="valueMap">The value map</param>
+    /// <param name="tref"></param>
+    let fromValueIndex (valueMap : ValueIndex) (tref : ClrTypeReference) =
+        match tref with
+        | RecordTypeReference(subject, fields) ->
+            let types = fields |> List.map(fun field -> field.PropertyType) |> Array.ofList
+            fields |> List.map(fun field -> valueMap.[field.Name.Text]) 
+                   |> Array.ofList 
+                   |> Converter.convertArray types
+                   |> ClrType.getRecordFactory(subject.Type)
+        | _ -> 
+            NotSupportedException() |> raise
+
 
 

@@ -24,8 +24,12 @@ module Converter =
                     //Convert an option value to an option type
                     Convert.ChangeType(value |> ClrOption.unwrapValue |> Option.get, valueType) |> ClrOption.makeSome
                 else
-                    //Convert an non-option value to an option type
-                    Convert.ChangeType(value, valueType) |> ClrOption.makeSome
+                    //Convert an non-option value to an option type; note though, special
+                    //handling is required for DBNull
+                    if value.GetType() = typeof<DBNull> then
+                        dstType |> ClrOption.makeNone
+                    else
+                        Convert.ChangeType(value, valueType) |> ClrOption.makeSome
             else
                 if value |> ClrOption.isOptionValue then
                     //Convert an option value to a non-option type
@@ -41,6 +45,16 @@ module Converter =
     let convertT<'T> (value : obj) =
         value |> convert typeof<'T> :?> 'T
 
+    /// <summary>
+    /// Converts an array of values
+    /// </summary>
+    /// <param name="dstTypes">The destination types</param>
+    /// <param name="values">The source values</param>
+    let convertArray (dstTypes : Type[]) (values : obj[])  =
+        if values.Length <> dstTypes.Length then
+            raise <| ArgumentException(
+                sprintf "Value array (length = %i) and type array (length = %i must be of the same length" values.Length dstTypes.Length)
+        values |> Array.mapi (fun i value -> value |> convert dstTypes.[i])
 
 
 [<AutoOpen>]

@@ -58,7 +58,7 @@ module CsvReader =
     /// <param name="file">Representation of the CSV file</param>
     let private read<'T> (file : FSharp.Data.Runtime.CsvFile<CsvRow>) = 
 
-        let proxy = tableproxy<'T>
+        let proxy = tabularproxy<'T>
 
         let getColumnProxy colName = 
             proxy |> DataObjectProxy.getColumns |> List.find(fun x -> x.DataElement.Name = colName)

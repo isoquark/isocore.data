@@ -72,6 +72,33 @@ module ProxyTestCases =
         Col05 : string
     }
 
+    module Metadata =
+        [<View("Metadata", "vDataType")>]
+        type vDataTypeA = {
+            DataTypeId : int
+            DataTypeName : string
+            SchemaId : int
+            SchemaName : string   
+            Nullable : bool 
+            IsUserDefined: bool
+            BaseTypeId : uint8 option
+        }
+
+        [<View("Metadata", "vDataType")>]
+        type vDataTypeB = {
+            DataTypeId : int
+            DataTypeName : string
+            SchemaId : int
+            SchemaName : string   
+            [<StorageType(StorageKind.Int16)>]
+            MaxLength : decimal
+            Precision : uint8
+            Scale : uint8
+            Nullable : bool 
+            IsUserDefined: bool
+            BaseTypeId : uint8 option
+        }
+    
     module ProxyTestCaseMethod =
         let getDbObjectName (testMethod : MethodBase) =
             let values = testMethod.Name 

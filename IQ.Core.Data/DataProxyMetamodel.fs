@@ -63,25 +63,25 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a table proxy
     /// </summary>
-    type TableProxyDescription = TableProxyDescription of proxy : ClrTypeReference * dataElement : TableDescription * columns : ColumnProxyDescription list
+    type TabularProxyDescription = TablularProxyDescription of proxy : ClrTypeReference * dataElement : TabularDescription * columns : ColumnProxyDescription list
     with
         /// <summary>
         /// Specifies the proxy record
         /// </summary>
         member this.ProxyElement = 
-            match this with TableProxyDescription(proxy=x) -> x
+            match this with TablularProxyDescription(proxy=x) -> x
 
         /// <summary>
         /// Specifies the data table
         /// </summary>
         member this.DataElement =
-            match this with TableProxyDescription(dataElement=x) -> x
+            match this with TablularProxyDescription(dataElement=x) -> x
 
         /// <summary>
         /// Specifies the column proxies
         /// </summary>
         member this.Columns = 
-            match this with TableProxyDescription(columns=x) -> x
+            match this with TablularProxyDescription(columns=x) -> x
     
 
     /// <summary>
@@ -170,7 +170,7 @@ module DataProxyMetamodel =
     /// Unifies data object proxy description types
     /// </summary>
     type DataObjectProxy =
-    | TableProxy of TableProxyDescription
+    | TabularProxy of TabularProxyDescription
     | ProcedureProxy of ProcedureProxyDescription
     | TableFunctionProxy of TableFunctionProxyDescription
 
@@ -178,7 +178,7 @@ module DataProxyMetamodel =
 module DataObjectProxy =
     let getColumns (subject : DataObjectProxy)  =
         match subject with
-        | TableProxy(proxy) -> 
+        | TabularProxy(proxy) -> 
             proxy.Columns
         | ProcedureProxy(proxy) -> 
             []
@@ -187,7 +187,7 @@ module DataObjectProxy =
 
     let getParameters (subject : DataObjectProxy) =
         match subject with
-        | TableProxy(proxy) -> 
+        | TabularProxy(proxy) -> 
             []
         | ProcedureProxy(proxy) -> 
             proxy.Parameters
@@ -196,7 +196,7 @@ module DataObjectProxy =
     
     let getProxyElement (subject : DataObjectProxy) =
         match subject with
-        | TableProxy(proxy) -> 
+        | TabularProxy(proxy) -> 
             proxy.ProxyElement |> TypeElement
         | ProcedureProxy(proxy) -> 
             proxy.ProxyElement |> MethodReference |> MemberElement
@@ -205,8 +205,8 @@ module DataObjectProxy =
 
     let getDataElement (subject : DataObjectProxy) =
         match subject with
-        | TableProxy(proxy) -> 
-            proxy.DataElement |> TableObject
+        | TabularProxy(proxy) -> 
+            proxy.DataElement |> TablularObject
         | ProcedureProxy(proxy) -> 
             proxy.DataElement |> ProcedureObject
         | TableFunctionProxy(proxy) ->
@@ -220,7 +220,7 @@ module DataObjectProxy =
         
     let unwrapTableProxy (subject : DataObjectProxy) =
         match subject with
-        | TableProxy(proxy) -> proxy
+        | TabularProxy(proxy) -> proxy
         | _ ->
             ArgumentException() |> raise
     
@@ -247,7 +247,7 @@ module DataProxyExtensions =
     /// <summary>
     /// Defines augmentations for the TableProxyDescription type
     /// </summary>
-    type TableProxyDescription
+    type TabularProxyDescription
     with
         /// <summary>
         /// Gets the proxy column description at a supplied ordinal position

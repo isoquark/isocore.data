@@ -60,8 +60,9 @@
     <None Include="packages.config" />
     <None Include="app.config" />
     <Compile Include="AssemblyInit.fs" />
-    <Compile Include="ProcedureExecutionTest.fs" />
     <Compile Include="SqlFormatterTest.fs" />
+    <Compile Include="TabularQueryTest.fs" />
+    <Compile Include="RoutineTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IQ.Core.Data.Sql\IQ.Core.Data.Sql.fsproj">
