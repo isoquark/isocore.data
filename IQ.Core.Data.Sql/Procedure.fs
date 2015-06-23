@@ -94,22 +94,35 @@ module internal ProcedureContract =
                 ()
         ] 
        
+    /// <summary>
+    /// Creates function that will be invoked whenever a contracted method is called to execute a stored procedure
+    /// </summary>
     let private createInvoker<'TContract,'TConfig> =
         let proxies = procproxies<'TContract> 
         
-        let tryDescribe m  =
-            proxies |> List.tryFind(fun p -> match p.ProxyElement with
-                                             |MethodElement(x) -> x.Subject.Element = m
-                                             | _ -> ArgumentException() |> raise
-            )
+        let describeProxy m  =
+            match proxies |> List.tryFind
+                (
+                    fun p -> match p.ProxyElement with
+                                | MethodElement(x) -> x.Subject.Element = m
+                                | _ -> ArgumentException() |> raise) with
+            | Some(proxy) ->
+                match proxy with
+                | ProcedureProxy(x) -> x |> Some
+                | _ -> ArgumentException() |> raise
+            | None ->
+                None
             
         fun (cs : string) (targetMethod : MethodInfo) (args : obj[]) ->
-            match targetMethod |> tryDescribe with
-            | Some(description) ->
-                let routineParamValues =  args |> indexParameterValues targetMethod (description |> DataObjectProxy.unwrapProcedureProxy)
-                let results = description.DataElement |> DataObjectDescription.unwrapProcedure |> Routine.executeProcedure cs routineParamValues
+            match targetMethod |> describeProxy with
+            | Some(proxy) ->
+                let routineParamValues =  
+                    args |> indexParameterValues targetMethod proxy
+                let results = 
+                    proxy.DataElement |> Routine.executeProcedure cs routineParamValues
                 let outputs = 
-                    description.Parameters |> List.filter(fun x -> x.DataElement.Direction = ParameterDirection.Output)
+                    proxy.Parameters |> List.filter(fun x -> x.DataElement.Direction = ParameterDirection.Output)
+                
                 if outputs.Length = 0 then
                     results |> ValueIndex.tryFindValue (NameKey("Return"))
                 else if outputs.Length = 1 then
