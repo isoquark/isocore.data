@@ -61,7 +61,7 @@
     <None Include="app.config" />
     <Compile Include="AssemblyInit.fs" />
     <Compile Include="SqlFormatterTest.fs" />
-    <Compile Include="TabularQueryTest.fs" />
+    <Compile Include="TabularTest.fs" />
     <Compile Include="RoutineTest.fs" />
   </ItemGroup>
   <ItemGroup>

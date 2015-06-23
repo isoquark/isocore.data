@@ -53,10 +53,10 @@ module ClrTypeValueTest =
     [<Test>]
     let ``Created record from value map - No optional fields``() =
         let valueMap = 
-            [(FieldA1Name.Text, 16 :> obj)
-             (FieldA2Name.Text, "Hello" :> obj)
-             (FieldA3Name.Text, 38.12m :> obj)
-            ]|> ValueIndex.fromNamedItems
+            [(FieldA1Name.Text, 0, 16 :> obj)
+             (FieldA2Name.Text, 1, "Hello" :> obj)
+             (FieldA3Name.Text, 2, 38.12m :> obj)
+            ]|> ValueIndex.create
         
         let expect = {
             FieldA1 = 16
@@ -70,10 +70,10 @@ module ClrTypeValueTest =
     [<Test>]
     let ``Created record from value map - Optional fields``() =
         let valueMap1 = 
-            [(FieldB1Name.Text, 16 :> obj)
-             (FieldB2Name.Text, 38.12m :> obj)
-             (FieldB3Name.Text, DateTime(2015, 5, 6) |> Some :> obj)
-            ]|> ValueIndex.fromNamedItems
+            [(FieldB1Name.Text, 0, 16 :> obj)
+             (FieldB2Name.Text, 1, 38.12m :> obj)
+             (FieldB3Name.Text, 2, DateTime(2015, 5, 6) |> Some :> obj)
+            ]|> ValueIndex.create
         
         let expect1 = {
             FieldB1 = 16
@@ -84,10 +84,10 @@ module ClrTypeValueTest =
         actual1 |> Claim.equal expect1
 
         let valueMap2 = 
-            [(FieldB1Name.Text, 16 :> obj)
-             (FieldB2Name.Text, 38.12m :> obj)
-             (FieldB3Name.Text, option<DateTime>.None :> obj)
-            ]|> ValueIndex.fromNamedItems
+            [(FieldB1Name.Text, 0, 16 :> obj)
+             (FieldB2Name.Text, 1, 38.12m :> obj)
+             (FieldB3Name.Text, 2, option<DateTime>.None :> obj)
+            ]|> ValueIndex.create
         
         let expect2 = {
             FieldB1 = 16
@@ -106,10 +106,10 @@ module ClrTypeValueTest =
         }
         let expect1 = 
             [
-            (FieldB1Name.Text, value1.FieldB1 :> obj)
-            (FieldB2Name.Text, value1.FieldB2 :> obj)
-            (FieldB3Name.Text, value1.FieldB3:> obj)
-            ] |> ValueIndex.fromNamedItems
+            (FieldB1Name.Text, 0, value1.FieldB1 :> obj)
+            (FieldB2Name.Text, 1, value1.FieldB2 :> obj)
+            (FieldB3Name.Text, 2, value1.FieldB3:> obj)
+            ] |> ValueIndex.create
 
         let actual1 = value1 |> ClrTypeValue.toValueIndex 
         actual1 |> Claim.equal expect1
@@ -121,10 +121,10 @@ module ClrTypeValueTest =
         }
         let expect2 = 
             [
-            (FieldB1Name.Text, value1.FieldB1 :> obj)
-            (FieldB2Name.Text, value1.FieldB2 :> obj)
-            (FieldB3Name.Text, value1.FieldB3:> obj)
-            ] |> ValueIndex.fromNamedItems
+            (FieldB1Name.Text, 0, value1.FieldB1 :> obj)
+            (FieldB2Name.Text, 1, value1.FieldB2 :> obj)
+            (FieldB3Name.Text, 2, value1.FieldB3:> obj)
+            ] |> ValueIndex.create
 
         let actual2 = value1 |> ClrTypeValue.toValueIndex 
         actual2 |> Claim.equal expect2

@@ -104,6 +104,8 @@
     <Build Include="SqlTest\Functions\fTable04Before.sql" />
     <Build Include="SqlTest\Procedures\pTable04Truncate.sql" />
     <Build Include="SqlTest\Functions\fTable04Between.sql" />
+    <Build Include="SqlTest\Tables\Table05.sql" />
+    <Build Include="SqlTest\Tables\Table06.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="IQ.Schemas.Test.refactorlog" />

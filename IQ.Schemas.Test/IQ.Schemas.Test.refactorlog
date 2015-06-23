@@ -7,4 +7,31 @@
     <Property Name="ParentElementType" Value="SqlSchema" />
     <Property Name="NewName" Value="pTable04Truncate" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="5fbaf601-f0ca-43e0-b153-fa5eb89870d1" ChangeDateTime="06/23/2015 19:22:45">
+    <Property Name="ElementName" Value="[dbo].[Table05].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Table05]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Col01" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9e8cb982-d3d8-42b9-8fc3-8846bc4acfa2" ChangeDateTime="06/23/2015 19:23:12">
+    <Property Name="ElementName" Value="[dbo].[Table05].[Col01]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Table05]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Col02" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2a08c5fb-3e0e-4976-9aee-768d4a84608f" ChangeDateTime="06/23/2015 21:55:29">
+    <Property Name="ElementName" Value="[dbo].[Table06].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Table06]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Col01" />
+  </Operation>
+  <Operation Name="Move Schema" Key="6af7129e-b035-456d-badd-dea9802f92bf" ChangeDateTime="06/23/2015 22:07:10">
+    <Property Name="ElementName" Value="[dbo].[Table06]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="NewSchema" Value="SqlTest" />
+    <Property Name="IsNewSchemaExternal" Value="False" />
+  </Operation>
 </Operations>

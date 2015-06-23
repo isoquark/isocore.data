@@ -338,7 +338,7 @@ module DataProxyMetadata =
             Description = proxyref.Type |> getMemberDescription
             Columns = columnProxies |> List.map(fun p -> p.DataElement)
         }
-        TablularProxyDescription(proxyref, table, columnProxies) |> TabularProxy
+        TablularProxyDescription(proxyref, table, columnProxies) //|> TabularProxy
     
     let describeTableFunctionProxy(proxyref : ClrElementReference) =
         let objectName = proxyref |> inferDataObjectName

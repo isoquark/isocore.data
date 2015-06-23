@@ -34,13 +34,14 @@ module internal Routine =
         
         // See https://msdn.microsoft.com/en-us/library/haa3afyz(v=vs.110).aspx for how to deal with multiple result sets
 
-        [for parameter in command.Parameters do
+        [for i in [0..command.Parameters.Count-1] do
+            let parameter = command.Parameters.[i]  
             if  parameter.Direction = ParameterDirection.InputOutput || 
                 parameter.Direction = ParameterDirection.Output || 
                 parameter.Direction = ParameterDirection.ReturnValue then
-                yield parameter.ParameterName, parameter.Value
-        ]|> ValueIndex.fromNamedItems
-
+                yield parameter.ParameterName, i, parameter.Value
+        ]|>ValueIndex.create                
+        
     /// <summary>
     /// Executes a table-valued function and returns a list of object arrays where each array
     /// represents a row of data
@@ -114,9 +115,9 @@ module internal Routine =
     let private getRoutineArgs (proxy : DataObjectProxy) (mii : MethodInvocationInfo) =
         match proxy with
         | ProcedureProxy(proxy) -> 
-            let methodParameterValues = mii.Method.GetParameters() |> Array.mapi (fun i p -> p.Name, mii.MethodArgs.[i]) |> ValueIndex.fromNamedItems
+            let methodParameterValues = mii.Method.GetParameters() |> Array.mapi (fun i p -> p.Name, i, mii.MethodArgs.[i]) |> ValueIndex.create
             [for p in proxy.Parameters do
-                let key = p |> getMethodParameterName  |> NameKey
+                let key = ValueIndexKey(p |> getMethodParameterName , p.ProxyElement.Position)
                 match methodParameterValues |> ValueIndex.tryFindValue key  with
                 | Some(value) ->
                     yield DataParameterValue(p.DataElement.Name, p.DataElement.Position, value)
@@ -152,9 +153,9 @@ module internal Routine =
                     proxy.Parameters |> List.filter(fun x -> x.DataElement.Direction = ParameterDirection.Output)
                 
                 if outputs.Length = 0 then
-                    results |> ValueIndex.tryFindValue (NameKey("Return"))
+                    results |> ValueIndex.tryFindNamedValue "Return"
                 else if outputs.Length = 1 then
-                    results |> ValueIndex.tryFindValue (NameKey(outputs.Head.DataElement.Name))
+                    results |> ValueIndex.tryFindNamedValue outputs.Head.DataElement.Name
                 else
                     NotSupportedException("Cannot yet support multiple output parameters") |> raise
             

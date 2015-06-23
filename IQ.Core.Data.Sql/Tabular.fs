@@ -10,6 +10,11 @@ open System.Diagnostics
 open IQ.Core.Data
 open IQ.Core.Framework
 
+type BulkInsertConfig = {
+    OverwriteDefaults : bool
+    OverwriteIdentity : bool
+}
+
 /// <summary>
 /// Provides capability to execute tabular queries/inserts
 /// </summary>
@@ -22,12 +27,22 @@ module internal Tabular =
         command |> SqlCommand.executeQuery tabular.Columns
 
     let executeProxyQuery cs (tref : ClrTypeReference) =
-        let data =
-            match tref |> DataProxyMetadata.describeTablularProxy with
-            | TabularProxy(proxy) -> proxy.DataElement |> executeQuery cs
-            | _ -> nosupport()
-
+        let proxy = tref |> DataProxyMetadata.describeTablularProxy
+        let data = proxy.DataElement |> executeQuery cs
         let items = [for row in data -> tref |> ClrTypeValue.fromValueArray row]
         items |> ClrCollection.create ClrCollectionKind.FSharpList tref.Type
 
+   
+
+    let bulkInsert<'T> cs (items : 'T seq) =
+        let config = {
+            OverwriteDefaults = true
+            OverwriteIdentity = false
+        }
+   
+        let proxy = tabularproxy<'T>
+        use bcp = new SqlBulkCopy(cs, SqlBulkCopyOptions.CheckConstraints)
+        bcp.DestinationTableName <- proxy.DataElement.Name |> SqlFormatter.formatObjectName
+        use table = items |> DataTable.fromProxyValuesT 
+        bcp.WriteToServer(table)
 

@@ -249,7 +249,7 @@ module StorageType =
             | UInt8Storage -> SqlDbType.TinyInt
             | UInt16Storage -> SqlDbType.Int
             | UInt32Storage -> SqlDbType.BigInt
-            | UInt64Storage -> SqlDbType.VarBinary //8
+            | UInt64Storage -> SqlDbType.VarBinary 
             | Int8Storage -> SqlDbType.SmallInt
             | Int16Storage -> SqlDbType.SmallInt
             | Int32Storage -> SqlDbType.Int
@@ -279,12 +279,54 @@ module StorageType =
             | DecimalStorage(precision,scale) -> SqlDbType.Decimal
             | MoneyStorage -> SqlDbType.Money
             | GuidStorage -> SqlDbType.UniqueIdentifier
-            | XmlStorage(schema) -> SqlDbType.UniqueIdentifier
+            | XmlStorage(schema) -> SqlDbType.Xml
             | VariantStorage -> SqlDbType.Variant
             | CustomTableStorage(name) -> SqlDbType.Structured
-            | CustomObjectStorage(name,t) -> SqlDbType.VarBinary //not sure about this
+            | CustomObjectStorage(name,t) -> SqlDbType.VarBinary 
             | CustomPrimitiveStorage(name) -> SqlDbType.Udt
                         
+        let toClrType (storageType : StorageType) =
+            match storageType with
+            | BitStorage -> typeof<bool>
+            | UInt8Storage -> typeof<uint8>
+            | UInt16Storage -> typeof<int32>
+            | UInt32Storage -> typeof<int64>
+            | UInt64Storage -> typeof<byte[]> //8
+            | Int8Storage -> typeof<int16>
+            | Int16Storage -> typeof<int16>
+            | Int32Storage -> typeof<int>
+            | Int64Storage -> typeof<int64>
+                        
+            | BinaryFixedStorage(_) -> typeof<byte[]>
+            | BinaryVariableStorage(_) -> typeof<byte[]>
+            | BinaryMaxStorage -> typeof<byte[]>
+            
+            | AnsiTextFixedStorage(length) -> typeof<string>
+            | AnsiTextVariableStorage(length) -> typeof<string>
+            | AnsiTextMaxStorage -> typeof<string>
+            
+            | UnicodeTextFixedStorage(length) -> typeof<string>
+            | UnicodeTextVariableStorage(length) -> typeof<string>
+            | UnicodeTextMaxStorage -> typeof<string>
+            
+            | DateTime32Storage -> typeof<DateTime>
+            | DateTime64Storage -> typeof<DateTime>
+            | DateTimeStorage(precision)-> typeof<DateTime>
+            | DateTimeOffsetStorage -> typeof<DateTimeOffset>
+            | TimeOfDayStorage -> typeof<TimeSpan>
+            | DateStorage -> typeof<DateTime>
+            
+            | Float32Storage -> typeof<float32>
+            | Float64Storage -> typeof<float>
+            | DecimalStorage(precision,scale) ->typeof<decimal>
+            | MoneyStorage -> typeof<decimal>
+            | GuidStorage -> typeof<Guid>
+            | XmlStorage(schema) -> typeof<string>
+            | VariantStorage -> typeof<obj>
+            | CustomTableStorage(name) -> typeof<obj>
+            | CustomObjectStorage(name,t) -> typeof<obj>
+            | CustomPrimitiveStorage(name) -> typeof<obj>
+            
         
         /// <summary>
         /// Infers the storage type from a supplied attribute

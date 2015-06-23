@@ -79,7 +79,7 @@ module Claim =
         !result |> Option.isSome |> isTrue
 
     /// <summary>
-    /// Assert that the left value is greater than the right value
+    /// Asserts that the left value is greater than the right value
     /// </summary>
     /// <param name="l">The left value</param>
     /// <param name="r">The right value</param>
@@ -96,7 +96,7 @@ module Claim =
         (>=) l r |> isTrue
 
     /// <summary>
-    /// Assert that the left value is less than the right value
+    /// Asserts that the left value is less than the right value
     /// </summary>
     /// <param name="l">The left value</param>
     /// <param name="r">The right value</param>
@@ -105,9 +105,16 @@ module Claim =
 
 
     /// <summary>
-    /// Assert that the left value is less or equal than the right value
+    /// Asserts that the left value is less or equal than the right value
     /// </summary>
     /// <param name="l">The left value</param>
     /// <param name="r">The right value</param>
     let lessOrEqual l r =
         (<=) l r |> isTrue
+
+    /// <summary>
+    /// Asserts that the supplied sequence has not items
+    /// </summary>
+    /// <param name="seq">The sequence to examine</param>
+    let seqIsEmpty (seq : seq<_>) =
+        seq |> Seq.isEmpty |> isTrue

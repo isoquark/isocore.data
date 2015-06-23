@@ -19,6 +19,11 @@ module DataProxyMetamodel =
     type MethodInputOutputReference =
     | MethodInputReference of ClrMethodParameterReference
     | MethodOutputReference of ClrMethodReturnReference
+    with
+        member this.Position = 
+            match this with
+            | MethodInputReference(x) -> x.Position
+            | MethodOutputReference(x) -> -1
     
     /// <summary>
     /// Describes a column proxy
@@ -206,7 +211,7 @@ module DataObjectProxy =
     let getDataElement (subject : DataObjectProxy) =
         match subject with
         | TabularProxy(proxy) -> 
-            proxy.DataElement |> TablularObject
+            proxy.DataElement |> TabularObject
         | ProcedureProxy(proxy) -> 
             proxy.DataElement |> ProcedureObject
         | TableFunctionProxy(proxy) ->

@@ -58,7 +58,7 @@ module CsvReader =
     /// <param name="file">Representation of the CSV file</param>
     let private read<'T> (file : FSharp.Data.Runtime.CsvFile<CsvRow>) = 
 
-        let proxy = tabularproxy<'T>
+        let proxy = tabularproxy<'T> |> TabularProxy
 
         let getColumnProxy colName = 
             proxy |> DataObjectProxy.getColumns |> List.find(fun x -> x.DataElement.Name = colName)
@@ -82,8 +82,8 @@ module CsvReader =
             value |> Txt.trim |> converters.[colname]
         
         let createValueMap (row : CsvRow) =
-            colnames |> Array.map(fun colname -> colname |> getColumnProxy |> fun f -> f.ProxyElement.Name.Text, colname|> row.GetColumn |> convert colname) 
-                     |> ValueIndex.fromNamedItems
+            colnames |> Array.map(fun colname -> colname |> getColumnProxy |> fun c -> c.ProxyElement.Name.Text, c.ProxyElement.Position, colname|> row.GetColumn |> convert colname) 
+                     |> ValueIndex.create
 
         file.Rows |> Seq.map createValueMap 
                   |> Seq.map (fun valueMap -> 

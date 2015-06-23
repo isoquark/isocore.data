@@ -42,6 +42,10 @@ module SqlDataStoreVocabulary =
         | TabularQuery of tabularName : string * columnNames : string list
         | TableFunctionQuery of  functionName : string * parameters : SqlQueryParameter list
         | ProcedureQuery of procedureName : string * parameters : SqlQueryParameter list
+
+
+    type SqlStoreCommand =
+    | TruncateTable of tableName : DataObjectName
     
         
     /// <summary>
@@ -67,40 +71,60 @@ module SqlDataStoreVocabulary =
 
         abstract GetContract: unit -> 'TContract when 'TContract : not struct
 
+        abstract BulkInsert:'T seq ->unit
+
+        abstract ExecuteCommand:command : SqlStoreCommand -> unit
+       
         
         
+module internal SqlStoreCommand =
+    let execute cs command =
+        let sql = 
+            match command with
+            | TruncateTable tableName ->
+                tableName |> SqlFormatter.formatTruncateTable   
+        use connection = cs |> SqlConnection.create
+        use sqlcommand = new SqlCommand(sql, connection)
+        sqlcommand.ExecuteNonQuery() |> ignore
+
+
+
+ 
        
 /// <summary>
 /// Provides ISqlDataStore realization
 /// </summary>
 module SqlDataStore =    
-    let internal bcp (cs : SqlConnectionString) (data : 'T seq) =
-        use bcp = new SqlBulkCopy(cs.Text)
-        use dataTable = data |> DataTable.fromProxyValuesT
-        dataTable |> bcp.WriteToServer
         
     type private SqlDataStore(csSqlDataStore : ConnectionString) =
-        let cs = SqlConnectionString(csSqlDataStore.Components)
+        let cs = SqlConnectionString(csSqlDataStore.Components) |> fun x -> x.Text
         interface ISqlDataStore with
             member this.Get q : list<'T>= 
                 match q with
                 | TabularQuery(tabularName,columnNames) ->
-                    typeref<'T> |> Tabular.executeProxyQuery cs.Text :?> list<'T>
+                    typeref<'T> |> Tabular.executeProxyQuery cs :?> list<'T>
                 | TableFunctionQuery(functionName, parameters) ->
                     []
                 | ProcedureQuery(procedureName, parameters) ->
                     []
             
             member this.Get() : list<'T> =
-                typeref<'T> |> Tabular.executeProxyQuery cs.Text :?> list<'T>
+                typeref<'T> |> Tabular.executeProxyQuery cs :?> list<'T>
                 
             
-            member this.Put items = bcp cs items
+            member this.Put items = 
+                items |> Tabular.bulkInsert cs
+            
             member this.Del q = ()
 
+            member this.BulkInsert (items : 'T seq) =
+                items |> Tabular.bulkInsert cs
 
+            member this.ExecuteCommand c =
+                c |> SqlStoreCommand.execute cs
+            
             member this.GetContract() =
-                Routine.getContract<'TContract>(cs.Text)
+                Routine.getContract<'TContract> cs
                 
                                              
     /// <summary>

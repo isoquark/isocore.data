@@ -96,7 +96,7 @@ module DataMetamodel =
     type DataObjectDescription =
     | TableFunctionObject of TableFunctionDescription
     | ProcedureObject of ProcedureDescription
-    | TablularObject of TabularDescription
+    | TabularObject of TabularDescription
 
 
     /// <summary>
@@ -116,7 +116,7 @@ module DataObjectDescription =
             x.Name
         | ProcedureObject(x) -> 
             x.Name
-        | TablularObject(x) ->
+        | TabularObject(x) ->
             x.Name
 
     let getParameters (subject : DataObjectDescription) =
@@ -125,7 +125,7 @@ module DataObjectDescription =
             x.Parameters
         | ProcedureObject(x) -> 
             x.Parameters
-        | TablularObject(x) ->
+        | TabularObject(x) ->
             []
     
     let tryFindParameter name (subject : DataObjectDescription) =
@@ -134,7 +134,7 @@ module DataObjectDescription =
             x.Parameters |> List.tryFind(fun p -> p.Name = name)
         | ProcedureObject(x) -> 
             x.Parameters |> List.tryFind(fun p -> p.Name = name)
-        | TablularObject(x) ->
+        | TabularObject(x) ->
             None
 
     let findParameter name (subject : DataObjectDescription) =
@@ -152,7 +152,7 @@ module DataObjectDescription =
 
     let unwrapTabular (subject : DataObjectDescription) =
         match subject with
-        | TablularObject(x) -> x
+        | TabularObject(x) -> x
         | _ -> ArgumentException() |> raise
 
 [<AutoOpen>]

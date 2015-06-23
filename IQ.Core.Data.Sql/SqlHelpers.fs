@@ -47,11 +47,18 @@ module SqlFormatter =
     let formatElementName name =
         name |> Txt.enclose "[" "]"         
 
+    /// <summary>
+    /// Formats a parameter name using the @-convention
+    /// </summary>
+    /// <param name="paramName">The name of the parameter</param>
     let formatParameterName paramName =
-        sprintf "@%s" paramName
+        if paramName |> Txt.startsWith "@" |> not then
+            sprintf "@%s" paramName
+        else
+            paramName
     
     /// <summary>
-    /// Creates a SQL select statement of the form "select * from [Schema].[Function](@Param1, ..., @ParamN)
+    /// Creates a SQL SELECT statement of the form "select * from [Schema].[Function](@Param1, ..., @ParamN)
     /// </summary>
     /// <param name="f">The table-valued function</param>
     let formatTableFunctionSelect (f : TableFunctionDescription) =
@@ -59,6 +66,12 @@ module SqlFormatter =
                        |> Txt.delemit ","
         sprintf "select * from %s(%s)" (f.Name |> formatObjectName) parameters
 
+    /// <summary>
+    /// Create a SQL TRUNCATE TABLE statement
+    /// </summary>
+    /// <param name="n">The name of the table to be truncated</param>
+    let formatTruncateTable (n : DataObjectName) =
+        n |> formatObjectName |> sprintf "truncate table %s"
 
     /// <summary>
     /// Formats a select statement for a tabular element
@@ -73,7 +86,7 @@ module SqlFormatter =
     /// </summary>
     let formatTabularSelectT<'T>() =
         let ptype = tabularproxy<'T>
-        ptype.DataElement |> DataObjectDescription.unwrapTabular |> formatTabularSelect
+        ptype.DataElement |> formatTabularSelect
         
 
 module internal SqlCommand =

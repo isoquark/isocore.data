@@ -17,6 +17,8 @@ module CompositionRootVocabulary =
 
 
 module CompositionRoot =
+    
+    let mutable private root = Unchecked.defaultof<ICompositionRoot>
         
     type CompositionRoot(assroot : Assembly) =
         let build() =
@@ -42,6 +44,7 @@ module CompositionRoot =
             member this.Dispose() = container.Value.Dispose()
 
     let build(assroot : Assembly) =
-        new CompositionRoot(assroot) :> ICompositionRoot                
+        root <- new CompositionRoot(assroot) :> ICompositionRoot
+        root
 
 

@@ -98,7 +98,23 @@ module ProxyTestCases =
             IsUserDefined: bool
             BaseTypeId : uint8 option
         }
+
+    [<AutoOpen>]
+    module SqlTest =
+        type Table05 = {
+            Col01 : int32
+            Col02 : uint8
+            Col03 : int16
+            Col04 : int64
+        }
     
+        type Table06 = {
+            Col01 : int32
+            Col02 : uint8 option
+            Col03 : int16 option
+            Col04 : int64
+        }
+
     module ProxyTestCaseMethod =
         let getDbObjectName (testMethod : MethodBase) =
             let values = testMethod.Name 

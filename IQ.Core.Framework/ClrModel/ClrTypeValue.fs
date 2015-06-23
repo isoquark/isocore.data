@@ -14,7 +14,7 @@ module ClrTypeValue =
     let toValueIndex (record : obj) =
         match record.GetType() |> ClrType.reference with
         | RecordTypeReference(subject, fields) ->
-            fields |> List.map(fun field -> field.Name.Text, field.Property.GetValue(record)) |> ValueIndex.fromNamedItems
+            fields |> List.map(fun field -> field.Name.Text, field.Position, field.Property.GetValue(record)) |> ValueIndex.create
         | _ -> 
             NotSupportedException() |> raise
     
