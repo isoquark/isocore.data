@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="0cfc39e9-8842-4ee6-ae74-6e642fbb6da0" ChangeDateTime="06/23/2015 00:09:02">
+    <Property Name="ElementName" Value="[SqlTest].[pTruncate]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[SqlTest]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="pTable04Truncate" />
+  </Operation>
+</Operations>

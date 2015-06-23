@@ -26,8 +26,8 @@ module DataTable =
     /// Creates a data table based on a proxy description
     /// </summary>
     /// <param name="description">The proxy description</param>
-    let fromProxyDescription (description : TableProxyDescription) =
-        let table = new DataTable(description.TableName.ToSemanticString())
+    let fromProxyDescription (description : DataObjectProxy) =        
+        let table = new DataTable(description.DataElement.Name.ToSemanticString())
         description.Columns |> List.iter(fun f -> table.Columns.Add(f.DataElement.Name, f.ProxyElement.PropertyType) |> ignore)
         table
 
@@ -39,13 +39,13 @@ module DataTable =
     /// </summary>
     /// <param name="proxyDescription">Description of the proxy</param>
     /// <param name="values">The record values that will be transformed into table rows</param>
-    let fromProxyValues (proxyDescription : TableProxyDescription) (values : obj seq) =
+    let fromProxyValues proxyDescription  (values : obj seq) =
         let valueList = values |> List.ofSeq
         if valueList.IsEmpty then
             ArgumentException("Cannot create a DataTable from an empty list of records") |> raise
         let table = proxyDescription |> fromProxyDescription
         valueList |> List.iter(fun item ->
-            item |> ClrType.toValueArray |> table.Rows.Add |> ignore                        
+            item |> ClrTypeValue.toValueArray |> table.Rows.Add |> ignore                        
         )
         table
 
@@ -65,7 +65,7 @@ module DataTable =
     /// <param name="dataTable">The data table</param>
     let toProxyValues (description : ClrTypeReference) (dataTable : DataTable) =
         [for row in dataTable.Rows ->
-            description |> ClrType.fromValueArray row.ItemArray
+            description |> ClrTypeValue.fromValueArray row.ItemArray
         ]
 
 

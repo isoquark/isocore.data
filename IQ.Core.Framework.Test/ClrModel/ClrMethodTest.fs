@@ -23,15 +23,11 @@ module ClrMethodTest =
 
     let private methodmap = methodrefmap<IInterfaceA>
 
-    let getMappedMethod(name) =  methodmap.[(BasicElementName(name))]
+    let getMappedMethod(name) =  methodmap.[(MemberElementName(name))]
     
-   
-    
-
-
     [<Test>]
     let ``Described non-tupled method - variation 1``() =
-        let mName = BasicElementName("Method01")
+        let mName = MemberElementName("Method01")
         let m = methodmap.[mName]
         m.Name |> Claim.equal (mName)
         m.Position |> Claim.equal 0
@@ -47,24 +43,21 @@ module ClrMethodTest =
 
     [<Test>]
     let ``Described tupled methods``() =
-        let m2Name = BasicElementName("Method02")
+        let m2Name = MemberElementName("Method02")
         let m2 = methodmap.[m2Name]
         m2.Name |> Claim.equal m2Name
         m2.Parameters.Length |> Claim.equal 2
         m2.Return.ReturnType |> Claim.isNone
 
-        let m3Name = BasicElementName("Method03")
+        let m3Name = MemberElementName("Method03")
         let m3 = methodmap.[m3Name]
         m3.Name |> Claim.equal m3Name
         m3.Parameters.Length |> Claim.equal 1
         m3.Return.ReturnType |> Claim.isNone
 
-
-
-
     [<Test>]
     let ``Described non-tupled method - variation 2``() =
-        let mName = BasicElementName("Method04")
+        let mName = MemberElementName("Method04")
         let m = methodmap.[mName]
         m.Name |> Claim.equal mName
         m.Parameters.Length |> Claim.equal 2
@@ -76,7 +69,6 @@ module ClrMethodTest =
         m.Parameters.[1].ValueType |> Claim.equal typeof<int>
         m.Parameters.[1].ParameterType |> Claim.equal typeof<option<int>>         
         m.Return.ReturnType |> Option.get |> Claim.equal typeof<DateTime>
-
     
     type private ClassA() =
         member this.Method01(p1 : int, ?p2 : int) = 0L
@@ -84,7 +76,7 @@ module ClrMethodTest =
     [<Test>]
     let ``Described methods with optional parameters``() =
         let methodmap = methodrefmap<ClassA>
-        let mName = BasicElementName("Method01")
+        let mName = MemberElementName("Method01")
         let m = methodmap.[mName]
         m.Name |> Claim.equal mName
         m.Parameters.Length |> Claim.equal 2

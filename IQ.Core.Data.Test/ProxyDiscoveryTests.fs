@@ -24,7 +24,7 @@ module ``Proxy Discovery`` =
 
     [<Test>]
     let ``Read table proxy description - no attribution``() =
-        let proxy = tableproxy<RecordA>
+        let proxy = tableproxy<RecordA> |> DataObjectProxy.unwrapTableProxy
         
         let tableExpect = {
             TableDescription.Name = DataObjectName("Proxies", typeof<RecordA>.Name)
@@ -85,7 +85,7 @@ module ``Proxy Discovery`` =
 
     [<Test>]
     let ``Read DateTimeStorage from table proxy metadata - attribute overrides``() =
-        let proxy = tableproxy<RecordB>
+        let proxy = tableproxy<RecordB> |> DataObjectProxy.unwrapTableProxy
         proxy.Columns.Length |> Claim.equal 4
 
         proxy.[0].DataElement.StorageType |> Claim.equal (DateTimeStorage(5uy))
@@ -96,7 +96,7 @@ module ``Proxy Discovery`` =
 
     [<Test>]
     let ``Read Column names from table proxy metadata - attribute overrides``() =
-        let proxy = tableproxy<RecordB>
+        let proxy = tableproxy<RecordB> |> DataObjectProxy.unwrapTableProxy
         proxy.Columns.Length |> Claim.equal 4
         
         proxy.[0].DataElement.Name |> Claim.equal "BField_1"
@@ -109,7 +109,7 @@ module ``Proxy Discovery`` =
             
         let procName = thisMethod() |> ProxyTestCaseMethod.getDbObjectName
         let proxies = procproxies<ISqlTestProcs>
-        let proxy = proxies |> List.find(fun x -> x.DataElement.Name = procName)
+        let proxy = proxies |> List.find(fun x -> x.DataElement.Name = procName) 
         let proc = proxy.DataElement
 
         proc.Name |> Claim.equal procName
@@ -168,18 +168,37 @@ module ``Proxy Discovery`` =
         ClrElement.fromType<ModuleA.RecordA> |> DataProxyMetadata.inferDataObjectName |> Claim.equal (DataObjectName("ModuleA", "RecordA"))
         ClrElement.fromType<ModuleB.RecordA> |> DataProxyMetadata.inferDataObjectName |> Claim.equal (DataObjectName("MySchema", "RecordA"))
 
-//    [<Test>]
-//    let ``Described [SqlTest].[fTable04Before] table function from proxy``() =
-//        let dbFunctionName = thisMethod() |> ProxyTestCaseMethod.getDbObjectName
-//        let clrMethodName = BasicElementName("fTable04Before")
-//        let clrMethod = interfaceref<ISqlTestFunctions>.Members 
-//                      |> List.find(fun m -> m.Name = clrMethodName)
-//                      |> fun x ->
-//                         match x with
-//                         |MethodReference(y) -> y
-//                         |_ ->
-//                            failwith "Not a method"
-//        let dbFunctionProxy = clrMethod |> MethodElement |> DataProxyMetadata.describeTableFunctionProxy
-//                              
-//
-//        ()
+    [<Test>]
+    let ``Described [SqlTest].[fTable04Before] table function from proxy``() =
+        let dbElementName = thisMethod() |> ProxyTestCaseMethod.getDbObjectName
+        dbElementName |> Claim.equal (DataObjectName("SqlTest", "fTable04Before"))
+        let methodref = match typeref<ISqlTestFunctions>  with
+                          | InterfaceTypeReference(subject, members) ->
+                            members |>  List.find(fun m -> m.Name.Text = dbElementName.LocalName)
+                            |> fun x ->
+                                 match x with
+                                 |MethodReference(y) -> y
+                                 |_ ->
+                                    failwith "Not a method"
+                          | _ ->
+        
+                            NotSupportedException() |> raise
+        let proxy = methodref |> MethodElement 
+                              |> DataProxyMetadata.describeTableFunctionProxy
+                              |> DataObjectProxy.unwrapTableFunctionProxy
+
+        proxy.CallProxy.DataElement.Name |> Claim.equal dbElementName
+        proxy.CallProxy.Parameters.Length |> Claim.equal 1
+        let param1 = proxy.CallProxy.Parameters.[0]
+        param1.DataElement.Name |> Claim.equal "startDate"
+        param1.DataElement.Position |> Claim.equal 0
+        param1.DataElement.StorageType |> Claim.equal (DateTimeStorage(7uy))
+
+        let resultProxy = proxy.ResultProxy
+        resultProxy.Columns.Length |> Claim.equal 4
+        resultProxy.Columns.[0].DataElement.Name |> Claim.equal "Id"
+        resultProxy.Columns.[1].DataElement.Name |> Claim.equal "Code"
+        resultProxy.Columns.[2].DataElement.Name |> Claim.equal "StartDate"
+        resultProxy.Columns.[3].DataElement.Name |> Claim.equal "EndDate"
+        ()
+

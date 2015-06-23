@@ -72,11 +72,11 @@
     <Compile Include="Framework\CompositionRoot.fs" />
     <Compile Include="Framework\ValueIndex.fs" />
     <Compile Include="ClrModel\ClrVocabulary.fs" />
-    <Compile Include="ClrModel\ClrTypeReferenceIndex.fs" />
     <Compile Include="ClrModel\ClrElementName.fs" />
     <Compile Include="ClrModel\ClrAssembly.fs" />
     <Compile Include="ClrModel\ClrOption.fs" />
     <Compile Include="ClrModel\ClrType.fs" />
+    <Compile Include="ClrModel\ClrTypeValue.fs" />
     <Compile Include="ClrModel\ClrElement.fs" />
     <Compile Include="ClrModel\Conversion.fs" />
     <Compile Include="FSharpModel\FSharpVocabulary.fs" />

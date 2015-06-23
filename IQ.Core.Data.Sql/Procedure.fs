@@ -5,28 +5,39 @@ open System.ComponentModel
 open System.Data
 open System.Data.SqlClient
 open System.Reflection
+open System.Diagnostics
 
 open IQ.Core.Data
 open IQ.Core.Framework
 
-module internal Procedure =
+
+module internal SqlConnection = 
+    let create cs = 
+        let connection = new SqlConnection(cs)
+        connection.Open() 
+        connection
+
+
+module internal Routine =
+        
+    
     /// <summary>
     /// Executes a stored procedure
     /// </summary>
     /// <param name="paramValues">The values of the parameters</param>
     /// <param name="proc">The procedure to execute</param>
     /// <param name="cs">The connection string</param>
-    let execute cs (paramValues : ValueIndex) (proc : ProcedureDescription) =
-        use connection = new SqlConnection(cs)
-        connection.Open()
+    let executeProcedure cs (paramValues : RoutineParameterValue list) (proc : ProcedureDescription) =
+        use connection = cs |> SqlConnection.create
         use command = new SqlCommand(proc.Name |> SqlFormatter.formatObjectName, connection)
         command.CommandType <- CommandType.StoredProcedure
         
         proc.Parameters |> List.iter(fun x ->
+                
                 let p = if x.Direction = ParameterDirection.ReturnValue then 
                             SqlParameter("Return", DBNull.Value) 
                         else if x.Direction = ParameterDirection.Input then
-                            SqlParameter(x.Name, paramValues.[x.Name])
+                            SqlParameter(x.Name, paramValues |> List.find(fun v -> v.Name = x.Name) |> fun value -> value.Value)
                         else if x.Direction = ParameterDirection.Output then
                             SqlParameter(x.Name, DBNull.Value)
                         else
@@ -44,6 +55,23 @@ module internal Procedure =
                 yield parameter.ParameterName, parameter.Value
         ]|> ValueIndex.fromNamedItems
 
+    let executeTableFunction cs (paramValues : RoutineParameterValue list) (f : TableFunctionDescription) =
+        use connection = cs |> SqlConnection.create
+        let sql = f |> SqlFormatter.formatTableFunctionSelect
+        use command = new SqlCommand(sql, connection)
+        paramValues |> List.iter(fun paramValue ->
+            let pos = command.Parameters.Add(paramValue.Value)
+            Debug.Assert( (pos = paramValue.Position), "Command parameter position mismatch")               
+        )
+        //TODO: call execute reader on the command for better efficiency
+        use adapter = new SqlDataAdapter(command)
+        let table = new DataTable()
+        adapter.Fill(table) |> ignore       
+        table
+        
+
+
+    
 
 module internal ProcedureContract =        
     let private getMethodParameterName(proxy : ParameterProxyDescription) =
@@ -55,31 +83,31 @@ module internal ProcedureContract =
             | MethodOutputReference(m) ->
                 "Return" 
 
-    let private indexRoutineParameterValues (proxy : ProcedureCallProxyDescription) (methodParameterValues : ValueIndex)  =
+    let private indexParameterValues (m : MethodInfo) (proxy : ProcedureCallProxyDescription) (values : obj[])  =
+        let methodParameterValues = m.GetParameters() |> Array.mapi (fun i p -> p.Name, values.[i]) |> ValueIndex.fromNamedItems
         [for p in proxy.Parameters do
             let key = p |> getMethodParameterName  |> NameKey
             match methodParameterValues |> ValueIndex.tryFindValue key  with
             | Some(value) ->
-                yield (p.DataElement.Name, value)
+                yield RoutineParameterValue(p.DataElement.Name, p.DataElement.Position, value)
             | None ->
                 ()
-        ] |> ValueIndex.fromNamedItems
-
-    let private indexMethodParameterValues (m : MethodInfo) (values : obj[]) =
-        m.GetParameters() |> Array.mapi (fun i p -> p.Name, values.[i]) |> ValueIndex.fromNamedItems
+        ] 
        
-    let private invoke<'TContract,'TConfig> =
+    let private createInvoker<'TContract,'TConfig> =
         let proxies = procproxies<'TContract> 
         
-        let tryDescribe(m) =
-            proxies |> List.tryFind(fun p -> p.ProxyElement.Subject.Element = m)
-
+        let tryDescribe m  =
+            proxies |> List.tryFind(fun p -> match p.ProxyElement with
+                                             |MethodElement(x) -> x.Subject.Element = m
+                                             | _ -> ArgumentException() |> raise
+            )
+            
         fun (cs : string) (targetMethod : MethodInfo) (args : obj[]) ->
-            let methodParamValues = args|> indexMethodParameterValues targetMethod
             match targetMethod |> tryDescribe with
             | Some(description) ->
-                let routineParamValues = methodParamValues |> indexRoutineParameterValues description   
-                let results = description.DataElement |> Procedure.execute cs routineParamValues
+                let routineParamValues =  args |> indexParameterValues targetMethod (description |> DataObjectProxy.unwrapProcedureProxy)
+                let results = description.DataElement |> DataObjectDescription.unwrapProcedure |> Routine.executeProcedure cs routineParamValues
                 let outputs = 
                     description.Parameters |> List.filter(fun x -> x.DataElement.Direction = ParameterDirection.Output)
                 if outputs.Length = 0 then
@@ -92,6 +120,6 @@ module internal ProcedureContract =
                 NotImplementedException(sprintf "There is no implementation for the method %s" targetMethod.Name) |> raise    
 
     let get<'TContract when 'TContract : not struct>(cs : string) =        
-        invoke<'TContract,string> |> DynamicContract.realize<'TContract,string> cs
+        createInvoker<'TContract,string> |> DynamicContract.realize<'TContract,string> cs
 
 

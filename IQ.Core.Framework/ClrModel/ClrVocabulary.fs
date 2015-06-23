@@ -55,9 +55,14 @@ module ClrVocabulary =
     /// Represents the name of a CLR element
     /// </summary>
     type ClrElementName =
+        ///Specifies the name of an assembly 
         | AssemblyElementName of ClrAssemblyName
+        ///Specifies the name of a type 
         | TypeElementName of ClrTypeName
-        | BasicElementName of string
+        ///Specifies the name of a type member
+        | MemberElementName of string
+        ///Specifies the name of a parameter
+        | ParameterElementName of string
 
     type ClrSubjectReference<'T> = ClrSubjectReference of name : ClrElementName * position : int * element : 'T
     with

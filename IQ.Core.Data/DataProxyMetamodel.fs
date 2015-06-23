@@ -40,7 +40,7 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a proxy for a tabular result set
     /// </summary>
-    type RoutineResultProxyDescription = TabularResultProxyDescription of proxy : ClrTypeReference  * dataElement : RoutineDescription * columns : ColumnProxyDescription list
+    type TableFunctionResultProxyDescription = TabularResultProxyDescription of proxy : ClrTypeReference  * dataElement : TableFunctionDescription * columns : ColumnProxyDescription list
     with
         /// <summary>
         /// Specifies the proxy record
@@ -131,34 +131,114 @@ module DataProxyMetamodel =
         member this.Parameters = 
             match this with ProcedureCallProxyDescription(parameters=x) -> x
 
+    type ProcedureProxyDescription = ProcedureCallProxyDescription
+
     /// <summary>
-    /// Describes a proxy for a stored procedure
+    /// Describes a proxy for calling a table-valued function
     /// </summary>
     type TableFunctionCallProxyDescription = TableFunctionCallProxyDescription of proxy : ClrMethodReference * dataElement : TableFunctionDescription * parameters : ParameterProxyDescription list
-    
-    
-    type TableFunctionProxy = TableFunctionProxy of call : TableFunctionCallProxyDescription * result : RoutineResultProxyDescription
     with
-        member this.CallProxy = match this with TableFunctionProxy(call=x) -> x
-        member this.ResultProxy = match this with TableFunctionProxy(result=x) ->x
+        /// <summary>
+        /// Specifies  the CLR proxy element
+        /// </summary>
+        member this.ProxyElement = match this  with TableFunctionCallProxyDescription(proxy=x) -> x
+
+        /// <summary>
+        /// Specifies  the data element that the proxy represents
+        /// </summary>
+        member this.DataElement = match this with TableFunctionCallProxyDescription(dataElement=x) -> x
+
+        /// <summary>
+        /// Specifies the parameter proxies
+        /// </summary>
+        member this.Parameters = 
+            match this with TableFunctionCallProxyDescription(parameters=x) -> x
     
     
+    type TableFunctionProxyDescription = TableFunctionProxyDescription of call : TableFunctionCallProxyDescription * result : TableFunctionResultProxyDescription
+    with
+        member this.CallProxy = match this with TableFunctionProxyDescription(call=x) -> x
+        member this.ResultProxy = match this with TableFunctionProxyDescription(result=x) ->x
+    
+
     /// <summary>
-    /// Unifies all proxy description types
+    /// Unifies data object proxy description types
     /// </summary>
-    type ProxyDescription =
-    | ColumnProxy of ColumnProxyDescription
+    type DataObjectProxy =
     | TableProxy of TableProxyDescription
-    | ParameterProxy of ParameterProxyDescription
-    | ProcedureCallProxy of ProcedureCallProxyDescription
-    | TableFunctionCallProxy of TableFunctionCallProxyDescription
-    | TableFunctionResultProxy of RoutineResultProxyDescription
+    | ProcedureProxy of ProcedureProxyDescription
+    | TableFunctionProxy of TableFunctionProxyDescription
+
+
+module DataObjectProxy =
+    let getColumns (subject : DataObjectProxy)  =
+        match subject with
+        | TableProxy(proxy) -> 
+            proxy.Columns
+        | ProcedureProxy(proxy) -> 
+            []
+        | TableFunctionProxy(proxy) ->
+            proxy.ResultProxy.Columns
+
+    let getParameters (subject : DataObjectProxy) =
+        match subject with
+        | TableProxy(proxy) -> 
+            []
+        | ProcedureProxy(proxy) -> 
+            proxy.Parameters
+        | TableFunctionProxy(proxy) ->
+            proxy.CallProxy.Parameters
+    
+    let getProxyElement (subject : DataObjectProxy) =
+        match subject with
+        | TableProxy(proxy) -> 
+            proxy.ProxyElement |> TypeElement
+        | ProcedureProxy(proxy) -> 
+            proxy.ProxyElement |> MethodElement
+        | TableFunctionProxy(proxy) ->
+            proxy.CallProxy.ProxyElement |> MethodElement
+
+    let getDataElement (subject : DataObjectProxy) =
+        match subject with
+        | TableProxy(proxy) -> 
+            proxy.DataElement |> TableObject
+        | ProcedureProxy(proxy) -> 
+            proxy.DataElement |> ProcedureObject
+        | TableFunctionProxy(proxy) ->
+            proxy.CallProxy.DataElement |> TableFunctionObject
+
+    let unwrapTableFunctionProxy (subject : DataObjectProxy) =
+        match subject with
+        | TableFunctionProxy(proxy) -> proxy
+        | _ ->
+            ArgumentException() |> raise
+        
+    let unwrapTableProxy (subject : DataObjectProxy) =
+        match subject with
+        | TableProxy(proxy) -> proxy
+        | _ ->
+            ArgumentException() |> raise
+    
+    let unwrapProcedureProxy (subject : DataObjectProxy) =
+        match subject with
+        | ProcedureProxy(proxy) -> proxy
+        | _ ->
+            ArgumentException() |> raise
+        
+        
 
 /// <summary>
 /// Defines operators and augmentations for the types in the DataProxyMetamodel module
 /// </summary>
 [<AutoOpen>]
-module DataProxyMetamodelExtensions =
+module DataProxyExtensions =
+    type DataObjectProxy
+    with
+        member this.Columns = this |> DataObjectProxy.getColumns
+        member this.Parameters = this |> DataObjectProxy.getParameters
+        member this.ProxyElement = this |> DataObjectProxy.getProxyElement
+        member this.DataElement = this |> DataObjectProxy.getDataElement
+    
     /// <summary>
     /// Defines augmentations for the TableProxyDescription type
     /// </summary>

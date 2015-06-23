@@ -5,6 +5,7 @@ open System.Data
 open System.Linq
 open System.Data.Linq
 open System.Reflection
+open System.Text
 
 
 open IQ.Core.Framework
@@ -43,14 +44,27 @@ module SqlFormatter =
     /// <param name="name">The name of the element</param>
     let formatElementName name =
         name |> Txt.enclose "[" "]"         
+
+    let formatParameterName (param : RoutineParameterDescription) =
+        sprintf "@%s" param.Name
     
+    /// <summary>
+    /// Creates a SQL select statement of the form "select * from [Schema].[Function](@Param1, ..., @ParamN)
+    /// </summary>
+    /// <param name="f">The table-valued function</param>
+    let formatTableFunctionSelect (f : TableFunctionDescription) =
+        let parameters = f.Parameters |> List.map formatParameterName
+                       |> Txt.delemit ","
+        sprintf "select * from %s(%s)" (f.Name |> formatObjectName) parameters
+
+
     /// <summary>
     /// Formats a select statement for a tabular proxy
     /// </summary>
     let formatTabularSelect<'T>() =
         let ptype = tableproxy<'T>
-        let columns = ptype.DataElement.Columns |> List.map(fun c -> c.Name |> formatElementName ) |> Txt.toDelimitedText ","
-        let tableName = ptype.TableName |> formatObjectName
+        let columns = ptype.Columns |> List.map(fun c -> c.DataElement.Name |> formatElementName ) |> Txt.delemit ","
+        let tableName = ptype.DataElement.Name |> formatObjectName
         sprintf "select %s from %s" columns tableName
         
         

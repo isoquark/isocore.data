@@ -61,7 +61,7 @@ module CsvReader =
         let proxy = tableproxy<'T>
 
         let getColumnProxy colName = 
-            proxy.Columns |> List.find(fun x -> x.DataElement.Name = colName)
+            proxy |> DataObjectProxy.getColumns |> List.find(fun x -> x.DataElement.Name = colName)
 
         let converters =
             match file.Headers with
@@ -86,7 +86,12 @@ module CsvReader =
                      |> ValueIndex.fromNamedItems
 
         file.Rows |> Seq.map createValueMap 
-                  |> Seq.map (fun valueMap -> proxy.ProxyElement |> ClrType.fromValueMap valueMap :?> 'T)
+                  |> Seq.map (fun valueMap -> 
+                    match proxy.ProxyElement with
+                    |TypeElement(e) -> e |> ClrTypeValue.fromValueIndex valueMap :?> 'T
+                    | _ ->
+                        ArgumentException() |> raise)
+                    
                   |> List.ofSeq
 
     /// <summary>

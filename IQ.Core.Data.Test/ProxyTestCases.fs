@@ -45,10 +45,17 @@ module ProxyTestCases =
         [<Procedure>]
         abstract pTable03Insert: Col01:uint8->Col02:int16->Col03:int32->Col04:int64->int
 
+        [<Procedure>]
+        abstract pTable04Truncate:unit->unit
+
+        [<Procedure>]
+        abstract pTable04Insert:code : string->startDate : DateTime -> endDate : DateTime -> int
+
     [<Schema("SqlTest")>]
     type ISqlTestFunctions =
         [<TableFunction>]
         abstract fTable04Before: startDate:DateTime-> Table04FunctionResult list
+        
 
 
     type ISqlTestRoutines =

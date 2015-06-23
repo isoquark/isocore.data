@@ -28,8 +28,8 @@ module TxtTest =
 
     [<Test>]
     let ``Created delimited list``() =
-        ["1"; "2"; "3"] |> Txt.toDelimitedText "," |> Claim.equal "1,2,3"
-        ["1"; "2"; "3"] |> Txt.toDelimitedText "**" |> Claim.equal "1**2**3"
+        ["1"; "2"; "3"] |> Txt.delemit "," |> Claim.equal "1,2,3"
+        ["1"; "2"; "3"] |> Txt.delemit "**" |> Claim.equal "1**2**3"
 
     [<Test>]
     let ``Found text beween two indices``() =

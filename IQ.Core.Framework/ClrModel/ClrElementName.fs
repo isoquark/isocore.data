@@ -11,9 +11,9 @@ open Microsoft.FSharp.Quotations.Patterns
 
 module ClrTypeName = 
     /// <summary>
-    /// Formats the typename text
+    /// Renders the type name as text
     /// </summary>
-    /// <param name="typeName">The typename</param>
+    /// <param name="typeName">The type name</param>
     let format typeName =
         match typeName with
         | SimpleTypeName(n) | FullTypeName(n) | AssemblyQualifiedTypeName(n) -> n
@@ -29,7 +29,8 @@ module ClrElementName =
         match name with
         | AssemblyElementName(n) -> n |> ClrAssemblyName.format
         | TypeElementName(n) -> n |> ClrTypeName.format
-        | BasicElementName(n) -> n
+        | MemberElementName(n) -> n
+        | ParameterElementName(n) -> n
 
 [<AutoOpen>]
 module ClrElementNameExtensions =
@@ -56,19 +57,19 @@ module ClrElementNameExtensions =
 
     type MethodInfo
     with
-        member this.ElementName = this.Name |> BasicElementName
+        member this.ElementName = this.Name |> MemberElementName
 
     type ParameterInfo
     with
-        member this.ElementName = this.Name |> BasicElementName
+        member this.ElementName = this.Name |> ParameterElementName
 
     type PropertyInfo
     with
-        member this.ElementName = this.Name |> BasicElementName
+        member this.ElementName = this.Name |> MemberElementName
 
     type UnionCaseInfo
     with
-        member this.ElementName = this.Name |> BasicElementName
+        member this.ElementName = this.Name |> MemberElementName
 
 
     /// <summary>

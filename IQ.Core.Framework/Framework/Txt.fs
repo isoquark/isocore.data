@@ -179,7 +179,7 @@ module Txt =
     /// </summary>
     /// <param name="delimiter">The delimiter use to demarcate the components</param>
     /// <param name="components">The components</param>
-    let toDelimitedText (delimiter : string) (components : string list) =
+    let delemit (delimiter : string) (components : string list) =
         let sb = new StringBuilder()
         for i in 0..components.Length-1 do
             components.[i] |> sb.Append |> ignore

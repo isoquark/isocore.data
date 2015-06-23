@@ -67,6 +67,14 @@ module DataMetamodel =
 
     }
 
+    /// <summary>
+    /// Represents the value passed to a routine parameters
+    /// </summary>
+    type RoutineParameterValue = RoutineParameterValue of  name : string * position : int * value : obj
+    with
+        member this.Position = match this with RoutineParameterValue(position=x) -> x
+        member this.Name = match this with RoutineParameterValue(name=x) -> x
+        member this.Value = match this with RoutineParameterValue(value=x) -> x
 
     /// <summary>
     /// Describes a stored procedure
@@ -93,38 +101,58 @@ module DataMetamodel =
         Columns : ColumnDescription list
     }
 
-    /// <summary>
-    /// Describes a routine
-    /// </summary>
-    type RoutineDescription = 
-    | Procedure of ProcedureDescription
-    | TableFunction of TableFunctionDescription
 
-module ProcedureDescription =
-    /// <summary>
-    /// Finds a procedure's named parameter
-    /// </summary>
-    /// <param name="name">The name of the parameter</param>
-    /// <param name="proc">The procedure</param>
-    let findParameter name (proc : ProcedureDescription) =
-        proc.Parameters |> List.find(fun p -> p.Name = name)
+    type DataObjectDescription =
+    | TableFunctionObject of TableFunctionDescription
+    | ProcedureObject of ProcedureDescription
+    | TableObject of TableDescription
 
-module TableFunctionDescription =
-    /// <summary>
-    /// Finds a procedure's named parameter
-    /// </summary>
-    /// <param name="name">The name of the parameter</param>
-    /// <param name="proc">The function</param>
-    let findParameter name (f : TableFunctionDescription) =
-        f.Parameters |> List.find(fun p -> p.Name = name)
 
-module RoutineDescription =
-    let findParameter name routine =
-        match routine with
-        |Procedure(x)  -> 
-            x |> ProcedureDescription.findParameter name
-        |TableFunction(x) -> 
-            x |> TableFunctionDescription.findParameter name
+module DataObjectDescription =
+    let getName (subject : DataObjectDescription) =
+        match subject with
+        | TableFunctionObject(x) -> 
+            x.Name
+        | ProcedureObject(x) -> 
+            x.Name
+        | TableObject(x) ->
+            x.Name
+
+    let getParameters (subject : DataObjectDescription) =
+        match subject with
+        | TableFunctionObject(x) -> 
+            x.Parameters
+        | ProcedureObject(x) -> 
+            x.Parameters
+        | TableObject(x) ->
+            []
+    
+    let tryFindParameter name (subject : DataObjectDescription) =
+        match subject with
+        | TableFunctionObject(x) -> 
+            x.Parameters |> List.tryFind(fun p -> p.Name = name)
+        | ProcedureObject(x) -> 
+            x.Parameters |> List.tryFind(fun p -> p.Name = name)
+        | TableObject(x) ->
+            None
+
+    let findParameter name (subject : DataObjectDescription) =
+        subject |> tryFindParameter name |> Option.get
+
+    let unwrapTableFunction (subject : DataObjectDescription) =
+        match subject with
+        | TableFunctionObject(x) -> x
+        | _ -> ArgumentException() |> raise
+        
+    let unwrapProcedure (subject : DataObjectDescription) =
+        match subject with
+        | ProcedureObject(x) -> x
+        | _ -> ArgumentException() |> raise
+
+    let unwrapTable (subject : DataObjectDescription) =
+        match subject with
+        | TableObject(x) -> x
+        | _ -> ArgumentException() |> raise
 
 [<AutoOpen>]
 module DataMetamodelExtensions =
@@ -152,20 +180,17 @@ module DataMetamodelExtensions =
     /// <summary>
     /// Defines augmentations for the ProcedureDescription type
     /// </summary>
-    type ProcedureDescription
+    type DataObjectDescription
     with
         member this.FindParameter(name) =
-            this |> ProcedureDescription.findParameter name
+            this |> DataObjectDescription.findParameter name
 
-    /// <summary>
-    /// Defines augmentations for the TableFunctionDescription type
-    /// </summary>
-    type TableFunctionDescription
-    with
-        member this.FindParameter(name) =
-            this |> TableFunctionDescription.findParameter name
+        member this.Parameters = 
+            this |> DataObjectDescription.getParameters
+        
+        member this.Name =
+            this |> DataObjectDescription.getName
 
-    type RoutineDescription 
-    with
-        member this.FindParameter(name) =
-            this |> RoutineDescription.findParameter name                       
+
+
+                        

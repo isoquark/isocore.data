@@ -118,7 +118,7 @@ module DataProxyMetadata =
 
         let getElementName() =
             match clrElement |> ClrElement.getName with
-            | BasicElementName(n) -> n
+            | MemberElementName(n) | ParameterElementName(n) -> n            
             | TypeElementName(n) ->
                 match n with
                 | SimpleTypeName(n) -> 
@@ -300,7 +300,7 @@ module DataProxyMetadata =
                 methreturn |> describeReturnParameter
         ParameterProxyDescription(clrElement, parameter)
                 
-    let describeProcedureCallProxy(proxy : ClrElementReference) =
+    let describeProcedureProxy(proxy : ClrElementReference) =
         let objectName = proxy |> inferDataObjectName
         match proxy with
         | MethodElement(m) ->        
@@ -316,7 +316,7 @@ module DataProxyMetadata =
                 ProcedureDescription.Name = objectName
                 Parameters = parameters |> List.map(fun p -> p.DataElement)
             }            
-            ProcedureCallProxyDescription(m, procedure, parameters)
+            ProcedureCallProxyDescription(m, procedure, parameters) |> ProcedureProxy
 
         | _ ->
             NotSupportedException() |> raise
@@ -333,7 +333,7 @@ module DataProxyMetadata =
             Description = clrType.Type |> getMemberDescription
             Columns = columnProxies |> List.map(fun p -> p.DataElement)
         }
-        TableProxyDescription(clrType, table, columnProxies)
+        TableProxyDescription(clrType, table, columnProxies) |> TableProxy
     
     let describeTableFunctionProxy(clrElement : ClrElementReference) =
         let objectName = clrElement |> inferDataObjectName
@@ -356,8 +356,8 @@ module DataProxyMetadata =
             Columns = columnProxies |> List.map(fun c -> c.DataElement)
         }
         let callProxy = TableFunctionCallProxyDescription(clrMethod, tableFunction, parameterProxies)
-        let resultProxy = TabularResultProxyDescription(returnType, tableFunction |> TableFunction, columnProxies)
-        TableFunctionProxy(callProxy, resultProxy)
+        let resultProxy = TabularResultProxyDescription(returnType, tableFunction, columnProxies)
+        TableFunctionProxyDescription(callProxy, resultProxy) |> TableFunctionProxy
 
 /// <summary>
 /// Convenience methods/operators intended to minimize syntactic clutter
@@ -373,13 +373,30 @@ module DataProxyOperators =
             members |> List.mapi (fun i m ->  
                 match m with
                 | MethodReference(m) ->
-                     m |> MethodElement |> DataProxyMetadata.describeProcedureCallProxy
+                     m |> MethodElement |> DataProxyMetadata.describeProcedureProxy
                 | _ ->
                     NotSupportedException() |> raise  )   
         | _ -> 
              NotSupportedException() |> raise           
-       
-        
+
+    let tfuncproxies<'T> =
+        match typeref<'T> with
+        | InterfaceTypeReference(subject, members) ->
+            members |> List.mapi (fun i m ->  
+                match m with
+                | MethodReference(m) ->
+                     m |> MethodElement |> DataProxyMetadata.describeTableFunctionProxy
+                | _ ->
+                    NotSupportedException() |> raise  )   
+        | _ -> 
+             NotSupportedException() |> raise           
+
+    let routineproxies<'T> =
+        procproxies<'T> |> List.append tfuncproxies<'T>                
+
+    
+               
+           
         
                   
 

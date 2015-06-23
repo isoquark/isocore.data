@@ -27,4 +27,4 @@ module ConnectionString =
     /// </summary>
     /// <param name="cs">The connection string to format</param>
     let format (cs : ConnectionString) =
-        cs.Components |> Txt.toDelimitedText ";"
+        cs.Components |> Txt.delemit ";"
