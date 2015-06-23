@@ -97,7 +97,7 @@ module SqlDataStore =
                 []
 
             member this.GetContract() =
-                ProcedureContract.get<'TContract>(cs.Text)
+                RoutineContract.get<'TContract>(cs.Text)
                 
                                              
     /// <summary>

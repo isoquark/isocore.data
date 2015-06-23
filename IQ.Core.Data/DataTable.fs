@@ -6,6 +6,8 @@ open System
 open System.Reflection
 open System.Data
 open System.Diagnostics
+open System.Collections
+open System.Collections.Generic
 
 
 /// <summary>
@@ -63,11 +65,19 @@ module DataTable =
     /// </summary>
     /// <param name="description">Describes the record</param>
     /// <param name="dataTable">The data table</param>
-    let toProxyValues (description : ClrTypeReference) (dataTable : DataTable) =
-        [for row in dataTable.Rows ->
-            description |> ClrTypeValue.fromValueArray row.ItemArray
-        ]
+    let toProxyValues (typeref : ClrTypeReference) (dataTable : DataTable) =
+        match typeref with
+        | CollectionTypeReference(subject, itemType, collectionKind) ->            
+            let items = 
+                [for row in dataTable.Rows ->
+                    itemType |> ClrTypeValue.fromValueArray row.ItemArray]
+            items |> ClrCollection.create collectionKind itemType.Type :?> IEnumerable
+        | _ ->
+            [for row in dataTable.Rows ->
+                typeref |> ClrTypeValue.fromValueArray row.ItemArray] :> IEnumerable
 
+    let toProxyValuesT<'T> (typeref : ClrTypeReference) (dataTable : DataTable) =
+        dataTable |> toProxyValues typeref :?> IEnumerable<'T>
 
  
     

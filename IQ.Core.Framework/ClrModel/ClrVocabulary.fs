@@ -216,8 +216,12 @@ module ClrVocabulary =
     /// </summary>
     type ClrCollectionKind = 
         | Unknown = 0
+        /// Identifies an F# list
         | FSharpList = 1
+        /// Identifies an array
         | Array = 2
+        /// Identifies a Sytem.Collections.Generic.List<_> collection
+        | GenericList = 3
 
 
     type ClrTypeKind =
@@ -245,11 +249,10 @@ module ClrVocabulary =
     /// Unifies the CLR element reference taxonomy
     /// </summary>
     type ClrElementReference =
-    | PropertyElement of ClrPropertyReference
-    | MethodElement of ClrMethodReference
-    | MethodParameterElement of ClrMethodParameterReference
+    | MethodParameterReference of ClrMethodParameterReference
     | UnionCaseElement of ClrUnionCaseReference
     | TypeElement of ClrTypeReference
+    | MemberElement of ClrMemberReference
 
 module ClrAccess =
     /// <summary>
@@ -268,7 +271,6 @@ module ClrAccess =
         else
             NotSupportedException("Cannot deduce the access level of the method") |> raise
        
-
 [<AutoOpen>]
 module ClrVocabularyExtensions =
     type ClrPropertyDescription

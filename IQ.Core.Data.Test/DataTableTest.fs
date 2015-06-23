@@ -65,7 +65,9 @@ module DataTableTest =
                 {Field01 = 1002L; Field02 = true; Field03 = "FGH"} :> obj
             ] 
 
-        let dst =  src |> DataTable.fromProxyValues tableproxy<DataTableRecord> |> DataTable.toProxyValues description
+        let dst =  src |> DataTable.fromProxyValues tableproxy<DataTableRecord> 
+                       |> DataTable.toProxyValuesT<obj> description
+                       |> List.ofSeq
         Claim.equal src.[0] dst.[0]
         Claim.equal src.[1] dst.[1]
         Claim.equal src.[2] dst.[2]

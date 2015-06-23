@@ -159,6 +159,11 @@ module DataProxyMetamodel =
     with
         member this.CallProxy = match this with TableFunctionProxyDescription(call=x) -> x
         member this.ResultProxy = match this with TableFunctionProxyDescription(result=x) ->x
+
+        /// <summary>
+        /// Specifies  the data element that the proxy represents
+        /// </summary>
+        member this.DataElement = this.CallProxy.DataElement
     
 
     /// <summary>
@@ -194,9 +199,9 @@ module DataObjectProxy =
         | TableProxy(proxy) -> 
             proxy.ProxyElement |> TypeElement
         | ProcedureProxy(proxy) -> 
-            proxy.ProxyElement |> MethodElement
+            proxy.ProxyElement |> MethodReference |> MemberElement
         | TableFunctionProxy(proxy) ->
-            proxy.CallProxy.ProxyElement |> MethodElement
+            proxy.CallProxy.ProxyElement |> MethodReference |> MemberElement
 
     let getDataElement (subject : DataObjectProxy) =
         match subject with

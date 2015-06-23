@@ -72,6 +72,7 @@
     <Compile Include="Framework\CompositionRoot.fs" />
     <Compile Include="Framework\ValueIndex.fs" />
     <Compile Include="ClrModel\ClrVocabulary.fs" />
+    <Compile Include="ClrModel\ClrCollection.fs" />
     <Compile Include="ClrModel\ClrElementName.fs" />
     <Compile Include="ClrModel\ClrAssembly.fs" />
     <Compile Include="ClrModel\ClrOption.fs" />

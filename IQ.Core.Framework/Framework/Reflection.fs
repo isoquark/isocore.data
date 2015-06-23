@@ -41,14 +41,21 @@ module MethodInfo =
     /// <summary>
     /// Retrieves an attribute applied to a member, if present
     /// </summary>
-    /// <param name="subject">The type to examine</param>
+    /// <param name="subject">The method to examine</param>
     let getAttribute<'T  when 'T :> Attribute>(subject : MethodInfo) =
         subject |> MemberInfo.getAttribute<'T>
 
     /// <summary>
+    /// Determines whether an attribute has been applied to a method
+    /// </summary>
+    /// <param name="subject">The method to examine</param>
+    let hasAttribute<'T when 'T :> Attribute>(subject : MethodInfo) =
+        Attribute.IsDefined(subject, typeof<'T>)
+
+    /// <summary>
     /// Retrieves an attribute applied to a method return, if present
     /// </summary>
-    /// <param name="subject">The type to examine</param>
+    /// <param name="subject">The method to examine</param>
     let getReturnAttribute<'T when 'T :> Attribute>(subject : MethodInfo) =
         let attribs = subject.ReturnTypeCustomAttributes.GetCustomAttributes(typeof<'T>, true)
         if attribs.Length <> 0 then

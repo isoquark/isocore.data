@@ -60,20 +60,15 @@ module internal Routine =
         let sql = f |> SqlFormatter.formatTableFunctionSelect
         use command = new SqlCommand(sql, connection)
         paramValues |> List.iter(fun paramValue ->
-            let pos = command.Parameters.Add(paramValue.Value)
-            Debug.Assert( (pos = paramValue.Position), "Command parameter position mismatch")               
+            command.Parameters.Add(SqlParameter(paramValue.Name |>  sprintf "@%s" , paramValue.Value)) |> ignore
         )
         //TODO: call execute reader on the command for better efficiency
         use adapter = new SqlDataAdapter(command)
         let table = new DataTable()
         adapter.Fill(table) |> ignore       
-        table
-        
+        table        
 
-
-    
-
-module internal ProcedureContract =        
+module internal RoutineContract =        
     let private getMethodParameterName(proxy : ParameterProxyDescription) =
         match proxy with
         | ParameterProxyDescription(proxy=x) ->
@@ -83,8 +78,26 @@ module internal ProcedureContract =
             | MethodOutputReference(m) ->
                 "Return" 
 
-    let private indexParameterValues (m : MethodInfo) (proxy : ProcedureCallProxyDescription) (values : obj[])  =
-        let methodParameterValues = m.GetParameters() |> Array.mapi (fun i p -> p.Name, values.[i]) |> ValueIndex.fromNamedItems
+    let private findMethodProxy (proxies : DataObjectProxy list) targetMethod =
+        let describeProxy m  =
+            proxies |> List.tryFind
+                (
+                    fun p -> match p.ProxyElement with                                
+                                | MemberElement(x) -> 
+                                    match x with
+                                    | MethodReference(x) ->
+                                        x.Subject.Element = m
+                                    | _ -> ArgumentException() |> raise
+                                | _ -> ArgumentException() |> raise) 
+
+
+        match targetMethod |> describeProxy with
+        | Some(x) -> x
+        | None -> NotImplementedException(sprintf "There is no implementation for the method %s" targetMethod.Name) |> raise  
+
+
+    let private getProcArgs (m : MethodInfo) (proxy : ProcedureProxyDescription) (methodArgs : obj list)  =
+        let methodParameterValues = m.GetParameters() |> Array.mapi (fun i p -> p.Name, methodArgs.[i]) |> ValueIndex.fromNamedItems
         [for p in proxy.Parameters do
             let key = p |> getMethodParameterName  |> NameKey
             match methodParameterValues |> ValueIndex.tryFindValue key  with
@@ -92,34 +105,30 @@ module internal ProcedureContract =
                 yield RoutineParameterValue(p.DataElement.Name, p.DataElement.Position, value)
             | None ->
                 ()
-        ] 
+        ]         
+    
+    let private getFuncArgs (m : MethodInfo) (proxy : TableFunctionProxyDescription) (methodArgs : obj list) =
+         methodArgs |> List.zip proxy.CallProxy.Parameters
+                    |> List.map (fun (param, value) -> 
+                                    RoutineParameterValue(param.DataElement.Name, param.DataElement.Position, value))
+   
        
     /// <summary>
     /// Creates function that will be invoked whenever a contracted method is called to execute a stored procedure
     /// </summary>
-    let private createInvoker<'TContract,'TConfig> =
-        let proxies = procproxies<'TContract> 
-        
-        let describeProxy m  =
-            match proxies |> List.tryFind
-                (
-                    fun p -> match p.ProxyElement with
-                                | MethodElement(x) -> x.Subject.Element = m
-                                | _ -> ArgumentException() |> raise) with
-            | Some(proxy) ->
-                match proxy with
-                | ProcedureProxy(x) -> x |> Some
-                | _ -> ArgumentException() |> raise
-            | None ->
-                None
-            
+    let private createRoutineInvoker<'TContract,'TConfig> =
+        let proxies = routineproxies<'TContract> 
+        let findProxy = findMethodProxy proxies
+                    
         fun (cs : string) (targetMethod : MethodInfo) (args : obj[]) ->
-            match targetMethod |> describeProxy with
-            | Some(proxy) ->
-                let routineParamValues =  
-                    args |> indexParameterValues targetMethod proxy
+
+            let proxy = targetMethod |> findProxy 
+            let args = args |> List.ofArray
+            match proxy with
+            | ProcedureProxy proxy ->
+                let procArgs = args |> getProcArgs targetMethod proxy
                 let results = 
-                    proxy.DataElement |> Routine.executeProcedure cs routineParamValues
+                    proxy.DataElement |> Routine.executeProcedure cs procArgs
                 let outputs = 
                     proxy.Parameters |> List.filter(fun x -> x.DataElement.Direction = ParameterDirection.Output)
                 
@@ -128,11 +137,15 @@ module internal ProcedureContract =
                 else if outputs.Length = 1 then
                     results |> ValueIndex.tryFindValue (NameKey(outputs.Head.DataElement.Name))
                 else
-                    NotSupportedException("Cannot yet support multiple output parameters") |> raise                    
-            | None ->
-                NotImplementedException(sprintf "There is no implementation for the method %s" targetMethod.Name) |> raise    
+                    NotSupportedException("Cannot yet support multiple output parameters") |> raise
+            | TableFunctionProxy proxy ->
+                let funcArgs = args |> getFuncArgs targetMethod proxy
+                let result = proxy.DataElement|> Routine.executeTableFunction cs funcArgs
+                result |> DataTable.toProxyValues proxy.ResultProxy.ProxyElement :> obj |> Some
+            | _ ->
+                NotSupportedException() |> raise
 
     let get<'TContract when 'TContract : not struct>(cs : string) =        
-        createInvoker<'TContract,string> |> DynamicContract.realize<'TContract,string> cs
+        createRoutineInvoker<'TContract,string> |> DynamicContract.realize<'TContract,string> cs
 
 

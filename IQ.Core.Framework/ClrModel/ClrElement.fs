@@ -16,12 +16,15 @@ module ClrElement =
     /// <param name="element">The potentially attributed element</param>
     let getAttribute<'T when 'T :> Attribute>(element : ClrElementReference) =
         match element with
-        | TypeElement(e) -> e |> ClrTypeReference.getAttribute<'T>
-        | PropertyElement(x) -> 
-            x.Property |> PropertyInfo.getAttribute<'T>
-        | MethodElement(x) -> 
-            x.Method |> MethodInfo.getAttribute<'T>
-        | MethodParameterElement(x) ->
+        | TypeElement(e) -> 
+            e |> ClrTypeReference.getAttribute<'T>
+        | MemberElement(e) ->
+            match e with
+            | MethodReference x -> 
+                x.Method |> MethodInfo.getAttribute<'T>
+            | PropertyReference x -> 
+                x.Property |> PropertyInfo.getAttribute<'T>
+        | MethodParameterReference(x) ->
             x.Parameter |> ParameterInfo.getAttribute
         | UnionCaseElement(x) -> 
             x.Case |> UnionCaseInfo.getAttribute
@@ -34,12 +37,10 @@ module ClrElement =
     let getName(element : ClrElementReference) =
         match element with
         | TypeElement(e) -> 
-            e |> ClrTypeReference.getName
-        | PropertyElement(x) -> 
+            e |> ClrTypeReference.getName        
+        | MemberElement(x) -> 
             x.Name
-        | MethodElement(x) -> 
-            x.Subject.Name
-        | MethodParameterElement(x) ->
+        | MethodParameterReference(x) ->
             x.Subject.Name
         | UnionCaseElement(x) -> 
             x.Name
@@ -56,11 +57,13 @@ module ClrElement =
         let declaringType = 
             match element with
             | TypeElement(e) -> e |> ClrTypeReference.getDeclaringType |> declarer
-            | PropertyElement(x) -> 
-                x.Property.DeclaringType |> declarer
-            | MethodElement(x) -> 
-                x.Method.DeclaringType |> declarer
-            | MethodParameterElement(x) ->
+            | MemberElement(e) ->
+                match e with
+                | PropertyReference(x) -> 
+                    x.Property.DeclaringType |> declarer
+                | MethodReference(x) -> 
+                    x.Method.DeclaringType |> declarer
+            | MethodParameterReference(x) ->
                 None
             | UnionCaseElement(x) -> 
                 x.Case.DeclaringType |> declarer
@@ -87,8 +90,8 @@ module ClrElement =
     /// <param name="element">The element whose declaring element should be returned</param>
     let getDeclaringElement(element : ClrElementReference) =
         match element with
-        | MethodParameterElement(x) ->
-            x.Method |>ClrType.referenceMethod 0 |> MethodElement |> Some
+        | MethodParameterReference(x) ->
+            x.Method |>ClrType.referenceMethod 0 |> MethodReference |> MemberElement |> Some
         | _ ->
             match element |> getDeclaringType with
             | Some(x) -> 

@@ -108,7 +108,7 @@ module ``Proxy Discovery`` =
     let ``Described [SqlTest].[pTable02Insert] procedure from proxy``() =
             
         let procName = thisMethod() |> ProxyTestCaseMethod.getDbObjectName
-        let proxies = procproxies<ISqlTestProcs>
+        let proxies = routineproxies<ISqlTestRoutines>
         let proxy = proxies |> List.find(fun x -> x.DataElement.Name = procName) 
         let proc = proxy.DataElement
 
@@ -172,7 +172,7 @@ module ``Proxy Discovery`` =
     let ``Described [SqlTest].[fTable04Before] table function from proxy``() =
         let dbElementName = thisMethod() |> ProxyTestCaseMethod.getDbObjectName
         dbElementName |> Claim.equal (DataObjectName("SqlTest", "fTable04Before"))
-        let methodref = match typeref<ISqlTestFunctions>  with
+        let methodref = match typeref<ISqlTestRoutines>  with
                           | InterfaceTypeReference(subject, members) ->
                             members |>  List.find(fun m -> m.Name.Text = dbElementName.LocalName)
                             |> fun x ->
@@ -183,7 +183,8 @@ module ``Proxy Discovery`` =
                           | _ ->
         
                             NotSupportedException() |> raise
-        let proxy = methodref |> MethodElement 
+        let proxy = methodref |> MethodReference
+                              |> MemberElement
                               |> DataProxyMetadata.describeTableFunctionProxy
                               |> DataObjectProxy.unwrapTableFunctionProxy
 

@@ -31,3 +31,29 @@ module ClrCollectionTest =
     let ``Referenced collection type``() =
         let ref1 = [1;2;3].GetType() |> ClrType.reference
         ref1.Type |> Claim.equal (typeof<list<int>>)
+
+    [<Test>]
+    let ``Created F# list via reflection``() =
+        let actual = [1 :> obj;2:> obj; 3:> obj]   
+                   |> ClrCollection.create ClrCollectionKind.FSharpList typeof<int> 
+                   :?> list<int>
+        let expect = [1; 2; 3;]
+        actual |> Claim.equal expect
+
+    [<Test>]
+    let ``Created array via reflection``() =
+        let actual = [1 :> obj;2:> obj; 3:> obj]   
+                   |> ClrCollection.create ClrCollectionKind.Array typeof<int> 
+                   :?> array<int>
+        let expect = [|1; 2; 3|]
+        actual |> Claim.equal expect
+
+    [<Test>]
+    let ``Created generic list via reflection``() =
+        let actual = [1 :> obj;2:> obj; 3:> obj]   
+                   |> ClrCollection.create ClrCollectionKind.GenericList typeof<int>
+                   :?> List<int>
+        let expect = List<int>([1;2;3])
+        actual.[0] |> Claim.equal expect.[0]
+        actual.[1] |> Claim.equal expect.[1]
+        actual.[2] |> Claim.equal expect.[2]

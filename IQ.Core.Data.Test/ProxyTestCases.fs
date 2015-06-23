@@ -18,12 +18,10 @@ module ProxyTestCases =
         StartDate : DateTime
         EndDate : DateTime        
     }
+        
 
-    /// <summary>
-    /// Defines stored procedure proxy contracts for testing purposes
-    /// </summary>
     [<Schema("SqlTest")>]
-    type ISqlTestProcs =
+    type ISqlTestRoutines =
         /// <summary>
         /// Inserts a record into the [SqlTest].[Table02] table, assigning the Col01 
         /// column the next value from the [SqlTest].[Table02Sequence] and returning it as 
@@ -51,16 +49,12 @@ module ProxyTestCases =
         [<Procedure>]
         abstract pTable04Insert:code : string->startDate : DateTime -> endDate : DateTime -> int
 
-    [<Schema("SqlTest")>]
-    type ISqlTestFunctions =
         [<TableFunction>]
         abstract fTable04Before: startDate:DateTime-> Table04FunctionResult list
-        
 
+        [<TableFunction("SqlTest", "fTable04Before")>]
+        abstract fTable04BeforeArray: startDate:DateTime-> Table04FunctionResult[]
 
-    type ISqlTestRoutines =
-        inherit ISqlTestProcs
-        inherit ISqlTestFunctions
 
     [<Description("SQL Test Table01")>]
     type Table01 = {
