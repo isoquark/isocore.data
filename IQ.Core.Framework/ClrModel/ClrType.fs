@@ -200,6 +200,18 @@ module ClrType =
         }
 
     /// <summary>
+    /// Creates a field reference
+    /// </summary>
+    /// <param name="pos">The ordinal position of the field relative to its declaration context</param>
+    /// <param name="f">The field to be referenced</param>
+    let internal referenceField pos (f : FieldInfo) =
+        {
+            Subject = ClrSubjectReference(f.ElementName, pos, f)
+            ValueType = f.FieldType|> getItemValueType
+            FieldType = f.FieldType
+        }
+
+    /// <summary>
     /// Creates a reference to a member
     /// </summary>
     /// <param name="pos">The position of the member</param>
@@ -207,9 +219,11 @@ module ClrType =
     let private referenceMember pos (m : MemberInfo) =
         match m with
         | :? MethodInfo as x ->
-            x |> referenceMethod pos |> MethodReference
+            x |> referenceMethod pos |> MethodMemberReference
         | :? PropertyInfo as x ->
-            x |> referenceProperty pos |> PropertyReference
+            x |> referenceProperty pos |> PropertyMemberReference |> DataMemberReference
+        | :? FieldInfo as x ->
+            x |> referenceField pos |> FieldMemberReference |> DataMemberReference
         | _ ->
             NotSupportedException() |> raise
 
@@ -500,6 +514,24 @@ module ClrTypeExtensions =
         member this.ValueType = this |> PropertyInfo.getValueType
 
 
+    module FieldInfo =
+        /// <summary>
+        /// Retrieves an attribute applied to a property, if present
+        /// </summary>
+        /// <param name="subject">The type to examine</param>
+        let getAttribute<'T when 'T :> Attribute>(subject : FieldInfo) = 
+            subject |> MemberInfo.getAttribute<'T>
+
+        /// <summary>
+        /// Gets the data type of the property, ignoring whether the property is optional
+        /// </summary>
+        /// <param name="f">The field</param>
+        let getValueType (f : FieldInfo) =
+            f.FieldType.ItemValueType
+
+    type FieldInfo
+    with
+        member this.ValueType = this |> FieldInfo.getValueType        
 
     /// <summary>
     /// Defines augmentations for the UnionCaseDescription type

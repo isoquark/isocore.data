@@ -20,10 +20,15 @@ module ClrElement =
             e |> ClrTypeReference.getAttribute<'T>
         | MemberElement(e) ->
             match e with
-            | MethodReference x -> 
+            | MethodMemberReference x -> 
                 x.Method |> MethodInfo.getAttribute<'T>
-            | PropertyReference x -> 
-                x.Property |> PropertyInfo.getAttribute<'T>
+            | DataMemberReference x ->
+                match x with
+                | PropertyMemberReference(p) -> 
+                    p.Property |> PropertyInfo.getAttribute<'T>
+                | FieldMemberReference(f) -> 
+                    f.Field |> FieldInfo.getAttribute<'T>
+
         | MethodParameterReference(x) ->
             x.Parameter |> ParameterInfo.getAttribute
         | UnionCaseElement(x) -> 
@@ -59,10 +64,15 @@ module ClrElement =
             | TypeElement(e) -> e |> ClrTypeReference.getDeclaringType |> declarer
             | MemberElement(e) ->
                 match e with
-                | PropertyReference(x) -> 
-                    x.Property.DeclaringType |> declarer
-                | MethodReference(x) -> 
+                | MethodMemberReference(x) -> 
                     x.Method.DeclaringType |> declarer
+                | DataMemberReference x ->
+                    match x with
+                    | PropertyMemberReference(p) -> 
+                        p.Property.DeclaringType |> declarer
+                    | FieldMemberReference(f) -> 
+                        f.Field.DeclaringType |> declarer
+
             | MethodParameterReference(x) ->
                 None
             | UnionCaseElement(x) -> 
@@ -91,7 +101,7 @@ module ClrElement =
     let getDeclaringElement(element : ClrElementReference) =
         match element with
         | MethodParameterReference(x) ->
-            x.Method |>ClrType.referenceMethod 0 |> MethodReference |> MemberElement |> Some
+            x.Method |>ClrType.referenceMethod 0 |> MethodMemberReference |> MemberElement |> Some
         | _ ->
             match element |> getDeclaringType with
             | Some(x) -> 

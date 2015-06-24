@@ -90,7 +90,7 @@ module internal Routine =
                     fun p -> match p.ProxyElement with                                
                                 | MemberElement(x) -> 
                                     match x with
-                                    | MethodReference(x) ->
+                                    | MethodMemberReference(x) ->
                                         x.Subject.Element = m
                                     | _ -> ArgumentException() |> raise
                                 | _ -> ArgumentException() |> raise) 

@@ -67,6 +67,10 @@ module ClrElementNameExtensions =
     with
         member this.ElementName = this.Name |> MemberElementName
 
+    type FieldInfo
+    with
+        member this.ElementName = this.Name |> MemberElementName
+
     type UnionCaseInfo
     with
         member this.ElementName = this.Name |> MemberElementName

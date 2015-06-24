@@ -204,9 +204,9 @@ module DataObjectProxy =
         | TabularProxy(proxy) -> 
             proxy.ProxyElement |> TypeElement
         | ProcedureProxy(proxy) -> 
-            proxy.ProxyElement |> MethodReference |> MemberElement
+            proxy.ProxyElement |> MethodMemberReference |> MemberElement
         | TableFunctionProxy(proxy) ->
-            proxy.CallProxy.ProxyElement |> MethodReference |> MemberElement
+            proxy.CallProxy.ProxyElement |> MethodMemberReference |> MemberElement
 
     let getDataElement (subject : DataObjectProxy) =
         match subject with

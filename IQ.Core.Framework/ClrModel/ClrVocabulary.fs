@@ -141,6 +141,28 @@ module ClrVocabulary =
         ValueType : Type    
     }
         
+    /// <summary>
+    /// References a field
+    /// </summary>
+    type ClrFieldReference = {
+        /// The CLR element being referenced
+        Subject : ClrSubjectReference<FieldInfo>
+
+        /// The CLR type of the field
+        FieldType : Type
+
+        /// If the type is of option type (or actually optional) then the enclosed type; otherwise, same as FieldType
+        ValueType : Type        
+    }
+
+    /// <summary>
+    /// References a data member (which by definition is a field or a property)
+    /// </summary>
+    type ClrDataMemberReference = 
+    /// References a field member
+    | FieldMemberReference of ClrFieldReference
+    /// References a property member
+    | PropertyMemberReference of ClrPropertyReference
 
     /// <summary>
     /// Describes a property
@@ -181,13 +203,8 @@ module ClrVocabulary =
     /// Represents a CLR member reference
     /// </summary>
     type ClrMemberReference =
-        | MethodReference of ClrMethodReference
-        | PropertyReference of ClrPropertyReference
-    with
-        member this.Name =
-            match this with
-            | MethodReference(x) -> x.Subject.Name
-            | PropertyReference(x) -> x.Subject.Name
+        | MethodMemberReference of ClrMethodReference
+        | DataMemberReference of ClrDataMemberReference
 
     type ClrTypeSubjectReference =
         {
@@ -270,9 +287,51 @@ module ClrAccess =
             ProtectedInternalAccess
         else
             NotSupportedException("Cannot deduce the access level of the method") |> raise
+
+
+    
+module ClrDataMemberReference =
+
+    let getName (mref : ClrDataMemberReference)    =
+        match mref with 
+        | FieldMemberReference(x) -> 
+            x.Subject.Name 
+        | PropertyMemberReference(x) -> 
+            x.Subject.Name
+    
+    let getMemberType (mref : ClrDataMemberReference) =
+        match mref with 
+        | FieldMemberReference(x) -> 
+            x.FieldType 
+        | PropertyMemberReference(x) 
+            -> x.PropertyType        
+
+    let getPosition (mref : ClrDataMemberReference) =
+        match mref with
+        | FieldMemberReference(x) -> 
+            x.Subject.Position
+        | PropertyMemberReference(x) -> 
+            x.Subject.Position
+
+module ClrMemberReference =
+    let getName (mref : ClrMemberReference) =
+        match mref with
+        | MethodMemberReference(x) -> x.Subject.Name
+        | DataMemberReference(x) -> x |> ClrDataMemberReference.getName
        
 [<AutoOpen>]
 module ClrVocabularyExtensions =
+    type ClrDataMemberReference
+    with
+        member this.Name = this |> ClrDataMemberReference.getName
+        member this.MemberType = this |> ClrDataMemberReference.getMemberType
+        member this.Position = this |> ClrDataMemberReference.getPosition
+
+    type ClrMemberReference
+    with
+        member this.Name = this |> ClrMemberReference.getName
+
+    
     type ClrPropertyDescription
     with
         /// <summary>
@@ -305,6 +364,13 @@ module ClrVocabularyExtensions =
         member this.Name = this.Subject.Name
         member this.Position = this.Subject.Position
         member this.Property = this.Subject.Element
+
+    type ClrFieldReference
+    with
+        member this.Name = this.Subject.Name
+        member this.Position = this.Subject.Position
+        member this.Field = this.Subject.Element
+        
 
     /// <summary>
     /// Defines augmentations for the <see cref="ClrMethodParameterReference"/> type

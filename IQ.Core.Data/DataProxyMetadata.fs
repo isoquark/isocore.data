@@ -49,7 +49,7 @@ module DataProxyMetadata =
             match proxyref with
             | MemberElement(x) ->
                 match x with
-                | PropertyReference(x) -> x.PropertyType
+                | DataMemberReference(x) -> x.MemberType
                 | _ -> NotSupportedException() |> raise                
             | MethodParameterReference(x) -> 
                 x.ParameterType
@@ -168,7 +168,7 @@ module DataProxyMetadata =
                     | Some(name) -> name
                     | None -> proxyref.Name.Text
                 Position = proxyref.Position |> defaultArg attrib.Position 
-                StorageType = proxyref |> PropertyReference |> MemberElement |> inferStorageType
+                StorageType = proxyref |> PropertyMemberReference |> DataMemberReference |> MemberElement |> inferStorageType
                 Nullable = proxyref.Property.PropertyType |> ClrOption.isOptionType
                 AutoValue = None
             }
@@ -177,7 +177,7 @@ module DataProxyMetadata =
             {
                 ColumnDescription.Name = proxyref.Name.Text
                 Position = proxyref.Position
-                StorageType = proxyref |> PropertyReference |> MemberElement |> inferStorageType
+                StorageType = proxyref |> PropertyMemberReference |> DataMemberReference |> MemberElement |> inferStorageType
                 Nullable = proxyref.Property.PropertyType |> ClrOption.isOptionType
                 AutoValue = None
             }
@@ -199,14 +199,20 @@ module DataProxyMetadata =
             | InterfaceTypeReference(subject, members) ->
                 members |> List.map(fun m -> 
                     match m with
-                    | PropertyReference(p) -> p
-                    | _ -> NotSupportedException() |> raise
+                    | DataMemberReference(m) -> 
+                        match m with
+                        | PropertyMemberReference(p) -> p   
+                        | _ -> nosupport()                     
+                    | _ -> nosupport()
                 )
             | ClassTypeReference(subject, members) ->
                 members |> List.map(fun m -> 
                     match m with
-                    | PropertyReference(p) -> p
-                    | _ -> NotSupportedException() |> raise
+                    | DataMemberReference(m) -> 
+                        match m with
+                        | PropertyMemberReference(p) -> p   
+                        | _ -> nosupport()                     
+                    | _ -> nosupport()
                 )
             | UnionTypeReference(subject, cases) ->
                 if cases.Length = 1 then
@@ -308,7 +314,7 @@ module DataProxyMetadata =
         match proxyref with
         | MemberElement(m) -> 
             match m with
-            | MethodReference(m) ->
+            | MethodMemberReference(m) ->
                 let parameters = 
                     [for p in m.Parameters do
                         yield p |> MethodInputReference
@@ -346,7 +352,7 @@ module DataProxyMetadata =
             match proxyref with
             | MemberElement(m) -> 
                 match m with
-                | MethodReference(m) ->
+                | MethodMemberReference(m) ->
                     m.Parameters |> List.map MethodInputReference |> List.map describeParameterProxy, 
                     (match m.Return.ReturnType with
                     | Some(t) ->
@@ -372,7 +378,7 @@ module DataProxyMetadata =
         match proxyref with
         | MemberElement(x) ->
                 match x with
-                | MethodReference(m) ->
+                | MethodMemberReference(m) ->
                     if m.Method |> MethodInfo.hasAttribute<ProcedureAttribute> then
                         proxyref |> describeProcedureProxy
                     else if m.Method |> MethodInfo.hasAttribute<TableFunctionAttribute> then
@@ -386,11 +392,11 @@ module DataProxyMetadata =
         | InterfaceTypeReference(subject, members) ->
             [for m in members do
                 match m with
-                | MethodReference(m) ->
+                | MethodMemberReference(m) ->
                     if m.Method |> MethodInfo.hasAttribute<ProcedureAttribute> then
-                        yield m |> MethodReference |> MemberElement |> describeProcedureProxy
+                        yield m |> MethodMemberReference |> MemberElement |> describeProcedureProxy
                     else if m.Method |> MethodInfo.hasAttribute<TableFunctionAttribute> then
-                        yield m |> MethodReference |> MemberElement |> describeTableFunctionProxy
+                        yield m |> MethodMemberReference |> MemberElement |> describeTableFunctionProxy
                 | _ ->
                     NotSupportedException() |> raise
             ]

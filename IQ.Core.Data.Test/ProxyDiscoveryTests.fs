@@ -177,13 +177,13 @@ module ``Proxy Discovery`` =
                             members |>  List.find(fun m -> m.Name.Text = dbElementName.LocalName)
                             |> fun x ->
                                  match x with
-                                 |MethodReference(y) -> y
+                                 |MethodMemberReference(y) -> y
                                  |_ ->
                                     failwith "Not a method"
                           | _ ->
         
                             NotSupportedException() |> raise
-        let proxy = methodref |> MethodReference
+        let proxy = methodref |> MethodMemberReference
                               |> MemberElement
                               |> DataProxyMetadata.describeTableFunctionProxy
                               |> DataObjectProxy.unwrapTableFunctionProxy
