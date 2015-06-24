@@ -20,7 +20,7 @@ module DataStorageTypeVocabulary =
     /// <summary>
     /// Defines the literals that specify the semantic names for the StorageType cases
     /// </summary>
-    module StorageTypeNames =
+    module internal StorageTypeNames =
         [<Literal>]
         let BitStorageName = "Bit"
         [<Literal>]
@@ -67,6 +67,8 @@ module DataStorageTypeVocabulary =
         let DateTimeOffsetStorageName = "DateTimeOffset"
         [<Literal>]
         let TimeOfDayStorageName = "TimeOfDay"
+        [<Literal>]        
+        let TimespanStorageName = "Timespan"
         [<Literal>]
         let DateStorageName = "Date"
         [<Literal>]
@@ -121,6 +123,7 @@ module DataStorageTypeVocabulary =
         | DateTimeStorage of precision : uint8
         | DateTimeOffsetStorage
         | TimeOfDayStorage
+        | TimespanStorage 
         | DateStorage
         | Float32Storage
         | Float64Storage
@@ -131,7 +134,7 @@ module DataStorageTypeVocabulary =
         | VariantStorage
         | CustomTableStorage of name : DataObjectName
         | CustomObjectStorage of name : DataObjectName * clrType : Type
-        | CustomPrimitiveStorage of name : DataObjectName 
+        | CustomPrimitiveStorage of name : DataObjectName
     with        
         /// <summary>
         /// Renders a faithful representation of an instance as text
@@ -166,6 +169,7 @@ module DataStorageTypeVocabulary =
             | DateTimeOffsetStorage -> DateTimeOffsetStorageName
             | TimeOfDayStorage -> TimeOfDayStorageName
             | DateStorage -> DateStorageName
+            | TimespanStorage -> TimespanStorageName
             
             | Float32Storage -> Float32StorageName
             | Float64Storage -> Float64StorageName
@@ -231,6 +235,7 @@ module StorageType =
             | DateTimeOffsetStorage -> StorageKind.DateTimeOffset
             | TimeOfDayStorage -> StorageKind.TimeOfDay
             | DateStorage -> StorageKind.Date
+            | TimespanStorage -> StorageKind.Timespan
             
             | Float32Storage -> StorageKind.Float32
             | Float64Storage -> StorageKind.Float64
@@ -273,7 +278,8 @@ module StorageType =
             | DateTimeOffsetStorage -> SqlDbType.DateTimeOffset
             | TimeOfDayStorage -> SqlDbType.Time
             | DateStorage -> SqlDbType.Date
-            
+            | TimespanStorage -> SqlDbType.BigInt
+
             | Float32Storage -> SqlDbType.Real
             | Float64Storage -> SqlDbType.Float
             | DecimalStorage(precision,scale) -> SqlDbType.Decimal
@@ -285,64 +291,7 @@ module StorageType =
             | CustomObjectStorage(name,t) -> SqlDbType.VarBinary 
             | CustomPrimitiveStorage(name) -> SqlDbType.Udt
                                     
-        
-        /// <summary>
-        /// Infers the storage type from a supplied attribute
-        /// </summary>
-        /// <param name="attrib">The attribute that describes the type of storage</param>
-        let fromAttribute (attrib : StorageTypeAttribute)=
-            match attrib.StorageKind with
-            | StorageKind.Bit ->BitStorage
-            | StorageKind.UInt8 -> UInt8Storage
-            | StorageKind.UInt16 -> UInt16Storage
-            | StorageKind.UInt32 -> UInt32Storage
-            | StorageKind.UInt64 -> UInt64Storage
-            | StorageKind.Int8 -> Int8Storage
-            | StorageKind.Int16 -> Int16Storage
-            | StorageKind.Int32 -> Int32Storage
-            | StorageKind.Int64 -> Int64Storage
-            | StorageKind.Float32 -> Float32Storage
-            | StorageKind.Float64 -> Float64Storage
-            | StorageKind.Money -> MoneyStorage
-            | StorageKind.Guid -> GuidStorage
-            | StorageKind.AnsiTextMax -> AnsiTextMaxStorage
-            | StorageKind.DateTime32 -> DateTime32Storage
-            | StorageKind.DateTime64 -> DateTime64Storage
-            | StorageKind.DateTimeOffset -> DateTimeOffsetStorage
-            | StorageKind.TimeOfDay -> TimeOfDayStorage
-            | StorageKind.Variant -> VariantStorage
-            | StorageKind.UnicodeTextMax -> UnicodeTextMaxStorage
-            | StorageKind.BinaryFixed -> 
-                BinaryFixedStorage( defaultArg attrib.Length StorageKind.BinaryFixed.DefaultLength)
-            | StorageKind.BinaryVariable -> 
-                BinaryVariableStorage (defaultArg attrib.Length StorageKind.BinaryVariable.DefaultLength)
-            | StorageKind.BinaryMax -> BinaryMaxStorage
-            | StorageKind.AnsiTextFixed -> 
-                AnsiTextFixedStorage(defaultArg attrib.Length StorageKind.AnsiTextFixed.DefaultLength)
-            | StorageKind.AnsiTextVariable -> 
-                AnsiTextVariableStorage(defaultArg attrib.Length StorageKind.AnsiTextVariable.DefaultLength)
-            | StorageKind.UnicodeTextFixed -> 
-                UnicodeTextFixedStorage(defaultArg attrib.Length StorageKind.UnicodeTextFixed.DefaultLength)
-            | StorageKind.UnicodeTextVariable -> 
-                UnicodeTextVariableStorage(defaultArg attrib.Length StorageKind.UnicodeTextVariable.DefaultLength)
-            | StorageKind.DateTime -> 
-                DateTimeStorage(defaultArg attrib.Precision StorageKind.DateTime.DefaultPrecision)  
-            | StorageKind.Date -> DateStorage
-            | StorageKind.Decimal -> 
-                DecimalStorage(
-                    defaultArg attrib.Precision StorageKind.Decimal.DefaultPrecision, 
-                    defaultArg attrib.Scale StorageKind.Decimal.DefaultScale)
-            | StorageKind.Xml -> XmlStorage("")
-            | StorageKind.CustomTable -> 
-                CustomTableStorage(attrib.CustomTypeName |> Option.get)
-            | StorageKind.CustomPrimitive -> 
-                CustomPrimitiveStorage(attrib.CustomTypeName |> Option.get)
-            | StorageKind.CustomObject | StorageKind.Geography | StorageKind.Geometry | StorageKind.Hierarchy ->          
-                CustomObjectStorage(attrib.CustomTypeName |> Option.get, attrib.ClrType |> Option.get)
-            | _ ->
-                NotSupportedException(sprintf "The storage kind %A is not recognized" attrib.StorageKind) |> raise
-            
-
+                    
         /// <summary>
         /// Parses the semantic representation of a StorageType
         /// </summary>

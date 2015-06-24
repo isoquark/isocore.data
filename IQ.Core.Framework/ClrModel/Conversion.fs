@@ -19,21 +19,21 @@ module Converter =
             value
         else
             let valueType = dstType.ItemValueType
-            if dstType |> ClrOption.isOptionType then
-                if value |> ClrOption.isOptionValue then
+            if dstType |> Option.isOptionType then
+                if value |> Option.isOptionValue then
                     //Convert an option value to an option type
-                    Convert.ChangeType(value |> ClrOption.unwrapValue |> Option.get, valueType) |> ClrOption.makeSome
+                    Convert.ChangeType(value |> Option.unwrapValue |> Option.get, valueType) |> Option.makeSome
                 else
                     //Convert an non-option value to an option type; note though, special
                     //handling is required for DBNull
                     if value.GetType() = typeof<DBNull> then
-                        dstType |> ClrOption.makeNone
+                        dstType |> Option.makeNone
                     else
-                        Convert.ChangeType(value, valueType) |> ClrOption.makeSome
+                        Convert.ChangeType(value, valueType) |> Option.makeSome
             else
-                if value |> ClrOption.isOptionValue then
+                if value |> Option.isOptionValue then
                     //Convert an option value to a non-option type
-                    Convert.ChangeType(value |> ClrOption.unwrapValue |> Option.get, valueType)
+                    Convert.ChangeType(value |> Option.unwrapValue |> Option.get, valueType)
                 else
                    //Convert a non-option value to a non-option type
                     Convert.ChangeType(value, valueType)

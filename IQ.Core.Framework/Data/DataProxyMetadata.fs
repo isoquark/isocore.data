@@ -17,7 +17,7 @@ type DescriptionAttribute = System.ComponentModel.DescriptionAttribute
 /// </summary>
 module DataProxyMetadata =    
     [<Literal>]
-    let private DefaultClrTypeMapResource = "Resources/DefaultClrStorageTypeMap.csv"
+    let private DefaultClrTypeMapResource = "Data/Resources/DefaultClrStorageTypeMap.csv"
     
     type private DefaultClrTypeMap = CsvProvider<DefaultClrTypeMapResource, Separators="|">
     
@@ -57,9 +57,6 @@ module DataProxyMetadata =
             | _ -> NotSupportedException() |> raise
         valueType |> inferStorageTypeFromClrType
         
-    let private inferStorageTypeFromAttribute (attrib : StorageTypeAttribute) =
-        attrib |> StorageType.fromAttribute
-
     /// <summary>
     /// Infers a <see cref"StorageType"/> from a CLR element
     /// </summary>
@@ -67,7 +64,7 @@ module DataProxyMetadata =
     let inferStorageType(proxyref : ClrElementReference) =
         match proxyref |> ClrElement.getAttribute<StorageTypeAttribute> with
         | Some(attrib) -> 
-            attrib |> inferStorageTypeFromAttribute
+            attrib.StorageType
         | None ->            
             proxyref |> inferStorageTypeFromClrElement                                             
 
@@ -168,7 +165,7 @@ module DataProxyMetadata =
                     | None -> proxyref.Name.Text
                 Position = proxyref.Position |> defaultArg attrib.Position 
                 StorageType = proxyref |> PropertyMemberReference |> DataMemberReference |> MemberElement |> inferStorageType
-                Nullable = proxyref.Property.PropertyType |> ClrOption.isOptionType
+                Nullable = proxyref.Property.PropertyType |> Option.isOptionType
                 AutoValue = None
             }
 
@@ -177,7 +174,7 @@ module DataProxyMetadata =
                 ColumnDescription.Name = proxyref.Name.Text
                 Position = proxyref.Position
                 StorageType = proxyref |> PropertyMemberReference |> DataMemberReference |> MemberElement |> inferStorageType
-                Nullable = proxyref.Property.PropertyType |> ClrOption.isOptionType
+                Nullable = proxyref.Property.PropertyType |> Option.isOptionType
                 AutoValue = None
             }
 
@@ -272,7 +269,7 @@ module DataProxyMetadata =
     let describeReturnParameter(proxyref : ClrMethodReturnReference) =
         let storageType = match proxyref.Method |> MethodInfo.getReturnAttribute<StorageTypeAttribute> with
                                 | Some(attrib) -> 
-                                    attrib |> inferStorageTypeFromAttribute
+                                    attrib.StorageType
                                 | None -> 
                                     proxyref.ReturnType |> Option.get |> inferStorageTypeFromClrType
         match proxyref.Method |> MethodInfo.getReturnAttribute<RoutineParameterAttribute> with            

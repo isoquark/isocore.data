@@ -11,7 +11,7 @@ open System.Text.RegularExpressions
 [<AutoOpen>]
 module DataObjectNameVocabulary =     
     /// <summary>
-    /// Responsible for identifying a data object within the scope of some catalog
+    /// Responsible for identifying a data object within the scope of some container
     /// </summary>
     [<DebuggerDisplay(DebuggerDisplayDefault)>]
     type DataObjectName = DataObjectName of schemaName : string * localName : string

@@ -8,8 +8,8 @@ module internal DataTypeConverter =
     let private stripOption (o : obj) =
         if o = null then
             o
-        else if o |> ClrOption.isOptionValue then
-            match o |> ClrOption.unwrapValue with
+        else if o |> Option.isOptionValue then
+            match o |> Option.unwrapValue with
             | Some(x) -> x 
             | None -> DBNull.Value :> obj
         else
@@ -45,6 +45,7 @@ module internal DataTypeConverter =
         | DateTimeOffsetStorage -> typeof<DateTimeOffset>
         | TimeOfDayStorage -> typeof<TimeSpan>
         | DateStorage -> typeof<DateTime>
+        | TimespanStorage -> typeof<int64>
             
         | Float32Storage -> typeof<float32>
         | Float64Storage -> typeof<float>
@@ -56,6 +57,12 @@ module internal DataTypeConverter =
         | CustomTableStorage(name) -> typeof<obj>
         | CustomObjectStorage(name,t) -> typeof<obj>
         | CustomPrimitiveStorage(name) -> typeof<obj>
+
+    let private timespanToTicks (ts : TimeSpan) =
+        ts.Ticks
+
+    let private ticksToTimespan (ticks : int64) =
+        TimeSpan.FromTicks
 
     let toClrTransportValue storageType  (value : obj) =
         let value = value |> stripOption

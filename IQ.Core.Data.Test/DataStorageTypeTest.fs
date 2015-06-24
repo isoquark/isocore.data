@@ -28,7 +28,7 @@ module ``DataStorageType Test`` =
         BinaryMaxStorage |> StorageType.toSemanticString |> Claim.equal "BinaryMax"
     
     let private verifyAttribute storageTypeExpect (attribute : StorageTypeAttribute) =
-        attribute |> StorageType.fromAttribute |> Claim.equal storageTypeExpect
+        attribute.StorageType |> Claim.equal storageTypeExpect
 
 
     [<Test>]
