@@ -4,6 +4,7 @@ open System
 //open System.ComponentModel
 open System.Reflection
 open System.Data
+open System.Text.RegularExpressions
 
 open FSharp.Data
 
@@ -130,10 +131,8 @@ module DataProxyMetadata =
                     n |> Txt.rightOfLast "."
                       |> getInnerName
                 | AssemblyQualifiedTypeName(n) ->
-                        n   |> Txt.matchRegexGroups ["TypeName"]  Txt.StockRegularExpressions.AssemblyQualifiedTypeName
-                            |> fun m -> m.["TypeName"]
-                            |> Txt.rightOfLast "."
-                            |> getInnerName
+                    AssemblyQualifiedTypeNameRegex().Match(n).TypeName.Value
+                    |> Txt.rightOfLast "." |> getInnerName
                     
             | AssemblyElementName(n) ->
                 NotSupportedException() |> raise

@@ -124,7 +124,6 @@ module ProxyTestCases =
 
     module ProxyTestCaseMethod =
         let getDbObjectName (testMethod : MethodBase) =
-            let values = testMethod.Name 
-                       |> Txt.betweenMarkers "[" "]" true 
-                       |> Txt.matchRegexGroups ["Schema"; "Name"] Txt.StockRegularExpressions.QualifiedDataObjectName
-            DataObjectName(values.["Schema"], values.["Name"])
+            let text = testMethod.Name |> Txt.betweenMarkers "[" "]" true 
+            let m = QualifiedDataObjectNameRegex().Match(text)
+            DataObjectName(m.Schema.Value, m.Name.Value)

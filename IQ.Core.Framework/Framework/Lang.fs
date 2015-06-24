@@ -107,4 +107,14 @@ module Lang =
         | BoundedRange of min : uint32 * max : uint32
             
         
+    /// <summary>
+    /// Specifies a concrete example of a regular expression
+    /// </summary>
+    type RegexExampleAttribute(text) =
+        inherit Attribute()
+        
+        /// <summary>
+        /// Gets the example text
+        /// </summary>
+        member this.Text : string = text    
         

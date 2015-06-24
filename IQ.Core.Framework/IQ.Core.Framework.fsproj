@@ -63,7 +63,9 @@
   </Target>
   <ItemGroup>
     <None Include="packages.config" />
+    <Content Include="app.config" />
     <Compile Include="Framework\Lang.fs" />
+    <Compile Include="Framework\Regex.fs" />
     <Compile Include="Framework\Txt.fs" />
     <Compile Include="Framework\Configuration.fs" />
     <Compile Include="Framework\ConnectionString.fs" />
@@ -93,6 +95,10 @@
     </Reference>
     <Reference Include="FSharp.Core">
       <HintPath>..\packages\FSharp.Core.3.1.2.1\lib\net40\FSharp.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FSharp.Text.RegexProvider">
+      <HintPath>..\packages\FSharp.Text.RegexProvider.0.0.7\lib\net40\FSharp.Text.RegexProvider.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="MathNet.Numerics">

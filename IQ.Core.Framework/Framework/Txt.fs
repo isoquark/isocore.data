@@ -4,44 +4,16 @@ open System
 open System.Text
 open System.Text.RegularExpressions
 
+open FSharp.Text.RegexProvider
 
+
+
+    
 /// <summary>
 /// Defines utility operations for working with text
 /// </summary>
 module Txt =
-    
-    /// <summary>
-    /// Specifies a concrete example of a regular expression
-    /// </summary>
-    type internal RegexExampleAttribute(text) =
-        inherit Attribute()
-        
-        /// <summary>
-        /// Gets the example text
-        /// </summary>
-        member this.Text : string = text    
-
-    /// <summary>
-    /// Records generally-applicable regular expressions
-    /// </summary>
-    module StockRegularExpressions =
-        /// <summary>
-        /// Regular expression for an assembly-qualified type name
-        /// </summary>
-        [<Literal>]
-        [<RegexExample("System.Xml.NameTable, System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")>]
-        let AssemblyQualifiedTypeName = @"(?<TypeName>[^,]*),[\s?](?<ShortAssemblyName>[^,]*),[\s?]Version=(?<Version>[^,]*),[\s?]Culture=(?<Culture>[^,]*),[\s?]PublicKeyToken=(?<PublicKeyToken>(.)*)"
-        /// <summary>
-        /// Regular expression for a full assembly name
-        /// </summary>
-        [<Literal>]
-        [<RegexExample("System.Xml, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")>]
-        let FullAssemblyName = @"[(?<ShortAssemblyName>[^,]*),[\s?]Version=(?<Version>[^,]*),[\s?]Culture=(?<Culture>[^,]*),[\s?]PublicKeyToken=(?<PublicKeyToken>(.)*)"
-
-        [<Literal>]
-        [<RegexExample("[CatalogName].[SchemaName].[ObjectName]")>]
-        let QualifiedDataObjectName = @"(((\[?(?<Catalog>[\w]+)\]?)?\.)?(\[?(?<Schema>[\w]+)\]?)?\.)?\[?(?<Name>[\w]+)\]?"
-    
+            
     /// <summary>
     /// Finds all text to the right of the first occurrence of a specified marker; if no marker is found, returns the empty string
     /// </summary>
@@ -147,7 +119,7 @@ module Txt =
     /// <param name="expression">The regular expression</param>
     /// <param name="text">The text to be searched/matched</param>
     let tryMatchGroups (groupNames : string list)  (expression : string) text =
-        let m = Regex(expression).Match(text)
+        let m = System.Text.RegularExpressions.Regex(expression).Match(text)
         if m.Success |> not then
             None
         else            
@@ -168,7 +140,7 @@ module Txt =
     /// <param name="text">The text to be searched/matched</param>
     let matchRegexGroups (groupNames : string list)  (expression : string) text =
         //TODO: The regular expression could be compiled/cached to improve performance
-        let m = Regex(expression).Match(text)
+        let m = System.Text.RegularExpressions.Regex(expression).Match(text)
         if m.Success |> not then
             ArgumentException() |> raise
             
