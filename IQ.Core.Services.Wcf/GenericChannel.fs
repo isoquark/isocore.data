@@ -7,19 +7,16 @@ open System.Threading.Tasks;
 
 module Channel =
    
-    type internal GenericChannel<'T> (endpointName0 : string option) =
-        //TODO: Why does this exist? 
-        let mutable endpointName = endpointName0
-     
+    type internal GenericChannel<'T> (endpointName : string option) =
+         
         let msgFct e t = 
             let msgRoot = sprintf "Failed to create channel factory for %sand serviceType %s"
             match e with
                 | Some(x) -> msgRoot (sprintf "endpoint %s" x) t
                 | _ -> msgRoot "" t
 
-        //TODO: Why is this mutable?
         //The channel factory instance whose lifcycle coincides with that of the containing class instance
-        let mutable fact =
+        let fact =
                 try
                     match endpointName with
                         | Some(x) -> new ChannelFactory<'T>(x)
