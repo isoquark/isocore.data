@@ -85,11 +85,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Xml" />
-    <ProjectReference Include="..\IQ.Core.Data\IQ.Core.Data.fsproj">
-      <Name>IQ.Core.Data</Name>
-      <Project>{e87b2131-39fc-4103-a90f-0fbb5a5b74ab}</Project>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Framework\IQ.Core.Framework.fsproj">
       <Name>IQ.Core.Framework</Name>
       <Project>{8e2497e0-941b-4ca7-ab78-4ca15291c56a}</Project>
