@@ -15,7 +15,7 @@ module internal DataTypeConverter =
         else
              o
     
-    let toClrStorageType storageType =
+    let toClrTransportType storageType =
         match storageType with
         | BitStorage -> typeof<bool>
         | UInt8Storage -> typeof<uint8>
@@ -57,12 +57,12 @@ module internal DataTypeConverter =
         | CustomObjectStorage(name,t) -> typeof<obj>
         | CustomPrimitiveStorage(name) -> typeof<obj>
 
-    let toClrStorageValue storageType  (value : obj) =
+    let toClrTransportValue storageType  (value : obj) =
         let value = value |> stripOption
         if value = null then
             DBNull.Value :> obj
         else
-            let clrType = storageType |> toClrStorageType
+            let clrType = storageType |> toClrTransportType
             value |> Converter.convert clrType
     
             

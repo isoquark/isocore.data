@@ -228,6 +228,8 @@ module DataAttributes =
             ColumnAttribute(name, position, UnspecifiedAutoValue)                
         new() =
             ColumnAttribute(UnspecifiedName, UnspecifiedPosition, UnspecifiedAutoValue)
+        new(autoValueKind) =
+            ColumnAttribute(UnspecifiedName, UnspecifiedPosition, autoValueKind)
 
         /// Indicates the name of the represented column if specified
         member this.Name = if String.IsNullOrWhiteSpace(name) then None else Some(name)

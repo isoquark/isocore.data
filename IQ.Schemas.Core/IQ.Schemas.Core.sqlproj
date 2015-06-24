@@ -88,6 +88,7 @@
     <Build Include="Metadata\Views\vUserProcedure.sql" />
     <Build Include="Metadata\Views\vProcedure.sql" />
     <Build Include="Metadata\Views\vProcedureParameter.sql" />
+    <Build Include="Metadata\Views\vSequence.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">

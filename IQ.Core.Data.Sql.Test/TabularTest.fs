@@ -42,6 +42,15 @@ module ``Tabular Query and Manipulation`` =
         money.Nullable |> Claim.isTrue 
         money.IsUserDefined |> Claim.isFalse      
 
+    let private verifyBulkInsert<'T>(input : 'T list) (sortBy: 'T->IComparable) =
+        tabularproxy<'T>.DataElement.Name |> TruncateTable |> store.ExecuteCommand
+        store.Get<'T>() |> Claim.seqIsEmpty
+        input |> store.BulkInsert
+        let output = store.Get<'T>() |> List.sortBy sortBy
+        output |> Claim.equal input
+        
+
+
     [<Test>]
     let ``Bulk inserted data into [SqlTest].[Table05]``() =
         let input = [
@@ -49,11 +58,8 @@ module ``Tabular Query and Manipulation`` =
             {Table05.Col01 = 2; Col02 = 6uy; Col03 = 7s; Col04=8L}
             {Table05.Col01 = 3; Col02 = 9uy; Col03 = 10s; Col04=11L}
         ]
-        tabularproxy<Table05>.DataElement.Name |> TruncateTable |> store.ExecuteCommand
-        store.Get<Table05>() |> Claim.seqIsEmpty
-        input |> store.BulkInsert
-        let output = store.Get<Table05>() |> List.sortBy(fun x -> x.Col01)
-        output |> Claim.equal input
+        verifyBulkInsert input (fun x -> x.Col01 :> IComparable)
+   
 
     [<Test>]
     let ``Bulk inserted data into [SqlTest].[Table06]``() =
@@ -62,8 +68,16 @@ module ``Tabular Query and Manipulation`` =
             {Table06.Col01 = 2; Col02 = Some 6uy; Col03 = Some 7s; Col04=8L}
             {Table06.Col01 = 3; Col02 = Some 9uy; Col03 = Some 10s; Col04=11L}
         ]
-        tabularproxy<Table06>.DataElement.Name |> TruncateTable |> store.ExecuteCommand
-        store.Get<Table06>() |> Claim.seqIsEmpty
-        input |> store.BulkInsert
-        let output = store.Get<Table06>() |> List.sortBy(fun x -> x.Col01)
-        output |> Claim.equal input
+        verifyBulkInsert input (fun x -> x.Col01 :> IComparable)
+
+
+    [<Test>]
+    let ``Bulk inserted data into [SqlTest].[Table07]``() =
+        let input = [
+            {Table07.Col01 = Some(1); Col02 = "ABC"; Col03 = "DEF"}
+            {Table07.Col01 = Some(2); Col02 = "GHI"; Col03 = "JKL"}
+            {Table07.Col01 = Some(3); Col02 = "MNO"; Col03 = "PQR"}
+        ]
+        verifyBulkInsert input (fun x -> x.Col02 :> IComparable)
+
+    

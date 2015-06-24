@@ -115,6 +115,13 @@ module ProxyTestCases =
             Col04 : int64
         }
 
+        type Table07 = {
+            [<Column(AutoValueKind.Identity)>]
+            Col01 : int32 option
+            Col02 : string
+            Col03 : string
+        }
+
     module ProxyTestCaseMethod =
         let getDbObjectName (testMethod : MethodBase) =
             let values = testMethod.Name 
