@@ -1100,24 +1100,26 @@ module ClrElement =
     let getAttributesT<'T when 'T :> Attribute>(subject : MemberInfo) =
         [for a in Attribute.GetCustomAttributes(subject, typeof<'T>) -> a :?> 'T]
 
-
-//    let rec walk (handler:ClrElement->unit) element =
-//        match element with
-//        | MemberElement(x) -> 
-//            match x with
-//            | DataMemberElement(x) -> 
-//                element |> handler
-//            | MethodElement(x) ->
-//                element |> handler
-//        | TypeElement(x) -> 
-//            ()
-//        | AssemblyElement(x) ->
-//            ()
-//        | ParameterElement(x) ->
-//            ()
-//        | UnionCaseElement(x) ->
-//            ()
-
+    /// <summary>
+    /// Recursively traverses the element hierarchy graph
+    /// </summary>
+    /// <param name="handler">The handler that will be invoked for each element</param>
+    /// <param name="element"></param>
+    let rec walk (handler:ClrElement->unit) element =
+        element |> handler
+        let children = 
+            match element with
+            | MemberElement(x,children) -> 
+                children 
+            | TypeElement(x,children) -> 
+                children
+            | AssemblyElement(x,children) ->
+                children
+            | ParameterElement(x) ->
+                []
+            | UnionCaseElement(x,children) ->
+                children 
+        children |> List.iter (fun child -> child |> walk handler)
 
     
 

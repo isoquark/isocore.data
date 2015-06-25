@@ -20,6 +20,7 @@ module ClrElementTestTypes =
     }
 
     let FieldA1Name = propname<@fun (x : RecordA) -> x.FieldA1 @>
+    let FieldA2Name = propname<@fun (x : RecordA) -> x.FieldA2 @>
     
     
     type ClassA() =
@@ -69,26 +70,23 @@ module ClrAssemblyTest =
         clrtype<RecordA> |> Claim.inList types
         clrtype<ClassA> |> Claim.inList types
 
-//    [<Test>]
-//    let ``Discovered attributed types within an assembly``() =
-//        ()
-
     [<Test>]
     let ``Discovered type child elements``() =
         let t = clrtype<ClassA>
         let children = t.Element |> ClrElement.getChildren 
-        ()
-        //children |> Claim.listHasLength 3
+        children |> Claim.listHasLength 6
     
-
-
-//[<TestContainer>]
-//module ClrTypeTest =
+    [<Test>]
+    let ``Traversed CLR element hierarchy``() =
+        let elements = ResizeArray<ClrElement>()
+        let handler (e : ClrElement) =
+            e |> elements.Add
+        clrtype<RecordA>.Element |> ClrElement.walk handler
+        elements |> Seq.tryFind(fun x -> x.Name = FieldA1Name) |> Claim.isSome
+        elements |> Seq.tryFind(fun x -> x.Name = FieldA2Name) |> Claim.isSome
+        
 //    [<Test>]
-//    let ``Discovered type members``() =
-//        let a = clrtype<RecordA>
-//        let aMembers = a |> ClrType.getMembers
-//        FieldA1Name |> Claim.inList (aMembers |> List.map(fun x -> x.ElementName))
-        
-        
-    
+//    let ``Discovered attributed types within an assembly``() =
+//        ()
+
+
