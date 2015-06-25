@@ -5,8 +5,6 @@ VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Services.Wcf", "IQ.Core.Services.Wcf\IQ.Core.Services.Wcf.fsproj", "{C7CD45A1-E3CF-45C0-A191-2FDA743B9FE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQ.Core.Services.Wcf.Tests", "IQ.Core.Services.Wcf.Tests\IQ.Core.Services.Wcf.Tests.csproj", "{FF812A65-1C24-4D0D-BF26-BD4819285875}"
-EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Services.Wcf.SampleService", "IQ.Core.Services.Wcf.SampleService\IQ.Core.Services.Wcf.SampleService.fsproj", "{36DFE5D9-35B7-4062-97F1-D73029DEE23E}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Services.Wcf.Tests.ConsoleHost", "IQ.Core.Services.Wcf.Tests.ConsoleHost\IQ.Core.Services.Wcf.Tests.ConsoleHost.fsproj", "{D3C68C65-FE0D-47B2-9B0A-ED6A8B19CB36}"
@@ -21,10 +19,6 @@ Global
 		{C7CD45A1-E3CF-45C0-A191-2FDA743B9FE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7CD45A1-E3CF-45C0-A191-2FDA743B9FE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7CD45A1-E3CF-45C0-A191-2FDA743B9FE6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{FF812A65-1C24-4D0D-BF26-BD4819285875}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{FF812A65-1C24-4D0D-BF26-BD4819285875}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{FF812A65-1C24-4D0D-BF26-BD4819285875}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{FF812A65-1C24-4D0D-BF26-BD4819285875}.Release|Any CPU.Build.0 = Release|Any CPU
 		{36DFE5D9-35B7-4062-97F1-D73029DEE23E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{36DFE5D9-35B7-4062-97F1-D73029DEE23E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36DFE5D9-35B7-4062-97F1-D73029DEE23E}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -38,7 +32,7 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
+		SccNumberOfProjects = 4
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://isoquark.visualstudio.com/defaultcollection
 		SccLocalPath0 = .
@@ -48,11 +42,8 @@ Global
 		SccProjectUniqueName2 = IQ.Core.Services.Wcf.Tests.ConsoleHost\\IQ.Core.Services.Wcf.Tests.ConsoleHost.fsproj
 		SccProjectName2 = IQ.Core.Services.Wcf.Tests.ConsoleHost
 		SccLocalPath2 = IQ.Core.Services.Wcf.Tests.ConsoleHost
-		SccProjectUniqueName3 = IQ.Core.Services.Wcf.Tests\\IQ.Core.Services.Wcf.Tests.csproj
-		SccProjectName3 = IQ.Core.Services.Wcf.Tests
-		SccLocalPath3 = IQ.Core.Services.Wcf.Tests
-		SccProjectUniqueName4 = IQ.Core.Services.Wcf\\IQ.Core.Services.Wcf.fsproj
-		SccProjectName4 = IQ.Core.Services.Wcf
-		SccLocalPath4 = IQ.Core.Services.Wcf
+		SccProjectUniqueName3 = IQ.Core.Services.Wcf\\IQ.Core.Services.Wcf.fsproj
+		SccProjectName3 = IQ.Core.Services.Wcf
+		SccLocalPath3 = IQ.Core.Services.Wcf
 	EndGlobalSection
 EndGlobal
