@@ -98,6 +98,8 @@ module ClrElementVocabulary =
 
 
 module ClrElement =         
+
+    
     /// <summary>
     /// Gets the element name
     /// </summary>
@@ -172,34 +174,70 @@ module ClrElement =
         | UnionCaseElement(x) ->
             x.Name |> MemberElementName
 
-    let getDataMemberValue (instance : obj) (element : ClrElement) =
+    /// <summary>
+    /// Determines whether the element is a member 
+    /// </summary>
+    /// <param name="element">The element to test</param>
+    let isMember (element : ClrElement) =
+        match element with
+        | MemberElement(x) -> true
+        |_ -> false
+
+    /// <summary>
+    /// Inteprets the CLR element as a type element if possible; otherwise, an error is raised
+    /// </summary>
+    /// <param name="element">The element to interpret</param>
+    let asMemberElement (element : ClrElement)   =            
+        match element with
+        | MemberElement(x) -> x
+        | _ ->
+            ArgumentException(sprintf"Element %O is not a member"  (element |> getName)) |> raise            
+    
+    
+    /// <summary>
+    /// Determines whether the element is a type
+    /// </summary>
+    /// <param name="element">The element to test</param>
+    let isType (element : ClrElement) =
+        match element with
+        | TypeElement(_) -> true
+        | _ -> false
+
+    /// <summary>
+    /// Inteprets the CLR element as a type element if possible; otherwise, an error is raised
+    /// </summary>
+    /// <param name="element">The element to interpret</param>
+    let asTypeElement (element : ClrElement)   =            
+        match element with
+        | TypeElement(x) -> x
+        | _ ->
+            ArgumentException(sprintf"Element %O is not a type"  (element |> getName)) |> raise            
+
+    /// <summary>
+    /// Determines whether the element is a data member
+    /// </summary>
+    /// <param name="element">The element to test</param>
+    let isDataMember (element : ClrElement) =
         match element with
         | MemberElement(x) -> 
             match x with
-            | DataMemberElement(x) ->
-                match x with
-                | PropertyMember(x) ->
-                    instance |> x.GetValue
-                | FieldMember(x) -> 
-                    instance |> x.GetValue
-            | MethodElement(x) ->
-                  nosupport()
-        | _ -> nosupport()
-
-    let getDataMemberType element =
+            | DataMemberElement(_) -> true
+            | MethodElement(_) -> false
+        | _ -> false
+        
+    /// <summary>
+    /// Inteprets the CLR element as a data member if possible; otherwise, an error is raised
+    /// </summary>
+    /// <param name="element">The element to interpret</param>
+    let asDataMember (element : ClrElement) =
         match element with
         | MemberElement(x) -> 
             match x with
-            | DataMemberElement(x) ->
-                match x with
-                | PropertyMember(x) ->
-                    x.PropertyType
-                | FieldMember(x) -> 
-                    x.FieldType
-            | MethodElement(x) ->
-                  nosupport()
-        | _ -> nosupport()
+            | DataMemberElement(x) -> x
+            | _ -> ArgumentException(sprintf"Element %O is not a data member"  (element |> getName)) |> raise            
+        | _ -> ArgumentException(sprintf"Element %O is not a data member"  (element |> getName)) |> raise            
 
+    
 
     /// <summary>
     /// Gets the acess modifier applied to the element, if applicable
@@ -408,6 +446,21 @@ module ClrElement =
     /// <param name="subject">The type to examine</param>
     let getAttributesT<'T when 'T :> Attribute>(subject : MemberInfo) =
         [for a in Attribute.GetCustomAttributes(subject, typeof<'T>) -> a :?> 'T]
+
+module ClrDataMemberElement =
+    let getValue (instance : obj) (element : ClrDataMemberElement) =
+        match element with
+        | PropertyMember(x) ->
+            instance |> x.GetValue
+        | FieldMember(x) -> 
+            instance |> x.GetValue
+
+    let getType element =
+        match element with
+        | PropertyMember(x) ->
+            x.PropertyType
+        | FieldMember(x) -> 
+            x.FieldType
 
 [<AutoOpen>]
 module ClrElementExtensions = 

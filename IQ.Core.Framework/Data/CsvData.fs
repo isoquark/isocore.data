@@ -82,7 +82,7 @@ module CsvReader =
             value |> Txt.trim |> converters.[colname]
         
         let createValueMap (row : CsvRow) =
-            colnames |> Array.map(fun colname -> colname |> getColumnProxy |> fun c -> c.ProxyElement.Name.Text, c.ProxyElement.Position, colname|> row.GetColumn |> convert colname) 
+            colnames |> Array.map(fun colname -> colname |> getColumnProxy |> fun c -> c.ProxyElement.ReferentName.Text, c.ProxyElement.ReferentPosition, colname|> row.GetColumn |> convert colname) 
                      |> ValueIndex.create
 
         file.Rows |> Seq.map createValueMap 

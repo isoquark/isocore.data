@@ -174,7 +174,7 @@ module ``Proxy Discovery`` =
         dbElementName |> Claim.equal (DataObjectName("SqlTest", "fTable04Before"))
         let methodref = match typeref<ISqlTestRoutines>  with
                           | InterfaceTypeReference(subject, members) ->
-                            members |>  List.find(fun m -> m.Name.Text = dbElementName.LocalName)
+                            members |>  List.find(fun m -> m.ReferentName.Text = dbElementName.LocalName)
                             |> fun x ->
                                  match x with
                                  |MethodMemberReference(y) -> y

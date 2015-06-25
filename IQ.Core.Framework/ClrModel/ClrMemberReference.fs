@@ -42,17 +42,77 @@ module ClrMemberReference =
 
 [<AutoOpen>]
 module ClrMemberReferenceExtensions =
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrDataMemberReference"/> type
+    /// </summary>
     type ClrDataMemberReference
     with
+        /// <summary>
+        /// The name of the referent
+        /// </summary>
         member this.Name = this |> ClrDataMemberReference.getName
+
+        /// <summary>
+        /// The CLR type of the data member
+        /// </summary>
         member this.MemberType = this |> ClrDataMemberReference.getMemberType
+
+        /// <summary>
+        /// The position of the referent
+        /// </summary>
         member this.Position = this |> ClrDataMemberReference.getPosition
 
+        /// <summary>
+        /// Interprets the the specific reference as a general element reference
+        /// </summary>
+        member this.ElementReference =
+            this |> DataMemberReference |> MemberReference
+
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrMemberReference"/> type
+    /// </summary>
     type ClrMemberReference
     with
         member internal this.Subject = this |> ClrMemberReference.getSubject
-        member this.Name = this |> ClrMemberReference.getName
+
+        /// <summary>
+        /// The name of the referent
+        /// </summary>
+        member this.ReferentName = this.Subject.Name
+
+
+        /// <summary>
+        /// The identified element
+        /// </summary>
+        member this.Referent = this.Subject.Element
             
+        /// <summary>
+        /// The position of the referent
+        /// </summary>
+        member this.ReferentPosition = this.Subject.Position
+
+        /// <summary>
+        /// Interprets the the specific reference as a general element reference
+        /// </summary>
+        member this.ElementReference = this |> MemberReference
+
+        /// <summary>
+        /// The raw CLR element represented by the referent
+        /// </summary>
+        member this.MemberInfo = 
+            match this.Referent with
+            | MemberElement(x) -> 
+                match x with
+                | MethodElement(x) -> x :> MemberInfo
+                | DataMemberElement(x) ->
+                    match x with
+                    | PropertyMember(x) -> x :> MemberInfo
+                    | FieldMember(x) -> x :> MemberInfo
+            | _ -> nosupport()
+                
+
     
     /// <summary>
     /// Defines augmentations for the <see cref="ClrMethodReference"/> type
@@ -60,18 +120,36 @@ module ClrMemberReferenceExtensions =
     type ClrMethodReference 
     with
         /// <summary>
-        /// The name of the method
+        /// The name of the referent
         /// </summary>
-        member this.Name = this.Subject.Name
-        member this.Position = this.Subject.Position
-        member this.Method = this.Subject.Element
+        member this.ReferentName = this.Subject.Name
+
+        /// <summary>
+        /// The position of the referent
+        /// </summary>
+        member this.ReferentPosition = this.Subject.Position
+        
+        /// <summary>
+        /// The identified element
+        /// </summary>
+        member this.Referent = this.Subject.Element
+        
+        /// <summary>
+        /// The raw CLR element represented by the referent
+        /// </summary>
         member this.MethodInfo = 
-            match this.Subject.Element with 
+            match this.Referent with 
             | MemberElement(x) -> 
                 match x with
                 | MethodElement(x) -> x 
                 | _ -> nosupport()
             |_ -> nosupport()
+        
+        /// <summary>
+        /// Interprets the the specific reference as a general element reference
+        /// </summary>
+        member this.ElementReference =
+            this |> MethodMemberReference |> MemberReference
 
     /// <summary>
     /// Defines augmentations for the <see cref="ClrPropertyReference"/> type
@@ -79,13 +157,25 @@ module ClrMemberReferenceExtensions =
     type ClrPropertyReference    
     with
         /// <summary>
-        /// The name of the property
+        /// The name of the referent
         /// </summary>
-        member this.Name = this.Subject.Name
-        member this.Position = this.Subject.Position
-        member this.Property = this.Subject.Element
+        member this.ReferentName = this.Subject.Name
+
+        /// <summary>
+        /// The relative position of the referent
+        /// </summary>
+        member this.ReferentPosition = this.Subject.Position
+
+        /// <summary>
+        /// The identified element
+        /// </summary>
+        member this.Referent = this.Subject.Element
+
+        /// <summary>
+        /// The raw CLR element represented by the referent
+        /// </summary>
         member this.PropertyInfo = 
-            match this.Subject.Element with 
+            match this.Referent with 
             | MemberElement(x) -> 
                 match x with
                 | DataMemberElement(x) ->
@@ -95,14 +185,46 @@ module ClrMemberReferenceExtensions =
                 | _ -> nosupport()
             |_ -> nosupport()
 
+        /// <summary>
+        /// Interprets the the specific reference as a general element reference
+        /// </summary>
+        member this.ElementReference =
+            this |> PropertyMemberReference |> DataMemberReference |> MemberReference
+    
+        
+    
 
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrFieldReference"/> type
+    /// </summary>
     type ClrFieldReference
     with
-        member this.Name = this.Subject.Name
-        member this.Position = this.Subject.Position
-        member this.Field = this.Subject.Element
+        /// <summary>
+        /// The name of the referent
+        /// </summary>
+        member this.ReferentName = this.Subject.Name
+        
+        /// <summary>
+        /// The relative position of the referent
+        /// </summary>
+        member this.ReferentPosition = this.Subject.Position
+        
+        /// <summary>
+        /// The identified element
+        /// </summary>
+        member this.Referent = this.Subject.Element
+
+        /// <summary>
+        /// Interprets the the specific reference as a general element reference
+        /// </summary>
+        member this.ElementReference =
+            this |> FieldMemberReference |> DataMemberReference |> MemberReference
+
+        /// <summary>
+        /// The raw CLR element represented by the referent
+        /// </summary>
         member this.FieldInfo = 
-            match this.Subject.Element with 
+            match this.Referent with 
             | MemberElement(x) -> 
                 match x with
                 | DataMemberElement(x) ->
@@ -118,11 +240,33 @@ module ClrMemberReferenceExtensions =
     type ClrMethodParameterReference
     with
         /// <summary>
-        /// The name of the parameter
+        /// The name of the referent
         /// </summary>
-        member this.Name = this.Subject.Name
-        member this.Position = this.Subject.Position
-        member this.Parameter = this.Subject.Element
+        member this.ReferentName = this.Subject.Name
+
+        /// <summary>
+        /// The relative position of the referent
+        /// </summary>
+        member this.ReferentPosition = this.Subject.Position
+
+        /// <summary>
+        /// The identified element
+        /// </summary>
+        member this.Referent = this.Subject.Element
+
+        /// <summary>
+        /// Interprets the the specific reference as a general element reference
+        /// </summary>
+        member this.ElementReference =
+            this |> MethodParameterReference
+
+        /// <summary>
+        /// The raw CLR element represented by the referent
+        /// </summary>
+        member this.ParameterInfo = 
+            match this.Referent with
+            | ParameterElement(x) -> x
+            |_ -> nosupport()
 
     /// <summary>
     /// Defines augmentations for the <see cref="ClrUnionCaseReference"/> type
@@ -132,6 +276,40 @@ module ClrMemberReferenceExtensions =
         /// <summary>
         /// The name of the union case
         /// </summary>
-        member this.Name = this.Subject.Name
-        member this.Position = this.Subject.Position
-        member this.Case = this.Subject.Element
+        member this.ReferentName = this.Subject.Name
+
+        /// <summary>
+        /// The relative position of the referent
+        /// </summary>
+        member this.ReferentPosition = this.Subject.Position
+
+        /// <summary>
+        /// The identified element
+        /// </summary>
+        member this.Referent = this.Subject.Element
+
+        /// <summary>
+        /// Interprets the the specific reference as a general element reference
+        /// </summary>
+        member this.ElementReference =
+            this |> UnionCaseReference
+
+        /// <summary>
+        /// Indexer that finds a case field by its position
+        /// </summary>
+        /// <param name="position">The position of the case field</param>
+        member this.Item(position) = this.Fields.[position]
+
+        /// <summary>
+        /// Indexer that finds a case field by its name
+        /// </summary>
+        /// <param name="name">The name of the case field</param>
+        member this.Item(name) = this.Fields |> List.find(fun f -> f.ReferentName = name)
+
+        /// <summary>
+        /// The raw CLR element represented by the referent
+        /// </summary>
+        member this.UnionCaseInfo = 
+            match this.Referent with
+            | UnionCaseElement(x) -> x
+            |_ -> nosupport()

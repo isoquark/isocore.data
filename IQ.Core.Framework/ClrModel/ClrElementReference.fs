@@ -27,11 +27,11 @@ module ClrElementReference =
         | TypeReference(e) -> 
             e.ReferentName
         | MemberReference(x) -> 
-            x.Name
+            x.ReferentName
         | MethodParameterReference(x) ->
             x.Subject.Name
         | UnionCaseReference(x) -> 
-            x.Name
+            x.ReferentName
 
    
     /// <summary>
@@ -63,18 +63,18 @@ module ClrElementReference =
             | MemberReference(x) ->
                 match x with
                 | MethodMemberReference(x) -> 
-                    x.Method.DeclaringType |> Option.get |> declarer
+                    x.Referent.DeclaringType |> Option.get |> declarer
                 | DataMemberReference x ->
                     match x with
                     | PropertyMemberReference(p) -> 
-                        p.Property.DeclaringType |> Option.get |> declarer
+                        p.Referent.DeclaringType |> Option.get |> declarer
                     | FieldMemberReference(f) -> 
-                        f.Field.DeclaringType |> Option.get |> declarer
+                        f.Referent.DeclaringType |> Option.get |> declarer
 
             | MethodParameterReference(x) ->
                 None
             | UnionCaseReference(x) -> 
-                x.Case.DeclaringType |> Option.get |> declarer
+                x.Referent.DeclaringType |> Option.get |> declarer
 
         match declaringType with
         |Some(x) -> x |> ClrTypeReference.reference |> Some

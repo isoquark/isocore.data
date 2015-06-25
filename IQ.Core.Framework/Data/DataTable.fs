@@ -76,7 +76,7 @@ module DataTable =
         for value in values do
             let valueidx = value |>ClrTypeValue.toValueIndex
             [|for column in columns do 
-                yield valueidx.[column.ProxyElement.Name.Text] |> DataTypeConverter.toClrTransportValue column.DataElement.StorageType
+                yield valueidx.[column.ProxyElement.ReferentName.Text] |> DataTypeConverter.toClrTransportValue column.DataElement.StorageType
             |] |> table.Rows.Add |> ignore
         table                
 

@@ -15,8 +15,8 @@ module ClrTypeValue =
         match record.GetType() |> ClrTypeReference.reference with
         | RecordTypeReference(subject, fields) ->
             fields |> List.map(fun field ->                 
-                let value = field.Property |> ClrElement.getDataMemberValue record
-                field.Name.Text, field.Position, value)                 
+                let value = field.Referent |> ClrElement.asDataMember |> ClrDataMemberElement.getValue record
+                field.ReferentName.Text, field.ReferentPosition, value)                 
                 |> ValueIndex.create
         | _ -> nosupport()
     
@@ -29,7 +29,7 @@ module ClrTypeValue =
         match record.GetType() |> ClrTypeReference.reference with
         | RecordTypeReference(subject, fields) ->
             [|for i in 0..fields.Length - 1 ->
-                fields.[i].Property |> ClrElement.getDataMemberValue record 
+                fields.[i].Referent |> ClrElement.asDataMember |> ClrDataMemberElement.getValue record 
             |]        
         | _ -> nosupport()
 
@@ -55,7 +55,7 @@ module ClrTypeValue =
         match tref with
         | RecordTypeReference(subject, fields) ->
             let types = fields |> List.map(fun field -> field.PropertyType) |> Array.ofList
-            fields |> List.map(fun field -> valueMap.[field.Name.Text]) 
+            fields |> List.map(fun field -> valueMap.[field.ReferentName.Text]) 
                    |> Array.ofList 
                    |> Converter.convertArray types
                    |> ClrTypeReference.getRecordFactory(tref)

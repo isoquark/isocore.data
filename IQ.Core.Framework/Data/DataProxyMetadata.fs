@@ -143,25 +143,26 @@ module DataProxyMetadata =
     /// </summary>
     /// <param name="clrElement">The CLR element from which the column description will be inferred</param>
     let describeColumn(proxyref : ClrPropertyReference) =
-        match proxyref.Property |> ClrElement.tryGetAttributeT<ColumnAttribute> with
+        let storageType = proxyref.ElementReference |> inferStorageType
+        match proxyref.Referent |> ClrElement.tryGetAttributeT<ColumnAttribute> with
         | Some(attrib) ->
             {
                 ColumnDescription.Name = 
                     match attrib.Name with 
                     | Some(name) -> name
-                    | None -> proxyref.Name.Text
-                Position = proxyref.Position |> defaultArg attrib.Position 
-                StorageType = proxyref |> PropertyMemberReference |> DataMemberReference |> MemberReference |> inferStorageType
-                Nullable = proxyref.Property |> ClrElement.getDataMemberType |> Option.isOptionType
+                    | None -> proxyref.ReferentName.Text
+                Position = proxyref.ReferentPosition |> defaultArg attrib.Position 
+                StorageType = storageType
+                Nullable = proxyref.Referent |> ClrElement.asDataMember |> ClrDataMemberElement.getType |> Option.isOptionType
                 AutoValue = None
             }
 
         | None ->
             {
-                ColumnDescription.Name = proxyref.Name.Text
-                Position = proxyref.Position
-                StorageType = proxyref |> PropertyMemberReference |> DataMemberReference |> MemberReference |> inferStorageType
-                Nullable = proxyref.Property |> ClrElement.getDataMemberType |> Option.isOptionType
+                ColumnDescription.Name = proxyref.ReferentName.Text
+                Position = proxyref.ReferentPosition
+                StorageType = storageType
+                Nullable = proxyref.Referent |> ClrElement.asDataMember |> ClrDataMemberElement.getType |> Option.isOptionType
                 AutoValue = None
             }
 
@@ -233,14 +234,14 @@ module DataProxyMetadata =
         let name, direction, position = 
             match proxyref.Subject.Element |> ClrElement.tryGetAttributeT<RoutineParameterAttribute> with
             | Some(attrib) ->
-                let position =  match attrib.Position with |Some(p) -> p |None -> proxyref.Position
+                let position =  match attrib.Position with |Some(p) -> p |None -> proxyref.ReferentPosition
                 match attrib.Name with
                 |Some(name) ->
                     name, attrib.Direction, position
                 | None ->
                     proxyref.Subject.Name.Text, attrib.Direction, position                
             | None ->
-                (proxyref.Subject.Name.Text, ParameterDirection.Input, proxyref.Position)
+                (proxyref.Subject.Name.Text, ParameterDirection.Input, proxyref.ReferentPosition)
         {
             RoutineParameterDescription.Name = name
             Position = position
@@ -362,9 +363,9 @@ module DataProxyMetadata =
         | MemberReference(x) ->
                 match x with
                 | MethodMemberReference(m) ->
-                    if m.Method |> ClrElement.hasAttributeT<ProcedureAttribute> then
+                    if m.Referent |> ClrElement.hasAttributeT<ProcedureAttribute> then
                         proxyref |> describeProcedureProxy
-                    else if m.Method |> ClrElement.hasAttributeT<TableFunctionAttribute> then
+                    else if m.Referent |> ClrElement.hasAttributeT<TableFunctionAttribute> then
                         proxyref |> describeTableFunctionProxy
                     else NotSupportedException() |> raise                        
                 | _ -> NotSupportedException() |> raise
@@ -376,9 +377,9 @@ module DataProxyMetadata =
             [for m in members do
                 match m with
                 | MethodMemberReference(m) ->
-                    if m.Method |> ClrElement.hasAttributeT<ProcedureAttribute> then
+                    if m.Referent |> ClrElement.hasAttributeT<ProcedureAttribute> then
                         yield m |> MethodMemberReference |> MemberReference |> describeProcedureProxy
-                    else if m.Method |>ClrElement.hasAttributeT<TableFunctionAttribute> then
+                    else if m.Referent |>ClrElement.hasAttributeT<TableFunctionAttribute> then
                         yield m |> MethodMemberReference |> MemberReference |> describeTableFunctionProxy
                 | _ ->
                     NotSupportedException() |> raise

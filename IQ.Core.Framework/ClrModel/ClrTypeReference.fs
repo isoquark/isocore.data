@@ -29,12 +29,12 @@ module ClrTypeReference =
 
     let internal getSubject(tref : ClrTypeReference) =
         match tref with 
-        |UnionTypeReference(subject=x)
-        |RecordTypeReference(subject=x)
-        |InterfaceTypeReference(subject=x)
-        |ClassTypeReference(subject=x)
-        |CollectionTypeReference(subject=x)
-        |StructTypeReference(subject=x) -> x        
+        | UnionTypeReference(subject=x)
+        | RecordTypeReference(subject=x)
+        | InterfaceTypeReference(subject=x)
+        | ClassTypeReference(subject=x)
+        | CollectionTypeReference(subject=x)
+        | StructTypeReference(subject=x) -> x        
 
     let getReferent (tref : ClrTypeReference) =
         let subject = tref |> getSubject
@@ -329,30 +329,18 @@ module ClrTypeReferenceExtensions =
     
 
     /// <summary>
-    /// Defines augmentations for the UnionCaseDescription type
-    /// </summary>
-    type ClrUnionCaseReference
-    with
-        /// <summary>
-        /// Indexer that finds a case field by its position
-        /// </summary>
-        /// <param name="position">The position of the case field</param>
-        member this.Item(position) = this.Fields.[position]
-
-        /// <summary>
-        /// Indexer that finds a case field by its name
-        /// </summary>
-        /// <param name="name">The name of the case field</param>
-        member this.Item(name) = this.Fields |> List.find(fun f -> f.Name = name)
-
-    /// <summary>
     /// Defines augmentations for the ClrTypeReference type
     /// </summary>
     type ClrTypeReference
     with
+        member private this.Subject = this |> ClrTypeReference.getSubject
+        
         member this.TypeReferent = this |> ClrTypeReference.getTypeReferent
         
-        member this.Referent = this |> ClrTypeReference.getReferent
+        /// <summary>
+        /// The identified element
+        /// </summary>
+        member this.Referent = this.Subject.Element
         
         member this.ReferentName = this |> ClrTypeReference.getReferentName
         

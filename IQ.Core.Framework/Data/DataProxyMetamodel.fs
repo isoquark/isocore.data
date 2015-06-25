@@ -22,7 +22,7 @@ module DataProxyMetamodel =
     with
         member this.Position = 
             match this with
-            | MethodInputReference(x) -> x.Position
+            | MethodInputReference(x) -> x.ReferentPosition
             | MethodOutputReference(x) -> -1
     
     /// <summary>

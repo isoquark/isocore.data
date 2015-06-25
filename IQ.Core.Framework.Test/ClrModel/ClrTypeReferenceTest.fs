@@ -34,9 +34,9 @@ module ClrTypeTest =
         match typeref<RecordA> with
         | RecordTypeReference(subject, fields) ->
             fields.Length |> Claim.equal 3  
-            fields.[0].Name |> Claim.equal AField01Name
+            fields.[0].ReferentName |> Claim.equal AField01Name
             fields.[0].PropertyType |> Claim.equal typeof<int>
-            fields.[0].Position |> Claim.equal 0
+            fields.[0].ReferentPosition |> Claim.equal 0
 
         | _ ->
             Claim.assertFail()
@@ -49,17 +49,17 @@ module ClrTypeTest =
         | RecordTypeReference(subject, fields) ->
             fields.Length |> Claim.equal 3  
         
-            fields.[0].Name |> Claim.equal BField01Name
+            fields.[0].ReferentName |> Claim.equal BField01Name
             fields.[0].PropertyType |> Claim.equal typeof<option<int>>
-            fields.[0].Position |> Claim.equal 0
+            fields.[0].ReferentPosition |> Claim.equal 0
 
-            fields.[1].Name |> Claim.equal BField02Name
+            fields.[1].ReferentName |> Claim.equal BField02Name
             fields.[1].PropertyType |> Claim.equal typeof<string>
-            fields.[1].Position |> Claim.equal 1
+            fields.[1].ReferentPosition |> Claim.equal 1
 
-            fields.[2].Name |> Claim.equal BField03Name
+            fields.[2].ReferentName |> Claim.equal BField03Name
             fields.[2].PropertyType |> Claim.equal typeof<option<RecordA>>
-            fields.[2].Position |> Claim.equal 2
+            fields.[2].ReferentPosition |> Claim.equal 2
         | _ ->
             Claim.assertFail()
 
@@ -76,11 +76,11 @@ module ClrTypeTest =
             cases.Length |> Claim.equal 1
             
             let field01Case = cases.[0].[0]        
-            let fieldCaseName = field01Case.Name
+            let fieldCaseName = field01Case.ReferentName
             cases.[0].[fieldCaseName] |> Claim.equal field01Case
-            field01Case.Position |> Claim.equal 0
+            field01Case.ReferentPosition |> Claim.equal 0
             field01Case.ValueType |> Claim.equal typeof<int>
-            field01Case.Name.Text |> Claim.equal "field01"
+            field01Case.ReferentName.Text |> Claim.equal "field01"
         | _ ->
             Claim.assertFail()
         

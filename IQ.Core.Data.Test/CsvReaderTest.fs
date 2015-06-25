@@ -59,7 +59,7 @@ module ``CsvReader Test`` =
         let format = CsvReader.getDefaultFormat()
         let actual = path |> CsvReader.describeFile format
         let fieldNames = match typeref<CsvTestCase1> with
-                         | RecordTypeReference(subject, fields) -> fields |> List.map(fun x -> x.Name.Text)
+                         | RecordTypeReference(subject, fields) -> fields |> List.map(fun x -> x.ReferentName.Text)
                          | _ -> 
                             NotSupportedException() |> raise
         let expect = {
