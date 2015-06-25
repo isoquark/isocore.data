@@ -32,6 +32,9 @@ module Lang =
         /// </remarks>
         let count (items : seq<'T>) = items.Count()
     
+    /// <summary>
+    /// Defines custom Array module operations
+    /// </summary>
     module Array =
         let pmap = Array.Parallel.map
 
@@ -158,6 +161,20 @@ module Lang =
         /// Not supported in F#
         | ProtectedInternalAccess
         
+    /// <summary>
+    /// Defines System.MethodInfo helpers
+    /// </summary>
+    module MethodInfo =
+        /// <summary>
+        /// Retrieves an attribute applied to a method return, if present
+        /// </summary>
+        /// <param name="subject">The method to examine</param>
+        let getReturnAttribute<'T when 'T :> Attribute>(subject : MethodInfo) =
+            let attribs = subject.ReturnTypeCustomAttributes.GetCustomAttributes(typeof<'T>, true)
+            if attribs.Length <> 0 then
+                attribs.[0] :?> 'T |> Some
+            else
+                None
 
        
 

@@ -143,7 +143,7 @@ module DataProxyMetadata =
     /// </summary>
     /// <param name="clrElement">The CLR element from which the column description will be inferred</param>
     let describeColumn(proxyref : ClrPropertyReference) =
-        match proxyref.Property |> AttributeT.tryGetOne<ColumnAttribute> with
+        match proxyref.Property |> ClrElement.tryGetAttributeT<ColumnAttribute> with
         | Some(attrib) ->
             {
                 ColumnDescription.Name = 
@@ -231,7 +231,7 @@ module DataProxyMetadata =
     /// <param name="clrElement">The CLR element from which the parameter description will be inferred</param>
     let describeRoutineParameter(proxyref  : ClrMethodParameterReference) =
         let name, direction, position = 
-            match proxyref.Subject.Element |> AttributeT.tryGetOne<RoutineParameterAttribute> with
+            match proxyref.Subject.Element |> ClrElement.tryGetAttributeT<RoutineParameterAttribute> with
             | Some(attrib) ->
                 let position =  match attrib.Position with |Some(p) -> p |None -> proxyref.Position
                 match attrib.Name with
@@ -362,9 +362,9 @@ module DataProxyMetadata =
         | MemberReference(x) ->
                 match x with
                 | MethodMemberReference(m) ->
-                    if m.Method |> AttributeT.isDefined<ProcedureAttribute> then
+                    if m.Method |> ClrElement.hasAttributeT<ProcedureAttribute> then
                         proxyref |> describeProcedureProxy
-                    else if m.Method |> AttributeT.isDefined<TableFunctionAttribute> then
+                    else if m.Method |> ClrElement.hasAttributeT<TableFunctionAttribute> then
                         proxyref |> describeTableFunctionProxy
                     else NotSupportedException() |> raise                        
                 | _ -> NotSupportedException() |> raise
@@ -376,9 +376,9 @@ module DataProxyMetadata =
             [for m in members do
                 match m with
                 | MethodMemberReference(m) ->
-                    if m.Method |> AttributeT.isDefined<ProcedureAttribute> then
+                    if m.Method |> ClrElement.hasAttributeT<ProcedureAttribute> then
                         yield m |> MethodMemberReference |> MemberReference |> describeProcedureProxy
-                    else if m.Method |> AttributeT.isDefined<TableFunctionAttribute> then
+                    else if m.Method |>ClrElement.hasAttributeT<TableFunctionAttribute> then
                         yield m |> MethodMemberReference |> MemberReference |> describeTableFunctionProxy
                 | _ ->
                     NotSupportedException() |> raise

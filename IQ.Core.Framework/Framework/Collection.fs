@@ -14,7 +14,7 @@ open Microsoft.FSharp.Reflection
 /// <summary>
 /// Defines operations for working with collections
 /// </summary>
-module ClrCollection =
+module Collection =
     let private makeGenericType (baseType : Type) (types : Type list) = 
 
       if (not baseType.IsGenericTypeDefinition) then

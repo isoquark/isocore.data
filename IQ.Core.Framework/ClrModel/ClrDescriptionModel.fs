@@ -60,9 +60,9 @@ module ClrDescription =
             ValueType = p.PropertyType |> Type.getItemValueType |> fun x -> x.ElementTypeName
             IsOptional = p.PropertyType |> Option.isOptionType
             CanRead = p.CanRead
-            ReadAccess = if p.CanRead then p.GetMethod |> MethodElement |> ClrElement.getAccess |> Some else None
+            ReadAccess = if p.CanRead then p.GetMethod.AccessModifier |> Some else None
             CanWrite = p.CanWrite
-            WriteAccess =  if p.CanWrite then p.SetMethod |> MethodElement |> ClrElement.getAccess |> Some else None
+            WriteAccess =  if p.CanWrite then p.SetMethod.AccessModifier |> Some else None
         }
 
 

@@ -139,7 +139,7 @@ module internal Routine =
     let private createInvoker<'TContract,'TConfig> =
         let proxies = routineproxies<'TContract> 
         let findProxy (mii : MethodInvocationInfo) = 
-            mii.Method |> MethodElement |>  findMethodProxy proxies
+            mii.Method.Element |>  findMethodProxy proxies
                             
         let invoke(mii : MethodInvocationInfo) =
             let proxy = mii |> findProxy 
@@ -171,7 +171,7 @@ module internal Routine =
                         let items = 
                             [for row in result ->
                                 itemTypeRef |> ClrTypeValue.fromValueArray row]
-                        items |> ClrCollection.create collectionKind itemTypeRef.ReferentType |> Some
+                        items |> Collection.create collectionKind itemTypeRef.ReferentType |> Some
                     | _ -> NotSupportedException() |> raise
                         
                     

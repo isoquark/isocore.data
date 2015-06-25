@@ -9,32 +9,7 @@ open Microsoft.FSharp.Reflection
 /// Defines operations applicable to the unified ClrElement type
 /// </summary>
 module ClrElementReference =
-    
-    /// <summary>
-    /// Reads an identified attribute from the element if applied
-    /// </summary>
-    /// <param name="element">The potentially attributed element</param>
-    let getAttribute<'T when 'T :> Attribute>(element : ClrElementReference) =
-        match element with
-        | TypeReference(e) -> 
-            e |> ClrTypeReference.getAttribute<'T>
-        | MemberReference(e) ->
-            match e with
-            | MethodMemberReference x -> 
-                x.Method |> AttributeT.tryGetOne<'T>
-            | DataMemberReference x ->
-                match x with
-                | PropertyMemberReference(p) -> 
-                    p.Property |> AttributeT.tryGetOne<'T>
-                | FieldMemberReference(f) -> 
-                    f.Field |> AttributeT.tryGetOne<'T>
-
-        | MethodParameterReference(x) ->
-             x.Parameter |> AttributeT.tryGetOne<'T> 
-        | UnionCaseReference(x) -> 
-            x.Case |> AttributeT.tryGetOne<'T> 
-
-
+            
     let internal getSubject(eref : ClrElementReference) =
         match eref with
             | MethodParameterReference(x) -> x.Subject
@@ -65,6 +40,13 @@ module ClrElementReference =
     /// <param name="eref"></param>
     let getReferent (eref : ClrElementReference) =
         eref |> getSubject |> fun x -> x.Element        
+
+    /// <summary>
+    /// Reads an identified attribute from the element if applied
+    /// </summary>
+    /// <param name="element">The potentially attributed element</param>
+    let getAttribute<'T when 'T :> Attribute>(eref : ClrElementReference) =
+        eref |> getReferent |> ClrElement.tryGetAttributeT<'T>
 
     /// <summary>
     /// Gets the type that declares the referent

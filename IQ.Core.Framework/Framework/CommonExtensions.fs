@@ -42,11 +42,11 @@ module ReflectionExtensions =
 
     type PropertyInfo
     with
-        member this.ValueType = this |> PropertyInfo.getValueType
+        member this.ValueType = this.PropertyType |> Type.getItemValueType
 
     type FieldInfo
     with
-        member this.ValueType = this |> FieldInfo.getValueType        
+        member this.ValueType = this.FieldType |> Type.getItemValueType
 
     /// <summary>
     /// Defines augmentations for the Assembly type

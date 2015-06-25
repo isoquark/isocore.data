@@ -80,7 +80,7 @@ module ClrTypeReference =
     let internal referenceMethod pos (m : MethodInfo) =
         let returnType = if m.ReturnType  = typeof<Void> then None else m.ReturnType |> Some
         {
-            Subject = ClrSubject(m.ElementName, pos, m |> MethodElement)
+            Subject = ClrSubject(m.ElementName, pos, m.Element)
             ReturnType = returnType
             ReturnValueType = match returnType with
                                 | Some(x) -> x |> getItemValueType|> Some
@@ -95,7 +95,7 @@ module ClrTypeReference =
     /// <param name="p">The property to be referenced</param>
     let internal referenceProperty pos (p : PropertyInfo) = 
         {
-            Subject = ClrSubject(p.ElementName, pos, p |> PropertyElement)
+            Subject = ClrSubject(p.ElementName, pos, p.Element)
             ValueType = p.PropertyType |> getItemValueType
             PropertyType = p.PropertyType
         }
@@ -107,7 +107,7 @@ module ClrTypeReference =
     /// <param name="f">The field to be referenced</param>
     let internal referenceField pos (f : FieldInfo) =
         {
-            Subject = ClrSubject(f.ElementName, pos, f |> FieldElement)
+            Subject = ClrSubject(f.ElementName, pos, f.Element)
             ValueType = f.FieldType|> getItemValueType
             FieldType = f.FieldType
         }
@@ -201,7 +201,7 @@ module ClrTypeReference =
             FSharpType.GetRecordFields(t,true) 
                |> Array.mapi(fun i p ->  
                     {
-                        ClrPropertyReference.Subject = ClrSubject(p.ElementName, i, p |> PropertyElement)
+                        ClrPropertyReference.Subject = ClrSubject(p.ElementName, i, p.Element)
                         PropertyType = p.PropertyType 
                         ValueType =   p.PropertyType |> getItemValueType
                     }) 
@@ -228,7 +228,7 @@ module ClrTypeReference =
     /// <param name="p">The property that represents the field</param>
     let private referenceUnionField pos (p : PropertyInfo) = 
         {
-            Subject = ClrSubject(p.ElementName, pos, p |> PropertyElement)
+            Subject = ClrSubject(p.ElementName, pos, p.Element)
             PropertyType = p.PropertyType
             ValueType = p.PropertyType |> getItemValueType
         }
@@ -294,7 +294,7 @@ module ClrTypeReference =
     /// </summary>
     /// <param name="t"></param>
     let getAttribute<'T when 'T :> Attribute> (tref : ClrTypeReference) =
-         tref |> getReferent |>  AttributeT.tryGetOne<'T>
+         tref |> getReferent |>  ClrElement.tryGetAttributeT<'T>
                                
     let getDeclaringType(tref : ClrTypeReference) =
         let element = tref |> getTypeReferent

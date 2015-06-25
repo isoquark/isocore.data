@@ -65,7 +65,13 @@ module ClrMemberReferenceExtensions =
         member this.Name = this.Subject.Name
         member this.Position = this.Subject.Position
         member this.Method = this.Subject.Element
-        member this.MethodInfo = match this.Subject.Element with | MethodElement(e) -> e |_ -> nosupport()
+        member this.MethodInfo = 
+            match this.Subject.Element with 
+            | MemberElement(x) -> 
+                match x with
+                | MethodElement(x) -> x 
+                | _ -> nosupport()
+            |_ -> nosupport()
 
     /// <summary>
     /// Defines augmentations for the <see cref="ClrPropertyReference"/> type
@@ -78,12 +84,33 @@ module ClrMemberReferenceExtensions =
         member this.Name = this.Subject.Name
         member this.Position = this.Subject.Position
         member this.Property = this.Subject.Element
+        member this.PropertyInfo = 
+            match this.Subject.Element with 
+            | MemberElement(x) -> 
+                match x with
+                | DataMemberElement(x) ->
+                    match x with
+                    | PropertyMember(x) -> x
+                    | _ -> nosupport()
+                | _ -> nosupport()
+            |_ -> nosupport()
+
 
     type ClrFieldReference
     with
         member this.Name = this.Subject.Name
         member this.Position = this.Subject.Position
         member this.Field = this.Subject.Element
+        member this.FieldInfo = 
+            match this.Subject.Element with 
+            | MemberElement(x) -> 
+                match x with
+                | DataMemberElement(x) ->
+                    match x with
+                    | FieldMember(x) -> x
+                    | _ -> nosupport()
+                | _ -> nosupport()
+            |_ -> nosupport()
 
     /// <summary>
     /// Defines augmentations for the <see cref="ClrMethodParameterReference"/> type
