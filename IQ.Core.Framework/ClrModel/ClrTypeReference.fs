@@ -284,7 +284,7 @@ module ClrTypeReference =
             | ClrTypeKind.Record -> t |> referenceRecord
             | ClrTypeKind.Union  -> t |> referenceUnion 
             | ClrTypeKind.Interface -> t |> referenceInterface
-            | ClrTypeKind.Class -> t |> referenceClass
+            | ClrTypeKind.Class | ClrTypeKind.Module -> t |> referenceClass
             | ClrTypeKind.Struct -> t |> referenceStruct
             | _ ->
                 NotSupportedException() |> raise                

@@ -137,12 +137,38 @@ module Lang =
     /// </summary>
     type ClrTypeKind =
         | Unclassified = 0
+        /// <summary>
+        /// Classifies a type as an F# discriminated union
+        /// </summary>
         | Union = 1
+        /// <summary>
+        /// Classifies a type as a record
+        /// </summary>
         | Record = 2
+        /// <summary>
+        /// Classifies a type as an interface
+        /// </summary>
         | Interface = 3
+        /// <summary>
+        /// Classifies a type as a class
+        /// </summary>
         | Class = 4 
+        /// <summary>
+        /// Classifies a type as a collection of some sort
+        /// </summary>
         | Collection = 5
+        /// <summary>
+        /// Classifies a type as a struct (a CLR value type)
+        /// </summary>
         | Struct = 6
+        /// <summary>
+        /// Classifies a type as an F# module
+        /// </summary>
+        | Module = 7
+        /// <summary>
+        /// Classifies a type as a nulluable value type, e.g., Nullable<int>
+        /// </summary>
+        | NullableValue = 8
 
     /// <summary>
     /// Specifies the visibility of a CLR element

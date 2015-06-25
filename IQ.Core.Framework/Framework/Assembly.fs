@@ -13,7 +13,7 @@ module Assembly =
     /// </summary>
     /// <param name="shortName">The name of the resource, excluding the namespace path</param>
     /// <param name="subject">The assembly that contains the resource</param>
-    let findTextResource shortName (subject : Assembly) =        
+    let internal findTextResource shortName (subject : Assembly) =        
         match subject.GetManifestResourceNames() |> Array.tryFind(fun name -> name.Contains(shortName)) with
         | Some(resname) ->
             use s = resname |> subject.GetManifestResourceStream
@@ -28,7 +28,7 @@ module Assembly =
     /// <param name="shortName">The name of the resource, excluding the namespace path</param>
     /// <param name="outputDir">The directory into which the resource will be deposited</param>
     /// <param name="subject">The assembly that contains the resource</param>
-    let writeTextResource shortName outputDir (subject : Assembly) =
+    let internal writeTextResource shortName outputDir (subject : Assembly) =
         let path = Path.ChangeExtension(outputDir, shortName) 
         match subject |> findTextResource shortName with
         | Some(text) -> File.WriteAllText(path, text)
@@ -61,6 +61,10 @@ module Assembly =
             if name |> isLoaded |>not then
                 name |> AppDomain.CurrentDomain.Load |> loadReferences filter
         )
+
+    let getTypes(subject : Assembly) =
+        subject.GetTypes() |> List.ofArray
+        
 
 [<AutoOpen>]
 module AssemblyExtensions =

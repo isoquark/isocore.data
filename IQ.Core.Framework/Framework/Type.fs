@@ -92,6 +92,13 @@ module Type =
     /// <param name="t">The type to examine</param>
     let isNullableType (t : Type) =
         t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<Nullable<_>>
+
+    /// <summary>
+    /// Determines whether the type icorresponds to an F# module
+    /// </summary>
+    /// <param name="t"></param>
+    let internal isModuleType (t : Type) =
+        t |> FSharpType.IsModule
         
     /// <summary>
     /// Determines whether a type is an array type
@@ -100,7 +107,6 @@ module Type =
     let isArray(t : Type) =
         t.IsArray
             
-
     [<Literal>]
     let private DefaultBindingFlags = 
         BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.Static ||| BindingFlags.Instance
@@ -116,6 +122,9 @@ module Type =
     /// Gets methods that aren't implemented to serve as property getters/setters
     /// </summary>
     /// <param name="subject">The type</param>
+    /// <remarks>
+    /// This will probably never be foolproof because its too arbitrary
+    /// </remarks>
     let getPureMethods (subject : Type) =
         let isGetOrSet (m : MethodInfo) =
             (m.IsSpecialName && m.Name.StartsWith "get_") || (m.IsSpecialName && m.Name.StartsWith "set_")
@@ -128,6 +137,21 @@ module Type =
     let getProperties  (subject : Type) =
         subject.GetProperties(DefaultBindingFlags) |> List.ofArray
 
+    /// <summary>
+    /// Gets fields that are not artifacts of the compiler, such as auto-generated backing stores for
+    /// property getters/setters
+    /// </summary>
+    /// <param name="subject">The type</param>
+    /// <remarks>
+    /// This will probably never be foolproof because its too arbitrary
+    /// </remarks>
+    let getPureFields (subject : Type) =
+        if (subject |> isRecordType |> not) && (subject |> isUnionType |> not) then
+            subject.GetFields(DefaultBindingFlags) |> List.ofArray
+        else
+            []
+            
+        
 
     /// <summary>
     /// Retrieves an attribute applied to a type, if present
@@ -163,8 +187,12 @@ module Type =
             ClrTypeKind.Collection
         else if t |> isRecordType then
             ClrTypeKind.Record
+        else if t |> isModuleType then
+            ClrTypeKind.Module
         else if t |> isUnionType then
             ClrTypeKind.Union 
+        else if t |> isNullableType then
+            ClrTypeKind.NullableValue
         else if t.IsInterface then
             ClrTypeKind.Interface
         else if t.IsClass then

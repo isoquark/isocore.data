@@ -118,3 +118,11 @@ module Claim =
     /// <param name="seq">The sequence to examine</param>
     let seqIsEmpty (seq : seq<_>) =
         seq |> Seq.isEmpty |> isTrue
+
+    /// <summary>
+    /// Asserts that an item is contained in a list
+    /// </summary>
+    /// <param name="list">The list to search</param>
+    /// <param name="item">The item to search for</param>
+    let inList list item =
+       list |> List.exists(fun x -> x = item) |> isTrue

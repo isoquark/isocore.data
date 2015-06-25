@@ -8,7 +8,7 @@ open System.Reflection
 open System.Collections.Generic
 
 [<TestContainer>]
-module ClrTypeTest =     
+module ClrTypeReferenceTest =     
     type private RecordA = {
         Field01 : int
         Field02 : decimal

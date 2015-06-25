@@ -532,6 +532,8 @@ module ClrDataMemberElement =
         | FieldMember(x) -> 
             x.FieldInfo.FieldType
 
+        
+
 [<AutoOpen>]
 module ClrElementExtensions = 
 
@@ -620,6 +622,7 @@ module ClrElementExtensions =
         /// </summary>
         member this.AccessModifier = this.Element |> ClrElement.getAccess
 
+
     /// <summary>
     /// Defines augmentations for the <see cref="System.Reflection.ParameterInfo"/> type
     /// </summary>
@@ -638,6 +641,7 @@ module ClrElementExtensions =
         /// </summary>
         member this.ElementName = this.Element.Name
 
+
     /// <summary>
     /// Defines augmentations for the <see cref="System.Reflection.PropertyInfo"/> type
     /// </summary>
@@ -647,9 +651,18 @@ module ClrElementExtensions =
         /// Interprets the property as a <see cref="ClrPropertyElement"/>
         /// </summary>
         member this.PropertyElement = this |> ClrPropertyElement
-        member this.PropertyMemberElement = this.PropertyElement |> PropertyMember
-        member this.DataMemberElement = this.PropertyMemberElement |> DataMemberElement
-        member this.Element = this.DataMemberElement |> MemberElement
+        /// <summary>
+        /// Interprets the property as a <see cref="ClrDataMemberElement"/>
+        /// </summary>
+        member this.DataMemberElement = this.PropertyElement |> PropertyMember
+        /// <summary>
+        /// Interprets the property as a <see cref="ClrMemberElement"/>
+        /// </summary>
+        member this.MemberElement = this.DataMemberElement |> DataMemberElement
+        /// <summary>
+        /// Interprets the property as a <see cref="ClrElement"/>
+        /// </summary>
+        member this.Element = this.MemberElement |> MemberElement
         /// <summary>
         /// Gets the <see cref="ClrElementName"/> of the property
         /// </summary>
@@ -658,6 +671,7 @@ module ClrElementExtensions =
         /// Gets the applied access modifier
         /// </summary>
         member this.AccessModifier = this.Element |> ClrElement.getAccess
+
 
     /// <summary>
     /// Defines augmentations for the <see cref="System.Reflection.FieldInfo"/> type
@@ -668,9 +682,12 @@ module ClrElementExtensions =
         /// Interprets the field as a <see cref="ClrFieldElement"/>
         /// </summary>
         member this.FieldElement = this |> ClrFieldElement
-        member this.FieldMemberElement = this.FieldElement |> FieldMember
-        member this.DataMemberElement = this.FieldMemberElement |> DataMemberElement
-        member this.Element = this.DataMemberElement |> MemberElement
+        member this.DataMemberElement = this.FieldElement |> FieldMember
+        member this.MemberElement = this.DataMemberElement |> DataMemberElement
+        /// <summary>
+        /// Interprets the field as a <see cref="ClrElement"/>
+        /// </summary>
+        member this.Element = this.MemberElement |> MemberElement
         /// <summary>
         /// Gets the <see cref="ClrElementName"/> of the field
         /// </summary>
@@ -689,6 +706,9 @@ module ClrElementExtensions =
         /// Interprets the case as a <see cref="ClrUnionCaseElement"/>
         /// </summary>
         member this.UnionCaseElement = this |> ClrUnionCaseElement
+        /// <summary>
+        /// Interprets the case as a <see cref="ClrElement"/>
+        /// </summary>
         member this.Element = this.UnionCaseElement |> UnionCaseElement
         /// <summary>
         /// Gets the <see cref="ClrElementName"/> of the case
@@ -697,14 +717,68 @@ module ClrElementExtensions =
 
 
     /// <summary>
-    /// When supplied a property accessor quotation, retrieves the name of the property
+    /// Defines augmentations for the <see cref="ClrPopertyElement"/> type
     /// </summary>
-    /// <param name="q">The property accessor quotation</param>
-    /// <remarks>
-    /// Inspired heavily by: http://www.contactandcoil.com/software/dotnet/getting-a-property-name-as-a-string-in-f/
-    /// </remarks>
-    let rec propname q =
-       match q with
-       | PropertyGet(_,p,_) -> p.ElementName
-       | Lambda(_, expr) -> propname expr
-       | _ -> nosupport()
+    type ClrPropertyElement
+    with
+        member this.PropertyMemberElement = this.PropertyInfo.DataMemberElement
+        member this.DataMemberElement = this.PropertyInfo.MemberElement
+        /// <summary>
+        /// Interprets the property as a <see cref="ClrElement"/>
+        /// </summary>
+        member this.Element = this.PropertyInfo.Element
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrMemberElement"/> type
+    /// </summary>
+    type ClrMemberElement
+    with
+        /// <summary>
+        /// Interprets the member as a <see cref="ClrElement"/>
+        /// </summary>
+        member this.Element = this |> MemberElement
+        /// <summary>
+        /// Gets the member's declaring type
+        /// </summary>
+        member this.DeclaringType = this.Element |> ClrElement.getDeclaringType |> Option.get
+        /// <summary>
+        /// Gets the <see cref="ClrElementName"/> of the member 
+        /// </summary>
+        member this.ElementName = this.Element.Name
+
+
+
+module ClrAssembly =
+    /// <summary>
+    /// Gets the type elements defined in the assembly
+    /// </summary>
+    /// <param name="subject"></param>
+    let getTypeElements (subject : ClrAssemblyElement) =
+        subject.Assembly |> Assembly.getTypes |> List.map ClrTypeElement
+
+    /// <summary>
+    /// Retrieves a text resource embedded in the subject assembly if found
+    /// </summary>
+    /// <param name="shortName">The name of the resource, excluding the namespace path</param>
+    /// <param name="subject">The assembly that contains the resource</param>
+    let findTextResource shortName (subject : ClrAssemblyElement) =
+        subject.Assembly |> Assembly.findTextResource shortName        
+
+    /// <summary>
+    /// Writes a text resource contained in an assembly to a file and returns the path
+    /// </summary>
+    /// <param name="shortName">The name of the resource, excluding the namespace path</param>
+    /// <param name="outputDir">The directory into which the resource will be deposited</param>
+    /// <param name="subject">The assembly that contains the resource</param>
+    let writeTextResource shortName outputDir (subject : ClrAssemblyElement) =
+        subject.Assembly |> Assembly.writeTextResource shortName outputDir
+
+        
+module ClrTypeElement =
+    let getMembers (subject : ClrTypeElement) =
+        [
+            yield! subject.Type |> Type.getPureMethods |> List.map(fun x -> x.MemberElement)
+            yield! subject.Type |> Type.getProperties |> List.map(fun x -> x.MemberElement)
+            yield! subject.Type |> Type.getPureFields |> List.map(fun x -> x.MemberElement)
+        ]
+

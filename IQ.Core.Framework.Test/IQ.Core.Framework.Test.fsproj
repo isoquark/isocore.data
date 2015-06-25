@@ -64,7 +64,7 @@
   <ItemGroup>
     <None Include="packages.config" />
     <EmbeddedResource Include="Resources\EmbeddedResource01.txt" />
-    <Compile Include="ClrModel\ClrPropertyTest.fs" />
+    <Compile Include="ClrModel\ClrDescriptionTest.fs" />
     <Compile Include="ClrModel\ClrInterfaceTest.fs" />
     <Compile Include="ClrModel\ClrTypeReferenceTest.fs" />
     <Compile Include="ClrModel\ClrTypeValueTest.fs" />
