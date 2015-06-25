@@ -1,10 +1,11 @@
-﻿namespace global
+﻿namespace IQ.Core.Framework
 
 open System
 open System.Reflection
 open System.Diagnostics
 open System.Linq
 open System.Collections.Generic
+open System.IO
 
 open Microsoft.FSharp.Reflection
 open Microsoft.FSharp.Quotations.Patterns
@@ -31,6 +32,8 @@ module Lang =
         /// </remarks>
         let count (items : seq<'T>) = items.Count()
     
+    module Array =
+        let pmap = Array.Parallel.map
 
     /// <summary>
     /// Raises a debugging assertion if a supplied predicate fails and emits a diagnostic message
@@ -43,8 +46,14 @@ module Lang =
     /// <summary>
     /// Raises a <see cref="System.NotSupportedException"/>
     /// </summary>
-    /// <param name="description"></param>
     let inline nosupport()  = NotSupportedException() |> raise
+
+    
+    /// <summary>
+    /// Raises a <see cref="System.NotSupportedException"/>
+    /// </summary>
+    /// <param name="description"></param>
+    let inline nosupportd description = NotSupportedException(description) |> raise
 
     /// <summary>
     /// Defines augmentations for the TimeSpan type
@@ -107,171 +116,60 @@ module Lang =
         | OneOrMore
         | BoundedRange of min : uint32 * max : uint32
             
+    /// <summary>
+    /// Classifies CLR collections
+    /// </summary>
+    type ClrCollectionKind = 
+        | Unclassified = 0
+        /// Identifies an F# list
+        | FSharpList = 1
+        /// Identifies an array
+        | Array = 2
+        /// Identifies a Sytem.Collections.Generic.List<_> collection
+        | GenericList = 3
+
+
+    /// <summary>
+    /// Classifies CLR types
+    /// </summary>
+    type ClrTypeKind =
+        | Unclassified = 0
+        | Union = 1
+        | Record = 2
+        | Interface = 3
+        | Class = 4 
+        | Collection = 5
+        | Struct = 6
+
+    /// <summary>
+    /// Specifies the visibility of a CLR element
+    /// </summary>
+    type ClrAccess =
+        /// Indicates that the target is visible everywhere 
+        | PublicAccess
+        /// Indicates that the target is visible only to subclasses
+        /// Not supported in F#
+        | ProtectedAcces
+        /// Indicates that the target is not visible outside its defining scope
+        | PrivateAccess
+        /// Indicates that the target is visible throughout the assembly in which it is defined
+        | InternalAccess
+        /// Indicates that the target is visible to subclasses and the defining assembly
+        /// Not supported in F#
+        | ProtectedInternalAccess
         
-    /// <summary>
-    /// Specifies a concrete example of a regular expression
-    /// </summary>
-    type RegexExampleAttribute(text) =
-        inherit Attribute()
-        
-        /// <summary>
-        /// Gets the example text
-        /// </summary>
-        member this.Text : string = text    
 
-/// <summary>
-/// Defines utility methods for working with options
-/// </summary>
-module Option =
-    
-    /// <summary>
-    /// Determines whether a type is an option type
-    /// </summary>
-    /// <param name="t">The type to examine</param>
-    let isOptionType (t : Type) =
-        t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<option<_>>        
-
-    /// <summary>
-    /// Determines whether a value is an option
-    /// </summary>
-    /// <param name="value">The value to examine</param>
-    let isOptionValue (value : obj) =
-        if value <> null then
-            value.GetType() |> isOptionType
-        else
-            false
+       
 
 
-    /// <summary>
-    /// Gets the type of the encapsulated value
-    /// </summary>
-    /// <param name="optionType">The option type</param>
-    let getOptionValueType (t : Type) =
-        if t |> isOptionType  then t.GetGenericArguments().[0] |> Some else None
 
-    
-    /// <summary>
-    /// Extracts the enclosed value if Some, otherwise yields None
-    /// </summary>
-    /// <param name="value">The option value</param>
-    let unwrapValue (value : obj) =
-        if value = null then 
-            None
-        else
-            _assert "Value is not an option" (fun () -> isOptionValue(value) )
-            let caseInfo, fields = FSharpValue.GetUnionFields(value, value.GetType(),true)
-            if fields.Length = 0 then
-                None
-            else
-                fields.[0] |> Some
-
-    /// <summary>
-    /// Encloses a supplied value within Some option
-    /// </summary>
-    /// <param name="value">The value to enclose</param>
-    let makeSome (value : obj) =
-        if value = null then
-            ArgumentNullException() |> raise
-        
-        let valueType = value.GetType()
-        let optionType = typedefof<option<_>>.MakeGenericType(valueType)
-        let unionCase = FSharpType.GetUnionCases(optionType,true) |> Array.find(fun c -> c.Name = "Some")
-        FSharpValue.MakeUnion(unionCase, [|value|], true)
-
-    /// <summary>
-    /// Creates an option with the case None
-    /// </summary>
-    /// <param name="valueType">The value's type</param>
-    let makeNone (valueType : Type) =
-        let optionType = typedefof<option<_>>.MakeGenericType(valueType)
-        let unionCase = FSharpType.GetUnionCases(optionType,true) |> Array.find(fun c -> c.Name = "None")
-        FSharpValue.MakeUnion(unionCase, [||], true)
-
-module Type =
-    /// <summary>
-    /// Determines whether a type is a generic enumerable
-    /// </summary>
-    /// <param name="t">The type to examine</param>
-    let internal isNonOptionalCollectionType (t : Type) =
-        let isEnumerable = t.GetInterfaces() |> Array.exists(fun x -> x.IsGenericType && x.GetGenericTypeDefinition() = typedefof<IEnumerable<_>>)
-        if t.IsArray |> not then
-            t.IsGenericType && isEnumerable
-        else
-            isEnumerable            
-
-    /// <summary>
-    /// Determines whether the type is of the form option<IEnumerable<_>>
-    /// </summary>
-    /// <param name="t">The type to examine</param>
-    let internal isOptionalCollectionType (t : Type) =
-        t |> Option.isOptionType && t |> Option.getOptionValueType |> Option.get |> (fun x -> x |> isNonOptionalCollectionType)
-
-    /// <summary>
-    /// Determines whether a type represents a collection (optional or not)
-    /// </summary>
-    /// <param name="t">The type to examine</param>
-    let internal isCollectionType (t : Type) =
-        t |> isNonOptionalCollectionType || t |> isOptionalCollectionType
                 
-    /// <summary>
-    /// Determines whether a supplied type is a record type
-    /// </summary>
-    /// <param name="t">The candidate type</param>
-    let internal isRecordType(t : Type) =
-        FSharpType.IsRecord(t, true)
 
-    /// <summary>
-    /// Determines whether a supplied type is a record type
-    /// </summary>
-    let internal isRecord<'T>() =
-        typeof<'T> |> isRecordType
 
-    /// <summary>
-    /// Determines whether a supplied type is a union type
-    /// </summary>
-    /// <param name="t">The candidate type</param>
-    let internal isUnionType (t : Type) =
-        FSharpType.IsUnion(t, true)
-
-    /// <summary>
-    /// Determines whether a supplied type is a union type
-    /// </summary>
-    let internal isUnion<'T>() =
-        typeof<'T> |> isUnionType
     
-    let getCollectionValueType (t : Type) =
-        //This is far from bullet-proof
-        let colltype =
-            if t |> isOptionalCollectionType then
-                t |> Option.getOptionValueType 
-            else if t |> isNonOptionalCollectionType then
-                t |> Some
-            else
-                None
-        match colltype with
-        | Some(t) ->
-            let i = t.GetInterfaces() |> Array.find(fun i -> i.IsGenericType && i.GetGenericTypeDefinition() = typedefof<IEnumerable<_>>)    
-            i.GetGenericArguments().[0] |> Some
-        | None ->
-            None
-                
-    let getItemValueType (t : Type)  =
-        match t |> getCollectionValueType with
-        | Some(t) -> t
-        | None ->
-            match t |> Option.getOptionValueType with
-            | Some(t) -> t
-            | None ->
-                t
 
-[<AutoOpen>]
-module TypeExtensions =
-    type Type
-    with
-        member this.IsOptionType = this |> Option.isOptionType
+    
 
-        /// <summary>
-        /// If optional type, gets the type of the underlying value; otherwise, the type itself
-        /// </summary>
-        member this.ItemValueType = this |> Type.getItemValueType
-            
+
+
+    

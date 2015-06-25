@@ -58,9 +58,11 @@ module internal DataTypeConverter =
         | CustomObjectStorage(name,t) -> typeof<obj>
         | CustomPrimitiveStorage(name) -> typeof<obj>
 
+    [<ConversionFunction>]
     let private timespanToTicks (ts : TimeSpan) =
         ts.Ticks
 
+    [<ConversionFunction>]
     let private ticksToTimespan (ticks : int64) =
         TimeSpan.FromTicks
 
@@ -72,6 +74,8 @@ module internal DataTypeConverter =
             let clrType = storageType |> toClrTransportType
             value |> Converter.convert clrType
     
-            
+
+    let fromClrTransportValue dstType (value : obj) =
+        value |> Converter.convert dstType
 
 

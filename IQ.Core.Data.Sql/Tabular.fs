@@ -30,7 +30,7 @@ module internal Tabular =
         let proxy = tref |> DataProxyMetadata.describeTablularProxy
         let data = proxy.DataElement |> executeQuery cs
         let items = [for row in data -> tref |> ClrTypeValue.fromValueArray row]
-        items |> ClrCollection.create ClrCollectionKind.FSharpList tref.Type
+        items |> ClrCollection.create ClrCollectionKind.FSharpList tref.ReferentType
 
    
 

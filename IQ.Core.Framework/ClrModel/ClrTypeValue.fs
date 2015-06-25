@@ -12,11 +12,13 @@ module ClrTypeValue =
     /// </summary>
     /// <param name="record">The record whose values will be retrieved</param>
     let toValueIndex (record : obj) =
-        match record.GetType() |> ClrType.reference with
+        match record.GetType() |> ClrTypeReference.reference with
         | RecordTypeReference(subject, fields) ->
-            fields |> List.map(fun field -> field.Name.Text, field.Position, field.Property.GetValue(record)) |> ValueIndex.create
-        | _ -> 
-            NotSupportedException() |> raise
+            fields |> List.map(fun field ->                 
+                let value = field.Property |> ClrElement.getDataMemberValue record
+                field.Name.Text, field.Position, value)                 
+                |> ValueIndex.create
+        | _ -> nosupport()
     
     
     /// <summary>
@@ -24,14 +26,12 @@ module ClrTypeValue =
     /// </summary>
     /// <param name="record"></param>
     let toValueArray (record : obj) =
-        match record.GetType() |> ClrType.reference with
+        match record.GetType() |> ClrTypeReference.reference with
         | RecordTypeReference(subject, fields) ->
             [|for i in 0..fields.Length - 1 ->
-                record |> fields.[i].Property.GetValue
+                fields.[i].Property |> ClrElement.getDataMemberValue record 
             |]        
-        | _ -> 
-            NotSupportedException() |> raise
-
+        | _ -> nosupport()
 
     /// <summary>
     /// Creates a record from an array of values that are specified in declaration order
@@ -43,9 +43,8 @@ module ClrTypeValue =
         | RecordTypeReference(subject, fields) ->
             let types = fields |> List.map(fun field -> field.PropertyType) |> Array.ofList
             valueArray |> Converter.convertArray types 
-                       |> ClrType.getRecordFactory(subject.Type)
-        | _ -> 
-            NotSupportedException() |> raise
+                       |> ClrTypeReference.getRecordFactory(tref)
+        | _ -> nosupport()
                 
     /// <summary>
     /// Instantiates a type using the data supplied in a value map
@@ -59,9 +58,8 @@ module ClrTypeValue =
             fields |> List.map(fun field -> valueMap.[field.Name.Text]) 
                    |> Array.ofList 
                    |> Converter.convertArray types
-                   |> ClrType.getRecordFactory(subject.Type)
-        | _ -> 
-            NotSupportedException() |> raise
+                   |> ClrTypeReference.getRecordFactory(tref)
+        | _ -> nosupport()
 
 
 

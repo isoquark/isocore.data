@@ -88,7 +88,7 @@ module internal Routine =
             proxies |> List.tryFind
                 (
                     fun p -> match p.ProxyElement with                                
-                                | MemberElement(x) -> 
+                                | MemberReference(x) -> 
                                     match x with
                                     | MethodMemberReference(x) ->
                                         x.Subject.Element = m
@@ -98,7 +98,7 @@ module internal Routine =
 
         match targetMethod |> describeProxy with
         | Some(x) -> x
-        | None -> NotImplementedException(sprintf "There is no implementation for the method %s" targetMethod.Name) |> raise  
+        | None -> NotImplementedException(sprintf "There is no implementation for the method %O" targetMethod.Name) |> raise  
 
 
     type private MethodInvocationInfo = {
@@ -138,7 +138,8 @@ module internal Routine =
     /// </summary>
     let private createInvoker<'TContract,'TConfig> =
         let proxies = routineproxies<'TContract> 
-        let findProxy (mii : MethodInvocationInfo) = mii.Method |>  findMethodProxy proxies
+        let findProxy (mii : MethodInvocationInfo) = 
+            mii.Method |> MethodElement |>  findMethodProxy proxies
                             
         let invoke(mii : MethodInvocationInfo) =
             let proxy = mii |> findProxy 
@@ -166,11 +167,11 @@ module internal Routine =
                 else
                     let result = proxy.DataElement|> executeTableFunction mii.ConnectionString routineArgs
                     match proxy.ResultProxy.ProxyElement with
-                    | CollectionTypeReference(subject, itemType, collectionKind) ->            
+                    | CollectionTypeReference(subject, itemTypeRef, collectionKind) ->            
                         let items = 
                             [for row in result ->
-                                itemType |> ClrTypeValue.fromValueArray row]
-                        items |> ClrCollection.create collectionKind itemType.Type |> Some
+                                itemTypeRef |> ClrTypeValue.fromValueArray row]
+                        items |> ClrCollection.create collectionKind itemTypeRef.ReferentType |> Some
                     | _ -> NotSupportedException() |> raise
                         
                     

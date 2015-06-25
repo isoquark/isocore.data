@@ -23,5 +23,7 @@ module LangTest =
         3 |> Option.makeSome |> Claim.equal (Some(3) :> obj)
         typeof<int> |> Option.makeNone |> Claim.equal (option<int>.None :> obj)
 
-
+    [<Test>]
+    let ``Determined collection value type``() =
+        [1;2;3].GetType() |> Type.getCollectionValueType |> Claim.equal (Some(typeof<int>))
         

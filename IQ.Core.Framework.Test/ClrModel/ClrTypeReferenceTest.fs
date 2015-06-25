@@ -68,12 +68,12 @@ module ClrTypeTest =
     [<Test>]
     let ``Created union reference - single-case``() =
         let u = typeref<UnionA>
+        u.ReferentType |> Claim.equal typeof<UnionA>
         let unionName = typeof<UnionA>.ElementName
         match typeref<UnionA> with
         | UnionTypeReference(subject,cases) ->
             subject.Name |> Claim.equal unionName
             cases.Length |> Claim.equal 1
-            subject.Type |> Claim.equal typeof<UnionA>
             
             let field01Case = cases.[0].[0]        
             let fieldCaseName = field01Case.Name
@@ -100,8 +100,8 @@ module ClrTypeTest =
         let p1Name = propname<@ fun (x : ClassA) -> x.Prop1 @> 
         let p1Expect = {
             ClrPropertyDescription.Subject = ClrSubjectDescription(p1Name, 0)
-            DeclaringType = typeof<ClassA>.FullName |> FullTypeName
-            ValueType = typeof<DateTime>.FullName |> FullTypeName
+            DeclaringType = typeof<ClassA>.ElementTypeName
+            ValueType = typeof<DateTime>.ElementTypeName
             IsOptional = false
             CanWrite = false
             WriteAccess = None
@@ -114,8 +114,8 @@ module ClrTypeTest =
         let p2Name = propname<@ fun (x : ClassA) -> x.Prop2 @> 
         let p2Expect = {
             ClrPropertyDescription.Subject = ClrSubjectDescription(p2Name, 1)
-            DeclaringType = typeof<ClassA>.FullName |> FullTypeName
-            ValueType = typeof<int>.FullName |> FullTypeName
+            DeclaringType = typeof<ClassA>.ElementTypeName
+            ValueType = typeof<int>.ElementTypeName
             IsOptional = false
             CanWrite = true
             WriteAccess = PublicAccess |> Some
@@ -126,8 +126,8 @@ module ClrTypeTest =
         let p3Name = propname<@ fun (x : ClassA) -> x.Prop3 @>
         let p3Expect = {
             ClrPropertyDescription.Subject = ClrSubjectDescription(p3Name, 2)
-            DeclaringType = typeof<ClassA>.FullName |> FullTypeName
-            ValueType = typeof<int64>.ItemValueType.FullName |> FullTypeName
+            DeclaringType = typeof<ClassA>.ElementTypeName
+            ValueType = typeof<int64>.ElementTypeName
             IsOptional = true
             CanWrite = false
             WriteAccess = None

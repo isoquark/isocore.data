@@ -34,11 +34,11 @@ module ClrInterfaceTest =
             let methods = [for m in members do  match m with | MethodMemberReference(x) -> yield x | _ -> ()]
             methods.Length |> Claim.equal 3
             let m1 = methods |> List.find(fun x -> x.Name.Text = "Method01")
-            m1.Return.ReturnType |> Claim.isNone
+            m1.ReturnType |> Claim.isNone
             m1.Parameters.Length |> Claim.equal 0
 
             let m2 = methods |> List.find(fun x -> x.Name.Text = "Method02")
-            m2.Return.ReturnType |> Claim.isNone
+            m2.ReturnType |> Claim.isNone
             m2.Parameters.Length |> Claim.equal 1
             m2.Parameters.[0].Subject.Name.Text |> String.IsNullOrWhiteSpace |> Claim.isTrue
             m2.Parameters.[0].ParameterType |> Claim.equal typeof<int>

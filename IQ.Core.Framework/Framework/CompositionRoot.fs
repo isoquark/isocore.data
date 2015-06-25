@@ -26,7 +26,7 @@ module CompositionRoot =
             let assfilter = "IQ."
             assroot |> Assembly.loadReferences (Some(assfilter))
             let assemblies = AppDomain.CurrentDomain.GetAssemblies() 
-                           |> Array.filter(fun a -> a.FullName |> Txt.startsWith assfilter)
+                           |> Array.filter(fun a -> a.FullName.StartsWith assfilter)
             builder.RegisterAssemblyTypes(assemblies).AsImplementedInterfaces() |> ignore
             builder
         
@@ -34,8 +34,7 @@ module CompositionRoot =
         let container = ref(Unchecked.defaultof<IContainer>)
        
         let c() = container.Value
-        
-        
+                
         interface ICompositionRoot with
             member this.RegisterInstance instance = builder.RegisterInstance(instance) |> ignore
             member this.Seal() = container := builder.Build()

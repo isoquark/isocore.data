@@ -8,7 +8,7 @@ open Microsoft.FSharp.Reflection
 /// <summary>
 /// Defines operations applicable to the unified ClrElement type
 /// </summary>
-module ClrElement =
+module ClrElementReference =
     
     /// <summary>
     /// Reads an identified attribute from the element if applied
@@ -16,77 +16,93 @@ module ClrElement =
     /// <param name="element">The potentially attributed element</param>
     let getAttribute<'T when 'T :> Attribute>(element : ClrElementReference) =
         match element with
-        | TypeElement(e) -> 
+        | TypeReference(e) -> 
             e |> ClrTypeReference.getAttribute<'T>
-        | MemberElement(e) ->
+        | MemberReference(e) ->
             match e with
             | MethodMemberReference x -> 
-                x.Method |> MethodInfo.getAttribute<'T>
+                x.Method |> AttributeT.tryGetOne<'T>
             | DataMemberReference x ->
                 match x with
                 | PropertyMemberReference(p) -> 
-                    p.Property |> PropertyInfo.getAttribute<'T>
+                    p.Property |> AttributeT.tryGetOne<'T>
                 | FieldMemberReference(f) -> 
-                    f.Field |> FieldInfo.getAttribute<'T>
+                    f.Field |> AttributeT.tryGetOne<'T>
 
         | MethodParameterReference(x) ->
-            x.Parameter |> ParameterInfo.getAttribute
-        | UnionCaseElement(x) -> 
-            x.Case |> UnionCaseInfo.getAttribute
+             x.Parameter |> AttributeT.tryGetOne<'T> 
+        | UnionCaseReference(x) -> 
+            x.Case |> AttributeT.tryGetOne<'T> 
 
+
+    let internal getSubject(eref : ClrElementReference) =
+        match eref with
+            | MethodParameterReference(x) -> x.Subject
+            | UnionCaseReference(x) -> x.Subject
+            | TypeReference(x) -> x |> ClrTypeReference.getSubject
+            | MemberReference(x) -> x.Subject
+       
 
     /// <summary>
     /// Gets the name of the element
     /// </summary>
     /// <param name="element">The element</param>
-    let getName(element : ClrElementReference) =
-        match element with
-        | TypeElement(e) -> 
-            e |> ClrTypeReference.getName        
-        | MemberElement(x) -> 
+    let getReferentName(eref : ClrElementReference) =
+        match eref with
+        | TypeReference(e) -> 
+            e.ReferentName
+        | MemberReference(x) -> 
             x.Name
         | MethodParameterReference(x) ->
             x.Subject.Name
-        | UnionCaseElement(x) -> 
+        | UnionCaseReference(x) -> 
             x.Name
 
+   
+    /// <summary>
+    /// Gets the CLR element being referenced
+    /// </summary>
+    /// <param name="eref"></param>
+    let getReferent (eref : ClrElementReference) =
+        eref |> getSubject |> fun x -> x.Element        
 
     /// <summary>
-    /// Gets the type that declares the element, if applicable
+    /// Gets the type that declares the referent
     /// </summary>
-    /// <param name="element">The element</param>
-    let getDeclaringType(element : ClrElementReference) =
+    /// <param name="element">The element reference</param>
+    let getDeclaringType(eref : ClrElementReference) =
         let declarer (t : Type) =
             if t = null then None else t |> Some
         
         let declaringType = 
-            match element with
-            | TypeElement(e) -> e |> ClrTypeReference.getDeclaringType |> declarer
-            | MemberElement(e) ->
-                match e with
+            match eref with
+            | TypeReference(x) -> 
+                x |> ClrTypeReference.getDeclaringType |> declarer
+            | MemberReference(x) ->
+                match x with
                 | MethodMemberReference(x) -> 
-                    x.Method.DeclaringType |> declarer
+                    x.Method.DeclaringType |> Option.get |> declarer
                 | DataMemberReference x ->
                     match x with
                     | PropertyMemberReference(p) -> 
-                        p.Property.DeclaringType |> declarer
+                        p.Property.DeclaringType |> Option.get |> declarer
                     | FieldMemberReference(f) -> 
-                        f.Field.DeclaringType |> declarer
+                        f.Field.DeclaringType |> Option.get |> declarer
 
             | MethodParameterReference(x) ->
                 None
-            | UnionCaseElement(x) -> 
-                x.Case.DeclaringType |> declarer
+            | UnionCaseReference(x) -> 
+                x.Case.DeclaringType |> Option.get |> declarer
 
         match declaringType with
-        |Some(x) -> x |> ClrType.reference |> Some
+        |Some(x) -> x |> ClrTypeReference.reference |> Some
         | None -> None
 
     /// <summary>
     /// Gets the element from a supplied type
     /// </summary>
     /// <param name="t">The type to be expressed as an element</param>
-    let fromTypeRef(t : ClrTypeReference) = t |> TypeElement
+    let fromTypeRef(t : ClrTypeReference) = t |> TypeReference
             
     /// <summary>
     /// Creates a CLR element reference from the type identified by the type parameter
@@ -101,7 +117,7 @@ module ClrElement =
     let getDeclaringElement(element : ClrElementReference) =
         match element with
         | MethodParameterReference(x) ->
-            x.Method |>ClrType.referenceMethod 0 |> MethodMemberReference |> MemberElement |> Some
+            x.Method |>ClrTypeReference.referenceMethod 0 |> MethodMemberReference |> MemberReference |> Some
         | _ ->
             match element |> getDeclaringType with
             | Some(x) -> 
@@ -114,13 +130,15 @@ module ClrElement =
     
 
 [<AutoOpen>]
-module ClrElementExtensions =
+module ClrElementReferenceExtensions =
     
     type ClrElementReference
     with
-        member this.DeclaringType = this |> ClrElement.getDeclaringType
-        member this.Name = this |> ClrElement.getName
-        member this.GetAttribute<'T when 'T :> Attribute>(element) = element |> ClrElement.getAttribute<'T>
+        member this.DeclaringType = this |> ClrElementReference.getDeclaringType
+        member this.ReferentName = this |> ClrElementReference.getReferentName
+        member this.Referent = this |> ClrElementReference.getReferent
+        
+        member this.GetAttribute<'T when 'T :> Attribute>(element) = element |> ClrElementReference.getAttribute<'T>
     
     /// <summary>
     /// Creates a reference to a CLR element

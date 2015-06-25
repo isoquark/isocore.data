@@ -88,7 +88,7 @@ module CsvReader =
         file.Rows |> Seq.map createValueMap 
                   |> Seq.map (fun valueMap -> 
                     match proxy.ProxyElement with
-                    |TypeElement(e) -> e |> ClrTypeValue.fromValueIndex valueMap :?> 'T
+                    |TypeReference(e) -> e |> ClrTypeValue.fromValueIndex valueMap :?> 'T
                     | _ ->
                         ArgumentException() |> raise)
                     

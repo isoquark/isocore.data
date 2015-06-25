@@ -12,25 +12,20 @@ module ClrCollectionTest =
 
     [<Test>]
     let ``Determined whether type is a collection type``() =
-        [1;2;3].GetType() |> ClrType.getKind|> Claim.equal ClrTypeKind.Collection                    
-        [|1;2;3|].GetType() |> ClrType.getKind|> Claim.equal ClrTypeKind.Collection
+        [1;2;3].GetType() |> Type.getTypeKind|> Claim.equal ClrTypeKind.Collection                    
+        [|1;2;3|].GetType() |> Type.getTypeKind|> Claim.equal ClrTypeKind.Collection
 
     [<Test>]
     let ``Determined collection kind``() =
-         [1;2;3].GetType() |>ClrType.getCollectionKind |> Claim.equal ClrCollectionKind.FSharpList
-         [|1;2;3|].GetType() |>ClrType.getCollectionKind |> Claim.equal ClrCollectionKind.Array
-         Some([|1;2;3|]).GetType()   |> ClrType.getCollectionKind |> Claim.equal ClrCollectionKind.Array
-
-
-    [<Test>]
-    let ``Determined collection value type``() =
-        [1;2;3].GetType() |> ClrType.getCollectionValueType |> Claim.equal (Some(typeof<int>))
+         [1;2;3].GetType() |>Type.getCollectionKind |> Claim.equal ClrCollectionKind.FSharpList
+         [|1;2;3|].GetType() |>Type.getCollectionKind |> Claim.equal ClrCollectionKind.Array
+         Some([|1;2;3|]).GetType()   |> Type.getCollectionKind |> Claim.equal ClrCollectionKind.Array
 
 
     [<Test>]
     let ``Referenced collection type``() =
-        let ref1 = [1;2;3].GetType() |> ClrType.reference
-        ref1.Type |> Claim.equal (typeof<list<int>>)
+        let ref1 = [1;2;3].GetType() |> ClrTypeReference.reference
+        ref1.ReferentType |> Claim.equal (typeof<list<int>>)
 
     [<Test>]
     let ``Created F# list via reflection``() =

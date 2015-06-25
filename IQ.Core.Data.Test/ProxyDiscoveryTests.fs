@@ -153,20 +153,20 @@ module ``Proxy Discovery`` =
 
     [<Test>]
     let ``Inferred schema name from table proxy``() =
-        typeref<RecordA> |> ClrElement.fromTypeRef |> DataProxyMetadata.inferSchemaName |> Claim.equal "MySchema"
+        typeref<RecordA> |> ClrElementReference.fromTypeRef |> DataProxyMetadata.inferSchemaName |> Claim.equal "MySchema"
 
 
     [<Test>]
     let ``Inferred schema name from enclosing module``() =
-        ClrElement.fromType<RecordA> |>  DataProxyMetadata.inferSchemaName |> Claim.equal "MySchema"
-        ClrElement.fromType<ModuleA.RecordA> |> DataProxyMetadata.inferSchemaName |> Claim.equal "ModuleA"
-        ClrElement.fromType<ModuleB.RecordA> |> DataProxyMetadata.inferSchemaName |> Claim.equal "MySchema"
+        ClrElementReference.fromType<RecordA> |>  DataProxyMetadata.inferSchemaName |> Claim.equal "MySchema"
+        ClrElementReference.fromType<ModuleA.RecordA> |> DataProxyMetadata.inferSchemaName |> Claim.equal "ModuleA"
+        ClrElementReference.fromType<ModuleB.RecordA> |> DataProxyMetadata.inferSchemaName |> Claim.equal "MySchema"
 
     [<Test>]
     let ``Inferred data object names``() =
-        ClrElement.fromType<RecordA> |>  DataProxyMetadata.inferDataObjectName |> Claim.equal (DataObjectName("MySchema", "RecordA"))
-        ClrElement.fromType<ModuleA.RecordA> |> DataProxyMetadata.inferDataObjectName |> Claim.equal (DataObjectName("ModuleA", "RecordA"))
-        ClrElement.fromType<ModuleB.RecordA> |> DataProxyMetadata.inferDataObjectName |> Claim.equal (DataObjectName("MySchema", "RecordA"))
+        ClrElementReference.fromType<RecordA> |>  DataProxyMetadata.inferDataObjectName |> Claim.equal (DataObjectName("MySchema", "RecordA"))
+        ClrElementReference.fromType<ModuleA.RecordA> |> DataProxyMetadata.inferDataObjectName |> Claim.equal (DataObjectName("ModuleA", "RecordA"))
+        ClrElementReference.fromType<ModuleB.RecordA> |> DataProxyMetadata.inferDataObjectName |> Claim.equal (DataObjectName("MySchema", "RecordA"))
 
     [<Test>]
     let ``Described [SqlTest].[fTable04Before] table function from proxy``() =
@@ -184,7 +184,7 @@ module ``Proxy Discovery`` =
         
                             NotSupportedException() |> raise
         let proxy = methodref |> MethodMemberReference
-                              |> MemberElement
+                              |> MemberReference
                               |> DataProxyMetadata.describeTableFunctionProxy
                               |> DataObjectProxy.unwrapTableFunctionProxy
 

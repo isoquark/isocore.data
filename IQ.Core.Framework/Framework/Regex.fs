@@ -6,6 +6,18 @@ open System.Text.RegularExpressions
 
 open FSharp.Text.RegexProvider
 
+
+/// <summary>
+/// Specifies a concrete example of a regular expression
+/// </summary>
+type RegexExampleAttribute(text) =
+    inherit Attribute()
+        
+    /// <summary>
+    /// Gets the example text
+    /// </summary>
+    member this.Text : string = text    
+
 /// <summary>
 /// Defines commonly used regular expressions
 /// </summary>

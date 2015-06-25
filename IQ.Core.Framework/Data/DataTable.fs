@@ -94,11 +94,11 @@ module DataTable =
     /// <param name="dataTable">The data table</param>
     let toProxyValues (typeref : ClrTypeReference) (dataTable : DataTable) =
         match typeref with
-        | CollectionTypeReference(subject, itemType, collectionKind) ->            
+        | CollectionTypeReference(subject, itemTypeRef, collectionKind) ->            
             let items = 
                 [for row in dataTable.Rows ->
-                    itemType |> ClrTypeValue.fromValueArray row.ItemArray]
-            items |> ClrCollection.create collectionKind itemType.Type :?> IEnumerable
+                    itemTypeRef |> ClrTypeValue.fromValueArray row.ItemArray]
+            items |> ClrCollection.create collectionKind itemTypeRef.ReferentType :?> IEnumerable
         | _ ->
             [for row in dataTable.Rows ->
                 typeref |> ClrTypeValue.fromValueArray row.ItemArray] :> IEnumerable
