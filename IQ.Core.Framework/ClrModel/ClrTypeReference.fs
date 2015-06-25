@@ -65,7 +65,7 @@ module ClrTypeReference =
     /// <param name="p">The parameter to reference</param>
     let private referenceMethodParameter(p : ParameterInfo) =
         {
-            ClrMethodParameterReference.Subject = ClrSubject(p.ElementName , p.Position, p |> ParameterElement)
+            ClrMethodParameterReference.Subject = ClrSubject(p.ElementName , p.Position, p.Element)
             ParameterType = p.ParameterType
             ValueType = p.ParameterType |> getItemValueType
             IsRequired = (p.IsOptional || p.IsDefined(typeof<OptionalArgumentAttribute>)) |> not   
@@ -239,7 +239,7 @@ module ClrTypeReference =
     /// <param name="c">The case information</param>
     let private referenceUnionCase(c : UnionCaseInfo) =
         {
-            ClrUnionCaseReference.Subject = ClrSubject(c.ElementName, c.Tag, c |> UnionCaseElement)            
+            ClrUnionCaseReference.Subject = ClrSubject(c.ElementName, c.Tag, c.Element)            
             Fields = c.GetFields() |> List.ofArray |> List.mapi referenceUnionField
         }
     
@@ -298,7 +298,7 @@ module ClrTypeReference =
                                
     let getDeclaringType(tref : ClrTypeReference) =
         let element = tref |> getTypeReferent
-        element.DeclaringType 
+        element.Type.DeclaringType 
     
         
 

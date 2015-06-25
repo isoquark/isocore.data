@@ -64,10 +64,9 @@ module ClrMemberReferenceExtensions =
         member this.Position = this |> ClrDataMemberReference.getPosition
 
         /// <summary>
-        /// Interprets the the specific reference as a general element reference
+        /// Interprets the reference as a <see cref="ClrElementReference"/>
         /// </summary>
-        member this.ElementReference =
-            this |> DataMemberReference |> MemberReference
+        member this.ElementReference = this |> DataMemberReference |> MemberReference
 
 
     /// <summary>
@@ -94,7 +93,7 @@ module ClrMemberReferenceExtensions =
         member this.ReferentPosition = this.Subject.Position
 
         /// <summary>
-        /// Interprets the the specific reference as a general element reference
+        /// Interprets the reference as a <see cref="ClrElementReference"/>
         /// </summary>
         member this.ElementReference = this |> MemberReference
 
@@ -105,11 +104,11 @@ module ClrMemberReferenceExtensions =
             match this.Referent with
             | MemberElement(x) -> 
                 match x with
-                | MethodElement(x) -> x :> MemberInfo
+                | MethodElement(x) -> x.MethodInfo :> MemberInfo
                 | DataMemberElement(x) ->
                     match x with
-                    | PropertyMember(x) -> x :> MemberInfo
-                    | FieldMember(x) -> x :> MemberInfo
+                    | PropertyMember(x) -> x.PropertyInfo :> MemberInfo
+                    | FieldMember(x) -> x.FieldInfo :> MemberInfo
             | _ -> nosupport()
                 
 
@@ -141,15 +140,19 @@ module ClrMemberReferenceExtensions =
             match this.Referent with 
             | MemberElement(x) -> 
                 match x with
-                | MethodElement(x) -> x 
+                | MethodElement(x) -> x.MethodInfo 
                 | _ -> nosupport()
             |_ -> nosupport()
         
         /// <summary>
-        /// Interprets the the specific reference as a general element reference
+        /// Interprets the reference as a <see cref="ClrMemberReference"/>
         /// </summary>
-        member this.ElementReference =
-            this |> MethodMemberReference |> MemberReference
+        member this.MemberReference = this |> MethodMemberReference
+            
+        /// <summary>
+        /// Interprets the reference as a <see cref="ClrElementReference"/>
+        /// </summary>
+        member this.ElementReference = this.MemberReference |> MemberReference
 
     /// <summary>
     /// Defines augmentations for the <see cref="ClrPropertyReference"/> type
@@ -186,14 +189,20 @@ module ClrMemberReferenceExtensions =
             |_ -> nosupport()
 
         /// <summary>
-        /// Interprets the the specific reference as a general element reference
+        /// Interprets the reference as a <see cref="ClrDataMemberReference"/>
         /// </summary>
-        member this.ElementReference =
-            this |> PropertyMemberReference |> DataMemberReference |> MemberReference
-    
+        member this.DataMemberReference = this |> PropertyMemberReference
         
-    
+        /// <summary>
+        /// Interprets the reference as a <see cref="ClrMemberReference"/>
+        /// </summary>
+        member this.MemberReference = this.DataMemberReference |> DataMemberReference
 
+        /// <summary>
+        /// Interprets the reference as a <see cref="ClrElementReference"/>
+        /// </summary>
+        member this.ElementReference = this.MemberReference |> MemberReference
+               
     /// <summary>
     /// Defines augmentations for the <see cref="ClrFieldReference"/> type
     /// </summary>
@@ -215,10 +224,19 @@ module ClrMemberReferenceExtensions =
         member this.Referent = this.Subject.Element
 
         /// <summary>
-        /// Interprets the the specific reference as a general element reference
+        /// Interprets the reference as a <see cref="ClrDataMemberReference"/>
         /// </summary>
-        member this.ElementReference =
-            this |> FieldMemberReference |> DataMemberReference |> MemberReference
+        member this.DataMemberReference = this |> FieldMemberReference
+        
+        /// <summary>
+        /// Interprets the reference as a <see cref="ClrMemberReference"/>
+        /// </summary>
+        member this.MemberReference = this.DataMemberReference |> DataMemberReference
+
+        /// <summary>
+        /// Interprets the reference as a <see cref="ClrElementReference"/>
+        /// </summary>
+        member this.ElementReference =this.MemberReference |> MemberReference
 
         /// <summary>
         /// The raw CLR element represented by the referent
@@ -255,7 +273,7 @@ module ClrMemberReferenceExtensions =
         member this.Referent = this.Subject.Element
 
         /// <summary>
-        /// Interprets the the specific reference as a general element reference
+        /// Interprets the reference as a <see cref="ClrElementReference"/>
         /// </summary>
         member this.ElementReference =
             this |> MethodParameterReference

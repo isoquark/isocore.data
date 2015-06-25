@@ -18,6 +18,7 @@ module ClrElementVocabulary =
     /// <summary>
     /// Represents a type name
     /// </summary>
+    [<DebuggerDisplay(DebuggerDisplayDefault)>]
     type ClrTypeName = ClrTypeName of simpleName : string * fullName : string option * assemblyQualifiedName : string option
     with
         ///The local name of the type; does not include enclosing type names or namespace
@@ -34,15 +35,23 @@ module ClrElementVocabulary =
                                                     | None ->
                                                         match full with
                                                         | Some(x) -> x
-                                                        | None -> simple              
-    
+                                                        | None -> simple 
+        override this.ToString() = this.Text
 
     /// <summary>
     /// Represents an assembly name
     /// </summary>
-    type ClrAssemblyName =
-        | SimpleAssemblyName of string
-        | FullAssemblyName of string
+    [<DebuggerDisplay(DebuggerDisplayDefault)>]
+    type ClrAssemblyName = ClrAssemblyName of simpleName : string * fullName : string option
+    with
+        member this.SimpleName = match this with ClrAssemblyName(simpleName=x) -> x
+        member this.FullName = match this with ClrAssemblyName(fullName=x) -> x
+        member this.Text =
+            match this with ClrAssemblyName(simpleName, fullName) -> match fullName with
+                                                                        | Some(x) -> x
+                                                                        | None ->
+                                                                            simpleName
+        override this.ToString() = this.Text
 
     /// <summary>
     /// Represents the name of a CLR element
@@ -60,40 +69,97 @@ module ClrElementVocabulary =
     with
         override this.ToString() =
             match this with
-            | AssemblyElementName x -> 
-                match x with
-                | SimpleAssemblyName(x) -> x
-                | FullAssemblyName(x) -> x
-            | TypeElementName x -> 
-                x.Text
+            | AssemblyElementName x -> x.Text
+            | TypeElementName x -> x.Text
             | MemberElementName x -> x
             | ParameterElementName x -> x
 
 
     /// <summary>
-    /// Represents a CLR type element
+    /// Represents and encapsulates a CLR Type
     /// </summary>
     type ClrTypeElement  = ClrTypeElement of Type
     with
+        /// <summary>
+        /// Gets the encapluated Type
+        /// </summary>
         member this.Type = match this with ClrTypeElement(x) -> x
-        member this.DeclaringType = this.Type.DeclaringType
-        
+    
+    /// <summary>
+    /// Represents and encapsulates a CLR Assembly
+    /// </summary>
+    type ClrAssemblyElement = ClrAssemblyElement of Assembly   
+    with
+        /// <summary>
+        /// Gets the encapluated Assembly
+        /// </summary>
+        member this.Assembly = match this with ClrAssemblyElement(x) -> x
+    
+    /// <summary>
+    /// Represents and encapsulates a CLR (method) parameter 
+    /// </summary>
+    type ClParameterElement = ClrParameterElement of ParameterInfo
+    with
+        /// <summary>
+        /// Gets the encapluated Parameter
+        /// </summary>
+        member this.ParamerInfo = match this with ClrParameterElement(x) -> x
+
+    /// <summary>
+    /// Represents and encapsulates a CLR property
+    /// </summary>
+    type ClrPropertyElement = ClrPropertyElement of PropertyInfo
+    with
+        /// <summary>
+        /// Gets the encapluated Property
+        /// </summary>
+        member this.PropertyInfo = match this with ClrPropertyElement(x) -> x
+
+    /// <summary>
+    /// Represents and encapsulates a CLR field
+    /// </summary>
+    type ClrFieldElement = ClrFieldElement of FieldInfo
+    with
+        /// <summary>
+        /// Gets the encapluated Field
+        /// </summary>
+        member this.FieldInfo = match this with ClrFieldElement(x) -> x
+
+    /// <summary>
+    /// Represents and encapsulates a union case
+    /// </summary>
+    type ClrUnionCaseElement = ClrUnionCaseElement of UnionCaseInfo
+    with
+        /// <summary>
+        /// Gets the encapsulated case
+        /// </summary>
+        member this.UnionCaseInfo = match this with ClrUnionCaseElement(x) -> x
+
+    /// <summary>
+    /// Represents and encapsulates a CLR method
+    /// </summary>
+    type ClrMethodElement = ClrMethodElement of MethodInfo
+    with
+        /// <summary>
+        /// Gets the encapsulated method
+        /// </summary>
+        member this.MethodInfo = match this with ClrMethodElement(x) -> x
     
     type ClrDataMemberElement = 
-        | PropertyMember of PropertyInfo
-        | FieldMember of FieldInfo
+        | PropertyMember of ClrPropertyElement
+        | FieldMember of ClrFieldElement
 
     type ClrMemberElement =
         | DataMemberElement of ClrDataMemberElement
-        | MethodElement of MethodInfo
+        | MethodElement of ClrMethodElement
 
-    
+
     type ClrElement =
         | MemberElement of ClrMemberElement
         | TypeElement of ClrTypeElement
-        | AssemblyElement of Assembly
-        | ParameterElement of ParameterInfo
-        | UnionCaseElement of UnionCaseInfo
+        | AssemblyElement of ClrAssemblyElement
+        | ParameterElement of ClParameterElement
+        | UnionCaseElement of ClrUnionCaseElement
         
 
 
@@ -132,14 +198,14 @@ module ClrElement =
             | DataMemberElement(x) ->
                 match x with
                 | PropertyMember(x) ->
-                    x.DeclaringType |> Some
+                    x.PropertyInfo.DeclaringType |> Some
                 | FieldMember(x) -> 
-                    x.DeclaringType |> Some
+                    x.FieldInfo.DeclaringType |> Some
             | MethodElement(x) ->
-                x.DeclaringType |> Some
+                x.MethodInfo.DeclaringType |> Some
         | TypeElement(x) -> 
-            if x.DeclaringType <> null then
-                x.DeclaringType |> Some
+            if x.Type.DeclaringType <> null then
+                x.Type.DeclaringType |> Some
             else
                 None
         | AssemblyElement(x) ->
@@ -147,7 +213,7 @@ module ClrElement =
         | ParameterElement(x) ->
             None
         | UnionCaseElement(x) ->
-            x.DeclaringType |> Some
+            x.UnionCaseInfo.DeclaringType |> Some
     
     /// <summary>
     /// Gets the name of the element
@@ -160,19 +226,19 @@ module ClrElement =
             | DataMemberElement(x) ->
                 match x with
                 | PropertyMember(x) ->
-                    x.Name |> MemberElementName
+                    x.PropertyInfo.Name |> MemberElementName
                 | FieldMember(x) -> 
-                    x.Name |> MemberElementName
+                    x.FieldInfo.Name |> MemberElementName
             | MethodElement(x) ->
-                  x.Name |> MemberElementName
+                  x.MethodInfo.Name |> MemberElementName
         | TypeElement(x) -> 
             x.Type |> getTypeNameFromType |> TypeElementName
         | AssemblyElement(x) ->
-            x.FullName |> FullAssemblyName |> AssemblyElementName
+            ClrAssemblyName(x.Assembly.SimpleName, x.Assembly.FullName |> Some) |> AssemblyElementName
         | ParameterElement(x) ->
-            x.Name |> ParameterElementName
+            x.ParamerInfo.Name |> ParameterElementName
         | UnionCaseElement(x) ->
-            x.Name |> MemberElementName
+            x.UnionCaseInfo.Name |> MemberElementName
 
     /// <summary>
     /// Determines whether the element is a member 
@@ -252,6 +318,21 @@ module ClrElement =
                 | PropertyMember(x) ->
                     None
                 | FieldMember(x) -> 
+                    match x with 
+                    | ClrFieldElement(x) ->
+                        if x.IsPublic then
+                            PublicAccess |> Some
+                        else if x.IsPrivate then
+                            PrivateAccess |> Some 
+                        else if x.IsAssembly then
+                            InternalAccess |> Some
+                        else if x.IsFamilyOrAssembly then
+                            ProtectedInternalAccess |> Some
+                        else
+                            nosupport()
+            | MethodElement(x) ->
+                match x with 
+                | ClrMethodElement(x) ->
                     if x.IsPublic then
                         PublicAccess |> Some
                     else if x.IsPrivate then
@@ -262,17 +343,6 @@ module ClrElement =
                         ProtectedInternalAccess |> Some
                     else
                         nosupport()
-            | MethodElement(x) ->
-                if x.IsPublic then
-                    PublicAccess |> Some
-                else if x.IsPrivate then
-                    PrivateAccess |> Some 
-                else if x.IsAssembly then
-                    InternalAccess |> Some
-                else if x.IsFamilyOrAssembly then
-                    ProtectedInternalAccess |> Some
-                else
-                    nosupport()
         | TypeElement(x) -> 
             if x.Type.IsPublic  || x.Type.IsNestedPublic then
                 PublicAccess |> Some
@@ -310,19 +380,19 @@ module ClrElement =
             | DataMemberElement(x) ->
                 match x with
                 | PropertyMember(x) ->
-                    x |> Attribute.GetCustomAttributes
+                    x.PropertyInfo |> Attribute.GetCustomAttributes
                 | FieldMember(x) -> 
-                    x |> Attribute.GetCustomAttributes
+                    x.FieldInfo |> Attribute.GetCustomAttributes
             | MethodElement(x) ->
-                    x |> Attribute.GetCustomAttributes
+                    x.MethodInfo |> Attribute.GetCustomAttributes
         | TypeElement(x) -> 
             x.Type |> Attribute.GetCustomAttributes
         | AssemblyElement(x) ->
-            x |> Attribute.GetCustomAttributes
+            x.Assembly |> Attribute.GetCustomAttributes
         | ParameterElement(x) ->
-            x |> Attribute.GetCustomAttributes
+            x.ParamerInfo |> Attribute.GetCustomAttributes
         | UnionCaseElement(x) ->
-            [|for a in x.GetCustomAttributes() -> a :?> Attribute|]
+            [|for a in x.UnionCaseInfo.GetCustomAttributes() -> a :?> Attribute|]
         |> List.ofArray
 
     /// <summary>
@@ -337,19 +407,19 @@ module ClrElement =
             | DataMemberElement(x) ->
                 match x with
                 | PropertyMember(x) ->
-                    Attribute.IsDefined(x, attribType) 
+                    Attribute.IsDefined(x.PropertyInfo, attribType) 
                 | FieldMember(x) -> 
-                    Attribute.IsDefined(x, attribType) 
+                    Attribute.IsDefined(x.FieldInfo, attribType) 
             | MethodElement(x) ->
-                    Attribute.IsDefined(x, attribType) 
+                    Attribute.IsDefined(x.MethodInfo, attribType) 
         | TypeElement(x) -> 
             Attribute.IsDefined(x.Type, attribType) 
         | AssemblyElement(x) ->
-            Attribute.IsDefined(x, attribType) 
+            Attribute.IsDefined(x.Assembly, attribType) 
         | ParameterElement(x) ->
-            Attribute.IsDefined(x, attribType) 
+            Attribute.IsDefined(x.ParamerInfo, attribType) 
         | UnionCaseElement(x) ->
-            x.GetCustomAttributes() |> Array.filter(fun a -> a.GetType() = attribType) |> Array.isEmpty |> not
+            x.UnionCaseInfo.GetCustomAttributes() |> Array.filter(fun a -> a.GetType() = attribType) |> Array.isEmpty |> not
 
     /// <summary>
     /// Retrieves an attribute from the element if it exists and returns None if it odes not
@@ -364,19 +434,19 @@ module ClrElement =
                 | DataMemberElement(x) ->
                     match x with
                     | PropertyMember(x) ->
-                        Attribute.GetCustomAttribute(x, attribType)
+                        Attribute.GetCustomAttribute(x.PropertyInfo, attribType)
                     | FieldMember(x) -> 
-                        Attribute.GetCustomAttribute(x, attribType)
+                        Attribute.GetCustomAttribute(x.FieldInfo, attribType)
                 | MethodElement(x) ->
-                        Attribute.GetCustomAttribute(x, attribType)
+                        Attribute.GetCustomAttribute(x.MethodInfo, attribType)
             | TypeElement(x) -> 
                 Attribute.GetCustomAttribute(x.Type, attribType)
             | AssemblyElement(x) ->
-                Attribute.GetCustomAttribute(x, attribType)
+                Attribute.GetCustomAttribute(x.Assembly, attribType)
             | ParameterElement(x) ->
-                Attribute.GetCustomAttribute(x, attribType)
+                Attribute.GetCustomAttribute(x.ParamerInfo, attribType)
             | UnionCaseElement(x) ->
-                x.GetCustomAttributes() |> Array.find(fun a -> a.GetType() = attribType) :?> Attribute
+                x.UnionCaseInfo.GetCustomAttributes() |> Array.find(fun a -> a.GetType() = attribType) :?> Attribute
             |> Some
         else
             None    
@@ -401,19 +471,19 @@ module ClrElement =
             | DataMemberElement(x) ->
                 match x with
                 | PropertyMember(x) ->
-                    Attribute.GetCustomAttributes(x, attribType)
+                    Attribute.GetCustomAttributes(x.PropertyInfo, attribType)
                 | FieldMember(x) -> 
-                    Attribute.GetCustomAttributes(x, attribType)
+                    Attribute.GetCustomAttributes(x.FieldInfo, attribType)
             | MethodElement(x) ->
-                    Attribute.GetCustomAttributes(x, attribType)
+                    Attribute.GetCustomAttributes(x.MethodInfo, attribType)
         | TypeElement(x) -> 
             Attribute.GetCustomAttributes(x.Type, attribType)
         | AssemblyElement(x) ->
-            Attribute.GetCustomAttributes(x, attribType)
+            Attribute.GetCustomAttributes(x.Assembly, attribType)
         | ParameterElement(x) ->
-            Attribute.GetCustomAttributes(x, attribType)
+            Attribute.GetCustomAttributes(x.ParamerInfo, attribType)
         | UnionCaseElement(x) ->
-            [|for a in x.GetCustomAttributes() do if a.GetType() = attribType then yield a :?> Attribute|]
+            [|for a in x.UnionCaseInfo.GetCustomAttributes() do if a.GetType() = attribType then yield a :?> Attribute|]
         |> List.ofArray
 
     /// <summary>
@@ -451,91 +521,178 @@ module ClrDataMemberElement =
     let getValue (instance : obj) (element : ClrDataMemberElement) =
         match element with
         | PropertyMember(x) ->
-            instance |> x.GetValue
+            instance |> x.PropertyInfo.GetValue
         | FieldMember(x) -> 
-            instance |> x.GetValue
+            instance |> x.FieldInfo.GetValue
 
     let getType element =
         match element with
         | PropertyMember(x) ->
-            x.PropertyType
+            x.PropertyInfo.PropertyType
         | FieldMember(x) -> 
-            x.FieldType
+            x.FieldInfo.FieldType
 
 [<AutoOpen>]
 module ClrElementExtensions = 
-    module internal ClrAssemblyName =
-        let format assname =
-            match assname with
-            | SimpleAssemblyName(n) | FullAssemblyName(n) -> n
 
-
-    module internal ClrElementName =
-        let format name =
-            match name with
-            | AssemblyElementName(n) -> n |> ClrAssemblyName.format
-            | TypeElementName(n) -> n.Text
-            | MemberElementName(n) -> n
-            | ParameterElementName(n) -> n
-
-
-        
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrElement"/> type
+    /// </summary>
     type ClrElement
     with
         member this.DeclaringType = this |> ClrElement.getDeclaringType
         member this.Name = this |> ClrElement.getName
 
-
-    type ClrAssemblyName
-    with
-        member this.Text = this |> ClrAssemblyName.format
-
-    type ClrTypeName
-    with
-        member this.Text = this.Text
-
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrElementName"/> type
+    /// </summary>
     type ClrElementName
     with
-        member this.Text = this |> ClrElementName.format
+        /// <summary>
+        /// Renders the name as text
+        /// </summary>
+        member this.Text = 
+            match this with
+            | AssemblyElementName(n) -> n.Text
+            | TypeElementName(n) -> n.Text
+            | MemberElementName(n) -> n
+            | ParameterElementName(n) -> n
 
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="System.Type"/> type
+    /// </summary>
     type Type 
     with
-        member this.Element = this |> ClrTypeElement |> TypeElement
+        /// <summary>
+        /// Interprets the method as a <see cref="ClrTypeElement"/>
+        /// </summary>
+        member this.TypeElement = this |> ClrTypeElement
+        member this.Element = this.TypeElement |> TypeElement
         member this.ElementTypeName = this |> ClrElement.getTypeNameFromType
+        /// <summary>
+        /// Gets the <see cref="ClrElementName"/> of the type
+        /// </summary>
         member this.ElementName = this.Element.Name
         member this.AccessModifier = this.Element |> ClrElement.getAccess
     
+    /// <summary>
+    /// Defines augmentations for the <see cref="System.Reflection.Assembly"/> type
+    /// </summary>
     type Assembly
     with
-        member this.Element = this |> AssemblyElement
+        /// <summary>
+        /// Interprets the assembly as a <see cref="ClrAssemblyElement"/>
+        /// </summary>
+        member this.AssemblyElement = this |> ClrAssemblyElement
+        /// <summary>
+        /// Interprets the assembly as a <see cref="ClrElement"/>
+        /// </summary>
+        member this.Element = this.AssemblyElement |> AssemblyElement
+        /// <summary>
+        /// Gets the <see cref="ClrElementName"/> of the assembly
+        /// </summary>
         member this.ElementName = this.Element.Name
 
+    /// <summary>
+    /// Defines augmentations for the <see cref="System.Reflection.MethodInfo"/> type
+    /// </summary>
     type MethodInfo
     with
-        member this.Element = this |> MethodElement |> MemberElement
+        /// <summary>
+        /// Interprets the method as a <see cref="ClrMethodElement"/>
+        /// </summary>
+        member this.MethodElement = this |> ClrMethodElement
+        /// <summary>
+        /// Interprets the method as a <see cref="ClrMemberElement"/>
+        /// </summary>
+        member this.MemberElement = this.MethodElement |> MethodElement
+        /// <summary>
+        /// Interprets the method as a <see cref="ClrElement"/>
+        /// </summary>
+        member this.Element = this.MemberElement |> MemberElement
+        /// <summary>
+        /// Gets the <see cref="ClrElementName"/> of the method
+        /// </summary>
         member this.ElementName = this.Element.Name
+        /// <summary>
+        /// Gets the applied access modifier
+        /// </summary>
         member this.AccessModifier = this.Element |> ClrElement.getAccess
 
+    /// <summary>
+    /// Defines augmentations for the <see cref="System.Reflection.ParameterInfo"/> type
+    /// </summary>
     type ParameterInfo
     with        
-        member this.Element = this |> ParameterElement
+        /// <summary>
+        /// Interprets the parameter as a <see cref="ClrParameterElement"/>
+        /// </summary>
+        member this.ParameterElement = this |> ClrParameterElement
+        /// <summary>
+        /// Interprets the parameter as a <see cref="ClrElement"/>
+        /// </summary>
+        member this.Element = this.ParameterElement |> ParameterElement
+        /// <summary>
+        /// Gets the <see cref="ClrElementName"/> of the parameter
+        /// </summary>
         member this.ElementName = this.Element.Name
 
+    /// <summary>
+    /// Defines augmentations for the <see cref="System.Reflection.PropertyInfo"/> type
+    /// </summary>
     type PropertyInfo
-    with
-        member this.Element = this |> PropertyMember |> DataMemberElement |> MemberElement
+    with        
+        /// <summary>
+        /// Interprets the property as a <see cref="ClrPropertyElement"/>
+        /// </summary>
+        member this.PropertyElement = this |> ClrPropertyElement
+        member this.PropertyMemberElement = this.PropertyElement |> PropertyMember
+        member this.DataMemberElement = this.PropertyMemberElement |> DataMemberElement
+        member this.Element = this.DataMemberElement |> MemberElement
+        /// <summary>
+        /// Gets the <see cref="ClrElementName"/> of the property
+        /// </summary>
         member this.ElementName = this.Element.Name
+        /// <summary>
+        /// Gets the applied access modifier
+        /// </summary>
         member this.AccessModifier = this.Element |> ClrElement.getAccess
 
+    /// <summary>
+    /// Defines augmentations for the <see cref="System.Reflection.FieldInfo"/> type
+    /// </summary>
     type FieldInfo
     with
-        member this.Element = this |> FieldMember |> DataMemberElement |> MemberElement
+        /// <summary>
+        /// Interprets the field as a <see cref="ClrFieldElement"/>
+        /// </summary>
+        member this.FieldElement = this |> ClrFieldElement
+        member this.FieldMemberElement = this.FieldElement |> FieldMember
+        member this.DataMemberElement = this.FieldMemberElement |> DataMemberElement
+        member this.Element = this.DataMemberElement |> MemberElement
+        /// <summary>
+        /// Gets the <see cref="ClrElementName"/> of the field
+        /// </summary>
         member this.ElementName = this.Element.Name
+        /// <summary>
+        /// Gets the applied access modifier
+        /// </summary>
         member this.AccessModifier = this.Element |> ClrElement.getAccess
 
+    /// <summary>
+    /// Defines augmentations for the <see cref="Microsoft.FSharp.Reflection.UnionCaseInfo"/> type
+    /// </summary>
     type UnionCaseInfo
     with
-        member this.Element = this |> UnionCaseElement
+        /// <summary>
+        /// Interprets the case as a <see cref="ClrUnionCaseElement"/>
+        /// </summary>
+        member this.UnionCaseElement = this |> ClrUnionCaseElement
+        member this.Element = this.UnionCaseElement |> UnionCaseElement
+        /// <summary>
+        /// Gets the <see cref="ClrElementName"/> of the case
+        /// </summary>
         member this.ElementName = this.Element.Name
 
 

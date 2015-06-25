@@ -79,12 +79,12 @@
     <Compile Include="Framework\ConnectionString.fs" />
     <Compile Include="Framework\DynamicContract.fs" />
     <Compile Include="Framework\ValueIndex.fs" />
+    <Compile Include="ClrModel\ClrDescriptionModel.fs" />
     <Compile Include="ClrModel\ClrReferenceModel.fs" />
     <Compile Include="ClrModel\ClrMemberReference.fs" />
     <Compile Include="ClrModel\ClrTypeReference.fs" />
     <Compile Include="ClrModel\ClrElementReference.fs" />
     <Compile Include="ClrModel\ClrTypeValue.fs" />
-    <Compile Include="ClrModel\ClrDescriptionModel.fs" />
     <Compile Include="ClrModel\FSharpVocabulary.fs" />
     <None Include="Data\Resources\DefaultClrStorageTypeMap.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

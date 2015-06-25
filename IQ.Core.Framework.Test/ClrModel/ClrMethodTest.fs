@@ -42,7 +42,7 @@ module ClrMethodTest =
         match m.Subject.Element with
         | MemberElement(x) -> 
             match x with
-            | MethodElement(x) -> x |> MethodInfo.getReturnAttribute<MyAttribute> |> Claim.isSome
+            | MethodElement(x) -> x.MethodInfo |> MethodInfo.getReturnAttribute<MyAttribute> |> Claim.isSome
             | _ -> Claim.assertFail()
         | _ -> Claim.assertFail()
 

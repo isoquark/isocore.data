@@ -62,7 +62,11 @@ module Assembly =
                 name |> AppDomain.CurrentDomain.Load |> loadReferences filter
         )
 
-
+[<AutoOpen>]
+module AssemblyExtensions =
+    type Assembly
+    with
+        member this.SimpleName = this.GetName().Name
         
 
 
