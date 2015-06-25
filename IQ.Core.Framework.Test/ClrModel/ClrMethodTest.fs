@@ -40,7 +40,7 @@ module ClrMethodTest =
         m.Parameters.[1].ValueType |> Claim.equal typeof<int>
         m.ReturnType |> Option.get |> Claim.equal typeof<int64>
         match m.Subject.Element with
-        | MemberElement(x) -> 
+        | MemberElement(element=x) -> 
             match x with
             | MethodElement(x) -> x.MethodInfo |> MethodInfo.getReturnAttribute<MyAttribute> |> Claim.isSome
             | _ -> Claim.assertFail()

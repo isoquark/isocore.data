@@ -43,7 +43,7 @@ module ClrTypeReference =
     let getTypeReferent (tref : ClrTypeReference) =
         let subject = tref |> getSubject
         match subject.Element with
-            | TypeElement(x) -> x
+            | TypeElement(element=x) -> x
             | _ -> nosupport()   
      
     let getReferentName (tref : ClrTypeReference) =
@@ -134,7 +134,7 @@ module ClrTypeReference =
     /// <param name="t">The type of the interface to reference</param>
     let private createClassReference(t : Type) =
             ClassTypeReference(
-                ClrSubject(t.ElementName, -1, t |> ClrTypeElement |> TypeElement), 
+                ClrSubject(t.ElementName, -1, t.Element), 
                 (t |> Type.getPureMethods |> List.mapi referenceMember ) 
                 |> List.append (t.GetProperties() |> Array.mapi referenceMember |> List.ofArray))
 
@@ -150,7 +150,7 @@ module ClrTypeReference =
 
     let private createStructReference(t : Type) =
         StructTypeReference(
-            ClrSubject(t.ElementName, -1, t |> ClrTypeElement |> TypeElement ),
+            ClrSubject(t.ElementName, -1, t.Element),
                 (t |> Type.getPureMethods |> List.mapi referenceMember ) 
                 |> List.append (t.GetProperties() |> Array.mapi referenceMember |> List.ofArray))
     
@@ -167,7 +167,7 @@ module ClrTypeReference =
     /// <param name="t">The type of the interface to reference</param>
     let private createInterfaceReference(t : Type) =
         InterfaceTypeReference(
-            ClrSubject(t.ElementName, -1, t |> ClrTypeElement |> TypeElement),
+            ClrSubject(t.ElementName, -1, t.Element),
                 (t |> Type.getPureMethods |> List.mapi referenceMember ) 
                 |> List.append (t.GetProperties() |> Array.mapi referenceMember |> List.ofArray))
 
@@ -206,7 +206,7 @@ module ClrTypeReference =
                         ValueType =   p.PropertyType |> getItemValueType
                     }) 
                 |> List.ofArray
-        RecordTypeReference(ClrSubject(t.ElementName, 0, t |> ClrTypeElement |> TypeElement ), proprefs)
+        RecordTypeReference(ClrSubject(t.ElementName, -1, t.Element), proprefs)
 
                
        
@@ -255,7 +255,7 @@ module ClrTypeReference =
     /// </summary>
     /// <param name="t">The union type</param>
     let private createUnionReference(t : Type) =      
-        UnionTypeReference(ClrSubject(t.ElementName, -1, t |> ClrTypeElement |> TypeElement ), t |> referenceCases)
+        UnionTypeReference(ClrSubject(t.ElementName, -1, t.Element ), t |> referenceCases)
 
     /// <summary>
     /// Describes the union represented by the type
@@ -275,7 +275,7 @@ module ClrTypeReference =
         let referenceCollection (t : Type) =
             let itemValueType = t |> getItemValueType |> reference 
             CollectionTypeReference(
-                ClrSubject(t.ElementName, -1, t |> ClrTypeElement |> TypeElement),
+                ClrSubject(t.ElementName, -1, t.Element),
                 itemValueType,
                 t |> getCollectionKind)
         

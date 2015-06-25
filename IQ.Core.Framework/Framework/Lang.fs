@@ -188,6 +188,20 @@ module Lang =
         | ProtectedInternalAccess
         
     /// <summary>
+    /// Classifies native CLR metadata elements
+    /// </summary>
+    type ClrReflectedKind =
+        | Assembly = 1
+        | Type = 2
+        | Method = 3
+        | Property = 4
+        | Field = 5
+        | Constructor = 6
+        | Event = 7
+        | Parameter = 8
+        | UnionCase = 9
+
+    /// <summary>
     /// Defines System.MethodInfo helpers
     /// </summary>
     module MethodInfo =
@@ -203,8 +217,19 @@ module Lang =
                 None
 
        
-
-
+module ClrReflectedKind =
+    let fromInstance (o : obj) =
+        match o with
+        | :? Assembly -> ClrReflectedKind.Assembly
+        | :? Type -> ClrReflectedKind.Type
+        | :? MethodInfo -> ClrReflectedKind.Method
+        | :? PropertyInfo -> ClrReflectedKind.Property
+        | :? FieldInfo -> ClrReflectedKind.Field
+        | :? ConstructorInfo -> ClrReflectedKind.Constructor
+        | :? EventInfo -> ClrReflectedKind.Event
+        | :? ParameterInfo -> ClrReflectedKind.Parameter
+        | :? UnionCaseInfo -> ClrReflectedKind.UnionCase
+        | :? _ -> nosupport()
 
                 
 

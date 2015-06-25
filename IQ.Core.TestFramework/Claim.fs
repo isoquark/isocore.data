@@ -126,3 +126,11 @@ module Claim =
     /// <param name="item">The item to search for</param>
     let inList list item =
        list |> List.exists(fun x -> x = item) |> isTrue
+
+    /// <summary>
+    /// Asserts that a list has a specified length
+    /// </summary>
+    /// <param name="list">The list to search</param>
+    /// <param name="item">The item to search for</param>
+    let listHasLength length (list : list<_>) =
+        list.Length |> equal length

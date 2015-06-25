@@ -109,7 +109,7 @@ module Type =
             
     [<Literal>]
     let private DefaultBindingFlags = 
-        BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.Static ||| BindingFlags.Instance
+        BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.Static ||| BindingFlags.Instance ||| BindingFlags.DeclaredOnly
     
     /// <summary>
     /// Gets the identified MethodInformation, searching non-public/public/static/instance methods
@@ -117,6 +117,11 @@ module Type =
     /// <param name="name">The name of the method</param>
     let getMethod name (subject : Type) =
             subject.GetMethod(name, DefaultBindingFlags)        
+
+    let private isPureMethod (m : MethodInfo) =
+        let isGetOrSet (m : MethodInfo) =
+            (m.IsSpecialName && m.Name.StartsWith "get_") || (m.IsSpecialName && m.Name.StartsWith "set_")
+        m |> isGetOrSet |> not
 
     /// <summary>
     /// Gets methods that aren't implemented to serve as property getters/setters
@@ -126,9 +131,7 @@ module Type =
     /// This will probably never be foolproof because its too arbitrary
     /// </remarks>
     let getPureMethods (subject : Type) =
-        let isGetOrSet (m : MethodInfo) =
-            (m.IsSpecialName && m.Name.StartsWith "get_") || (m.IsSpecialName && m.Name.StartsWith "set_")
-        subject.GetMethods(DefaultBindingFlags) |> Array.filter(fun x -> x |> isGetOrSet |> not) |> List.ofArray
+        subject.GetMethods(DefaultBindingFlags) |> Array.filter(fun x -> x |> isPureMethod) |> List.ofArray
 
     /// <summary>
     /// Gets the properties defined by the type
@@ -136,6 +139,9 @@ module Type =
     /// <param name="subject">The type</param>
     let getProperties  (subject : Type) =
         subject.GetProperties(DefaultBindingFlags) |> List.ofArray
+
+    let private isPureField (f : FieldInfo) =
+        (f.DeclaringType |> isRecordType |> not) && (f.DeclaringType |> isUnionType |> not)
 
     /// <summary>
     /// Gets fields that are not artifacts of the compiler, such as auto-generated backing stores for
@@ -151,7 +157,17 @@ module Type =
         else
             []
             
-        
+    let getPureMembers (subject : Type) =
+        subject.GetMembers(DefaultBindingFlags) |> Array.filter(fun m ->
+            match m with
+            | :? MethodInfo as x  -> x |> isPureMethod
+            | :? PropertyInfo  -> true
+            | :? FieldInfo as x -> x |> isPureField
+            | :? ConstructorInfo -> false
+            | :? Type -> false
+            | :? EventInfo -> false
+            | _ -> nosupport()
+        ) |> List.ofArray
 
     /// <summary>
     /// Retrieves an attribute applied to a type, if present

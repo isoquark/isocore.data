@@ -102,13 +102,7 @@ module ClrMemberReferenceExtensions =
         /// </summary>
         member this.MemberInfo = 
             match this.Referent with
-            | MemberElement(x) -> 
-                match x with
-                | MethodElement(x) -> x.MethodInfo :> MemberInfo
-                | DataMemberElement(x) ->
-                    match x with
-                    | PropertyMember(x) -> x.PropertyInfo :> MemberInfo
-                    | FieldMember(x) -> x.FieldInfo :> MemberInfo
+            | MemberElement(element=x) -> x.MemberInfo
             | _ -> nosupport()
                 
 
@@ -138,10 +132,7 @@ module ClrMemberReferenceExtensions =
         /// </summary>
         member this.MethodInfo = 
             match this.Referent with 
-            | MemberElement(x) -> 
-                match x with
-                | MethodElement(x) -> x.MethodInfo 
-                | _ -> nosupport()
+            | MemberElement(element=x) -> x.MemberInfo :?> MethodInfo
             |_ -> nosupport()
         
         /// <summary>
@@ -175,23 +166,24 @@ module ClrMemberReferenceExtensions =
         member this.Referent = this.Subject.Element
 
         /// <summary>
+        /// Interprets the reference as a <see cref="ClrDataMemberReference"/>
+        /// </summary>
+        member this.DataMemberReference = this |> PropertyMemberReference
+
+        /// <summary>
         /// The raw CLR element represented by the referent
         /// </summary>
         member this.PropertyInfo = 
             match this.Referent with 
-            | MemberElement(x) -> 
+            | MemberElement(element=x) -> 
                 match x with
                 | DataMemberElement(x) ->
                     match x with
-                    | PropertyMember(x) -> x
+                    | PropertyMember(x) -> x.PropertyInfo
                     | _ -> nosupport()
                 | _ -> nosupport()
             |_ -> nosupport()
 
-        /// <summary>
-        /// Interprets the reference as a <see cref="ClrDataMemberReference"/>
-        /// </summary>
-        member this.DataMemberReference = this |> PropertyMemberReference
         
         /// <summary>
         /// Interprets the reference as a <see cref="ClrMemberReference"/>
@@ -243,11 +235,11 @@ module ClrMemberReferenceExtensions =
         /// </summary>
         member this.FieldInfo = 
             match this.Referent with 
-            | MemberElement(x) -> 
+            | MemberElement(element=x) -> 
                 match x with
                 | DataMemberElement(x) ->
                     match x with
-                    | FieldMember(x) -> x
+                    | FieldMember(x) -> x.FieldInfo
                     | _ -> nosupport()
                 | _ -> nosupport()
             |_ -> nosupport()
@@ -329,5 +321,5 @@ module ClrMemberReferenceExtensions =
         /// </summary>
         member this.UnionCaseInfo = 
             match this.Referent with
-            | UnionCaseElement(x) -> x
+            | UnionCaseElement(element=x) -> x.UnionCaseInfo
             |_ -> nosupport()

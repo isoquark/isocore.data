@@ -63,19 +63,19 @@
   </Target>
   <ItemGroup>
     <None Include="packages.config" />
+    <Content Include="app.config" />
     <EmbeddedResource Include="Resources\EmbeddedResource01.txt" />
     <Compile Include="ClrModel\ClrDescriptionTest.fs" />
     <Compile Include="ClrModel\ClrInterfaceTest.fs" />
     <Compile Include="ClrModel\ClrTypeReferenceTest.fs" />
     <Compile Include="ClrModel\ClrTypeValueTest.fs" />
-    <Compile Include="ClrModel\ClrAssemblyTest.fs" />
     <Compile Include="ClrModel\ClrMethodTest.fs" />
     <Compile Include="ClrModel\ClrCollectionTest.fs" />
     <Compile Include="LangTest.fs" />
     <Compile Include="ConverterTest.fs" />
     <Compile Include="TxtTest.fs" />
     <Compile Include="ConnectionStringTest.fs" />
-    <Content Include="app.config" />
+    <Compile Include="ClrElementTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
