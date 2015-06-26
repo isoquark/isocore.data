@@ -60,47 +60,43 @@ module ``Channel and Service Hosting Tests`` =
     let validateResult result  =
         Claim.isFalse <| String.IsNullOrEmpty result
         Claim.isTrue <| (result.ToUpper().Contains <| firstName.ToUpper())
-        
+
+    let actionAsAction() = Action<ISimpleService> (fun (x : ISimpleService) -> result <- x.MyRequestReplyMessage(inputName))
+    let actionAsFun = fun (x : 'T when 'T :> ISimpleService) -> result <- x.MyRequestReplyMessage(inputName)
+
     [<Test>]
     let ``Invoke Service With Action and Endpoint Name As Option``() =
-        let action() = Action<ISimpleService> (fun (x : ISimpleService) -> result <- x.MyRequestReplyMessage(inputName))
-        cm.Invoke (action(), epnOpt)
+        cm.Invoke (actionAsAction(), epnOpt)
         validateResult result
 
     [<Test>]
     let ``Invoke Service With Func and Endpoint Name As Option``() =
-        let action = fun (x : ISimpleService) -> result <- x.MyRequestReplyMessage(inputName)
-        cm.Invoke2 (action, epnOpt)
+        cm.Invoke2 (actionAsFun, epnOpt)
         validateResult result
 
     [<Test>]
     let ``Invoke Service With Action and Endpoint Name As String``() =
-        let action() = Action<ISimpleService> (fun (x : ISimpleService) -> result <- x.MyRequestReplyMessage(inputName))
-        cm.Invoke (action(), epnStr)
+        cm.Invoke (actionAsAction(), epnStr)
         validateResult result
 
     [<Test>]
     let ``Invoke Service With Func and Endpoint Name As String``() =
-        let action = fun (x : ISimpleService) -> result <- x.MyRequestReplyMessage(inputName)
-        cm.Invoke2 (action, epnStr)
+        cm.Invoke2 (actionAsFun, epnStr)
         validateResult result
 
     [<Test>]
     let ``Invoke Service With Action and Without Endpoint Name``() =
-        let action() = Action<ISimpleService> (fun (x : ISimpleService) -> result <- x.MyRequestReplyMessage(inputName))
-        cm.Invoke (action())
+        cm.Invoke (actionAsAction())
         validateResult result
 
     [<Test>]
     let ``Invoke Service With Func and Without Endpoint Name``() =
-        let action = fun (x : ISimpleService) -> result <- x.MyRequestReplyMessage(inputName)
-        cm.Invoke2 (action)
+        cm.Invoke2 (actionAsFun)
         validateResult result
 
 //    [<Test>] //TODO: how to do ExpectedException
 //    let ``Invoke Service With Func and Invalid Endpoint Name As String``() =
-//        let action = fun (x : ISimpleService) -> result <- x.MyRequestReplyMessage(inputName)
-//        cm.Invoke2 (action, epnStr) //exception here
+//        cm.Invoke2 (actionAsFun, epnStr) //exception here
 //        validateResult result
 
 
