@@ -18,6 +18,11 @@ open Microsoft.FSharp.Quotations.Patterns
 /// </remarks>
 [<AutoOpen>]
 module Lang =
+    /// <summary>
+    /// Raises a <see cref="System.NotSupportedException"/>
+    /// </summary>
+    let inline nosupport()  = NotSupportedException() |> raise
+
                                             
     /// <summary>
     /// Defines custom Seq module operations
@@ -36,7 +41,11 @@ module Lang =
     /// Defines custom Array module operations
     /// </summary>
     module Array =
+        /// <summary>
+        /// Maps items in an array in parallel
+        /// </summary>
         let pmap = Array.Parallel.map
+
 
     /// <summary>
     /// Raises a debugging assertion if a supplied predicate fails and emits a diagnostic message
@@ -47,10 +56,17 @@ module Lang =
         Debug.Assert(predicate(), message)
 
     /// <summary>
-    /// Raises a <see cref="System.NotSupportedException"/>
+    /// Extracts the MethodInfo of a function used in a lambda expression
     /// </summary>
-    let inline nosupport()  = NotSupportedException() |> raise
-
+    /// <remarks>
+    /// Useful for quotations of the form <@fun () -> myfunc @>
+    /// </remarks>
+    let rec funcinfo q =
+        match q with
+        | Lambda(_, expr) -> funcinfo expr
+        | Call(_,m,_) -> m
+        | _ -> nosupport()
+        
     /// <summary>
     /// Raises a <see cref="System.ArgumentException"/> 
     /// </summary>
@@ -258,6 +274,46 @@ module Lang =
         /// Not supported in F#
         | ProtectedInternalAccess
         
+        /// <summary>
+        /// Represents a type name
+        /// </summary>
+        type ClrTypeName = ClrTypeName of simpleName : string * fullName : string option * assemblyQualifiedName : string option
+
+        /// <summary>
+        /// Represents an assembly name
+        /// </summary>
+        type ClrAssemblyName = ClrAssemblyName of simpleName : string * fullName : string option
+        with
+            member this.SimpleName = match this with ClrAssemblyName(simpleName=x) -> x
+            member this.FullName = match this with ClrAssemblyName(fullName=x) -> x
+            member this.Text =
+                match this with ClrAssemblyName(simpleName, fullName) -> match fullName with
+                                                                            | Some(x) -> x
+                                                                            | None ->
+                                                                                simpleName    
+
+        /// <summary>
+        /// Represents the name of a member
+        /// </summary>    
+        type ClrMemberElementName = ClrMemberElementName of string
+    
+        /// <summary>
+        /// Represents the name of a parameter
+        /// </summary>    
+        type ClrParameterElementName = ClrParameterElementName of string
+
+        /// <summary>
+        /// Represents the name of a CLR element
+        /// </summary>
+        type ClrElementName =
+            ///Specifies the name of an assembly 
+            | AssemblyElementName of ClrAssemblyName
+            ///Specifies the name of a type 
+            | TypeElementName of ClrTypeName
+            ///Specifies the name of a type member
+            | MemberElementName of ClrMemberElementName
+            ///Specifies the name of a parameter
+            | ParameterElementName of ClrParameterElementName
 
     /// <summary>
     /// Defines System.MethodInfo helpers

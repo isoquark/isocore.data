@@ -30,14 +30,14 @@ module ClrElement =
             | DataMemberElement(x) ->
                 match x with
                 | PropertyMember(x) ->
-                    x.PropertyInfo.DeclaringType |> ClrElementProvider.getTypeElement |> Some
+                    x.PropertyInfo.DeclaringType |> ClrElementProvider.getType |> Some
                 | FieldMember(x) -> 
-                    x.FieldInfo.DeclaringType |> ClrElementProvider.getTypeElement |> Some
+                    x.FieldInfo.DeclaringType |> ClrElementProvider.getType |> Some
             | MethodElement(x) ->
-                x.MethodInfo.DeclaringType |> ClrElementProvider.getTypeElement |> Some
+                x.MethodInfo.DeclaringType |> ClrElementProvider.getType |> Some
         | TypeElement(element=x) -> 
             if x.Type.DeclaringType <> null then
-                x.Type.DeclaringType |> ClrElementProvider.getTypeElement |> Some
+                x.Type.DeclaringType |> ClrElementProvider.getType |> Some
             else
                 None
         | AssemblyElement(element=x) ->
@@ -45,7 +45,7 @@ module ClrElement =
         | ParameterElement(element=x) ->
             None
         | UnionCaseElement(element=x) ->
-            x.UnionCaseInfo.DeclaringType |> ClrElementProvider.getTypeElement |> Some
+            x.UnionCaseInfo.DeclaringType |> ClrElementProvider.getType |> Some
 
 
     /// <summary>
@@ -152,6 +152,32 @@ module ClrElement =
             None
         | UnionCaseElement(element=x) ->
              PublicAccess |> Some
+
+    /// <summary>
+    /// Determines whether the element is static
+    /// </summary>
+    /// <param name="element">The element to examine</param>
+    let isStatic (element : ClrElement) =
+        match element with
+        | MemberElement(element=x) -> 
+            match x with
+            | DataMemberElement(x) ->
+                match x with
+                | PropertyMember(x) ->
+                    x.PropertyInfo.GetMethod.IsStatic && x.PropertyInfo.SetMethod.IsStatic
+                | FieldMember(x) -> 
+                    x.FieldInfo.IsStatic
+            | MethodElement(x) ->
+                x.MethodInfo.IsStatic
+        | TypeElement(element=x) -> 
+                x.Type.IsAbstract && x.Type.IsSealed
+        | AssemblyElement(element=x) ->
+            false
+        | ParameterElement(x) ->
+            false
+        | UnionCaseElement(element=x) ->
+            false
+        
         
     /// <summary>
     /// Gets the acess modifier applied to the element, if applicable; otherwise,
@@ -160,9 +186,7 @@ module ClrElement =
     /// <param name="element">The element to examine</param>
     let getAccess (element : ClrElement) = 
         element |> tryGetAccess |> Option.get
-
-        
-
+       
     /// <summary>
     /// Retrieves all attributes applied to the element
     /// </summary>
@@ -312,7 +336,7 @@ module ClrElement =
         [for a in Attribute.GetCustomAttributes(subject, typeof<'T>) -> a :?> 'T]
 
     /// <summary>
-    /// Recursively traverses the element hierarchy graph
+    /// Recursively traverses the element hierarchy graph and invokes the supplied handler as each element is traversed
     /// </summary>
     /// <param name="handler">The handler that will be invoked for each element</param>
     /// <param name="element"></param>
@@ -332,6 +356,16 @@ module ClrElement =
                 children 
         children |> List.iter (fun child -> child |> walk handler)
 
+    /// <summary>
+    /// Recursively traverses the element hierarchy graph and invokes each of the supplied handlers as each element is traversed
+    /// </summary>
+    /// <param name="handler">The handlers that will be invoked for each element</param>
+    /// <param name="element"></param>
+    let multiwalk (handlers: (ClrElement->unit) list) element =
+        let handler e =
+            handlers |> List.iter(fun handler -> e|> handler)
+        
+        element |> walk handler
     
 
 module ClrDataMemberElement =
@@ -361,6 +395,7 @@ module ClrElementExtensions =
     with
         member this.DeclaringType = this |> ClrElement.getDeclaringType
         member this.DeclaringAssembly = this |> ClrElement.getDeclaringAssembly
+        member this.IsStatic = this |> ClrElement.isStatic
 
     /// <summary>
     /// Defines augmentations for the <see cref="System.Type"/> type

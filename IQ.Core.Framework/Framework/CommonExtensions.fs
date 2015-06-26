@@ -52,6 +52,14 @@ module ReflectionExtensions =
        | PropertyGet(_,p,_) -> p.ElementName
        | Lambda(_, expr) -> propname expr
        | _ -> nosupport()
+            
+    /// <summary>
+    /// Extracts the name of a function used in a lambda expression
+    /// </summary>
+    /// <remarks>
+    /// Useful for quotations of the form <@fun () -> myfunc @>
+    /// </remarks>
+    let funcname q = q |> funcinfo |> fun x -> x.Name
 
     /// <summary>
     /// Gets the type element from the suppied type argument

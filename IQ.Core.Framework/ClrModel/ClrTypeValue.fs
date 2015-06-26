@@ -42,7 +42,7 @@ module ClrTypeValue =
         match tref with
         | RecordTypeReference(subject, fields) ->
             let types = fields |> List.map(fun field -> field.PropertyType) |> Array.ofList
-            valueArray |> Converter.convertArray types 
+            valueArray |> Transformer.convertArray types 
                        |> ClrTypeReference.getRecordFactory(tref)
         | _ -> nosupport()
                 
@@ -57,7 +57,7 @@ module ClrTypeValue =
             let types = fields |> List.map(fun field -> field.PropertyType) |> Array.ofList
             fields |> List.map(fun field -> valueMap.[field.ReferentName.Text]) 
                    |> Array.ofList 
-                   |> Converter.convertArray types
+                   |> Transformer.convertArray types
                    |> ClrTypeReference.getRecordFactory(tref)
         | _ -> nosupport()
 

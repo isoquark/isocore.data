@@ -76,7 +76,7 @@
     <Compile Include="Framework\ClrElement.fs" />
     <Compile Include="Framework\CommonExtensions.fs" />
     <Compile Include="Framework\CompositionRoot.fs" />
-    <Compile Include="Framework\Conversion.fs" />
+    <Compile Include="Framework\Transformation.fs" />
     <Compile Include="Framework\Regex.fs" />
     <Compile Include="Framework\Txt.fs" />
     <Compile Include="Framework\Configuration.fs" />

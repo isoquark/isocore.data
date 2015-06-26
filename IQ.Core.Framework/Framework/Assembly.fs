@@ -4,6 +4,10 @@ open System
 open System.Reflection
 open System.IO
 
+
+
+        
+             
 /// <summary>
 /// Defines System.Assembly helpers
 /// </summary>
@@ -45,6 +49,8 @@ module Assembly =
             |> Array.map(fun a -> a.GetName()) 
             |> Array.exists (fun n -> n = name)
     
+    
+
     /// <summary>
     /// Recursively loads assembly references into the application domain
     /// </summary>
@@ -65,17 +71,62 @@ module Assembly =
     let getTypes(subject : Assembly) =
         subject.GetTypes() |> List.ofArray
         
-
 [<AutoOpen>]
 module AssemblyExtensions =
     type Assembly
     with
         member this.SimpleName = this.GetName().Name
+
         
 
 
+module AppDomain =
+ 
+    let private findPotentialMatches (clrName : ClrAssemblyName) (domain : AppDomain) =
+        let isPotentialMatch (_, assname : AssemblyName) =
+            match clrName with 
+                ClrAssemblyName(simpleName,fullName) ->
+                    match fullName with
+                    | Some(fullName) -> assname.FullName = fullName
+                    | None -> simpleName = assname.Name
+        
+        domain.GetAssemblies() |> Array.map(fun x -> x, x.GetName()) |> Array.filter isPotentialMatch
 
+    
+    /// <summary>
+    /// Searches the application domain for a specified assembly
+    /// </summary>
+    /// <param name="clrName">The name of the assembly</param>
+    /// <param name="domain">The domain to search</param>
+    let tryFindAssembly (name : ClrAssemblyName) (domain : AppDomain)=
+        
+        let matches = domain |> findPotentialMatches name 
+        if matches.Length <> 0 then
+            if matches.Length = 1 then
+                matches.[0] |> fst |> Some
+            else
+                failwith "Ambiguous assembly match"
+        else
+            None
 
+    /// <summary>
+    /// Gets the identified assembly, attempting to load it if not currently loaded
+    /// </summary>
+    /// <param name="clrName">The name of the assembly</param>
+    /// <param name="domain">The application domain into which the assembly will be loaded</param>
+    let acquireAssembly (name : ClrAssemblyName)  (domain : AppDomain) =
+        let matches = domain |> findPotentialMatches name 
+        match tryFindAssembly name domain with
+        | Some(a) -> a
+        | None -> 
+            AssemblyName(name.Text) |> domain.Load
+
+[<AutoOpen>]
+module AppDomainExtensions =
+    type AppDomain
+    with
+        member this.AcquireAssembly (name : ClrAssemblyName) =
+            this |> AppDomain.acquireAssembly name
 
             
 

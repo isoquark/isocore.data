@@ -302,11 +302,18 @@ module ClrHierarchyExtensions =
         /// Upcasts the element to a <see cref="ClrElement"/>
         /// </summary>
         member this.Element = this.Assembly |> ClrElementProvider.getElement
+        
+        /// <summary>
+        /// Gets the name of the assembly
+        /// </summary>
+        member this.Name = match this.Element.Name with 
+                            | AssemblyElementName(x) -> x 
+                            | _ -> nosupport()
 
     /// <summary>
     /// Defines augmentations for the <see cref="ClrParameterElement"/> type
     /// </summary>
-    type ClParameterElement
+    type ClrParameterElement
     with
         /// <summary>
         /// Upcasts the element to a <see cref="ClrElement"/>
@@ -336,6 +343,7 @@ module ClrHierarchyExtensions =
         /// Gets the encapsulated method
         /// </summary>
         member this.MethodInfo = match this with ClrMethodElement(x) -> x.Primitive
+        
 
 
     /// <summary>

@@ -85,11 +85,21 @@ module ClrElementProvider =
                 cache.[o]
         |(_,element) -> element
 
-    let getTypeElement (o : obj) = 
+    let getType (o : obj) = 
         let element = o |> getElement
-        if (element |> ClrElement.getKind) <> ClrElementKind.Type then
+        if element.Kind <> ClrElementKind.Type then
             argerrord "o" o "Not a type"
         else
             element |> ClrElement.asTypeElement
-        
-        
+
+    /// <summary>
+    /// Gets the parameters elements associated with the method
+    /// </summary>
+    /// <param name="m"></param>
+    let getParameters (m : MethodInfo) =
+        m.GetParameters() |> Array.map getElement 
+                          |> Array.map ClrElement.asParameterElement 
+                          |> List.ofArray
+
+    let getAssemblyElement(name : ClrAssemblyName) =
+        name |> AppDomain.CurrentDomain.AcquireAssembly |> getElement 

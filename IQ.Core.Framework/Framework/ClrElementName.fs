@@ -108,18 +108,8 @@ module ClrNameExtensions =
                                                         | Some(x) -> x
                                                         | None -> simple 
 
-    /// <summary>
-    /// Defines augmentations for the <see cref="ClrAssemblyName"/> type
-    /// </summary>
-    type ClrAssemblyName 
-    with
-        member this.SimpleName = match this with ClrAssemblyName(simpleName=x) -> x
-        member this.FullName = match this with ClrAssemblyName(fullName=x) -> x
-        member this.Text =
-            match this with ClrAssemblyName(simpleName, fullName) -> match fullName with
-                                                                        | Some(x) -> x
-                                                                        | None ->
-                                                                            simpleName    
+
+
     /// <summary>
     /// Defines augmentations for the <see cref="ClrMemberElementName"/> type
     /// </summary>

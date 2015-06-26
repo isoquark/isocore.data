@@ -14,38 +14,6 @@ open Microsoft.FSharp.Quotations.Patterns
 [<AutoOpen>]
 module ClrElementVocabulary = 
 
-    /// <summary>
-    /// Represents a type name
-    /// </summary>
-    type ClrTypeName = ClrTypeName of simpleName : string * fullName : string option * assemblyQualifiedName : string option
-
-    /// <summary>
-    /// Represents an assembly name
-    /// </summary>
-    type ClrAssemblyName = ClrAssemblyName of simpleName : string * fullName : string option
-
-    /// <summary>
-    /// Represents the name of a member
-    /// </summary>    
-    type ClrMemberElementName = ClrMemberElementName of string
-    
-    /// <summary>
-    /// Represents the name of a parameter
-    /// </summary>    
-    type ClrParameterElementName = ClrParameterElementName of string
-
-    /// <summary>
-    /// Represents the name of a CLR element
-    /// </summary>
-    type ClrElementName =
-        ///Specifies the name of an assembly 
-        | AssemblyElementName of ClrAssemblyName
-        ///Specifies the name of a type 
-        | TypeElementName of ClrTypeName
-        ///Specifies the name of a type member
-        | MemberElementName of ClrMemberElementName
-        ///Specifies the name of a parameter
-        | ParameterElementName of ClrParameterElementName
     
     type IReflectionPrimitive =
         abstract Primitive:obj
@@ -83,7 +51,7 @@ module ClrElementVocabulary =
     /// Represents and encapsulates a CLR (method) parameter 
     /// </summary>
     [<DebuggerDisplay(DebuggerDisplayDefault)>]
-    type ClParameterElement = ClrParameterElement of ClrReflectionPrimitive<ParameterInfo>
+    type ClrParameterElement = ClrParameterElement of ClrReflectionPrimitive<ParameterInfo>
     with
         override this.ToString() = match this with ClrParameterElement(x)  -> x.Primitive.Name
 
@@ -178,7 +146,7 @@ module ClrElementVocabulary =
         | MemberElement of element : ClrMemberElement * children : ClrElement list
         | TypeElement of element : ClrTypeElement* children : ClrElement list
         | AssemblyElement of element : ClrAssemblyElement* children : ClrElement list
-        | ParameterElement of element : ClParameterElement
+        | ParameterElement of element : ClrParameterElement
         | UnionCaseElement of element : ClrUnionCaseElement* children : ClrElement list
     with
         override this.ToString() = 
@@ -256,6 +224,27 @@ module ClrElementClassification =
             | MemberElement(element=x) -> x
             | _ ->
                 argerrord "element" element "Element is not a member"
+
+        /// <summary>
+        /// Determines whether the element is a method
+        /// </summary>
+        /// <param name="element"></param>
+        let isMethod element = (element |> getKind) = ClrElementKind.Method
+
+        /// <summary>
+        /// Upcasts the element as a method element; otherwise, an error is raised
+        /// </summary>
+        /// <param name="element">The element to interpret</param>
+        let asMethodElement element = 
+            let error() = argerrord "element" element "Element is not a method"
+            match element with
+            | MemberElement(element=x) -> 
+                match x with
+                | MethodElement(x) -> x
+                | _ -> error()
+            | _ ->
+                error()
+            
     
         /// <summary>
         /// Determines whether the element is a type
@@ -291,7 +280,19 @@ module ClrElementClassification =
                 | DataMemberElement(x) -> x
                 | _ -> error()
             | _ -> error()
+
+        /// <summary>
+        /// Inteprets the CLR element as a parameter if possible; otherwise, an error is raised
+        /// </summary>
+        /// <param name="element">The element to interpret</param>
+        let asParameterElement element =
+            match element with
+            | ParameterElement(x) -> x
+            | _ -> argerrord "element" element "Element is not a parameter"
                     
+    type ClrElement
+    with
+        member this.Kind = this |> ClrElement.getKind
 
 
 [<AutoOpen>]

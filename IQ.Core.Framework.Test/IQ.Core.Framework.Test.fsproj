@@ -72,7 +72,7 @@
     <Compile Include="ClrModel\ClrMethodTest.fs" />
     <Compile Include="ClrModel\ClrCollectionTest.fs" />
     <Compile Include="LangTest.fs" />
-    <Compile Include="ConverterTest.fs" />
+    <Compile Include="TransformerTest.fs" />
     <Compile Include="TxtTest.fs" />
     <Compile Include="ConnectionStringTest.fs" />
     <Compile Include="ClrElementTest.fs" />
