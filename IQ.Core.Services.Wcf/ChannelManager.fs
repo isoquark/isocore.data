@@ -102,7 +102,7 @@ module ChannelAdapter =
                 else
                     raise ( msg (Some x) contractType |> ApplicationException)
 
-    let private disposeEndpointMap () =
+    let internal disposeEndpointMap () =
         if not _endpointMap.IsEmpty then
             _endpointMap.Values |> Seq.iter  (fun v -> if v <> null then (v:?> IDisposable).Dispose())
 
@@ -120,7 +120,7 @@ module ChannelAdapter =
             let factory = GetChannel<'T> None
             factory.Call (getFun action)
 
-        member x.Invoke<'T>(action : 'T -> unit) = 
+        member x.Invoke2<'T>(action : 'T -> unit) = 
             let factory = GetChannel<'T> None
             factory.Call action
 
@@ -128,7 +128,7 @@ module ChannelAdapter =
             let factory = GetChannel<'T> endpointName
             factory.Call (getFun action)
 
-        member x.Invoke<'T>(action : 'T -> unit, endpointName) = 
+        member x.Invoke2<'T> (action : 'T -> unit, endpointName) = 
             let factory = GetChannel<'T> endpointName
             factory.Call action
 
@@ -137,7 +137,7 @@ module ChannelAdapter =
             let factory = GetChannel<'T> endpointName
             factory.Call (getFun action)
 
-        member x.Invoke<'T>(action : 'T -> unit, endpointNameStr) =
+        member x.Invoke2<'T>(action : 'T -> unit, endpointNameStr) =
             let endpointName = getOptionFromString endpointNameStr
             let factory = GetChannel<'T> endpointName
             factory.Call action
