@@ -218,6 +218,12 @@ module Type =
         else
             ClrTypeKind.Unclassified
 
+[<AutoOpen>]
+module TypeExtensions =
+    /// <summary>
+    /// Gets the properties defined by the type
+    /// </summary>
+    let props<'T> = typeof<'T> |> Type.getProperties
 
 
 

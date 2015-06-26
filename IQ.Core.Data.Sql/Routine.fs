@@ -117,7 +117,7 @@ module internal Routine =
         | ProcedureProxy(proxy) -> 
             let methodParameterValues = mii.Method.GetParameters() |> Array.mapi (fun i p -> p.Name, i, mii.MethodArgs.[i]) |> ValueIndex.create
             [for p in proxy.Parameters do
-                let key = ValueIndexKey(p |> getMethodParameterName , p.ProxyElement.Position)
+                let key = ValueIndexKey(p |> getMethodParameterName , p.ProxyParameterPosition)
                 match methodParameterValues |> ValueIndex.tryFindValue key  with
                 | Some(value) ->
                     yield DataParameterValue(p.DataElement.Name, p.DataElement.Position, value)
@@ -171,7 +171,7 @@ module internal Routine =
                         let items = 
                             [for row in result ->
                                 itemTypeRef |> ClrTypeValue.fromValueArray row]
-                        items |> Collection.create collectionKind itemTypeRef.ReferentType |> Some
+                        items |> Collection.create collectionKind itemTypeRef.ReferentType.Type |> Some
                     | _ -> NotSupportedException() |> raise
                         
                     

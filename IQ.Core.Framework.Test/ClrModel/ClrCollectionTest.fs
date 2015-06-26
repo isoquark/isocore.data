@@ -25,7 +25,7 @@ module ClrCollectionTest =
     [<Test>]
     let ``Referenced collection type``() =
         let ref1 = [1;2;3].GetType() |> ClrTypeReference.reference
-        ref1.ReferentType |> Claim.equal (typeof<list<int>>)
+        ref1.ReferentType.Type |> Claim.equal (typeof<list<int>>)
 
     [<Test>]
     let ``Created F# list via reflection``() =

@@ -115,9 +115,9 @@ module DataProxyMetadata =
         
         let getElementName() =
             match proxyref |> ClrElementReference.getReferentName with
-            | MemberElementName(n) | ParameterElementName(n) -> n            
-            | TypeElementName(n) -> n.SimpleName
-                    
+            | MemberElementName(n) ->n.Text
+            | ParameterElementName(n) -> n.Text           
+            | TypeElementName(n) -> n.SimpleName                    
             | AssemblyElementName(n) ->
                 NotSupportedException() |> raise
 
@@ -284,14 +284,15 @@ module DataProxyMetadata =
     /// Constructs a <see cref="ParameterProxyDescription"/> based on the CLR element that will proxy it
     /// </summary>
     /// <param name="clrElement">The field correlated with the proxy</param>
-    let private describeParameterProxy  (proxyref : MethodInputOutputReference) =
-        let parameter =
+    let private describeParameterProxy (proxyref : MethodInputOutputReference) =
+        let parameter, pos =
             match proxyref with
             | MethodInputReference(methparam) ->
-                methparam |> describeRoutineParameter
+                (methparam |> describeRoutineParameter), methparam.ParameterInfo.ParamerInfo.Position
             | MethodOutputReference(methreturn) ->
-                methreturn |> describeReturnParameter
-        ParameterProxyDescription(proxyref, parameter)
+                methreturn |> describeReturnParameter, -1
+        ParameterProxyDescription(proxyref, pos, parameter)
+
                 
     let describeProcedureProxy(proxyref : ClrElementReference) =
         let objectName = proxyref |> inferDataObjectName
@@ -325,10 +326,10 @@ module DataProxyMetadata =
         let columnProxies = proxyref |> describeColumnProxies
         let table = {
             TabularDescription.Name = objectName
-            Description = proxyref.ReferentType|> getMemberDescription
+            Description = proxyref.ReferentType.Type|> getMemberDescription
             Columns = columnProxies |> List.map(fun p -> p.DataElement)
         }
-        TablularProxyDescription(proxyref, table, columnProxies) //|> TabularProxy
+        TablularProxyDescription(proxyref, table, columnProxies) 
     
     let describeTableFunctionProxy(proxyref : ClrElementReference) =
         let objectName = proxyref |> inferDataObjectName
@@ -337,7 +338,7 @@ module DataProxyMetadata =
             | MemberReference(m) -> 
                 match m with
                 | MethodMemberReference(m) ->
-                    m.Parameters |> List.map MethodInputReference |> List.map describeParameterProxy, 
+                    m.Parameters |> List.map MethodInputReference |> List.mapi (fun i x ->  x |> describeParameterProxy ), 
                     (match m.ReturnType with
                     | Some(t) ->
                         t |> ClrTypeReference.reference |> describeColumnProxies 

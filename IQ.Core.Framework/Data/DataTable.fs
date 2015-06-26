@@ -98,7 +98,7 @@ module DataTable =
             let items = 
                 [for row in dataTable.Rows ->
                     itemTypeRef |> ClrTypeValue.fromValueArray row.ItemArray]
-            items |> Collection.create collectionKind itemTypeRef.ReferentType :?> IEnumerable
+            items |> Collection.create collectionKind itemTypeRef.ReferentType.Type :?> IEnumerable
         | _ ->
             [for row in dataTable.Rows ->
                 typeref |> ClrTypeValue.fromValueArray row.ItemArray] :> IEnumerable

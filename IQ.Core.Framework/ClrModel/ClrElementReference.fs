@@ -56,30 +56,10 @@ module ClrElementReference =
         let declarer (t : Type) =
             if t = null then None else t |> Some
         
-        let declaringType = 
-            match eref with
-            | TypeReference(x) -> 
-                x |> ClrTypeReference.getDeclaringType |> declarer
-            | MemberReference(x) ->
-                match x with
-                | MethodMemberReference(x) -> 
-                    x.Referent.DeclaringType |> Option.get |> declarer
-                | DataMemberReference x ->
-                    match x with
-                    | PropertyMemberReference(p) -> 
-                        p.Referent.DeclaringType |> Option.get |> declarer
-                    | FieldMemberReference(f) -> 
-                        f.Referent.DeclaringType |> Option.get |> declarer
-
-            | MethodParameterReference(x) ->
-                None
-            | UnionCaseReference(x) -> 
-                x.Referent.DeclaringType |> Option.get |> declarer
-
-        match declaringType with
-        |Some(x) -> x |> ClrTypeReference.reference |> Some
+        match eref |> getReferent |> ClrElement.getDeclaringType with
+        | Some(x) -> x.Type |> ClrTypeReference.reference |> Some
         | None -> None
-
+                                
     /// <summary>
     /// Gets the element from a supplied type
     /// </summary>

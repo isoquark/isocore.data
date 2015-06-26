@@ -19,11 +19,6 @@ module DataProxyMetamodel =
     type MethodInputOutputReference =
     | MethodInputReference of ClrMethodParameterReference
     | MethodOutputReference of ClrMethodReference
-    with
-        member this.Position = 
-            match this with
-            | MethodInputReference(x) -> x.ReferentPosition
-            | MethodOutputReference(x) -> -1
     
     /// <summary>
     /// Describes a column proxy
@@ -93,7 +88,7 @@ module DataProxyMetamodel =
     /// Describes a proxy for a routine parameter
     /// </summary>
     [<DebuggerDisplay("{DebuggerDisplay,nq}")>]
-    type ParameterProxyDescription = ParameterProxyDescription of proxy : MethodInputOutputReference * dataElement : RoutineParameterDescription
+    type ParameterProxyDescription = ParameterProxyDescription of proxy : MethodInputOutputReference * proxyParameterPosition : int * dataElement : RoutineParameterDescription 
     with   
         /// <summary>
         /// Specifies  the CLR proxy element
@@ -106,6 +101,9 @@ module DataProxyMetamodel =
         /// </summary>
         member this.DataElement = 
             match this with ParameterProxyDescription(dataElement=x) -> x
+        
+        member this.ProxyParameterPosition =
+            match this with ParameterProxyDescription(proxyParameterPosition = x) -> x
 
         /// <summary>
         /// Formats the element for presentation in the debugger

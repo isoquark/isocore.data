@@ -39,10 +39,6 @@ module ReflectionExtensions =
     /// </remarks>
     let inline thisConstructor() = MethodInfo.GetCurrentMethod() :?> ConstructorInfo
 
-    /// <summary>
-    /// Gets the properties defined by the type
-    /// </summary>
-    let props<'T> = typeof<'T> |> Type.getProperties
 
     /// <summary>
     /// When supplied a property accessor quotation, retrieves the name of the property

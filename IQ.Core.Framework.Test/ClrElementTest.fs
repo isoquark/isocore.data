@@ -40,6 +40,18 @@ module ClrElementTestTypes =
             with get() = f3
             and  set(value) = f3 <- value
     
+
+    type AttributeAAttribute() =
+        inherit Attribute()
+
+    module ModuleA =
+        [<AttributeA>]
+        let sum a b  =
+            a + b
+        [<AttributeA>]
+        let subtract a b  =
+            a - b
+
 open ClrElementTestTypes
 
 module ClrElementTest = ()
@@ -64,11 +76,11 @@ module ClrAssemblyTest =
         text.Value.Trim() |> Claim.equal "This is an embedded text resource"
     
 
-    [<Test>]
-    let ``Discovered types from assembly``() =
-        let types = thisAssemblyElement() |> ClrAssembly.getTypeElements
-        clrtype<RecordA> |> Claim.inList types
-        clrtype<ClassA> |> Claim.inList types
+//    [<Test>]
+//    let ``Discovered types from assembly``() =
+//        //let types = thisAssemblyElement() |> ClrAssembly.getTypeElements
+//        clrtype<RecordA> |> Claim.inList types
+//        clrtype<ClassA> |> Claim.inList types
 
     [<Test>]
     let ``Discovered type child elements``() =
@@ -84,6 +96,21 @@ module ClrAssemblyTest =
         clrtype<RecordA>.Element |> ClrElement.walk handler
         elements |> Seq.tryFind(fun x -> x.Name = FieldA1Name) |> Claim.isSome
         elements |> Seq.tryFind(fun x -> x.Name = FieldA2Name) |> Claim.isSome
+
+    [<Test>]
+    let ``Discovered attributed functions``() =
+        let functions = ResizeArray<ClrElement>()
+        
+        let handler (e : ClrElement) =
+            match e |> ClrElement.tryGetAttributeT<AttributeAAttribute> with
+            | Some(x) ->
+                e |> functions.Add
+            | None -> ()
+        
+        thisAssemblyElement().Element |> ClrElement.walk handler
+        let x = 1
+        ()
+              
         
 //    [<Test>]
 //    let ``Discovered attributed types within an assembly``() =

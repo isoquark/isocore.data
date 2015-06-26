@@ -51,6 +51,24 @@ module Lang =
     /// </summary>
     let inline nosupport()  = NotSupportedException() |> raise
 
+    /// <summary>
+    /// Raises a <see cref="System.ArgumentException"/> 
+    /// </summary>
+    /// <param name="paramName">The name of the parameter</param>
+    /// <param name="paramName">The value of the parameter</param>
+    let inline argerror paramName paramValue =
+        let message = sprintf "The argument value %O for %s is incorrect" paramValue paramName 
+        ArgumentException(message) |> raise
+            
+    /// <summary>
+    /// Raises a <see cref="System.ArgumentException"/> with a description
+    /// </summary>
+    /// <param name="paramName">The name of the parameter</param>
+    /// <param name="paramName">The value of the parameter</param>
+    /// <param name="description">Explains why the argument is unsatisfactory</param>
+    let inline argerrord paramName paramValue description =
+        let message = sprintf "The argument value %O for %s is incorrect:%s" paramValue paramName description
+        ArgumentException(message) |> raise
     
     /// <summary>
     /// Raises a <see cref="System.NotSupportedException"/>
@@ -119,6 +137,20 @@ module Lang =
         | OneOrMore
         | BoundedRange of min : uint32 * max : uint32
             
+        /// <summary>
+    /// Classifies native CLR metadata elements
+    /// </summary>
+    type ReflectedKind =
+        | Assembly = 1
+        | Type = 2
+        | Method = 3
+        | Property = 4
+        | Field = 5
+        | Constructor = 6
+        | Event = 7
+        | Parameter = 8
+        | UnionCase = 9
+
     /// <summary>
     /// Classifies CLR collections
     /// </summary>
@@ -171,6 +203,45 @@ module Lang =
         | NullableValue = 8
 
     /// <summary>
+    /// Classifies CLR elements
+    /// </summary>
+    type ClrElementKind =
+        | Unclassified = 0
+        /// <summary>
+        /// Classifies a CLR element as a propert
+        /// </summary>
+        | Property = 1
+        /// <summary>
+        /// Classifies a CLR element as a property
+        /// </summary>
+        | Method = 2
+        /// <summary>
+        /// Classifies a CLR element as a field
+        /// </summary>
+        | Field = 3
+        /// <summary>
+        /// Classifies a CLR element as an event
+        /// </summary>
+        | Event = 4
+        /// <summary>
+        /// Classifies a CLR element as a type 
+        /// </summary>
+        | Type = 5
+        /// <summary>
+        /// Classifies a CLR element as an assembly
+        /// </summary>
+        | Assembly = 6
+        /// <summary>
+        /// Classifies a CLR element as method parameter
+        /// </summary>
+        | Parameter = 7
+        /// <summary>
+        /// Classifies a CLR element a union case
+        /// </summary>
+        | UnionCase = 8
+
+
+    /// <summary>
     /// Specifies the visibility of a CLR element
     /// </summary>
     type ClrAccess =
@@ -187,19 +258,6 @@ module Lang =
         /// Not supported in F#
         | ProtectedInternalAccess
         
-    /// <summary>
-    /// Classifies native CLR metadata elements
-    /// </summary>
-    type ClrReflectedKind =
-        | Assembly = 1
-        | Type = 2
-        | Method = 3
-        | Property = 4
-        | Field = 5
-        | Constructor = 6
-        | Event = 7
-        | Parameter = 8
-        | UnionCase = 9
 
     /// <summary>
     /// Defines System.MethodInfo helpers
@@ -217,19 +275,19 @@ module Lang =
                 None
 
        
-module ClrReflectedKind =
+module ReflectedKind =
     let fromInstance (o : obj) =
         match o with
-        | :? Assembly -> ClrReflectedKind.Assembly
-        | :? Type -> ClrReflectedKind.Type
-        | :? MethodInfo -> ClrReflectedKind.Method
-        | :? PropertyInfo -> ClrReflectedKind.Property
-        | :? FieldInfo -> ClrReflectedKind.Field
-        | :? ConstructorInfo -> ClrReflectedKind.Constructor
-        | :? EventInfo -> ClrReflectedKind.Event
-        | :? ParameterInfo -> ClrReflectedKind.Parameter
-        | :? UnionCaseInfo -> ClrReflectedKind.UnionCase
-        | :? _ -> nosupport()
+        | :? Assembly -> ReflectedKind.Assembly
+        | :? Type -> ReflectedKind.Type
+        | :? MethodInfo -> ReflectedKind.Method
+        | :? PropertyInfo -> ReflectedKind.Property
+        | :? FieldInfo -> ReflectedKind.Field
+        | :? ConstructorInfo -> ReflectedKind.Constructor
+        | :? EventInfo -> ReflectedKind.Event
+        | :? ParameterInfo -> ReflectedKind.Parameter
+        | :? UnionCaseInfo -> ReflectedKind.UnionCase
+        | _ -> nosupport()
 
                 
 

@@ -69,6 +69,10 @@
     <Compile Include="Framework\Option.fs" />
     <Compile Include="Framework\Type.fs" />
     <Compile Include="Framework\Assembly.fs" />
+    <Compile Include="Framework\ClrElementVocabulary.fs" />
+    <Compile Include="Framework\ClrElementName.fs" />
+    <Compile Include="Framework\ClrElementProvider.fs" />
+    <Compile Include="Framework\ClrHierarchyExtensions.fs" />
     <Compile Include="Framework\ClrElement.fs" />
     <Compile Include="Framework\CommonExtensions.fs" />
     <Compile Include="Framework\CompositionRoot.fs" />

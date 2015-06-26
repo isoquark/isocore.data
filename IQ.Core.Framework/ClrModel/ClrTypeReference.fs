@@ -52,7 +52,7 @@ module ClrTypeReference =
 
     let getReferentType (tref : ClrTypeReference) =
         let element = tref |> getTypeReferent
-        element.Type
+        element.Type |> ClrElementProvider.getTypeElement
 
     let getReferentTypeName (tref : ClrTypeReference) =
         let element = tref |> getTypeReferent

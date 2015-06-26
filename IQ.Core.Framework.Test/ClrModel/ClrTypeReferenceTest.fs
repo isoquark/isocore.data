@@ -68,7 +68,7 @@ module ClrTypeReferenceTest =
     [<Test>]
     let ``Created union reference - single-case``() =
         let u = typeref<UnionA>
-        u.ReferentType |> Claim.equal typeof<UnionA>
+        u.ReferentType |> Claim.equal typeof<UnionA>.TypeElement
         let unionName = typeof<UnionA>.ElementName
         match typeref<UnionA> with
         | UnionTypeReference(subject,cases) ->
@@ -99,7 +99,8 @@ module ClrTypeReferenceTest =
         let infomap = propinfomap<ClassA>
         let p1Name = propname<@ fun (x : ClassA) -> x.Prop1 @> 
         let p1Expect = {
-            ClrPropertyDescription.Subject = ClrSubjectDescription(p1Name, 0)
+            Name = p1Name
+            Position = 0
             DeclaringType = typeof<ClassA>.ElementTypeName
             ValueType = typeof<DateTime>.ElementTypeName
             IsOptional = false
@@ -113,7 +114,8 @@ module ClrTypeReferenceTest =
 
         let p2Name = propname<@ fun (x : ClassA) -> x.Prop2 @> 
         let p2Expect = {
-            ClrPropertyDescription.Subject = ClrSubjectDescription(p2Name, 1)
+            Name = p2Name
+            Position = 1
             DeclaringType = typeof<ClassA>.ElementTypeName
             ValueType = typeof<int>.ElementTypeName
             IsOptional = false
@@ -125,7 +127,8 @@ module ClrTypeReferenceTest =
 
         let p3Name = propname<@ fun (x : ClassA) -> x.Prop3 @>
         let p3Expect = {
-            ClrPropertyDescription.Subject = ClrSubjectDescription(p3Name, 2)
+            Name = p3Name
+            Position = 2
             DeclaringType = typeof<ClassA>.ElementTypeName
             ValueType = typeof<int64>.ElementTypeName
             IsOptional = true
