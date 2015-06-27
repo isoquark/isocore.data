@@ -25,12 +25,20 @@ module Channel =
                    | _ -> 
                           raise  (msgFct endpointName typedefof<'T>.Name |> ApplicationException)
        
-       //main function to invoke a service: the factory creates a channel and invokes the service operation
+        //call when no result is expected (as action)
         member this.Call(a : 'T -> unit)  =
             let proxy = fact.CreateChannel() //create channel
             a proxy //invoke service operation
             (box proxy :?> IClientChannel).Close()
             (box proxy :?> IClientChannel).Dispose()
+
+        //call when expecting a result (as function)
+        member this.Call (a : 'T -> 'S)  =
+            let proxy = fact.CreateChannel() //create channel
+            let result = a proxy //invoke service operation
+            (box proxy :?> IClientChannel).Close()
+            (box proxy :?> IClientChannel).Dispose()
+            result
 
         interface IDisposable with
             member this.Dispose() = fact.Close() //disposing the channel factory

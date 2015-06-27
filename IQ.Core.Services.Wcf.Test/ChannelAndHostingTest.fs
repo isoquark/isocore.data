@@ -29,6 +29,12 @@ module ``No-Host No-Channel Helper Tests`` =
         Claim.isSome actual
         actual |> Claim.equal expect
 
+    [<Test>]
+    let ``Test Singleton``() =
+        let cm1 = ServiceFacade.create()
+        let cm2 = ServiceFacade.create()
+        cm1 |> Claim.equal cm2
+
 
 [<TestContainer>]
 module ``Channel and Service Hosting Tests`` =
@@ -56,48 +62,73 @@ module ``Channel and Service Hosting Tests`` =
         nameObj.LastName <- lastName
         nameObj
 
-    let cm = ChannelAdapter.ChannelManager.Instance
+    let cm = ServiceFacade.create()
+    let cmCs = ServiceFacadeCSharp.create()
+
     let validateResult result  =
         Claim.isFalse <| String.IsNullOrEmpty result
         Claim.isTrue <| (result.ToUpper().Contains <| firstName.ToUpper())
 
-    let actionAsAction() = Action<ISimpleService> (fun (x : ISimpleService) -> result <- x.MyRequestReplyMessage(inputName))
-    let actionAsFun = fun (x : 'T when 'T :> ISimpleService) -> result <- x.MyRequestReplyMessage(inputName)
+    let svcOpActionCs = Action<ISimpleService> (fun (x : ISimpleService) -> result <- x.MyRequestReplyMessage(inputName))
+    let svcOpFuncCs = Func<ISimpleService,string> (fun (x : ISimpleService) -> x.MyRequestReplyMessage(inputName))
+    let svcOpAction : (ISimpleService -> unit) = fun (x : ISimpleService) -> result <- x.MyRequestReplyMessage(inputName)
+    let svcOpFunc : (ISimpleService -> string) = fun (x : ISimpleService) -> x.MyRequestReplyMessage(inputName)
+    let svcOpActionOneWay : (ISimpleService -> unit) = fun (x : ISimpleService) -> x.MyOneWayMessage(10, true) //argument values are irrelevant
 
+    //FSharp interface tests
     [<Test>]
-    let ``Invoke Service With Action and Endpoint Name As Option``() =
-        cm.Invoke (actionAsAction(), epnOpt)
+    let ``Invoke Service With Action and Endpoint Name``() =
+        cm.Invoke (svcOpAction, epnOpt)
         validateResult result
 
     [<Test>]
-    let ``Invoke Service With Func and Endpoint Name As Option``() =
-        cm.Invoke2 (actionAsFun, epnOpt)
-        validateResult result
-
-    [<Test>]
-    let ``Invoke Service With Action and Endpoint Name As String``() =
-        cm.Invoke (actionAsAction(), epnStr)
-        validateResult result
-
-    [<Test>]
-    let ``Invoke Service With Func and Endpoint Name As String``() =
-        cm.Invoke2 (actionAsFun, epnStr)
-        validateResult result
+    let ``Invoke Service With Func and Endpoint Name ``() =
+        let r = cm.InvokeFun (svcOpFunc, epnOpt)
+        validateResult r
 
     [<Test>]
     let ``Invoke Service With Action and Without Endpoint Name``() =
-        cm.Invoke (actionAsAction())
+        cm.Invoke svcOpAction
         validateResult result
 
     [<Test>]
     let ``Invoke Service With Func and Without Endpoint Name``() =
-        cm.Invoke2 (actionAsFun)
+        let r = cm.InvokeFun svcOpFunc
+        validateResult r
+
+    [<Test>]
+    let ``Invoke OneWay Service With Action and Endpoint Name``() =
+        cm.Invoke (svcOpActionOneWay, epnOpt)
+
+    [<Test>]
+    let ``Invoke OneWay Service With Action and Without Endpoint Name``() =
+        cm.Invoke svcOpActionOneWay
+
+    //CSharp interface tests
+    [<Test>]
+    let ``CSharp Invoke Service With Action and Endpoint Name``() =
+        cmCs.Invoke (svcOpActionCs, epnStr)
         validateResult result
 
-//    [<Test>] //TODO: how to do ExpectedException
-//    let ``Invoke Service With Func and Invalid Endpoint Name As String``() =
-//        cm.Invoke2 (actionAsFun, epnStr) //exception here
-//        validateResult result
+    [<Test>]
+    let ``CSharp Invoke Service With Func and Endpoint Name``() =
+        let r = cmCs.Invoke (svcOpFuncCs, epnStr) 
+        validateResult r
+
+    [<Test>]
+    let ``CSharp Invoke Service With Action and Without Endpoint Name``() =
+        cmCs.Invoke svcOpActionCs
+        validateResult result
+
+    [<Test>]
+    let ``CSharp Invoke Service With Func and Without Endpoint Name``() =
+        let r = cmCs.Invoke svcOpFuncCs
+        validateResult r
+
+    [<Test>] //TODO: how to do ExpectedException
+    let ``Invoke Service With Func and Invalid Endpoint Name As String``() =
+        let r = cm.InvokeFun (svcOpFunc, epnOpt) //exception here
+        validateResult r
 
 
 

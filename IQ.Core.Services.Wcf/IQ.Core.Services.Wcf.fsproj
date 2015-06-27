@@ -53,7 +53,9 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Helpers.fs" />
     <Compile Include="GenericChannel.fs" />
-    <Compile Include="ChannelManager.fs" />
+    <Compile Include="ChannelAdadpter.fs" />
+    <Compile Include="ServiceFacade.fs" />
+    <Compile Include="ServiceFacade.CSharp.fs" />
     <Compile Include="CustomServiceHost.fs" />
     <None Include="Script.fsx" />
   </ItemGroup>

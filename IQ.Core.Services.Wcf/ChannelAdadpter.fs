@@ -74,7 +74,7 @@ module ChannelAdapter =
         _endpointMap.TryAdd(key, channel) |> ignore
 
 
-    let private ReadAllClientEndpoints =             
+    let internal ReadAllClientEndpoints =             
         let props = getClientEndpoints()
         [ for prop in props -> 
                                     Console.WriteLine("prop contract = {0} ",  prop.Contract)
@@ -106,42 +106,5 @@ module ChannelAdapter =
         if not _endpointMap.IsEmpty then
             _endpointMap.Values |> Seq.iter  (fun v -> if v <> null then (v:?> IDisposable).Dispose())
 
-    //the MAIN SINGLETON type which is accessible from the outside world
-    type ChannelManager private () =
-        static let instance = lazy (
-                                ReadAllClientEndpoints 
-                                new ChannelManager()
-                              )
-                        
-        static member Instance = instance.Value
 
-        //access point from outside (all overloaded members, to support easy calling both from C# and F#
-        member x.Invoke<'T>(action : Action<'T>) =
-            let factory = GetChannel<'T> None
-            factory.Call (getFun action)
-
-        member x.Invoke2<'T>(action : 'T -> unit) = 
-            let factory = GetChannel<'T> None
-            factory.Call action
-
-        member x.Invoke<'T>(action : Action<'T>, endpointName) =
-            let factory = GetChannel<'T> endpointName
-            factory.Call (getFun action)
-
-        member x.Invoke2<'T> (action : 'T -> unit, endpointName) = 
-            let factory = GetChannel<'T> endpointName
-            factory.Call action
-
-        member x.Invoke<'T>(action : Action<'T>, endpointNameStr) =
-            let endpointName = getOptionFromString endpointNameStr
-            let factory = GetChannel<'T> endpointName
-            factory.Call (getFun action)
-
-        member x.Invoke2<'T>(action : 'T -> unit, endpointNameStr) =
-            let endpointName = getOptionFromString endpointNameStr
-            let factory = GetChannel<'T> endpointName
-            factory.Call action
-
-        interface IDisposable with
-            member x.Dispose() = disposeEndpointMap()
-        //end acces point from outside
+    

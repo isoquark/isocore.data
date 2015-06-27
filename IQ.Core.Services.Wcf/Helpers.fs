@@ -9,8 +9,11 @@ open System.ServiceModel.Configuration
 
 module Helpers =
 
-    let getFun (a : Action<'T>) : 'T -> unit =
+    let getFunFromAction (a : Action<'T>) : 'T -> unit =
         Core.FuncConvert.ToFSharpFunc a
+
+    let getFunFromFunc (a : Func<'T, 'TResult>) : 'T -> 'TResult =
+        fun x -> a.Invoke(x)
 
     let getOptionFromString s =
             match String.IsNullOrEmpty(s) with
