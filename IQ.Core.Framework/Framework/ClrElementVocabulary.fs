@@ -14,6 +14,83 @@ open Microsoft.FSharp.Quotations.Patterns
 [<AutoOpen>]
 module ClrElementVocabulary = 
 
+    /// <summary>
+    /// Describes a property
+    /// </summary>
+    type ClrPropertyDescription = {
+        /// The name of the property 
+        Name : ClrMemberName
+        
+        /// The position of the property
+        Position : int
+        
+        /// The name of the type that declares the property
+        DeclaringType : ClrTypeName       
+    
+        /// The type of the property value
+        ValueType : ClrTypeName
+
+        /// Specifies whether the property is of option<> type
+        IsOptional : bool
+
+        /// Specifies whether the property has a get accessor
+        CanRead : bool
+
+        /// Specifies the access of the get accessor if applicable
+        ReadAccess : ClrAccess option
+
+        /// Specifies whether the property has a set accessor
+        CanWrite : bool
+
+        /// Specifies the access of the set accessor if applicable
+        WriteAccess : ClrAccess option
+    }
+
+    /// <summary>
+    /// Describes a field
+    /// </summary>
+    type ClrFieldDescription = {
+        /// The name of the property 
+        Name : ClrMemberName
+        
+        /// The position of the property
+        Position : int            
+    }
+
+    type ClrMemberDescription =
+    | PropertyMemberDescription of ClrPropertyDescription
+    | PropertyFieldDescription of ClrFieldDescription
+
+    /// <summary>
+    /// Describes a type
+    /// </summary>
+    type ClrTypeDescription = {
+        /// The name of the type
+        Name : ClrTypeName
+
+        /// The position of the type
+        Position : int
+
+        /// The name of the type that declares the type, if any
+        DeclaringType : ClrTypeName option
+
+        DeclaredTypes : ClrTypeName list
+
+        Members : ClrMemberDescription list
+    }
+
+    /// <summary>
+    /// Describes an assembly
+    /// </summary>
+    type ClrAssemblyDescription = {
+        
+        Name : ClrAssemblyName
+
+        Types : ClrTypeDescription list
+    }
+
+
+
     
     type IReflectionPrimitive =
         abstract Primitive:obj
@@ -54,36 +131,6 @@ module ClrElementVocabulary =
     type ClrParameterElement = ClrParameterElement of ClrReflectionPrimitive<ParameterInfo>
     with
         override this.ToString() = match this with ClrParameterElement(x)  -> x.Primitive.Name
-
-
-    type ClrPropertyDescription = {
-        /// The name of the property 
-        Name : ClrElementName
-        
-        /// The position of the property
-        Position : int
-        
-        /// The name of the type that declares the property
-        DeclaringType : ClrTypeName       
-    
-        /// The type of the property value
-        ValueType : ClrTypeName
-
-        /// Specifies whether the property is of option<> type
-        IsOptional : bool
-
-        /// Specifies whether the property has a get accessor
-        CanRead : bool
-
-        /// Specifies the access of the get accessor if applicable
-        ReadAccess : ClrAccess option
-
-        /// Specifies whether the property has a set accessor
-        CanWrite : bool
-
-        /// Specifies the access of the set accessor if applicable
-        WriteAccess : ClrAccess option
-    }
     
     
     /// <summary>
@@ -294,6 +341,7 @@ module ClrElementClassification =
     with
         member this.Kind = this |> ClrElement.getKind
 
+        
 
 [<AutoOpen>]
 module internal ClrElementVocabularyExtensions =

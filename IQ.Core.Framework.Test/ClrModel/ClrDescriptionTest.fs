@@ -19,7 +19,8 @@ module ClrPropertyTest =
     let ``Created property descriptions from record``() =
         
         let infomap = propinfomap<RecordA> 
-        let p1Name = propname<@ fun (x : RecordA) -> x.Prop1 @> 
+        let pinfo = propinfo<@ fun (x : RecordA) -> x.Prop1 @>
+        let p1Name = pinfo.Name |> ClrMemberName
         let p1Actual = infomap.[p1Name]
         let p1Expect = {
             Name = p1Name

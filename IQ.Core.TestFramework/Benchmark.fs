@@ -12,6 +12,7 @@ open IQ.Core.Framework
 [<AutoOpen>]
 module BenchmarkVocabulary =
     
+    //[<DebuggerDisplay(DebuggerDisplayDefault)>]
     type BenchmarkSummary = {
         /// The name of the benchmark
         Name : string
@@ -31,6 +32,8 @@ module BenchmarkVocabulary =
         /// The iteration number assigned to the benchmark execution if applicable
         Iteration : int option
     }
+    with 
+        override this.ToString() = sprintf "%s benchmark required %i (ms)" this.Name (int(this.Duration.TotalMilliseconds))
 
     /// <summary>
     /// Encapsulates a benchmark execution result
@@ -42,6 +45,8 @@ module BenchmarkVocabulary =
         
         member this.Detail = 
             match this with BenchmarkResult(detail=x) ->x
+        
+        override this.ToString() = this.Summary.ToString()
 
 
 /// <summary>

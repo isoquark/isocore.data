@@ -72,10 +72,14 @@
     <Compile Include="ClrModel\ClrMethodTest.fs" />
     <Compile Include="ClrModel\ClrCollectionTest.fs" />
     <Compile Include="LangTest.fs" />
+    <Compile Include="TypeTest.fs" />
     <Compile Include="TransformerTest.fs" />
     <Compile Include="TxtTest.fs" />
     <Compile Include="ConnectionStringTest.fs" />
     <Compile Include="ClrElementTest.fs" />
+    <None Include="run.bat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

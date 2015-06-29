@@ -65,6 +65,7 @@
     <None Include="packages.config" />
     <Content Include="app.config" />
     <Compile Include="Framework\Lang.fs" />
+    <Compile Include="Framework\Regex.fs" />
     <Compile Include="Framework\Collection.fs" />
     <Compile Include="Framework\Option.fs" />
     <Compile Include="Framework\Type.fs" />
@@ -77,7 +78,6 @@
     <Compile Include="Framework\CommonExtensions.fs" />
     <Compile Include="Framework\CompositionRoot.fs" />
     <Compile Include="Framework\Transformation.fs" />
-    <Compile Include="Framework\Regex.fs" />
     <Compile Include="Framework\Txt.fs" />
     <Compile Include="Framework\Configuration.fs" />
     <Compile Include="Framework\ConnectionString.fs" />

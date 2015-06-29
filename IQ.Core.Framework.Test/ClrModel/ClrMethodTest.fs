@@ -27,7 +27,7 @@ module ClrMethodTest =
     
     [<Test>]
     let ``Described non-tupled method - variation 1``() =
-        let mName = "Method01" |> ClrMemberElementName |> MemberElementName
+        let mName = "Method01" |> ClrMemberName |> MemberElementName
         let m = methodmap.[mName]
         m.ReferentName |> Claim.equal (mName)
         m.ReferentPosition |> Claim.equal 0
@@ -48,13 +48,13 @@ module ClrMethodTest =
 
     [<Test>]
     let ``Described tupled methods``() =
-        let m2Name = "Method02" |> ClrMemberElementName |> MemberElementName
+        let m2Name = "Method02" |> ClrMemberName |> MemberElementName
         let m2 = methodmap.[m2Name]
         m2.ReferentName |> Claim.equal m2Name
         m2.Parameters.Length |> Claim.equal 2
         m2.ReturnType |> Claim.isNone
 
-        let m3Name = "Method03" |> ClrMemberElementName |> MemberElementName
+        let m3Name = "Method03" |> ClrMemberName |> MemberElementName
         let m3 = methodmap.[m3Name]
         m3.ReferentName |> Claim.equal m3Name
         m3.Parameters.Length |> Claim.equal 1
@@ -62,7 +62,7 @@ module ClrMethodTest =
 
     [<Test>]
     let ``Described non-tupled method - variation 2``() =
-        let mName = "Method04" |> ClrMemberElementName |> MemberElementName
+        let mName = "Method04" |> ClrMemberName |> MemberElementName
         let m = methodmap.[mName]
         m.ReferentName |> Claim.equal mName
         m.Parameters.Length |> Claim.equal 2
@@ -81,7 +81,7 @@ module ClrMethodTest =
     [<Test>]
     let ``Described methods with optional parameters``() =
         let methodmap = methodrefmap<ClassA>
-        let mName = "Method01" |> ClrMemberElementName |> MemberElementName
+        let mName = "Method01" |> ClrMemberName |> MemberElementName
         let m = methodmap.[mName]
         m.ReferentName |> Claim.equal mName
         m.Parameters.Length |> Claim.equal 2

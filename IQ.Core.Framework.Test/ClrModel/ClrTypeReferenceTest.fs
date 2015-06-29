@@ -97,7 +97,8 @@ module ClrTypeReferenceTest =
     [<Test>]
     let ``Created class reference``() =
         let infomap = propinfomap<ClassA>
-        let p1Name = propname<@ fun (x : ClassA) -> x.Prop1 @> 
+        let p1Info = propinfo<@ fun (x : ClassA) -> x.Prop1 @> 
+        let p1Name = p1Info.Name |> ClrMemberName
         let p1Expect = {
             Name = p1Name
             Position = 0
@@ -112,9 +113,9 @@ module ClrTypeReferenceTest =
         let p1Actual = infomap.[p1Name]
         p1Actual |> Claim.equal p1Expect
 
-        let p2Name = propname<@ fun (x : ClassA) -> x.Prop2 @> 
+        let p2Info = propinfo<@ fun (x : ClassA) -> x.Prop2 @> 
         let p2Expect = {
-            Name = p2Name
+            Name = p2Info.Name |> ClrMemberName
             Position = 1
             DeclaringType = typeof<ClassA>.ElementTypeName
             ValueType = typeof<int>.ElementTypeName
@@ -125,7 +126,8 @@ module ClrTypeReferenceTest =
             ReadAccess = PublicAccess|> Some
         }
 
-        let p3Name = propname<@ fun (x : ClassA) -> x.Prop3 @>
+        let p3Info = propinfo<@ fun (x : ClassA) -> x.Prop3 @>
+        let p3Name = p3Info.Name |> ClrMemberName
         let p3Expect = {
             Name = p3Name
             Position = 2

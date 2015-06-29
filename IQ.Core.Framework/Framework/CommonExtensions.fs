@@ -49,10 +49,17 @@ module ReflectionExtensions =
     /// </remarks>
     let rec propname q =
        match q with
-       | PropertyGet(_,p,_) -> p.ElementName
+       | PropertyGet(_,p,_) -> p.ElementName 
        | Lambda(_, expr) -> propname expr
        | _ -> nosupport()
             
+    let rec propinfo q =
+       match q with
+       | PropertyGet(_,p,_) -> p
+       | Lambda(_, expr) -> propinfo expr
+       | _ -> nosupport()
+
+
     /// <summary>
     /// Extracts the name of a function used in a lambda expression
     /// </summary>

@@ -54,13 +54,13 @@ module internal ClrElementName =
                 match x with
                 | PropertyMember(x) ->
                     match x with 
-                        ClrPropertyElement(x) -> x.Primitive.Name |> ClrMemberElementName|> MemberElementName
+                        ClrPropertyElement(x) -> x.Primitive.Name |> ClrMemberName|> MemberElementName
                 | FieldMember(x) -> 
                     match x with
-                        ClrFieldElement(x) -> x.Primitive.Name |> ClrMemberElementName |> MemberElementName
+                        ClrFieldElement(x) -> x.Primitive.Name |> ClrMemberName |> MemberElementName
             | MethodElement(x) ->
                   match x with
-                    ClrMethodElement(x) -> x.Primitive.Name |> ClrMemberElementName |> MemberElementName
+                    ClrMethodElement(x) -> x.Primitive.Name |> ClrMemberName |> MemberElementName
         | TypeElement(element=x) -> 
             x |> ClrTypeName.fromTypeElement |> TypeElementName
         | AssemblyElement(element=x) ->
@@ -74,67 +74,7 @@ module internal ClrElementName =
         | UnionCaseElement(element=x) ->
             match x with
                 ClrUnionCaseElement(x) ->
-                    x.Primitive.Name |> ClrMemberElementName |> MemberElementName
+                    x.Primitive.Name |> ClrMemberName |> MemberElementName
             
-/// <summary>
-/// Defines <see cref="ClrElementName"/>-related augmentations 
-/// </summary>
-[<AutoOpen>]
-module ClrNameExtensions =
-    /// <summary>
-    /// Defines augmentations for the <see cref="ClrTypeName"/> type
-    /// </summary>
-    type ClrTypeName 
-    with
-        /// <summary>
-        /// Gets the local name of the type (which does not include enclosing type names or namespace)
-        /// </summary>
-        member this.SimpleName = match this with ClrTypeName(simpleName=x) -> x
-        /// <summary>
-        /// Gets namespace and nested type-qualified name of the type
-        /// </summary>
-        member this.FullName = match this with ClrTypeName(fullName=x) -> x
-        /// <summary>
-        /// Gets the assembly-qualified type name of the type
-        /// </summary>
-        member this.AssemblyQualifiedName = match this with ClrTypeName(assemblyQualifiedName=x) -> x
-        
-        member this.Text = 
-            match this with 
-                ClrTypeName(simple,full, aqn) -> match aqn with                                    
-                                                    | Some(x) -> x
-                                                    | None ->
-                                                        match full with
-                                                        | Some(x) -> x
-                                                        | None -> simple 
-
-
-
-    /// <summary>
-    /// Defines augmentations for the <see cref="ClrMemberElementName"/> type
-    /// </summary>
-    type ClrMemberElementName
-    with
-        member this.Text = match this with ClrMemberElementName(x) -> x
-    
-
-    /// <summary>
-    /// Defines augmentations for the <see cref="ClrParameterElementName"/> type
-    /// </summary>
-    type ClrParameterElementName
-    with
-        member this.Text = match this with ClrParameterElementName(x) -> x
-
-    /// <summary>
-    /// Represents the name of a CLR element
-    /// </summary>
-    type ClrElementName
-    with
-        member this.Text =
-            match this with
-            | AssemblyElementName x -> x.Text
-            | TypeElementName x -> x.Text
-            | MemberElementName x -> x.Text
-            | ParameterElementName x -> x.Text
 
 

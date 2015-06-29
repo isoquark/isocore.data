@@ -453,6 +453,7 @@ module ClrElementExtensions =
         member this.DeclaringType = this.Element |> ClrElement.getDeclaringType |> Option.get
      
 
+
 module ClrAssembly =
 
     /// <summary>
@@ -471,3 +472,20 @@ module ClrAssembly =
     /// <param name="subject">The assembly that contains the resource</param>
     let writeTextResource shortName outputDir (subject : ClrAssemblyElement) =
         subject.Assembly |> Assembly.writeTextResource shortName outputDir
+
+    
+    let describe(a : Assembly) =
+        let describeType pos (t : Type) =
+            {
+                ClrTypeDescription.Name = t.ElementTypeName
+                Position = pos
+                DeclaringType = if t.DeclaringType <> null then t.DeclaringType.ElementTypeName |> Some else None
+                DeclaredTypes = t.GetNestedTypes() |> Array.map(fun n -> n.ElementTypeName) |> List.ofArray
+                Members = []
+            }
+        
+        {
+            Name = ClrAssemblyName(a.SimpleName, a.FullName |> Some)
+            Types = a.GetTypes() |> Array.mapi(fun pos t -> describeType pos t) |> List.ofArray
+        }
+        

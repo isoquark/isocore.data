@@ -3,6 +3,7 @@
 open System
 open System.Reflection
 open System.Collections.Generic
+open System.Linq.Expressions
 
 open Microsoft.FSharp.Reflection
 
@@ -218,12 +219,33 @@ module Type =
         else
             ClrTypeKind.Unclassified
 
+    /// <summary>
+    /// Gets types that are (directly) nested within a spcecified type
+    /// </summary>
+    /// <param name="subject">The type whose nested types are returned</param>
+    let getNestedTypes (subject : Type) =
+        subject.GetNestedTypes(BindingFlags.Public ||| BindingFlags.NonPublic) |> List.ofArray
+
+    /// <summary>
+    /// Gets a <see cref="System.Type" /> from a type name
+    /// </summary>
+    /// <param name="name"></param>
+    /// <remarks>
+    /// This is inlined to increase the cases in which the type can be obtained using only
+    /// the full name and not the AQN; if the type is in the currently executing assembly
+    /// (or mscorlib) it can be resolved with the full name
+    /// </remarks>
+    let inline fromName (name : ClrTypeName) =
+        match name with ClrTypeName(_, fullName, aqName) ->  Type.GetType(defaultArg aqName fullName.Value)
+            
+        
+       
+
 [<AutoOpen>]
 module TypeExtensions =
     /// <summary>
     /// Gets the properties defined by the type
     /// </summary>
     let props<'T> = typeof<'T> |> Type.getProperties
-
 
 

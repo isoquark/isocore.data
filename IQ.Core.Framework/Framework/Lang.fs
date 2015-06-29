@@ -295,7 +295,7 @@ module Lang =
         /// <summary>
         /// Represents the name of a member
         /// </summary>    
-        type ClrMemberElementName = ClrMemberElementName of string
+        type ClrMemberName = ClrMemberName of string
     
         /// <summary>
         /// Represents the name of a parameter
@@ -311,7 +311,7 @@ module Lang =
             ///Specifies the name of a type 
             | TypeElementName of ClrTypeName
             ///Specifies the name of a type member
-            | MemberElementName of ClrMemberElementName
+            | MemberElementName of ClrMemberName
             ///Specifies the name of a parameter
             | ParameterElementName of ClrParameterElementName
 
@@ -345,6 +345,66 @@ module ReflectedKind =
         | :? UnionCaseInfo -> ReflectedKind.UnionCase
         | _ -> nosupport()
 
+/// <summary>
+/// Defines <see cref="ClrElementName"/>-related augmentations 
+/// </summary>
+[<AutoOpen>]
+module ClrNameExtensions =
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrTypeName"/> type
+    /// </summary>
+    type ClrTypeName 
+    with
+        /// <summary>
+        /// Gets the local name of the type (which does not include enclosing type names or namespace)
+        /// </summary>
+        member this.SimpleName = match this with ClrTypeName(simpleName=x) -> x
+        /// <summary>
+        /// Gets namespace and nested type-qualified name of the type
+        /// </summary>
+        member this.FullName = match this with ClrTypeName(fullName=x) -> x
+        /// <summary>
+        /// Gets the assembly-qualified type name of the type
+        /// </summary>
+        member this.AssemblyQualifiedName = match this with ClrTypeName(assemblyQualifiedName=x) -> x
+        
+        member this.Text = 
+            match this with 
+                ClrTypeName(simple,full, aqn) -> match aqn with                                    
+                                                    | Some(x) -> x
+                                                    | None ->
+                                                        match full with
+                                                        | Some(x) -> x
+                                                        | None -> simple 
+
+
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrMemberElementName"/> type
+    /// </summary>
+    type ClrMemberName
+    with
+        member this.Text = match this with ClrMemberName(x) -> x
+    
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrParameterElementName"/> type
+    /// </summary>
+    type ClrParameterElementName
+    with
+        member this.Text = match this with ClrParameterElementName(x) -> x
+
+    /// <summary>
+    /// Represents the name of a CLR element
+    /// </summary>
+    type ClrElementName
+    with
+        member this.Text =
+            match this with
+            | AssemblyElementName x -> x.Text
+            | TypeElementName x -> x.Text
+            | MemberElementName x -> x.Text
+            | ParameterElementName x -> x.Text
                 
 
 

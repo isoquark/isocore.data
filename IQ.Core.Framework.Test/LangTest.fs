@@ -27,4 +27,6 @@ module LangTest =
     [<Test>]
     let ``Determined collection value type``() =
         [1;2;3].GetType() |> Type.getCollectionValueType |> Claim.equal (Some(typeof<int>))
-        
+
+       
+             

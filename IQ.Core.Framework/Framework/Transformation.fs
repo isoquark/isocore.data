@@ -5,7 +5,11 @@ open System.Reflection
 open System.Diagnostics
 open System.Collections.Concurrent
 open System.Collections.Generic
+open System.Linq.Expressions
 open System.Linq
+open System.Text.RegularExpressions
+
+open FSharp.Text.RegexProvider
 
 [<AutoOpen>]
 module TransformerVocabulary =
@@ -13,24 +17,34 @@ module TransformerVocabulary =
     
     [<Literal>]
     let  DefaultTransformerCategory = "Default"
+
+    [<Literal>]
+    let private IdRegexText = @"(?<Category>[^:]*):(?<SrcType>.+?(?=-->))-->(?<DstType>(.)*)"
+    [<RegexExample("somecategory:type+1-->type+2")>]
+    type private IdRegex = Regex<IdRegexText>
+   
     
     /// <summary>
     /// Indentifies a data conversion operation
     /// </summary>
-    [<DebuggerDisplay(DebuggerDisplayDefault)>]
-    type TransformationIdentifier = TransformationIdentifier of category : String * srcType : Type * dstType : Type
+    type TransformationIdentifier = TransformationIdentifier of category : String * srcType : ClrTypeName * dstType : ClrTypeName
     with
         member this.Category = match this with TransformationIdentifier(category=x) ->x
         member this.SrcType = match this with TransformationIdentifier(srcType=x) -> x
         member this.DstType = match this with TransformationIdentifier(dstType=x) ->x
         override this.ToString() =
-            sprintf "%s:%s -> %s" this.Category this.DstType.FullName this.SrcType.FullName
-    
+            sprintf "%s:%s-->%s" this.Category this.DstType.SimpleName this.SrcType.SimpleName
+//        static member Parse text = 
+//            let m = IdRegex().Match(text)                                   
+//            TransformationIdentifier(m.Category.Value, m.SrcType.Value, m.DstType.Value)
+            
+
      
     type TransformationFunction<'TSrc,'TDst> = 'TSrc->'TDst
     
     type TransformationFunction = obj -> obj
-    
+      
+
     /// <summary>
     /// Applied to a function to identify it as a converter
     /// </summary>
@@ -94,18 +108,12 @@ module TransformerVocabulary =
         member this.Category = match this with DataConverterConfig(category=x) -> x
 
 
-module TransformationIdentifier =
-    let createDefault(srcType : Type) (dstType : Type) =
-        TransformationIdentifier(DefaultTransformerCategory, srcType, dstType)
+ module TransformationIdentifier =
+    let create<'TSrc,'TDst>(category) =
+        TransformationIdentifier(category, clrtype<'TSrc>.ElementTypeName, clrtype<'TDst>.ElementTypeName)
 
-    let createDefaultT<'TSrc,'TDst>() =
-        TransformationIdentifier(DefaultTransformerCategory, typeof<'TSrc>, typeof<'TDst>)
-    
-    let createT<'TSrc,'TDst>(category) =
-        TransformationIdentifier(category, typeof<'TSrc>, typeof<'TDst>)
-
-    let create category srcType dstType =
-        TransformationIdentifier(category, srcType, dstType)
+    let createDefault<'TSrc,'TDst>() =
+        create<'TSrc,'TDst>(DefaultTransformerCategory)
 
 
 /// <summary>
@@ -158,42 +166,100 @@ module Transformer =
     let convertArray (dstTypes : Type[]) (values : obj[])  =
         if values.Length <> dstTypes.Length then
             raise <| ArgumentException(
-                sprintf "Value array (length = %i) and type array (length = %i must be of the same length" values.Length dstTypes.Length)
+                sprintf "Value array (length = %i) and type array (length = %i) must be of the same length" values.Length dstTypes.Length)
         values |> Array.mapi (fun i value -> value |> convert dstTypes.[i])
 
+    
+    let private createDelegate1(m : MethodInfo) =
+        if not(m.IsStatic) || m.IsGenericMethod then
+            nosupportd "This method only allows creating delegates for non-generic static methods"
+        let parameterTypes = [| yield! m.GetParameters() |>Array.map(fun x -> x.ParameterType); yield m.ReturnType|]
+        let deltype = Expression.GetDelegateType(parameterTypes)
+        deltype |> m.CreateDelegate
 
+    let private createDelegate2(m : MethodInfo) =
+        if not(m.IsStatic) || m.IsGenericMethod then
+            nosupportd "This method only allows creating delegates for non-generic static methods"
+        let parameters = m.GetParameters() |> Array.map(fun p -> Expression.Parameter(p.ParameterType, p.Name)) 
+        let call = Expression.Call(null, m,parameters |> Array.map(fun p -> p :> Expression))
+        Expression.Lambda(call,parameters).Compile()
+    
+  
+    /// <summary>
+    /// Creates a lambda expression compiled into a delegate for transformations of the 
+    /// form T:A->B where A and B are any types. The resulting signature of the 
+    /// delegate is of the form T:obj->obj
+    /// </summary>
+    /// <param name="m">The (static) method that will be executed when the delegate is invoked</param>
+    let private createDelegate(m : MethodInfo) =
+        //Define input parameter and 
+        let input = Expression.Parameter(typeof<obj>, "input")
+        //Cast input parameter to the type required by the method        
+        let convert = Expression.Convert(input, m.GetParameters().[0].ParameterType)
+        //Call the moethod
+        let callresult = Expression.Call(null, m,[|convert :> Expression|])
+        //Convert the result of the method to obj
+        let result = Expression.Convert(callresult, typeof<obj>)
+        //Create lambda function and compile into delegate
+        Expression.Lambda<Func<obj,obj>>(result, input).Compile()
 
+    type private TransformationDelegate = Func<obj,obj>           
+    type private Key = uint64
+    type private TransformationIndex = Dictionary<Key, TransformationDelegate>
+    let private createDelegateIndex() = TransformationIndex()    
+    let inline private createKey (srcType : Type) (dstType : Type)=
+        let x = srcType.GetHashCode() |> uint64
+        let y = dstType.GetHashCode() |> uint64
+        let key = (x <<< 32) ||| y
+        key
+    let inline private getTransform  srcType dstType (idx : TransformationIndex) = 
+        let key = createKey srcType dstType
+        idx.[key]
+    let inline private putTransform key del (idx : TransformationIndex) = 
+        idx.[key] <- del
+
+    
+                
     let private discover(config : TransformerConfig) =
-        let functions = ConcurrentDictionary<TransformationIdentifier, obj->obj>()
+        let delegateIndex = createDelegateIndex()
+        let category = defaultArg config.Category DefaultTransformerCategory
+        let identifiers = ResizeArray<TransformationIdentifier>()
         let handler (e : ClrElement) =
             if e.Kind = ClrElementKind.Method && e.IsStatic then
                 match e |> ClrElement.tryGetAttributeT<TransformationAttribute> with
-                | Some(a) ->
-                    let m = e |> ClrElement.asMethodElement
-                    let parameters = m.MethodInfo |> ClrElementProvider.getParameters
-                    if parameters.Length <> 1 || m.MethodInfo.ReturnType = typeof<Void> then
-                        failwith (sprintf "Method %O incorrectly identified as a conversion function" m)
-                    let cid = TransformationIdentifier(a.Category, parameters.Head.ParamerInfo.ParameterType, m.MethodInfo.ReturnType)
-                    //TODO: this can be done much faster by creating/caching a delegate
-                    let f  srcValue  =
-                        m.MethodInfo.Invoke(null, [|srcValue|])                    
-                    if functions.TryAdd(cid,f) |> not then
-                        failwith (sprintf "Key for %O already exists" cid)
+                | Some(a) -> 
+                    if a.Category = category then
+                        let m = e |> ClrElement.asMethodElement
+                        let parameters = m.MethodInfo |> ClrElementProvider.getParameters
+                        if parameters.Length <> 1 || m.MethodInfo.ReturnType = typeof<Void> then
+                            failwith (sprintf "Method %O incorrectly identified as a conversion function" m)
+                   
+                        let parameter = parameters.Head.ParamerInfo
+                        let srcType = parameter.ParameterType
+                        let dstType = m.MethodInfo.ReturnType
+                    
+                        let del = m.MethodInfo |> createDelegate
+                        let key = createKey srcType dstType
+                        putTransform key del delegateIndex
+                    
+                        TransformationIdentifier(a.Category, srcType.ElementTypeName, dstType.ElementTypeName) |> identifiers.Add
+                                                               
                 | _ -> ()
         
         config.SearchAssemblies |> List.map ClrElementProvider.getAssemblyElement 
                                 |> List.iter (fun x -> x |> ClrElement.walk handler)
-        functions
+        delegateIndex, identifiers |> List.ofSeq
+
                    
     type private Realization(config : TransformerConfig) =
-        let transformations = config |> discover
+        let delegates, identifiers = config |> discover
         let category = match config.Category with | Some(c) -> c | None -> DefaultTransformerCategory
-        //let targetTypes = lazy(transformations.Keys.Select(fun x -> x.DstType).Distinct() |> List.ofSeq)
+        
         
         let transform dstType srcValue =
-            let id = TransformationIdentifier(category, srcValue.GetType(), dstType)
-            let transform = transformations.[id]
-            srcValue |> transform
+            let srcType = srcValue.GetType()
+            (getTransform srcType dstType delegates).Invoke(srcValue)
+
             
         interface ITransformer with
             member this.Transform dstType srcValue =               
@@ -203,21 +269,16 @@ module Transformer =
                     then Seq.empty
                 else
                     let srcType = srcValues |> Seq.nth 0 |> fun x -> x.GetType()
-                    //let srcType = srcValues.GetType().GetGenericArguments() |> Seq.exactlyOne
-                    let id = TransformationIdentifier(category, srcType, dstType)
-                    let transform = transformations.[id]
-                    srcValues |> Seq.map transform
+                    let transform = getTransform srcType dstType delegates
+                    srcValues |> Seq.map transform.Invoke
             member this.GetTargetTypes srcType  = []
-            member this.GetKnownTransformations() = transformations.Keys |> List.ofSeq
+            member this.GetKnownTransformations() = identifiers
         interface ITypedTransformer with
             member this.Transform value = 
                 value |> transform typeof<'TDst> :?> 'TDst
             member this.TransformMany values =
                 [] |> Seq.ofList
-
-            
-
-
+           
     let get(config : TransformerConfig) =        
         Realization(config) :> ITransformer
 

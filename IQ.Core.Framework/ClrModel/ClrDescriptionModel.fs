@@ -18,7 +18,7 @@ module ClrDescription =
     /// <param name="p">The property to be referenced</param>
     let internal describeProperty pos (p : PropertyInfo) =
         {
-            Name = p.Name |> ClrMemberElementName |> MemberElementName
+            Name = p.Name |> ClrMemberName 
             Position = pos
             DeclaringType  = p.DeclaringType.ElementTypeName
             ValueType = p.PropertyType |> Type.getItemValueType |> fun x -> x.ElementTypeName
