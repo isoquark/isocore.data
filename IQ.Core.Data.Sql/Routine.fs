@@ -170,7 +170,7 @@ module internal Routine =
                     | CollectionTypeReference(subject, itemTypeRef, collectionKind) ->            
                         let items = 
                             [for row in result ->
-                                itemTypeRef |> ClrTypeValue.fromValueArray row]
+                                itemTypeRef.ReferentType.Type |> RecordValue.fromValueArray row]
                         items |> Collection.create collectionKind itemTypeRef.ReferentType.Type |> Some
                     | _ -> NotSupportedException() |> raise
                         

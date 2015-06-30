@@ -77,6 +77,14 @@ module AssemblyExtensions =
     with
         member this.SimpleName = this.GetName().Name
 
+    /// <summary>
+    /// Gets the currently executing assembly
+    /// </summary>
+    /// <remarks>
+    /// Note that since the method is designated inline, the call to get the executing
+    /// assembly is injected at the call-site and so works as expected
+    /// </remarks>
+    let inline thisAssembly() = Assembly.GetExecutingAssembly()
         
 
 

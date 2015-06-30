@@ -33,8 +33,8 @@ module ClrTypeValueTest =
             FieldA2 = "Hello"
             FieldA3 = 14.1m
         }
-        let actual = typeref<RecordA> 
-                  |> ClrTypeValue.fromValueArray [|expect.FieldA1 :> obj; expect.FieldA2 :> obj; expect.FieldA3 :> obj|]
+        let actual = typeof<RecordA> 
+                  |> RecordValue.fromValueArray [|expect.FieldA1 :> obj; expect.FieldA2 :> obj; expect.FieldA3 :> obj|]
                   :?> RecordA
         actual |> Claim.equal expect
 
@@ -45,7 +45,7 @@ module ClrTypeValueTest =
             FieldA2 = "Hello"
             FieldA3 = 38.12m
         }
-        let valueArray = recordValue |> ClrTypeValue.toValueArray
+        let valueArray = recordValue |> RecordValue.toValueArray
         Claim.equal (recordValue.FieldA1 :> obj) valueArray.[0]
         Claim.equal (recordValue.FieldA2 :> obj) valueArray.[1]
         Claim.equal (recordValue.FieldA3 :> obj) valueArray.[2]
@@ -63,7 +63,7 @@ module ClrTypeValueTest =
             FieldA2 = "Hello"
             FieldA3 = 38.12m
         }
-        let actual =  typeref<RecordA> |> ClrTypeValue.fromValueIndex valueMap :?> RecordA
+        let actual =  typeof<RecordA> |> RecordValue.fromValueIndex valueMap :?> RecordA
         actual |> Claim.equal expect
 
 
@@ -80,7 +80,7 @@ module ClrTypeValueTest =
             FieldB2 = 38.12m
             FieldB3 = DateTime(2015, 5, 6) |> Some
         }
-        let actual1 =  typeref<RecordB> |> ClrTypeValue.fromValueIndex valueMap1 :?> RecordB
+        let actual1 =  typeof<RecordB> |> RecordValue.fromValueIndex valueMap1 :?> RecordB
         actual1 |> Claim.equal expect1
 
         let valueMap2 = 
@@ -94,7 +94,7 @@ module ClrTypeValueTest =
             FieldB2 = 38.12m
             FieldB3 = None
         }
-        let actual2 =  typeref<RecordB> |> ClrTypeValue.fromValueIndex valueMap2 :?> RecordB
+        let actual2 =  typeof<RecordB> |> RecordValue.fromValueIndex valueMap2 :?> RecordB
         actual2 |> Claim.equal expect2
 
     [<Test>]
@@ -111,7 +111,7 @@ module ClrTypeValueTest =
             (FieldB3Name.Text, 2, value1.FieldB3:> obj)
             ] |> ValueIndex.create
 
-        let actual1 = value1 |> ClrTypeValue.toValueIndex 
+        let actual1 = value1 |> RecordValue.toValueIndex 
         actual1 |> Claim.equal expect1
 
         let value2 = {
@@ -126,5 +126,5 @@ module ClrTypeValueTest =
             (FieldB3Name.Text, 2, value1.FieldB3:> obj)
             ] |> ValueIndex.create
 
-        let actual2 = value1 |> ClrTypeValue.toValueIndex 
+        let actual2 = value1 |> RecordValue.toValueIndex 
         actual2 |> Claim.equal expect2

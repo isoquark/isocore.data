@@ -74,7 +74,7 @@ module DataTable =
         let table = d.DataElement |> fromTabularDescription
            
         for value in values do
-            let valueidx = value |>ClrTypeValue.toValueIndex
+            let valueidx = value |>RecordValue.toValueIndex
             [|for column in columns do 
                 yield valueidx.[column.ProxyElement.ReferentName.Text] |> DataTypeConverter.toClrTransportValue column.DataElement.StorageType
             |] |> table.Rows.Add |> ignore
@@ -97,11 +97,11 @@ module DataTable =
         | CollectionTypeReference(subject, itemTypeRef, collectionKind) ->            
             let items = 
                 [for row in dataTable.Rows ->
-                    itemTypeRef |> ClrTypeValue.fromValueArray row.ItemArray]
+                    itemTypeRef.TypeReferent.Type |> RecordValue.fromValueArray row.ItemArray]
             items |> Collection.create collectionKind itemTypeRef.ReferentType.Type :?> IEnumerable
         | _ ->
             [for row in dataTable.Rows ->
-                typeref |> ClrTypeValue.fromValueArray row.ItemArray] :> IEnumerable
+                typeref.TypeReferent.Type |> RecordValue.fromValueArray row.ItemArray] :> IEnumerable
 
     let toProxyValuesT<'T> (typeref : ClrTypeReference) (dataTable : DataTable) =
         dataTable |> toProxyValues typeref :?> IEnumerable<'T>

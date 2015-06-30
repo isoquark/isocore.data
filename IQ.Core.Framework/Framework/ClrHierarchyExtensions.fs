@@ -13,12 +13,31 @@ open Microsoft.FSharp.Quotations.Patterns
 /// </summary>
 [<AutoOpen>]
 module ClrHierarchyExtensions =
+
     /// <summary>
     /// Defines augmentations for the <see cref="ClrElement"/> type
     /// </summary>
     type ClrElement
     with
         member this.Name = this |> ClrElementName.fromElement
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="System.Reflection.Assembly"/> type
+    /// </summary>
+    type Assembly
+    with
+        /// <summary>
+        /// Interprets the assembly as a <see cref="ClrElement"/>
+        /// </summary>
+        member this.Element = this |> ClrMetadataProvider.getElement
+        /// <summary>
+        /// Interprets the assembly as a <see cref="ClrAssemblyElement"/>
+        /// </summary>
+        member this.AssemblyElement =  match this.Element with | AssemblyElement(element=x) -> x | _ ->nosupport()
+        /// <summary>
+        /// Gets the <see cref="ClrElementName"/> of the assembly
+        /// </summary>
+        member this.ElementName = this.Element.Name
 
     /// <summary>
     /// Defines augmentations for the <see cref="System.Type"/> type
@@ -28,7 +47,7 @@ module ClrHierarchyExtensions =
         /// <summary>
         /// Interprets the type as a <see cref="ClrElement"/>
         /// </summary>
-        member this.Element = this |> ClrElementProvider.getElement
+        member this.Element = this |> ClrMetadataProvider.getElement
 
         /// <summary>
         /// Interprets the method as a <see cref="ClrTypeElement"/>
@@ -45,23 +64,6 @@ module ClrHierarchyExtensions =
         /// </summary>
         member this.ElementName = this.Element.Name
     
-    /// <summary>
-    /// Defines augmentations for the <see cref="System.Reflection.Assembly"/> type
-    /// </summary>
-    type Assembly
-    with
-        /// <summary>
-        /// Interprets the assembly as a <see cref="ClrElement"/>
-        /// </summary>
-        member this.Element = this |> ClrElementProvider.getElement
-        /// <summary>
-        /// Interprets the assembly as a <see cref="ClrAssemblyElement"/>
-        /// </summary>
-        member this.AssemblyElement =  match this.Element with | AssemblyElement(element=x) -> x | _ ->nosupport()
-        /// <summary>
-        /// Gets the <see cref="ClrElementName"/> of the assembly
-        /// </summary>
-        member this.ElementName = this.Element.Name
 
     /// <summary>
     /// Defines augmentations for the <see cref="System.Reflection.MethodInfo"/> type
@@ -71,7 +73,7 @@ module ClrHierarchyExtensions =
         /// <summary>
         /// Interprets the method as a <see cref="ClrElement"/>
         /// </summary>
-        member this.Element = this |> ClrElementProvider.getElement
+        member this.Element = this |> ClrMetadataProvider.getElement
         /// <summary>
         /// Interprets the method as a <see cref="ClrMethodElement"/>
         /// </summary>
@@ -100,7 +102,7 @@ module ClrHierarchyExtensions =
         /// <summary>
         /// Interprets the parameter as a <see cref="ClrElement"/>
         /// </summary>
-        member this.Element = this |> ClrElementProvider.getElement
+        member this.Element = this |> ClrMetadataProvider.getElement
         /// <summary>
         /// Interprets the parameter as a <see cref="ClrParameterElement"/>
         /// </summary>
@@ -119,7 +121,7 @@ module ClrHierarchyExtensions =
         /// <summary>
         /// Interprets the property as a <see cref="ClrElement"/>
         /// </summary>
-        member this.Element = this |> ClrElementProvider.getElement
+        member this.Element = this |> ClrMetadataProvider.getElement
         /// <summary>
         /// Interprets the property as a <see cref="ClrPropertyElement"/>
         /// </summary>
@@ -165,7 +167,7 @@ module ClrHierarchyExtensions =
         /// <summary>
         /// Interprets the field as a <see cref="ClrElement"/>
         /// </summary>
-        member this.Element = this |> ClrElementProvider.getElement
+        member this.Element = this |> ClrMetadataProvider.getElement
         /// <summary>
         /// Interprets the field as a <see cref="ClrFieldElement"/>
         /// </summary>
@@ -208,7 +210,7 @@ module ClrHierarchyExtensions =
         /// <summary>
         /// Interprets the case as a <see cref="ClrElement"/>
         /// </summary>
-        member this.Element = this |> ClrElementProvider.getElement
+        member this.Element = this |> ClrMetadataProvider.getElement
         /// <summary>
         /// Interprets the case as a <see cref="ClrUnionCaseElement"/>
         /// </summary>
@@ -260,7 +262,7 @@ module ClrHierarchyExtensions =
         /// <summary>
         /// Upcasts the element to a <see cref="ClrElement"/>
         /// </summary>
-        member this.Element = this.MemberInfo |> ClrElementProvider.getElement
+        member this.Element = this.MemberInfo |> ClrMetadataProvider.getElement
         /// <summary>
         /// Gets the <see cref="ClrElementName"/> of the member 
         /// </summary>
@@ -279,7 +281,7 @@ module ClrHierarchyExtensions =
         /// <summary>
         /// Upcasts the element to a <see cref="ClrElement"/>
         /// </summary>
-        member this.Element = this.Type |> ClrElementProvider.getElement
+        member this.Element = this.Type |> ClrMetadataProvider.getElement
         /// <summary>
         /// Gets the <see cref="ClrElementName"/> of the member 
         /// </summary>
@@ -301,7 +303,7 @@ module ClrHierarchyExtensions =
         /// <summary>
         /// Upcasts the element to a <see cref="ClrElement"/>
         /// </summary>
-        member this.Element = this.Assembly |> ClrElementProvider.getElement
+        member this.Element = this.Assembly |> ClrMetadataProvider.getElement
         
         /// <summary>
         /// Gets the name of the assembly
@@ -327,7 +329,7 @@ module ClrHierarchyExtensions =
     /// <summary>
     /// Defines augmentations for the <see cref="ClrFieldElement"/> type
     /// </summary>
-    type ClrFieldElement
+    type ClrStorageFieldElement
     with
         /// <summary>
         /// Gets the encapluated Field
@@ -356,4 +358,8 @@ module ClrHierarchyExtensions =
         /// </summary>
         member this.UnionCaseInfo = match this with ClrUnionCaseElement(x) -> x.Primitive
 
+    /// <summary>
+    /// Gets the type element from the suppied type argument
+    /// </summary>
+    let clrtype<'T> = typeof<'T>.TypeElement
 

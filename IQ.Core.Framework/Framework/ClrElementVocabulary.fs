@@ -24,6 +24,8 @@ module ClrElementVocabulary =
         /// The position of the property
         Position : int
         
+        ReflectedElement : PropertyInfo option
+        
         /// The name of the type that declares the property
         DeclaringType : ClrTypeName       
     
@@ -35,35 +37,107 @@ module ClrElementVocabulary =
 
         /// Specifies whether the property has a get accessor
         CanRead : bool
-
+       
         /// Specifies the access of the get accessor if applicable
-        ReadAccess : ClrAccess option
+        //ReadAccess : ClrAccess option
 
         /// Specifies whether the property has a set accessor
         CanWrite : bool
 
         /// Specifies the access of the set accessor if applicable
-        WriteAccess : ClrAccess option
+        //WriteAccess : ClrAccess option
     }
 
     /// <summary>
     /// Describes a field
     /// </summary>
-    type ClrFieldDescription = {
+    type ClrStorageFieldDescription = {
         /// The name of the property 
         Name : ClrMemberName
         
+        ReflectedElement : FieldInfo option
+
         /// The position of the property
         Position : int            
     }
 
+    /// <summary>
+    /// Describes a method
+    /// </summary>
+    type ClrMethodDescription = {
+        /// The name of the method
+        Name : ClrMemberName
+        
+        ReflectedElement : MethodInfo option
+
+        /// The position of the method
+        Position : int            
+    
+    }
+
+    /// <summary>
+    /// Describes a constructor
+    /// </summary>
+    type ClrConstructorDescription = {
+    
+        Name : ClrMemberName
+
+        ReflectedElement : ConstructorInfo option
+
+        /// The position of the property
+        Position : int            
+    }
+
+    type ClrEventDescription = {
+        Name : ClrMemberName
+
+        ReflectedElement : EventInfo option
+
+        /// The position of the property
+        Position : int            
+    }
+
+    
+    [<DebuggerDisplay("{Name}")>]
     type ClrMemberDescription =
-    | PropertyMemberDescription of ClrPropertyDescription
-    | PropertyFieldDescription of ClrFieldDescription
+    | PropertyDescription of ClrPropertyDescription
+    | FieldDescription of ClrStorageFieldDescription
+    | MethodDescription of ClrMethodDescription
+    | EventDescription of ClrEventDescription
+    | ConstructorDescription of ClrConstructorDescription
+    with
+        member this.Name =
+            match this with
+            | PropertyDescription(x) -> x.Name
+            | FieldDescription(x) -> x.Name
+            | MethodDescription(x) -> x.Name
+            | EventDescription(x) -> x.Name
+            | ConstructorDescription(x) -> x.Name
+
+        member this.Kind =
+            match this with
+            | PropertyDescription(_) -> ClrMemberKind.Property
+            | FieldDescription(_) -> ClrMemberKind.StorageField
+            | MethodDescription(_) -> ClrMemberKind.Method
+            | EventDescription(_) -> ClrMemberKind.Event
+            | ConstructorDescription(_) -> ClrMemberKind.Constructor
+
+        member this.Position =
+            match this with
+            | PropertyDescription(x) -> x.Position
+            | FieldDescription(x) -> x.Position
+            | MethodDescription(x) -> x.Position
+            | EventDescription(x) -> x.Position
+            | ConstructorDescription(x) -> x.Position
+                    
+            
+    
+    
 
     /// <summary>
     /// Describes a type
     /// </summary>
+    [<DebuggerDisplay("{Name}")>]
     type ClrTypeDescription = {
         /// The name of the type
         Name : ClrTypeName
@@ -71,13 +145,45 @@ module ClrElementVocabulary =
         /// The position of the type
         Position : int
 
+        ReflectedElement : Type option
+
         /// The name of the type that declares the type, if any
         DeclaringType : ClrTypeName option
 
+        /// The nested types declared by the type
         DeclaredTypes : ClrTypeName list
 
+        /// The kind of type, if recognized
+        Kind : ClrTypeKind
+
+        /// The kind of collection represented by the type, if applicable
+        CollectionKind : ClrCollectionKind option
+
+        //Specifies whether the type is of the form option<_>
+        IsOptionType : bool
+        
         Members : ClrMemberDescription list
     }
+    with
+        /// <summary>
+        /// Gets the properties declared by the type
+        /// </summary>
+        member this.Properties = 
+            [for x in this.Members do
+                match x with
+                | PropertyDescription(x) -> yield x
+                |_ ->()
+            ]
+
+        /// <summary>
+        /// Gets the methods declared by the type
+        /// </summary>
+        member this.Methods =
+            [for x in this.Members do
+                match x with
+                | MethodDescription(x) -> yield x
+                |_ ->()
+            ]
 
     /// <summary>
     /// Describes an assembly
@@ -85,13 +191,16 @@ module ClrElementVocabulary =
     type ClrAssemblyDescription = {
         
         Name : ClrAssemblyName
+        
+        ReflectedElement : Assembly option
+
+        /// The position of the assembly relative to its specification/reflection context
+        Position : int
 
         Types : ClrTypeDescription list
     }
 
-
-
-    
+       
     type IReflectionPrimitive =
         abstract Primitive:obj
     
@@ -145,7 +254,7 @@ module ClrElementVocabulary =
     /// Represents and encapsulates a CLR field
     /// </summary>
     [<DebuggerDisplay(DebuggerDisplayDefault)>]
-    type ClrFieldElement = ClrFieldElement of ClrReflectionPrimitive<FieldInfo>
+    type ClrStorageFieldElement = ClrFieldElement of ClrReflectionPrimitive<FieldInfo>
     with
         override this.ToString() = match this with ClrFieldElement(x)  -> x.Primitive.Name
 
@@ -171,7 +280,7 @@ module ClrElementVocabulary =
     [<DebuggerDisplay(DebuggerDisplayDefault)>]
     type ClrDataMemberElement = 
         | PropertyMember of ClrPropertyElement
-        | FieldMember of ClrFieldElement
+        | FieldMember of ClrStorageFieldElement
     with
         override this.ToString() = match this with PropertyMember(x) -> x.ToString() | FieldMember(x) -> x.ToString()
 
@@ -213,7 +322,7 @@ module ClrElementKind =
     /// <param name="kind">The kind</param>
     let isMemberKind kind =
         match kind with
-        | ClrElementKind.Method | ClrElementKind.Property | ClrElementKind.Field | ClrElementKind.Event -> true
+        | ClrElementKind.Method | ClrElementKind.Property | ClrElementKind.StorageField | ClrElementKind.Event -> true
         | _ -> false
 
     /// <summary>
@@ -222,7 +331,7 @@ module ClrElementKind =
     /// <param name="kind">The kind</param>
     let isDataMemberKind kind =
         match kind with
-        | ClrElementKind.Property | ClrElementKind.Field -> true
+        | ClrElementKind.Property | ClrElementKind.StorageField -> true
         | _ -> false
                 
 
@@ -243,7 +352,7 @@ module ClrElementClassification =
                     | PropertyMember(_) ->
                        ClrElementKind.Property
                     | FieldMember(_) -> 
-                        ClrElementKind.Field
+                        ClrElementKind.StorageField
                 | MethodElement(_) ->
                     ClrElementKind.Method
             | TypeElement(element=x) -> 

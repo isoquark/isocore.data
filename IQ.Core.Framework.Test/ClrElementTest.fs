@@ -76,12 +76,6 @@ module ClrAssemblyTest =
         text.Value.Trim() |> Claim.equal "This is an embedded text resource"
     
 
-//    [<Test>]
-//    let ``Discovered types from assembly``() =
-//        //let types = thisAssemblyElement() |> ClrAssembly.getTypeElements
-//        clrtype<RecordA> |> Claim.inList types
-//        clrtype<ClassA> |> Claim.inList types
-
     [<Test>]
     let ``Discovered type child elements``() =
         let t = clrtype<ClassA>

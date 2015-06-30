@@ -230,7 +230,7 @@ module Transformer =
                 | Some(a) -> 
                     if a.Category = category then
                         let m = e |> ClrElement.asMethodElement
-                        let parameters = m.MethodInfo |> ClrElementProvider.getParameters
+                        let parameters = m.MethodInfo |> ClrMetadataProvider.getParameters
                         if parameters.Length <> 1 || m.MethodInfo.ReturnType = typeof<Void> then
                             failwith (sprintf "Method %O incorrectly identified as a conversion function" m)
                    
@@ -246,7 +246,7 @@ module Transformer =
                                                                
                 | _ -> ()
         
-        config.SearchAssemblies |> List.map ClrElementProvider.getAssemblyElement 
+        config.SearchAssemblies |> List.map ClrMetadataProvider.getAssemblyElement 
                                 |> List.iter (fun x -> x |> ClrElement.walk handler)
         delegateIndex, identifiers |> List.ofSeq
 

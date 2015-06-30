@@ -64,22 +64,20 @@
   <ItemGroup>
     <None Include="packages.config" />
     <Content Include="app.config" />
+    <None Include="runtests.bat">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <EmbeddedResource Include="Resources\EmbeddedResource01.txt" />
-    <Compile Include="ClrModel\ClrDescriptionTest.fs" />
-    <Compile Include="ClrModel\ClrInterfaceTest.fs" />
-    <Compile Include="ClrModel\ClrTypeReferenceTest.fs" />
     <Compile Include="ClrModel\ClrTypeValueTest.fs" />
     <Compile Include="ClrModel\ClrMethodTest.fs" />
     <Compile Include="ClrModel\ClrCollectionTest.fs" />
     <Compile Include="LangTest.fs" />
     <Compile Include="TypeTest.fs" />
+    <Compile Include="ClrMetadataProviderTest.fs" />
     <Compile Include="TransformerTest.fs" />
     <Compile Include="TxtTest.fs" />
     <Compile Include="ConnectionStringTest.fs" />
     <Compile Include="ClrElementTest.fs" />
-    <None Include="run.bat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

@@ -66,6 +66,21 @@ module Lang =
         | Lambda(_, expr) -> funcinfo expr
         | Call(_,m,_) -> m
         | _ -> nosupport()
+
+    /// <summary>
+    /// Extracts the name of a function used in a lambda expression
+    /// </summary>
+    /// <remarks>
+    /// Useful for quotations of the form <@fun () -> myfunc @>
+    /// </remarks>
+    let funcname q = q |> funcinfo |> fun x -> x.Name
+
+            
+    let rec propinfo q =
+       match q with
+       | PropertyGet(_,p,_) -> p
+       | Lambda(_, expr) -> propinfo expr
+       | _ -> nosupport()
         
     /// <summary>
     /// Raises a <see cref="System.ArgumentException"/> 
@@ -234,28 +249,57 @@ module Lang =
         /// <summary>
         /// Classifies a CLR element as a field
         /// </summary>
-        | Field = 3
+        | StorageField = 3
         /// <summary>
         /// Classifies a CLR element as an event
         /// </summary>
         | Event = 4
         /// <summary>
+        /// Classifies a CLR element as a constructor
+        /// </summary>
+        | Constructor = 5        
+        /// <summary>
         /// Classifies a CLR element as a type 
         /// </summary>
-        | Type = 5
+        | Type = 6
         /// <summary>
         /// Classifies a CLR element as an assembly
         /// </summary>
-        | Assembly = 6
+        | Assembly = 7
         /// <summary>
         /// Classifies a CLR element as method parameter
         /// </summary>
-        | Parameter = 7
+        | Parameter = 8
         /// <summary>
         /// Classifies a CLR element a union case
         /// </summary>
-        | UnionCase = 8
+        | UnionCase = 9
 
+    /// <summary>
+    /// Classifies CLR member elements
+    /// </summary>
+    type ClrMemberKind =
+        /// <summary>
+        /// Classifies a CLR element as a property
+        /// </summary>
+        | Property = 1
+        /// <summary>
+        /// Classifies a CLR element as a property
+        /// </summary>
+        | Method = 2
+        /// <summary>
+        /// Classifies a CLR element as a field
+        /// </summary>
+        | StorageField = 3
+        /// <summary>
+        /// Classifies a CLR element as an event
+        /// </summary>
+        | Event = 4
+        /// <summary>
+        /// Classifies a CLR element as a constructor
+        /// </summary>
+        | Constructor = 5
+        
 
     /// <summary>
     /// Specifies the visibility of a CLR element
@@ -274,46 +318,76 @@ module Lang =
         /// Not supported in F#
         | ProtectedInternalAccess
         
-        /// <summary>
-        /// Represents a type name
-        /// </summary>
-        type ClrTypeName = ClrTypeName of simpleName : string * fullName : string option * assemblyQualifiedName : string option
+    /// <summary>
+    /// Represents a type name
+    /// </summary>
+    [<DebuggerDisplay("{Text, nq}")>]
+    type ClrTypeName = ClrTypeName of simpleName : string * fullName : string option * assemblyQualifiedName : string option
+    with
+        member this.Text = 
+            match this with 
+                ClrTypeName(simpleName, fullName, aqn) ->
+                    match aqn with
+                    | Some(x) -> x
+                    | None ->
+                        match fullName with
+                        | Some(x) -> x
+                        | None ->
+                            simpleName
+        override this.ToString() = this.Text
+                    
 
-        /// <summary>
-        /// Represents an assembly name
-        /// </summary>
-        type ClrAssemblyName = ClrAssemblyName of simpleName : string * fullName : string option
-        with
-            member this.SimpleName = match this with ClrAssemblyName(simpleName=x) -> x
-            member this.FullName = match this with ClrAssemblyName(fullName=x) -> x
-            member this.Text =
-                match this with ClrAssemblyName(simpleName, fullName) -> match fullName with
-                                                                            | Some(x) -> x
-                                                                            | None ->
-                                                                                simpleName    
+    /// <summary>
+    /// Represents an assembly name
+    /// </summary>
+    type ClrAssemblyName = ClrAssemblyName of simpleName : string * fullName : string option
+    with
+        member this.SimpleName = match this with ClrAssemblyName(simpleName=x) -> x
+        member this.FullName = match this with ClrAssemblyName(fullName=x) -> x
+        member this.Text =
+            match this with ClrAssemblyName(simpleName, fullName) -> match fullName with
+                                                                        | Some(x) -> x
+                                                                        | None ->
+                                                                            simpleName    
+        override this.ToString() = this.Text
 
-        /// <summary>
-        /// Represents the name of a member
-        /// </summary>    
-        type ClrMemberName = ClrMemberName of string
+    /// <summary>
+    /// Represents the name of a member
+    /// </summary>    
+    type ClrMemberName = ClrMemberName of string
+    with
+        member this.Text = match this with ClrMemberName(x) -> x
+        override this.ToString() = this.Text
     
-        /// <summary>
-        /// Represents the name of a parameter
-        /// </summary>    
-        type ClrParameterElementName = ClrParameterElementName of string
+    /// <summary>
+    /// Represents the name of a parameter
+    /// </summary>    
+    type ClrParameterElementName = ClrParameterElementName of string
+    with
+        member this.Text = match this with ClrParameterElementName(x) -> x
+        override this.ToString() = this.Text
 
-        /// <summary>
-        /// Represents the name of a CLR element
-        /// </summary>
-        type ClrElementName =
-            ///Specifies the name of an assembly 
-            | AssemblyElementName of ClrAssemblyName
-            ///Specifies the name of a type 
-            | TypeElementName of ClrTypeName
-            ///Specifies the name of a type member
-            | MemberElementName of ClrMemberName
-            ///Specifies the name of a parameter
-            | ParameterElementName of ClrParameterElementName
+    /// <summary>
+    /// Represents the name of a CLR element
+    /// </summary>
+    type ClrElementName =
+        ///Specifies the name of an assembly 
+        | AssemblyElementName of ClrAssemblyName
+        ///Specifies the name of a type 
+        | TypeElementName of ClrTypeName
+        ///Specifies the name of a type member
+        | MemberElementName of ClrMemberName
+        ///Specifies the name of a parameter
+        | ParameterElementName of ClrParameterElementName
+    with
+        member this.Text =
+            match this with 
+                | AssemblyElementName(x) -> x.Text
+                | TypeElementName(x) -> x.Text
+                | MemberElementName(x) -> x.Text
+                | ParameterElementName(x) -> x.Text
+        override this.ToString() = this.Text
+
 
     /// <summary>
     /// Defines System.MethodInfo helpers
@@ -344,6 +418,8 @@ module ReflectedKind =
         | :? ParameterInfo -> ReflectedKind.Parameter
         | :? UnionCaseInfo -> ReflectedKind.UnionCase
         | _ -> nosupport()
+
+
 
 /// <summary>
 /// Defines <see cref="ClrElementName"/>-related augmentations 

@@ -30,14 +30,14 @@ module ClrElement =
             | DataMemberElement(x) ->
                 match x with
                 | PropertyMember(x) ->
-                    x.PropertyInfo.DeclaringType |> ClrElementProvider.getType |> Some
+                    x.PropertyInfo.DeclaringType |> ClrMetadataProvider.getType |> Some
                 | FieldMember(x) -> 
-                    x.FieldInfo.DeclaringType |> ClrElementProvider.getType |> Some
+                    x.FieldInfo.DeclaringType |> ClrMetadataProvider.getType |> Some
             | MethodElement(x) ->
-                x.MethodInfo.DeclaringType |> ClrElementProvider.getType |> Some
+                x.MethodInfo.DeclaringType |> ClrMetadataProvider.getType |> Some
         | TypeElement(element=x) -> 
             if x.Type.DeclaringType <> null then
-                x.Type.DeclaringType |> ClrElementProvider.getType |> Some
+                x.Type.DeclaringType |> ClrMetadataProvider.getType |> Some
             else
                 None
         | AssemblyElement(element=x) ->
@@ -45,7 +45,7 @@ module ClrElement =
         | ParameterElement(element=x) ->
             None
         | UnionCaseElement(element=x) ->
-            x.UnionCaseInfo.DeclaringType |> ClrElementProvider.getType |> Some
+            x.UnionCaseInfo.DeclaringType |> ClrMetadataProvider.getType |> Some
 
 
     /// <summary>
@@ -72,7 +72,7 @@ module ClrElement =
             x.ParamerInfo.Member.DeclaringType.Assembly
         | UnionCaseElement(element=x) ->
             x.UnionCaseInfo.DeclaringType.Assembly
-        |> ClrElementProvider.getElement
+        |> ClrMetadataProvider.getElement
 
 
                 
@@ -472,20 +472,5 @@ module ClrAssembly =
     /// <param name="subject">The assembly that contains the resource</param>
     let writeTextResource shortName outputDir (subject : ClrAssemblyElement) =
         subject.Assembly |> Assembly.writeTextResource shortName outputDir
-
+                           
     
-    let describe(a : Assembly) =
-        let describeType pos (t : Type) =
-            {
-                ClrTypeDescription.Name = t.ElementTypeName
-                Position = pos
-                DeclaringType = if t.DeclaringType <> null then t.DeclaringType.ElementTypeName |> Some else None
-                DeclaredTypes = t.GetNestedTypes() |> Array.map(fun n -> n.ElementTypeName) |> List.ofArray
-                Members = []
-            }
-        
-        {
-            Name = ClrAssemblyName(a.SimpleName, a.FullName |> Some)
-            Types = a.GetTypes() |> Array.mapi(fun pos t -> describeType pos t) |> List.ofArray
-        }
-        

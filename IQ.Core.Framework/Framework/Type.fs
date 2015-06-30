@@ -141,34 +141,33 @@ module Type =
     let getProperties  (subject : Type) =
         subject.GetProperties(DefaultBindingFlags) |> List.ofArray
 
-    let private isPureField (f : FieldInfo) =
+    let private isDeclaredField (f : FieldInfo) =
         (f.DeclaringType |> isRecordType |> not) && (f.DeclaringType |> isUnionType |> not)
 
+            
     /// <summary>
-    /// Gets fields that are not artifacts of the compiler, such as auto-generated backing stores for
-    /// property getters/setters
+    /// Gets members that are not artifacts of the compiler, such as auto-generated fields that are 
+    /// backing stores for property getters/setters
     /// </summary>
     /// <param name="subject">The type</param>
     /// <remarks>
     /// This will probably never be foolproof because its too arbitrary
     /// </remarks>
-    let getPureFields (subject : Type) =
-        if (subject |> isRecordType |> not) && (subject |> isUnionType |> not) then
-            subject.GetFields(DefaultBindingFlags) |> List.ofArray
-        else
-            []
-            
-    let getPureMembers (subject : Type) =
-        subject.GetMembers(DefaultBindingFlags) |> Array.filter(fun m ->
-            match m with
-            | :? MethodInfo as x  -> x |> isPureMethod
-            | :? PropertyInfo  -> true
-            | :? FieldInfo as x -> x |> isPureField
-            | :? ConstructorInfo -> false
-            | :? Type -> false
-            | :? EventInfo -> false
-            | _ -> nosupport()
-        ) |> List.ofArray
+    let getDeclaredMembers (subject : Type) =
+        if subject |> isRecordType then
+            FSharpType.GetRecordFields(subject, true) |> Array.map(fun x -> x :> MemberInfo)
+        else       
+            subject.GetMembers(DefaultBindingFlags) |> Array.filter(fun m ->
+                match m with
+                | :? MethodInfo as x  -> x |> isPureMethod
+                | :? PropertyInfo  -> true
+                | :? FieldInfo as x -> x |> isDeclaredField
+                | :? ConstructorInfo -> false
+                | :? Type -> false
+                | :? EventInfo -> false
+                | _ -> nosupport()
+            ) 
+        |> List.ofArray
 
     /// <summary>
     /// Retrieves an attribute applied to a type, if present
@@ -248,4 +247,23 @@ module TypeExtensions =
     /// </summary>
     let props<'T> = typeof<'T> |> Type.getProperties
 
+    type Type
+    with
+        member this.IsOptionType = this |> Option.isOptionType
+
+        /// <summary>
+        /// If optional type, gets the type of the underlying value; otherwise, the type itself
+        /// </summary>
+        member this.ItemValueType = this |> Type.getItemValueType
+
+
+    /// <summary>
+    /// Defines augmentations for the Assembly type
+    /// </summary>
+    type Assembly
+    with
+        /// <summary>
+        /// Gets the short name of the assembly without version/culture/security information
+        /// </summary>
+        member this.ShortName = this.GetName().Name    
 

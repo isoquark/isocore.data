@@ -26,4 +26,10 @@ module TypeTest =
     let ``Loaded type from name``() =
         ClrTypeName("B", typeof<A.B>.FullName |> Some, None) |> Type.fromName |> Claim.equal typeof<A.B>
 
+    [<Test>]
+    let ``Determined the item value type of a type``() =        
+        typeof<List<string>>.ItemValueType |> Claim.equal typeof<string>
+        typeof<option<string>>.ItemValueType |> Claim.equal typeof<string>
+        typeof<option<List<string>>>.ItemValueType |> Claim.equal typeof<string>
+        typeof<string>.ItemValueType |> Claim.equal typeof<string>
 
