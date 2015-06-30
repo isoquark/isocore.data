@@ -362,9 +362,9 @@ module Lang =
     /// <summary>
     /// Represents the name of a parameter
     /// </summary>    
-    type ClrParameterElementName = ClrParameterElementName of string
+    type ClrParameterName = ClrParameterName of string
     with
-        member this.Text = match this with ClrParameterElementName(x) -> x
+        member this.Text = match this with ClrParameterName(x) -> x
         override this.ToString() = this.Text
 
     /// <summary>
@@ -378,7 +378,7 @@ module Lang =
         ///Specifies the name of a type member
         | MemberElementName of ClrMemberName
         ///Specifies the name of a parameter
-        | ParameterElementName of ClrParameterElementName
+        | ParameterElementName of ClrParameterName
     with
         member this.Text =
             match this with 
@@ -389,20 +389,6 @@ module Lang =
         override this.ToString() = this.Text
 
 
-    /// <summary>
-    /// Defines System.MethodInfo helpers
-    /// </summary>
-    module MethodInfo =
-        /// <summary>
-        /// Retrieves an attribute applied to a method return, if present
-        /// </summary>
-        /// <param name="subject">The method to examine</param>
-        let getReturnAttribute<'T when 'T :> Attribute>(subject : MethodInfo) =
-            let attribs = subject.ReturnTypeCustomAttributes.GetCustomAttributes(typeof<'T>, true)
-            if attribs.Length <> 0 then
-                attribs.[0] :?> 'T |> Some
-            else
-                None
 
        
 module ReflectedKind =
@@ -466,9 +452,9 @@ module ClrNameExtensions =
     /// <summary>
     /// Defines augmentations for the <see cref="ClrParameterElementName"/> type
     /// </summary>
-    type ClrParameterElementName
+    type ClrParameterName
     with
-        member this.Text = match this with ClrParameterElementName(x) -> x
+        member this.Text = match this with ClrParameterName(x) -> x
 
     /// <summary>
     /// Represents the name of a CLR element

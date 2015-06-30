@@ -71,7 +71,7 @@ module ClrElementNameTests =
 module ClrAssemblyTest =
     [<Test>]
     let ``Extracted embedded text resource from assembly``() =
-        let text = thisAssemblyElement() |> ClrAssembly.findTextResource "EmbeddedResource01.txt"
+        let text = thisAssembly() |> Assembly.findTextResource "EmbeddedResource01.txt"
         text |> Claim.isSome
         text.Value.Trim() |> Claim.equal "This is an embedded text resource"
     

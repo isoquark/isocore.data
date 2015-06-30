@@ -70,7 +70,7 @@ module internal ClrElementName =
         | ParameterElement(x) ->
             match x with
                 ClrParameterElement(x) ->
-                    x.Primitive.Name |> ClrParameterElementName |> ParameterElementName
+                    x.Primitive.Name |> ClrParameterName |> ParameterElementName
         | UnionCaseElement(element=x) ->
             match x with
                 ClrUnionCaseElement(x) ->

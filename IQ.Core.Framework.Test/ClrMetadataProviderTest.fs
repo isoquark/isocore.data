@@ -87,8 +87,11 @@ module ClrMetadataProviderTest =
                 ValueType = typeof<DateTime>.ElementTypeName
                 IsOptional = false
                 CanWrite = false
+                WriteAccess = None
                 CanRead = true
+                ReadAccess = PublicAccess |> Some
                 ReflectedElement = p1Info |> Some
+                IsStatic = false
             } |> PropertyDescription
         let p1Actual = infomap.[p1Name]
         p1Actual |> Claim.equal p1Expect
@@ -101,8 +104,11 @@ module ClrMetadataProviderTest =
             ValueType = typeof<int>.ElementTypeName
             IsOptional = false
             CanWrite = true
+            WriteAccess = PublicAccess |> Some
             CanRead = true
+            ReadAccess = PublicAccess |> Some
             ReflectedElement = p2Info |> Some
+            IsStatic = false
         }
 
         let p3Info = propinfo<@ fun (x : ClassA) -> x.Prop3 @>
@@ -115,8 +121,11 @@ module ClrMetadataProviderTest =
                 ValueType = typeof<int64>.ElementTypeName
                 IsOptional = true
                 CanWrite = false
+                WriteAccess = None
                 CanRead = true
+                ReadAccess = PublicAccess |> Some
                 ReflectedElement = p3Info |> Some
+                IsStatic = false
             } |> PropertyDescription
         let p3Actual = infomap.[p3Name]
         p3Actual |> Claim.equal p3Expect

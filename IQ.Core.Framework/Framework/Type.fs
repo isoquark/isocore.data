@@ -236,7 +236,23 @@ module Type =
     /// </remarks>
     let inline fromName (name : ClrTypeName) =
         match name with ClrTypeName(_, fullName, aqName) ->  Type.GetType(defaultArg aqName fullName.Value)
-            
+
+    /// <summary>
+    /// Gets the type's access specifier
+    /// </summary>
+    /// <param name="t"></param>
+    let getAccess (t : Type) =
+        if t.IsPublic  || t.IsNestedPublic then
+            PublicAccess 
+        else if t.IsNestedPrivate then
+            PrivateAccess
+        else if t.IsNotPublic || t.IsNestedAssembly then
+            InternalAccess 
+        else if t.IsNestedFamORAssem then
+            ProtectedInternalAccess 
+        else
+            nosupport()
+        
         
        
 
@@ -255,6 +271,8 @@ module TypeExtensions =
         /// If optional type, gets the type of the underlying value; otherwise, the type itself
         /// </summary>
         member this.ItemValueType = this |> Type.getItemValueType
+
+        member this.Access = this |> Type.getAccess
 
 
     /// <summary>

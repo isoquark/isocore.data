@@ -14,38 +14,41 @@ open Microsoft.FSharp.Quotations.Patterns
 [<AutoOpen>]
 module ClrElementVocabulary = 
 
+    type ClrAttribution = {
+        /// The name of the attribute
+        AttributeName : ClrTypeName
+        /// The values applied by the attribute
+        AppliedValues : ValueIndex
+        /// The attribute instance if applicable
+        AttributeInstance : Attribute option
+    }
+    
     /// <summary>
     /// Describes a property
     /// </summary>
     type ClrPropertyDescription = {
         /// The name of the property 
-        Name : ClrMemberName
-        
+        Name : ClrMemberName        
         /// The position of the property
-        Position : int
-        
-        ReflectedElement : PropertyInfo option
-        
+        Position : int        
+        /// The reflected property, if applicable
+        ReflectedElement : PropertyInfo option        
         /// The name of the type that declares the property
-        DeclaringType : ClrTypeName       
-    
+        DeclaringType : ClrTypeName           
         /// The type of the property value
         ValueType : ClrTypeName
-
         /// Specifies whether the property is of option<> type
         IsOptional : bool
-
         /// Specifies whether the property has a get accessor
         CanRead : bool
-       
-        /// Specifies the access of the get accessor if applicable
-        //ReadAccess : ClrAccess option
-
+        /// The access specifier of the get accessor if one exists
+        ReadAccess : ClrAccess option      
         /// Specifies whether the property has a set accessor
         CanWrite : bool
-
-        /// Specifies the access of the set accessor if applicable
-        //WriteAccess : ClrAccess option
+        /// The access specifier of the set accessor if one exists
+        WriteAccess : ClrAccess option        
+        /// Specifies whether the property is static
+        IsStatic : bool
     }
 
     /// <summary>
@@ -53,12 +56,27 @@ module ClrElementVocabulary =
     /// </summary>
     type ClrStorageFieldDescription = {
         /// The name of the property 
-        Name : ClrMemberName
-        
+        Name : ClrMemberName        
+        /// The reflected property, if applicable
         ReflectedElement : FieldInfo option
-
         /// The position of the property
         Position : int            
+        /// The field's access specifier
+        Access : ClrAccess
+        /// Specifies whether the field is static
+        IsStatic : bool
+    }
+
+    /// <summary>
+    /// Describes a method parameter
+    /// </summary>
+    type ClrParameterDescription = {
+        /// The name of the parameter
+        Name : ClrParameterName
+        /// The position of the parameter
+        Position : int    
+        /// The reflected method, if applicable                
+        ReflectedElement : ParameterInfo option
     }
 
     /// <summary>
@@ -67,34 +85,43 @@ module ClrElementVocabulary =
     type ClrMethodDescription = {
         /// The name of the method
         Name : ClrMemberName
-        
+        /// The reflected method, if applicable        
         ReflectedElement : MethodInfo option
-
         /// The position of the method
         Position : int            
-    
+        /// The method's access specifier
+        Access : ClrAccess
+        /// Specifies whether the method is static
+        IsStatic : bool
+        /// The methods parameters
+        Parameters : ClrParameterDescription list
     }
 
     /// <summary>
     /// Describes a constructor
     /// </summary>
     type ClrConstructorDescription = {
-    
+        /// The name of the constructor    
         Name : ClrMemberName
-
+        /// The reflected constructor, if applicable        
         ReflectedElement : ConstructorInfo option
-
         /// The position of the property
         Position : int            
+        /// The constructor's access specifier
+        Access : ClrAccess
+        /// Specifies whether the constructor is static
+        IsStatic : bool
+        /// The constructor parameters
+        Parameters : ClrParameterDescription list
     }
 
     type ClrEventDescription = {
+        /// The name of the event
         Name : ClrMemberName
-
+        /// The reflected event, if applicable        
         ReflectedElement : EventInfo option
-
-        /// The position of the property
-        Position : int            
+        /// The position of the event
+        Position : int                
     }
 
     
@@ -129,26 +156,40 @@ module ClrElementVocabulary =
             | MethodDescription(x) -> x.Position
             | EventDescription(x) -> x.Position
             | ConstructorDescription(x) -> x.Position
-                    
-            
-    
+
+        member this.IsStatic =
+            match this with
+            | PropertyDescription(x) -> x.IsStatic
+            | FieldDescription(x) -> x.IsStatic
+            | MethodDescription(x) -> x.IsStatic
+            | EventDescription(x) -> false
+            | ConstructorDescription(x) -> x.IsStatic
+
+        member this.Access = 
+            match this with
+            | PropertyDescription(x) -> None
+            | FieldDescription(x) -> x.Access |> Some
+            | MethodDescription(x) -> x.Access |> Some
+            | EventDescription(x) -> None
+            | ConstructorDescription(x) -> x.Access |> Some
+
+        member this.ReflectedElement =
+            match this with
+            | PropertyDescription(x) -> match x.ReflectedElement with |Some(x) -> x :> obj |> Some | None -> None
+            | FieldDescription(x) -> match x.ReflectedElement with |Some(x) -> x :> obj |> Some | None -> None
+            | MethodDescription(x) -> match x.ReflectedElement with |Some(x) -> x :> obj |> Some | None -> None
+            | EventDescription(x) -> match x.ReflectedElement with |Some(x) -> x :> obj |> Some | None -> None
+            | ConstructorDescription(x) -> match x.ReflectedElement with |Some(x) -> x :> obj |> Some | None -> None
+
+                                    
     type ClrUnionCaseDescription = {
         /// The name of the type
         Name : ClrMemberName
 
         /// The position of the type
-        Position : int
-    
+        Position : int    
     }
 
-    type ClrParameterDescription = {
-        /// The name of the type
-        Name : ClrParameterElementName
-
-        /// The position of the type
-        Position : int
-    
-    }
     
 
     /// <summary>
@@ -180,6 +221,11 @@ module ClrElementVocabulary =
         IsOptionType : bool
         
         Members : ClrMemberDescription list
+
+        Access : ClrAccess
+
+        /// Specifies whether the constructor is static
+        IsStatic : bool
     }
     with
         /// <summary>
@@ -426,7 +472,8 @@ module ClrElementClassification =
         /// Determines whether the element is a member 
         /// </summary>
         /// <param name="element"></param>
-        let isMember element = element |> getKind |> ClrElementKind.isMemberKind    
+        let isMember element = 
+            element |> getKind |> ClrElementKind.isMemberKind    
 
         /// <summary>
         /// Inteprets the CLR element as a type element if possible; otherwise, an error is raised
@@ -507,7 +554,8 @@ module ClrElementClassification =
     with
         member this.Kind = this |> ClrElement.getKind
 
-        
+
+
 
 [<AutoOpen>]
 module internal ClrElementVocabularyExtensions =

@@ -56,7 +56,7 @@ module ClrElementReference =
         let declarer (t : Type) =
             if t = null then None else t |> Some
         
-        match eref |> getReferent |> ClrElement.getDeclaringType with
+        match eref |> getReferent |> fun x -> x.DeclaringType with
         | Some(x) -> x.Type |> ClrTypeReference.reference |> Some
         | None -> None
                                 

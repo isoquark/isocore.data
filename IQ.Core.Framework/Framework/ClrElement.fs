@@ -12,72 +12,7 @@ open Microsoft.FSharp.Quotations.Patterns
 
 
 module ClrElement =         
-    /// <summary>
-    /// Gets the name of the element
-    /// </summary>
-    /// <param name="element"></param>
-    let internal getName (element : ClrElement) = element |> ClrElementName.fromElement
-    
-         
-    /// <summary>
-    /// Gets the type that declares the element if applicable
-    /// </summary>
-    /// <param name="element">The element</param>
-    let getDeclaringType (element : ClrElement) =
-        match element with
-        | MemberElement(element=x) -> 
-            match x with
-            | DataMemberElement(x) ->
-                match x with
-                | PropertyMember(x) ->
-                    x.PropertyInfo.DeclaringType |> ClrMetadataProvider.getType |> Some
-                | FieldMember(x) -> 
-                    x.FieldInfo.DeclaringType |> ClrMetadataProvider.getType |> Some
-            | MethodElement(x) ->
-                x.MethodInfo.DeclaringType |> ClrMetadataProvider.getType |> Some
-        | TypeElement(element=x) -> 
-            if x.Type.DeclaringType <> null then
-                x.Type.DeclaringType |> ClrMetadataProvider.getType |> Some
-            else
-                None
-        | AssemblyElement(element=x) ->
-            None
-        | ParameterElement(element=x) ->
-            None
-        | UnionCaseElement(element=x) ->
-            x.UnionCaseInfo.DeclaringType |> ClrMetadataProvider.getType |> Some
-
-    //let getDeclaringType2 (element : ClrElementDescription)
-
-
-    /// <summary>
-    /// Gets the assembly in which the element is defined
-    /// </summary>
-    /// <param name="element">The element</param>
-    let getDeclaringAssembly(element : ClrElement) =
-        match element with
-        | MemberElement(element=x) -> 
-            match x with
-            | DataMemberElement(x) ->
-                match x with
-                | PropertyMember(x) ->
-                    x.PropertyInfo.DeclaringType.Assembly
-                | FieldMember(x) -> 
-                    x.FieldInfo.DeclaringType.Assembly
-            | MethodElement(x) ->
-                x.MethodInfo.DeclaringType.Assembly
-        | TypeElement(element=x) -> 
-                x.Type.Assembly
-        | AssemblyElement(element=x) ->
-            x.Assembly
-        | ParameterElement(x) ->
-            x.ParamerInfo.Member.DeclaringType.Assembly
-        | UnionCaseElement(element=x) ->
-            x.UnionCaseInfo.DeclaringType.Assembly
-        |> ClrMetadataProvider.getElement
-
-
-                
+                            
     /// <summary>
     /// Retrieves the (direct) children of the element
     /// </summary>
@@ -94,100 +29,7 @@ module ClrElement =
             []
         | UnionCaseElement(children=x) ->
             x
-
-    /// <summary>
-    /// Gets the acess modifier applied to the element, if applicable
-    /// </summary>
-    /// <param name="element">The element to examine</param>
-    let tryGetAccess (element : ClrElement)  =
-        match element with
-        | MemberElement(element=x) -> 
-            match x with
-            | DataMemberElement(x) ->
-                match x with
-                | PropertyMember(x) ->
-                    None
-                | FieldMember(x) -> 
-                    match x with 
-                    | ClrFieldElement(x) ->
-                        match x with 
-                            ClrReflectionPrimitive(primitive=x) ->
-                                if x.IsPublic then
-                                    PublicAccess |> Some
-                                else if x.IsPrivate then
-                                    PrivateAccess |> Some 
-                                else if x.IsAssembly then
-                                    InternalAccess |> Some
-                                else if x.IsFamilyOrAssembly then
-                                    ProtectedInternalAccess |> Some
-                                else
-                                    nosupport()
-            | MethodElement(x) ->
-                match x with 
-                | ClrMethodElement(x) ->
-                        match x with 
-                            ClrReflectionPrimitive(primitive=x) ->
-                                if x.IsPublic then
-                                    PublicAccess |> Some
-                                else if x.IsPrivate then
-                                    PrivateAccess |> Some 
-                                else if x.IsAssembly then
-                                    InternalAccess |> Some
-                                else if x.IsFamilyOrAssembly then
-                                    ProtectedInternalAccess |> Some
-                                else
-                                    nosupport()
-        | TypeElement(element=x) -> 
-            if x.Type.IsPublic  || x.Type.IsNestedPublic then
-                PublicAccess |> Some
-            else if x.Type.IsNestedPrivate then
-                PrivateAccess |> Some
-            else if x.Type.IsNotPublic || x.Type.IsNestedAssembly then
-                InternalAccess |> Some
-            else if x.Type.IsNestedFamORAssem then
-                ProtectedInternalAccess |> Some
-            else
-                nosupport()
-        | AssemblyElement(element=x) ->
-            None
-        | ParameterElement(x) ->
-            None
-        | UnionCaseElement(element=x) ->
-             PublicAccess |> Some
-
-    /// <summary>
-    /// Determines whether the element is static
-    /// </summary>
-    /// <param name="element">The element to examine</param>
-    let isStatic (element : ClrElement) =
-        match element with
-        | MemberElement(element=x) -> 
-            match x with
-            | DataMemberElement(x) ->
-                match x with
-                | PropertyMember(x) ->
-                    x.PropertyInfo.GetMethod.IsStatic && x.PropertyInfo.SetMethod.IsStatic
-                | FieldMember(x) -> 
-                    x.FieldInfo.IsStatic
-            | MethodElement(x) ->
-                x.MethodInfo.IsStatic
-        | TypeElement(element=x) -> 
-                x.Type.IsAbstract && x.Type.IsSealed
-        | AssemblyElement(element=x) ->
-            false
-        | ParameterElement(x) ->
-            false
-        | UnionCaseElement(element=x) ->
-            false
-        
-        
-    /// <summary>
-    /// Gets the acess modifier applied to the element, if applicable; otherwise,
-    /// raises an error
-    /// </summary>
-    /// <param name="element">The element to examine</param>
-    let getAccess (element : ClrElement) = 
-        element |> tryGetAccess |> Option.get
+                
        
     /// <summary>
     /// Retrieves all attributes applied to the element
@@ -391,13 +233,116 @@ module ClrDataMemberElement =
 module ClrElementExtensions = 
 
     /// <summary>
+    /// Determines whether the element is static
+    /// </summary>
+    /// <param name="element">The element to examine</param>
+    let private isStatic (element : ClrElement) =
+        match element with
+        | MemberElement(element=x) -> 
+            match x with
+            | DataMemberElement(x) ->
+                match x with
+                | PropertyMember(x) ->
+                    x.PropertyInfo.GetMethod.IsStatic && x.PropertyInfo.SetMethod.IsStatic
+                | FieldMember(x) -> 
+                    x.FieldInfo.IsStatic
+            | MethodElement(x) ->
+                x.MethodInfo.IsStatic
+        | TypeElement(element=x) -> 
+                x.Type.IsAbstract && x.Type.IsSealed
+        | AssemblyElement(element=x) ->
+            false
+        | ParameterElement(x) ->
+            false
+        | UnionCaseElement(element=x) ->
+            false
+
+    
+    /// <summary>
+    /// Gets the acess modifier applied to the element, if applicable
+    /// </summary>
+    /// <param name="element">The element to examine</param>
+    let getAccess (element : ClrElement)  =
+        match element with
+        | MemberElement(element=x) -> 
+            match x with
+            | DataMemberElement(x) ->
+                match x with
+                | PropertyMember(x) -> None                                        
+                | FieldMember(x) -> 
+                    match x with 
+                    | ClrFieldElement(x) ->match x with ClrReflectionPrimitive(primitive=x) -> x.Access |> Some
+            | MethodElement(x) -> 
+                 match x with 
+                 | ClrMethodElement(x) ->match x with ClrReflectionPrimitive(primitive=x) -> x.Access |> Some
+        | TypeElement(element=x) -> x.Type.Access |> Some
+        | AssemblyElement(element=x) -> None
+        | ParameterElement(x) -> None
+        | UnionCaseElement(element=x) -> PublicAccess |> Some
+    
+    
+    /// <summary>
+    /// Gets the type that declares the element if applicable
+    /// </summary>
+    /// <param name="element">The element</param>
+    let getDeclaringType (element : ClrElement) =
+        match element with
+        | MemberElement(element=x) -> 
+            match x with
+            | DataMemberElement(x) ->
+                match x with
+                | PropertyMember(x) ->
+                    x.PropertyInfo.DeclaringType |> ClrMetadataProvider.getType |> Some
+                | FieldMember(x) -> 
+                    x.FieldInfo.DeclaringType |> ClrMetadataProvider.getType |> Some
+            | MethodElement(x) ->
+                x.MethodInfo.DeclaringType |> ClrMetadataProvider.getType |> Some
+        | TypeElement(element=x) -> 
+            if x.Type.DeclaringType <> null then
+                x.Type.DeclaringType |> ClrMetadataProvider.getType |> Some
+            else
+                None
+        | AssemblyElement(element=x) ->
+            None
+        | ParameterElement(element=x) ->
+            None
+        | UnionCaseElement(element=x) ->
+            x.UnionCaseInfo.DeclaringType |> ClrMetadataProvider.getType |> Some
+
+    /// <summary>
+    /// Gets the assembly in which the element is defined
+    /// </summary>
+    /// <param name="element">The element</param>
+    let getDeclaringAssembly(element : ClrElement) =
+        match element with
+        | MemberElement(element=x) -> 
+            match x with
+            | DataMemberElement(x) ->
+                match x with
+                | PropertyMember(x) ->
+                    x.PropertyInfo.DeclaringType.Assembly
+                | FieldMember(x) -> 
+                    x.FieldInfo.DeclaringType.Assembly
+            | MethodElement(x) ->
+                x.MethodInfo.DeclaringType.Assembly
+        | TypeElement(element=x) -> 
+                x.Type.Assembly
+        | AssemblyElement(element=x) ->
+            x.Assembly
+        | ParameterElement(x) ->
+            x.ParamerInfo.Member.DeclaringType.Assembly
+        | UnionCaseElement(element=x) ->
+            x.UnionCaseInfo.DeclaringType.Assembly
+        |> ClrMetadataProvider.getElement
+    
+    /// <summary>
     /// Defines augmentations for the <see cref="ClrElement"/> type
     /// </summary>
     type ClrElement
     with
-        member this.DeclaringType = this |> ClrElement.getDeclaringType
-        member this.DeclaringAssembly = this |> ClrElement.getDeclaringAssembly
-        member this.IsStatic = this |> ClrElement.isStatic
+        member this.DeclaringType = this |> getDeclaringType
+        member this.DeclaringAssembly = this |> getDeclaringAssembly
+        member this.IsStatic = this |> isStatic
 
     /// <summary>
     /// Defines augmentations for the <see cref="System.Type"/> type
@@ -407,7 +352,7 @@ module ClrElementExtensions =
         /// <summary>
         /// Gets the applied access modifier
         /// </summary>
-        member this.AccessModifier = this.Element |> ClrElement.getAccess
+        member this.AccessModifier = this.Element |> getAccess |> Option.get
     
 
     /// <summary>
@@ -418,19 +363,8 @@ module ClrElementExtensions =
         /// <summary>
         /// Gets the applied access modifier
         /// </summary>
-        member this.AccessModifier = this.Element |> ClrElement.getAccess
+        member this.AccessModifier = this.Element |> getAccess |> Option.get
 
-
-
-    /// <summary>
-    /// Defines augmentations for the <see cref="System.Reflection.PropertyInfo"/> type
-    /// </summary>
-    type PropertyInfo
-    with        
-        /// <summary>
-        /// Gets the applied access modifier
-        /// </summary>
-        member this.AccessModifier = this.Element |> ClrElement.getAccess
 
 
     /// <summary>
@@ -441,7 +375,7 @@ module ClrElementExtensions =
         /// <summary>
         /// Gets the applied access modifier
         /// </summary>
-        member this.AccessModifier = this.Element |> ClrElement.getAccess
+        member this.AccessModifier = this.Element |> getAccess |> Option.get
 
 
     /// <summary>
@@ -452,27 +386,5 @@ module ClrElementExtensions =
         /// <summary>
         /// Gets the member's declaring type
         /// </summary>
-        member this.DeclaringType = this.Element |> ClrElement.getDeclaringType |> Option.get
+        member this.DeclaringType = this.Element |> getDeclaringType |> Option.get
      
-
-
-module ClrAssembly =
-
-    /// <summary>
-    /// Retrieves a text resource embedded in the subject assembly if found
-    /// </summary>
-    /// <param name="shortName">The name of the resource, excluding the namespace path</param>
-    /// <param name="subject">The assembly that contains the resource</param>
-    let findTextResource shortName (subject : ClrAssemblyElement) =
-        subject.Assembly |> Assembly.findTextResource shortName        
-
-    /// <summary>
-    /// Writes a text resource contained in an assembly to a file and returns the path
-    /// </summary>
-    /// <param name="shortName">The name of the resource, excluding the namespace path</param>
-    /// <param name="outputDir">The directory into which the resource will be deposited</param>
-    /// <param name="subject">The assembly that contains the resource</param>
-    let writeTextResource shortName outputDir (subject : ClrAssemblyElement) =
-        subject.Assembly |> Assembly.writeTextResource shortName outputDir
-                           
-    

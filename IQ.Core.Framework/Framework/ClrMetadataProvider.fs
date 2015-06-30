@@ -110,14 +110,25 @@ module ClrMetadataProvider =
     
     let private getTypeDescriptions() = 
         [for a in assemblyDescriptions.Values do yield! a.Types]
-
-
    
     let describeAssembly (a : Assembly) =        
+        
+        let describeParameter pos (p : ParameterInfo) = {
+            ClrParameterDescription.Name = p.Name |> ClrParameterName
+            Position = pos
+            ReflectedElement = p |> Some
+        }
+
+        let describeParameters (parameters : ParameterInfo[]) =
+            parameters |> Array.mapi(fun pos p -> p |> describeParameter pos) |>List.ofArray
+        
         let describeMethod pos (m : MethodInfo) = {
             ClrMethodDescription.Name = m.Name |> ClrMemberName
             Position = pos
             ReflectedElement = m |> Some
+            Access = m.Access
+            IsStatic = m.IsStatic
+            Parameters = m.GetParameters() |> describeParameters
         }
 
         let describeProperty pos (p : PropertyInfo) =
@@ -128,8 +139,12 @@ module ClrMetadataProvider =
                 ValueType = p.PropertyType |> Type.getItemValueType |> fun x -> x |> ClrTypeName.fromType
                 IsOptional = p.PropertyType |> Option.isOptionType
                 CanRead = p.CanRead
+                ReadAccess = if p.CanRead then p.GetMethod.Access |> Some else None
                 CanWrite = p.CanWrite
+                WriteAccess = if p.CanWrite then p.SetMethod.Access |> Some else None
                 ReflectedElement = p |> Some
+                IsStatic = p.GetMethod.IsStatic
+                
             }
 
         let describeField pos (f : FieldInfo) =
@@ -137,6 +152,8 @@ module ClrMetadataProvider =
                 ClrStorageFieldDescription.Name = f.Name |> ClrMemberName
                 Position = pos
                 ReflectedElement = f |> Some
+                Access = f.Access
+                IsStatic = f.IsStatic
             }
 
         let describeConstructor pos (c : ConstructorInfo) =
@@ -144,13 +161,16 @@ module ClrMetadataProvider =
                 ClrConstructorDescription.Name = c.Name |> ClrMemberName
                 Position = pos
                 ReflectedElement = c |> Some
+                Access = c.Access
+                IsStatic = c.IsStatic
+                Parameters = c.GetParameters() |>  describeParameters
             }
 
         let describeEvent pos (e : EventInfo) =
             {
                 ClrEventDescription.Name = e.Name |> ClrMemberName
                 Position = pos
-                ReflectedElement = e |> Some
+                ReflectedElement = e |> Some                
             }
 
         let describeMember pos (m : MemberInfo) =
@@ -182,6 +202,8 @@ module ClrMetadataProvider =
                 ReflectedElement = t |> Some
                 CollectionKind = if t |> Type.isCollectionType then t |> Type.getCollectionKind |> Some else None
                 IsOptionType = t |> Option.isOptionType
+                Access = t.Access
+                IsStatic = t.IsAbstract && t.IsSealed
             }                                    
 
         assemblyDescriptions.GetOrAdd(a, fun a -> 
@@ -216,14 +238,27 @@ module ClrMetadataProvider =
             match getTypeDescriptions() |> List.tryFind(fun x -> x.Name = name) with
             | Some(x) -> [x]
             | None -> []
-                                       
-    
+
+module ClrElementDescription = 
+    let getChildren (d : ClrElementDescription) =
+        match d with
+        | MemberDescription(m) ->
+            match m with
+            | MethodDescription(x) -> 
+                x.Parameters |> List.map(fun x -> x |> ParameterDescription)
+            |_ -> []            
+        | TypeDescription(d) -> 
+            d.Members |> List.map(fun x -> x |> MemberDescription)
+        | AssemblyDescription(z) ->
+            z.Types |> List.map(fun x -> x |> TypeDescription)
+        | ParameterDescription(_) -> []
+        | UnionCaseDescription(_) -> []
+        
+                                           
 [<AutoOpen>]
 module ClrDescriptionExtensions =
 
-    
-        
-
+           
     /// <summary>
     /// Creates a property description
     /// </summary>
