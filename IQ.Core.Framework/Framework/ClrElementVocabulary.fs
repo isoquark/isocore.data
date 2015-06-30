@@ -30,9 +30,15 @@ module ClrElementVocabulary =
         /// The name of the property 
         Name : ClrMemberName        
         /// The position of the property
-        Position : int        
+        Position : int         
         /// The reflected property, if applicable
         ReflectedElement : PropertyInfo option        
+        /// The attributes applied directly to the property
+        Attributes : ClrAttribution list
+        /// The attributes applied directly to the get method, if applicable
+        GetMethodAttributes : ClrAttribution list
+        /// The attributes applied directly to the set method, if applicable
+        SetMethodAttributes : ClrAttribution list
         /// The name of the type that declares the property
         DeclaringType : ClrTypeName           
         /// The type of the property value
@@ -61,6 +67,8 @@ module ClrElementVocabulary =
         ReflectedElement : FieldInfo option
         /// The position of the property
         Position : int            
+        /// The attributes applied to the field
+        Attributes : ClrAttribution list
         /// The field's access specifier
         Access : ClrAccess
         /// Specifies whether the field is static
@@ -77,6 +85,8 @@ module ClrElementVocabulary =
         Position : int    
         /// The reflected method, if applicable                
         ReflectedElement : ParameterInfo option
+        /// The attributes applied to the parameter
+        Attributes : ClrAttribution list
     }
 
     /// <summary>
@@ -89,6 +99,8 @@ module ClrElementVocabulary =
         ReflectedElement : MethodInfo option
         /// The position of the method
         Position : int            
+        /// The attributes applied to the method
+        Attributes : ClrAttribution list
         /// The method's access specifier
         Access : ClrAccess
         /// Specifies whether the method is static
@@ -107,6 +119,8 @@ module ClrElementVocabulary =
         ReflectedElement : ConstructorInfo option
         /// The position of the property
         Position : int            
+        /// The attributes applied to the constructor
+        Attributes : ClrAttribution list        
         /// The constructor's access specifier
         Access : ClrAccess
         /// Specifies whether the constructor is static
@@ -115,6 +129,9 @@ module ClrElementVocabulary =
         Parameters : ClrParameterDescription list
     }
 
+    /// <summary>
+    /// Describes an event
+    /// </summary>
     type ClrEventDescription = {
         /// The name of the event
         Name : ClrMemberName
@@ -122,9 +139,13 @@ module ClrElementVocabulary =
         ReflectedElement : EventInfo option
         /// The position of the event
         Position : int                
+        /// The attributes applied to the event
+        Attributes : ClrAttribution list
     }
-
     
+    /// <summary>
+    /// Describes a member
+    /// </summary>
     [<DebuggerDisplay("{Name}")>]
     type ClrMemberDescription =
     | PropertyDescription of ClrPropertyDescription
@@ -182,16 +203,16 @@ module ClrElementVocabulary =
             | ConstructorDescription(x) -> match x.ReflectedElement with |Some(x) -> x :> obj |> Some | None -> None
 
                                     
+    /// <summary>
+    /// Describes a union case
+    /// </summary>
     type ClrUnionCaseDescription = {
         /// The name of the type
         Name : ClrMemberName
-
         /// The position of the type
         Position : int    
     }
-
     
-
     /// <summary>
     /// Describes a type
     /// </summary>
@@ -199,33 +220,28 @@ module ClrElementVocabulary =
     type ClrTypeDescription = {
         /// The name of the type
         Name : ClrTypeName
-
         /// The position of the type
         Position : int
-
+        /// The reflected type, if applicable        
         ReflectedElement : Type option
-
         /// The name of the type that declares the type, if any
         DeclaringType : ClrTypeName option
-
         /// The nested types declared by the type
         DeclaredTypes : ClrTypeName list
-
         /// The kind of type, if recognized
         Kind : ClrTypeKind
-
         /// The kind of collection represented by the type, if applicable
         CollectionKind : ClrCollectionKind option
-
         //Specifies whether the type is of the form option<_>
         IsOptionType : bool
-        
+        //The type members
         Members : ClrMemberDescription list
-
+        //The access specifier applied to the type
         Access : ClrAccess
-
-        /// Specifies whether the constructor is static
+        /// Specifies whether the type is static
         IsStatic : bool
+        /// The attributes applied to the type
+        Attributes : ClrAttribution list
     }
     with
         /// <summary>
@@ -252,17 +268,21 @@ module ClrElementVocabulary =
     /// Describes an assembly
     /// </summary>
     type ClrAssemblyDescription = {
-        
+        /// The name of the assembly
         Name : ClrAssemblyName
-        
+        /// The reflected assembly, if applicable                
         ReflectedElement : Assembly option
-
         /// The position of the assembly relative to its specification/reflection context
         Position : int
-
+        /// The types defined in the assembly
         Types : ClrTypeDescription list
+        /// The attributes applied to the assembly
+        Attributes : ClrAttribution list
     }
 
+    /// <summary>
+    /// Describes c CLR element
+    /// </summary>
     type ClrElementDescription =
         | MemberDescription of description : ClrMemberDescription
         | TypeDescription of description : ClrTypeDescription

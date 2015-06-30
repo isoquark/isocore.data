@@ -1,5 +1,6 @@
 ﻿namespace IQ.Core.Framework.Test
 open System
+open System.ComponentModel
 
 open IQ.Core.Framework
 open IQ.Core.TestFramework
@@ -92,6 +93,9 @@ module ClrMetadataProviderTest =
                 ReadAccess = PublicAccess |> Some
                 ReflectedElement = p1Info |> Some
                 IsStatic = false
+                Attributes = []
+                GetMethodAttributes = []
+                SetMethodAttributes = []
             } |> PropertyDescription
         let p1Actual = infomap.[p1Name]
         p1Actual |> Claim.equal p1Expect
@@ -109,6 +113,9 @@ module ClrMetadataProviderTest =
             ReadAccess = PublicAccess |> Some
             ReflectedElement = p2Info |> Some
             IsStatic = false
+            Attributes = []
+            GetMethodAttributes = []
+            SetMethodAttributes = []
         }
 
         let p3Info = propinfo<@ fun (x : ClassA) -> x.Prop3 @>
@@ -126,6 +133,9 @@ module ClrMetadataProviderTest =
                 ReadAccess = PublicAccess |> Some
                 ReflectedElement = p3Info |> Some
                 IsStatic = false
+                Attributes = []
+                GetMethodAttributes = []
+                SetMethodAttributes = []
             } |> PropertyDescription
         let p3Actual = infomap.[p3Name]
         p3Actual |> Claim.equal p3Expect
@@ -156,3 +166,18 @@ module ClrMetadataProviderTest =
         let results = typeof<UnionA>.ElementTypeName |> FindTypeByName |> ClrMetadataProvider.findTypes
         results |> List.isEmpty |> Claim.isFalse
         Claim.equal typeof<UnionA>.ElementTypeName results.Head.Name
+
+    module ModuleB =
+        [<Description("This is RecordA")>]
+        type RecordA = {
+            FieldA1 : decimal
+            FieldA2 : int64
+            FieldA3 : DateTime option   
+        }
+
+    [<Test>]
+    let ``Discovered attributes on type``() =
+        let t = typeinfo<ModuleB.RecordA>
+        let desc = t.Attributes 
+                |> List.find(fun a -> a.AttributeName = typeof<DescriptionAttribute>.ElementTypeName)
+        desc.AppliedValues.["Description"] :?> string |> Claim.equal "This is RecordA"

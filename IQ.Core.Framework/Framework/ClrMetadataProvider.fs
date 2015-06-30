@@ -111,12 +111,29 @@ module ClrMetadataProvider =
     let private getTypeDescriptions() = 
         [for a in assemblyDescriptions.Values do yield! a.Types]
    
+    let private createAttributions(attributes : Attribute seq) =
+        [for attribute in attributes do
+            let attribType = attribute.GetType()
+            let attribName = ClrTypeName(attribType.Name, attribType.FullName |> Some, attribType.AssemblyQualifiedName |> Some)
+            yield 
+                {
+                    ClrAttribution.AttributeName =  attribName
+                    AppliedValues = attribType.GetProperties() 
+                                  |> Array.mapi( fun i p -> ValueIndexKey(p.Name, i), p.GetValue(attribute) ) 
+                                  |>List.ofArray 
+                                  |> ValueIndex
+                    AttributeInstance = attribute |> Some
+                }
+            
+        ]
+    
     let describeAssembly (a : Assembly) =        
         
         let describeParameter pos (p : ParameterInfo) = {
             ClrParameterDescription.Name = p.Name |> ClrParameterName
             Position = pos
             ReflectedElement = p |> Some
+            Attributes = p.GetCustomAttributes() |> createAttributions
         }
 
         let describeParameters (parameters : ParameterInfo[]) =
@@ -129,6 +146,7 @@ module ClrMetadataProvider =
             Access = m.Access
             IsStatic = m.IsStatic
             Parameters = m.GetParameters() |> describeParameters
+            Attributes = m.GetCustomAttributes() |> createAttributions
         }
 
         let describeProperty pos (p : PropertyInfo) =
@@ -143,8 +161,10 @@ module ClrMetadataProvider =
                 CanWrite = p.CanWrite
                 WriteAccess = if p.CanWrite then p.SetMethod.Access |> Some else None
                 ReflectedElement = p |> Some
-                IsStatic = p.GetMethod.IsStatic
-                
+                IsStatic = if p.CanRead then p.GetMethod.IsStatic else p.SetMethod.IsStatic
+                Attributes = p.GetCustomAttributes() |> createAttributions
+                GetMethodAttributes = if p.CanRead then p.GetMethod.GetCustomAttributes() |> createAttributions else []
+                SetMethodAttributes = if p.CanWrite then p.SetMethod.GetCustomAttributes() |> createAttributions else []
             }
 
         let describeField pos (f : FieldInfo) =
@@ -154,6 +174,7 @@ module ClrMetadataProvider =
                 ReflectedElement = f |> Some
                 Access = f.Access
                 IsStatic = f.IsStatic
+                Attributes = f.GetCustomAttributes() |> createAttributions
             }
 
         let describeConstructor pos (c : ConstructorInfo) =
@@ -164,6 +185,7 @@ module ClrMetadataProvider =
                 Access = c.Access
                 IsStatic = c.IsStatic
                 Parameters = c.GetParameters() |>  describeParameters
+                Attributes = c.GetCustomAttributes() |> createAttributions
             }
 
         let describeEvent pos (e : EventInfo) =
@@ -171,6 +193,7 @@ module ClrMetadataProvider =
                 ClrEventDescription.Name = e.Name |> ClrMemberName
                 Position = pos
                 ReflectedElement = e |> Some                
+                Attributes = e.GetCustomAttributes() |> createAttributions
             }
 
         let describeMember pos (m : MemberInfo) =
@@ -204,6 +227,7 @@ module ClrMetadataProvider =
                 IsOptionType = t |> Option.isOptionType
                 Access = t.Access
                 IsStatic = t.IsAbstract && t.IsSealed
+                Attributes = t.GetCustomAttributes() |> createAttributions
             }                                    
 
         assemblyDescriptions.GetOrAdd(a, fun a -> 
@@ -212,6 +236,7 @@ module ClrMetadataProvider =
                 Position = 0
                 Types = a.GetTypes() |> Array.mapi(fun pos t -> describeType pos t) |> List.ofArray
                 ReflectedElement = a |> Some
+                Attributes = a.GetCustomAttributes() |> createAttributions
             })    
 
     let describeType (t : Type) =
