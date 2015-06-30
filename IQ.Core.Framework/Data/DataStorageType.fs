@@ -91,6 +91,8 @@ module DataStorageTypeVocabulary =
         let CustomObjectStorageName = "CustomObject"
         [<Literal>]
         let CustomPrimitiveStorageName = "CustomPrimitive"
+        [<Literal>]
+        let TypedDocumentStorageName = "TypedDocument"
 
 
     open StorageTypeNames
@@ -135,6 +137,7 @@ module DataStorageTypeVocabulary =
         | CustomTableStorage of name : DataObjectName
         | CustomObjectStorage of name : DataObjectName * clrType : Type
         | CustomPrimitiveStorage of name : DataObjectName
+        | TypedDocumentStorage of doctype : Type
     with        
         /// <summary>
         /// Renders a faithful representation of an instance as text
@@ -181,6 +184,7 @@ module DataStorageTypeVocabulary =
             | CustomTableStorage(name) -> name |> sprintf "%s%O" CustomTableStorageName
             | CustomObjectStorage(name,t) -> sprintf "%s%O:%s" CustomObjectStorageName name t.AssemblyQualifiedName
             | CustomPrimitiveStorage(name) -> sprintf "%s%O" CustomPrimitiveStorageName name 
+            | TypedDocumentStorage(t) -> sprintf "%s%s" TypedDocumentStorageName t.AssemblyQualifiedName
 
         /// <summary>
         /// Renders a representation of an instance as text
@@ -242,11 +246,12 @@ module StorageType =
             | DecimalStorage(precision,scale) -> StorageKind.Decimal
             | MoneyStorage -> StorageKind.Money
             | GuidStorage -> StorageKind.Guid
-            | XmlStorage(schema) -> StorageKind.Xml
+            | XmlStorage(_) -> StorageKind.Xml
             | VariantStorage -> StorageKind.Variant
-            | CustomTableStorage(name) -> StorageKind.CustomTable
-            | CustomObjectStorage(name,t) -> StorageKind.CustomObject
-            | CustomPrimitiveStorage(name) -> StorageKind.CustomPrimitive
+            | CustomTableStorage(_) -> StorageKind.CustomTable
+            | CustomObjectStorage(_) -> StorageKind.CustomObject
+            | CustomPrimitiveStorage(_) -> StorageKind.CustomPrimitive
+            | TypedDocumentStorage(_) -> StorageKind.TypedDocument
 
         let toSqlDbType (storageType : StorageType) =
             match storageType with
@@ -290,6 +295,7 @@ module StorageType =
             | CustomTableStorage(name) -> SqlDbType.Structured
             | CustomObjectStorage(name,t) -> SqlDbType.VarBinary 
             | CustomPrimitiveStorage(name) -> SqlDbType.Udt
+            | TypedDocumentStorage(_) -> SqlDbType.NVarChar
                                     
                     
         /// <summary>

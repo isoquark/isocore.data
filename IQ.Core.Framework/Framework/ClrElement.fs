@@ -30,154 +30,155 @@ module ClrElement =
         | UnionCaseElement(children=x) ->
             x
                 
-       
+    let getAllAttributes(element : ClrElement) =
+        element.IReflectionPrimitive.Primitive
     /// <summary>
     /// Retrieves all attributes applied to the element
     /// </summary>
     /// <param name="element">The element to examine</param>
-    let getAllAttributes(element : ClrElement) =
-        match element with
-        | MemberElement(element=x) -> 
-            match x with
-            | DataMemberElement(x) ->
-                match x with
-                | PropertyMember(x) ->
-                    x.PropertyInfo |> Attribute.GetCustomAttributes
-                | FieldMember(x) -> 
-                    x.FieldInfo |> Attribute.GetCustomAttributes
-            | MethodElement(x) ->
-                    x.MethodInfo |> Attribute.GetCustomAttributes
-        | TypeElement(element=x) -> 
-            x.Type |> Attribute.GetCustomAttributes
-        | AssemblyElement(element=x) ->
-            x.Assembly |> Attribute.GetCustomAttributes
-        | ParameterElement(x) ->
-            x.ParamerInfo |> Attribute.GetCustomAttributes
-        | UnionCaseElement(element=x) ->
-            [|for a in x.UnionCaseInfo.GetCustomAttributes() -> a :?> Attribute|]
-        |> List.ofArray
+//    let getAllAttributes(element : ClrElement) =
+//        match element with
+//        | MemberElement(element=x) -> 
+//            match x with
+//            | DataMemberElement(x) ->
+//                match x with
+//                | PropertyMember(x) ->
+//                    x.PropertyInfo |> Attribute.GetCustomAttributes
+//                | FieldMember(x) -> 
+//                    x.FieldInfo |> Attribute.GetCustomAttributes
+//            | MethodElement(x) ->
+//                    x.MethodInfo |> Attribute.GetCustomAttributes
+//        | TypeElement(element=x) -> 
+//            x.Type |> Attribute.GetCustomAttributes
+//        | AssemblyElement(element=x) ->
+//            x.Assembly |> Attribute.GetCustomAttributes
+//        | ParameterElement(x) ->
+//            x.ParamerInfo |> Attribute.GetCustomAttributes
+//        | UnionCaseElement(element=x) ->
+//            [|for a in x.UnionCaseInfo.GetCustomAttributes() -> a :?> Attribute|]
+//        |> List.ofArray
 
     /// <summary>
     /// Determines whether an attribute of a specified type has been applied to an element
     /// </summary>
     /// <param name="element">The element to examine</param>
     /// <param name="attribType">The type of attribute to match</param>
-    let hasAttribute (element : ClrElement) (attribType : Type) =
-        match element with
-        | MemberElement(element=x) -> 
-            match x with
-            | DataMemberElement(x) ->
-                match x with
-                | PropertyMember(x) ->
-                    Attribute.IsDefined(x.PropertyInfo, attribType) 
-                | FieldMember(x) -> 
-                    Attribute.IsDefined(x.FieldInfo, attribType) 
-            | MethodElement(x) ->
-                    Attribute.IsDefined(x.MethodInfo, attribType) 
-        | TypeElement(element=x) -> 
-            Attribute.IsDefined(x.Type, attribType) 
-        | AssemblyElement(element=x) ->
-            Attribute.IsDefined(x.Assembly, attribType) 
-        | ParameterElement(x) ->
-            Attribute.IsDefined(x.ParamerInfo, attribType) 
-        | UnionCaseElement(element=x) ->
-            x.UnionCaseInfo.GetCustomAttributes() |> Array.filter(fun a -> a.GetType() = attribType) |> Array.isEmpty |> not
+//    let hasAttribute (element : ClrElement) (attribType : Type) =
+//        match element with
+//        | MemberElement(element=x) -> 
+//            match x with
+//            | DataMemberElement(x) ->
+//                match x with
+//                | PropertyMember(x) ->
+//                    Attribute.IsDefined(x.PropertyInfo, attribType) 
+//                | FieldMember(x) -> 
+//                    Attribute.IsDefined(x.FieldInfo, attribType) 
+//            | MethodElement(x) ->
+//                    Attribute.IsDefined(x.MethodInfo, attribType) 
+//        | TypeElement(element=x) -> 
+//            Attribute.IsDefined(x.Type, attribType) 
+//        | AssemblyElement(element=x) ->
+//            Attribute.IsDefined(x.Assembly, attribType) 
+//        | ParameterElement(x) ->
+//            Attribute.IsDefined(x.ParamerInfo, attribType) 
+//        | UnionCaseElement(element=x) ->
+//            x.UnionCaseInfo.GetCustomAttributes() |> Array.filter(fun a -> a.GetType() = attribType) |> Array.isEmpty |> not
 
     /// <summary>
     /// Retrieves an attribute from the element if it exists and returns None if it odes not
     /// </summary>
     /// <param name="element">The element to examine</param>
     /// <param name="attribType">The type of attribute to match</param>
-    let tryGetAttribute (element : ClrElement) (attribType : Type) =
-        if attribType |> hasAttribute element then
-            match element with
-            | MemberElement(element=x) -> 
-                match x with
-                | DataMemberElement(x) ->
-                    match x with
-                    | PropertyMember(x) ->
-                        Attribute.GetCustomAttribute(x.PropertyInfo, attribType)
-                    | FieldMember(x) -> 
-                        Attribute.GetCustomAttribute(x.FieldInfo, attribType)
-                | MethodElement(x) ->
-                        Attribute.GetCustomAttribute(x.MethodInfo, attribType)
-            | TypeElement(element=x) -> 
-                Attribute.GetCustomAttribute(x.Type, attribType)
-            | AssemblyElement(element=x) ->
-                Attribute.GetCustomAttribute(x.Assembly, attribType)
-            | ParameterElement(x) ->
-                Attribute.GetCustomAttribute(x.ParamerInfo, attribType)
-            | UnionCaseElement(element=x) ->
-                x.UnionCaseInfo.GetCustomAttributes() |> Array.find(fun a -> a.GetType() = attribType) :?> Attribute
-            |> Some
-        else
-            None    
+//    let tryGetAttribute (element : ClrElement) (attribType : Type) =
+//        if attribType |> hasAttribute element then
+//            match element with
+//            | MemberElement(element=x) -> 
+//                match x with
+//                | DataMemberElement(x) ->
+//                    match x with
+//                    | PropertyMember(x) ->
+//                        Attribute.GetCustomAttribute(x.PropertyInfo, attribType)
+//                    | FieldMember(x) -> 
+//                        Attribute.GetCustomAttribute(x.FieldInfo, attribType)
+//                | MethodElement(x) ->
+//                        Attribute.GetCustomAttribute(x.MethodInfo, attribType)
+//            | TypeElement(element=x) -> 
+//                Attribute.GetCustomAttribute(x.Type, attribType)
+//            | AssemblyElement(element=x) ->
+//                Attribute.GetCustomAttribute(x.Assembly, attribType)
+//            | ParameterElement(x) ->
+//                Attribute.GetCustomAttribute(x.ParamerInfo, attribType)
+//            | UnionCaseElement(element=x) ->
+//                x.UnionCaseInfo.GetCustomAttributes() |> Array.find(fun a -> a.GetType() = attribType) :?> Attribute
+//            |> Some
+//        else
+//            None    
 
     /// <summary>
     /// Retrieves an attribute from the element if it exists and raises an exception otherwise
     /// </summary>
     /// <param name="element">The element to examine</param>
     /// <param name="attribType">The type of attribute to match</param>
-    let getAttribute (element : ClrElement) (attribType : Type) =
-        attribType |> tryGetAttribute element |> Option.get
+//    let getAttribute (element : ClrElement) (attribType : Type) =
+//        attribType |> tryGetAttribute element |> Option.get
 
     /// <summary>
     /// Retrieves all attributes of a specified type that have been applied to an element
     /// </summary>
     /// <param name="element">The element to examine</param>
     /// <param name="attribType">The type of attribute to match</param>
-    let getAttributes (element : ClrElement) (attribType : Type)  =
-        match element with
-        | MemberElement(element=x) -> 
-            match x with
-            | DataMemberElement(x) ->
-                match x with
-                | PropertyMember(x) ->
-                    Attribute.GetCustomAttributes(x.PropertyInfo, attribType)
-                | FieldMember(x) -> 
-                    Attribute.GetCustomAttributes(x.FieldInfo, attribType)
-            | MethodElement(x) ->
-                    Attribute.GetCustomAttributes(x.MethodInfo, attribType)
-        | TypeElement(element=x) -> 
-            Attribute.GetCustomAttributes(x.Type, attribType)
-        | AssemblyElement(element=x) ->
-            Attribute.GetCustomAttributes(x.Assembly, attribType)
-        | ParameterElement(x) ->
-            Attribute.GetCustomAttributes(x.ParamerInfo, attribType)
-        | UnionCaseElement(element=x) ->
-            [|for a in x.UnionCaseInfo.GetCustomAttributes() do if a.GetType() = attribType then yield a :?> Attribute|]
-        |> List.ofArray
+//    let getAttributes (element : ClrElement) (attribType : Type)  =
+//        match element with
+//        | MemberElement(element=x) -> 
+//            match x with
+//            | DataMemberElement(x) ->
+//                match x with
+//                | PropertyMember(x) ->
+//                    Attribute.GetCustomAttributes(x.PropertyInfo, attribType)
+//                | FieldMember(x) -> 
+//                    Attribute.GetCustomAttributes(x.FieldInfo, attribType)
+//            | MethodElement(x) ->
+//                    Attribute.GetCustomAttributes(x.MethodInfo, attribType)
+//        | TypeElement(element=x) -> 
+//            Attribute.GetCustomAttributes(x.Type, attribType)
+//        | AssemblyElement(element=x) ->
+//            Attribute.GetCustomAttributes(x.Assembly, attribType)
+//        | ParameterElement(x) ->
+//            Attribute.GetCustomAttributes(x.ParamerInfo, attribType)
+//        | UnionCaseElement(element=x) ->
+//            [|for a in x.UnionCaseInfo.GetCustomAttributes() do if a.GetType() = attribType then yield a :?> Attribute|]
+//        |> List.ofArray
 
     /// <summary>
     /// Determines whether an attribute is applied to an element
     /// </summary>
     /// <param name="element">The element to examine</param>
-    let hasAttributeT<'T when 'T :> Attribute>(element : ClrElement) =
-        typeof<'T> |> hasAttribute  element        
+//    let hasAttributeT<'T when 'T :> Attribute>(element : ClrElement) =
+//        typeof<'T> |> hasAttribute  element        
 
     /// <summary>
     /// Retrieves an attribute applied to a member, if present
     /// </summary>
     /// <param name="subject">The type to examine</param>
-    let tryGetAttributeT<'T when 'T :> Attribute>(element : ClrElement) =
-        match typeof<'T> |> tryGetAttribute element with
-        | Some(x) -> x :?> 'T |> Some
-        | None -> None
+//    let tryGetAttributeT<'T when 'T :> Attribute>(element : ClrElement) =
+//        match typeof<'T> |> tryGetAttribute element with
+//        | Some(x) -> x :?> 'T |> Some
+//        | None -> None
     
     /// <summary>
     /// Retrieves an attribute from the element if it exists and raises an exception otherwise
     /// </summary>
     /// <param name="element">The element to examine</param>
     /// <param name="attribType">The type of attribute to match</param>
-    let getAttributeT<'T when 'T :> Attribute>(element : ClrElement) =
-        element |> tryGetAttributeT<'T> |> Option.get
+//    let getAttributeT<'T when 'T :> Attribute>(element : ClrElement) =
+//        element |> tryGetAttributeT<'T> |> Option.get
 
     /// <summary>
     /// Retrieves an arbitrary number of attributes of the same type applied to a member
     /// </summary>
     /// <param name="subject">The type to examine</param>
-    let getAttributesT<'T when 'T :> Attribute>(subject : MemberInfo) =
-        [for a in Attribute.GetCustomAttributes(subject, typeof<'T>) -> a :?> 'T]
+//    let getAttributesT<'T when 'T :> Attribute>(subject : MemberInfo) =
+//        [for a in Attribute.GetCustomAttributes(subject, typeof<'T>) -> a :?> 'T]
 
     /// <summary>
     /// Recursively traverses the element hierarchy graph and invokes the supplied handler as each element is traversed
@@ -262,7 +263,7 @@ module ClrElementExtensions =
     /// Gets the acess modifier applied to the element, if applicable
     /// </summary>
     /// <param name="element">The element to examine</param>
-    let getAccess (element : ClrElement)  =
+    let private getAccess (element : ClrElement)  =
         match element with
         | MemberElement(element=x) -> 
             match x with
@@ -285,7 +286,7 @@ module ClrElementExtensions =
     /// Gets the type that declares the element if applicable
     /// </summary>
     /// <param name="element">The element</param>
-    let getDeclaringType (element : ClrElement) =
+    let private getDeclaringType (element : ClrElement) =
         match element with
         | MemberElement(element=x) -> 
             match x with
@@ -313,7 +314,7 @@ module ClrElementExtensions =
     /// Gets the assembly in which the element is defined
     /// </summary>
     /// <param name="element">The element</param>
-    let getDeclaringAssembly(element : ClrElement) =
+    let private getDeclaringAssembly(element : ClrElement) =
         match element with
         | MemberElement(element=x) -> 
             match x with

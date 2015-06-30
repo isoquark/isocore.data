@@ -57,6 +57,7 @@ module StorageKindVocabulary =
         | Geography = 160uy
         | Geometry = 161uy
         | Hierarchy = 162uy
+        | TypedDocument = 180uy
 
 
 module StorageKind =

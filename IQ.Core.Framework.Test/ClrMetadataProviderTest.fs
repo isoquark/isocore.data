@@ -52,6 +52,16 @@ module ClrMetadataProviderTest =
         t2Props.[2].Position |> Claim.equal 2
 
             
+    [<AttributeUsage(AttributeTargets.All)>]
+    type MyAttribute() =
+        inherit Attribute()
+
+    type private IInterfaceA =        
+        abstract Method01:p1 : string -> p2 : int -> [<return: MyAttribute>] int64
+        abstract Method02:p1 : string * p2: int->unit
+        abstract Method03:p1 : (string*int) -> unit
+        abstract Method04:p1 : string -> p2 : int option -> DateTime
+
     type private IInterfaceB =
         abstract Method01:unit->unit
         abstract Method02:int->unit
@@ -59,7 +69,51 @@ module ClrMetadataProviderTest =
         abstract Property01:DateTime
         abstract Property02:DateTime with get,set
 
-    
+    let methodmap = methodinfomap<IInterfaceA>    
+    [<Test>]
+    let ``Described non-tupled method - variation 1``() =
+        let mName = "Method01" |> ClrMemberName 
+        let m = methodmap.[mName]
+        m.Name |> Claim.equal (mName)
+        m.Position |> Claim.equal 0
+        m.Parameters.Length |> Claim.equal 3
+        m.Parameters.[0].CanOmit |> Claim.isFalse
+        m.Parameters.[0].Name.Text |> Claim.equal "p1"
+        m.Parameters.[0].ParameterType.SimpleName |> Claim.equal typeof<string>.Name
+        m.Parameters.[1].CanOmit |> Claim.isFalse
+        m.Parameters.[1].Name.Text |> Claim.equal "p2"
+        m.Parameters.[1].ParameterType.SimpleName |> Claim.equal typeof<int>.Name
+        m.ReturnType |> Option.get |> Claim.equal typeof<int64>.ElementTypeName
+        m.ReturnAttributes.Length |> Claim.equal 1
+        m.ReturnAttributes.Head.AttributeName |> Claim.equal typeof<MyAttribute>.ElementTypeName
+
+    [<Test>]
+    let ``Described tupled methods``() =
+        let m2Name = "Method02" |> ClrMemberName 
+        let m2 = methodmap.[m2Name]
+        m2.Name |> Claim.equal m2Name
+        m2.Parameters.Length |> Claim.equal 2
+        m2.ReturnType |> Claim.isNone
+
+        let m3Name = "Method03" |> ClrMemberName 
+        let m3 = methodmap.[m3Name]
+        m3.Name |> Claim.equal m3Name
+        m3.Parameters.Length |> Claim.equal 1
+        m3.ReturnType |> Claim.isNone
+
+    [<Test>]
+    let ``Described non-tupled method - variation 2``() =
+        let mName = "Method04" |> ClrMemberName 
+        let m = methodmap.[mName]
+        m.Name |> Claim.equal mName
+        m.Parameters.Length |> Claim.equal 3
+        m.Parameters.[0].CanOmit |> Claim.isFalse
+        m.Parameters.[0].Name.Text |> Claim.equal "p1"
+        m.Parameters.[0].ParameterType |> Claim.equal typeof<string>.ElementTypeName
+        m.Parameters.[1].CanOmit |> Claim.isFalse
+        m.Parameters.[1].Name.Text |> Claim.equal "p2"        
+        m.Parameters.[1].ParameterType |> Claim.equal typeof<option<int>>.ElementTypeName
+        m.ReturnType |> Option.get |> Claim.equal typeof<DateTime>.ElementTypeName
 
     [<Test>]
     let ``Described interfaces``() =
@@ -74,6 +128,20 @@ module ClrMetadataProviderTest =
             with get() = p2Val
             and  set(value) = p2Val <-value
         member this.Prop3 with get() = p3Val
+
+    type private ClassB() =
+        member this.Method01(p1 : int, ?p2 : int) = 0L
+
+    [<Test>]
+    let ``Described class methods with optional parameters``() =
+        let methodmap = methodinfomap<ClassB>
+        let mName = "Method01" |> ClrMemberName 
+        let m = methodmap.[mName]
+        m.Name |> Claim.equal mName
+        m.Parameters.Length |> Claim.equal 3
+        m.Parameters.[1].CanOmit |> Claim.isTrue
+        m.ReturnType|> Option.get |> Claim.equal typeof<int64>.ElementTypeName
+
 
     [<Test>]
     let ``Described classes``() =
@@ -125,7 +193,7 @@ module ClrMetadataProviderTest =
                 Name = p3Name
                 Position = 2
                 DeclaringType = typeof<ClassA>.ElementTypeName
-                ValueType = typeof<int64>.ElementTypeName
+                ValueType = typeof<option<int64>>.ElementTypeName
                 IsOptional = true
                 CanWrite = false
                 WriteAccess = None
@@ -137,29 +205,43 @@ module ClrMetadataProviderTest =
                 GetMethodAttributes = []
                 SetMethodAttributes = []
             } |> PropertyDescription
-        let p3Actual = infomap.[p3Name]
-        p3Actual |> Claim.equal p3Expect
+        let p3Actual = match infomap.[p3Name]  with | PropertyDescription(x) -> x | _ -> nosupport()
+        p3Actual.Name |> Claim.equal p3Name
+        p3Actual.Position |> Claim.equal 2
+        p3Actual.DeclaringType |> Claim.equal typeof<ClassA>.ElementTypeName
+        p3Actual.ValueType |> Claim.equal typeof<option<int64>>.ElementTypeName
+        p3Actual.IsOptional |> Claim.isTrue
+        p3Actual.CanWrite |> Claim.isFalse
+        p3Actual.CanRead |> Claim.isTrue
+        p3Actual.WriteAccess |> Claim.equal None
+        p3Actual.ReadAccess |> Claim.equal (Some(PublicAccess))
+        p3Actual.ReflectedElement |> Claim.equal (p3Info |> Some)
+        p3Actual.IsStatic |> Claim.isFalse
+        p3Actual.Attributes |> Claim.seqIsEmpty
+        p3Actual.GetMethodAttributes |> Claim.seqIsEmpty
+        p3Actual.SetMethodAttributes |> Claim.seqIsEmpty
+       
+        
+        
+        
+        //p3Actual |> Claim.equal p3Expect
 
     type private UnionA = UnionA of field01 : int * field02 : decimal * field03 : DateTime        
     
     [<Test>]
     let ``Described union``() =
         let u = typeinfo<UnionA>
-        u.ReflectedElement  |> Option.get|> Claim.equal typeof<UnionA>
-        let unionName = typeof<UnionA>.ElementName
-        match typeref<UnionA> with
-        | UnionTypeReference(subject,cases) ->
-            subject.Name |> Claim.equal unionName
-            cases.Length |> Claim.equal 1
-            
-            let field01Case = cases.[0].[0]        
-            let fieldCaseName = field01Case.ReferentName
-            cases.[0].[fieldCaseName] |> Claim.equal field01Case
-            field01Case.ReferentPosition |> Claim.equal 0
-            field01Case.ValueType |> Claim.equal typeof<int>
-            field01Case.ReferentName.Text |> Claim.equal "field01"
-        | _ ->
-            Claim.assertFail()
+        u.ReflectedElement  |> Option.get|> Claim.equal typeof<UnionA>        
+        let unioninfo = typeinfo<UnionA>
+        unioninfo.Name.SimpleName |> Claim.equal typeof<UnionA>.Name
+//        cases.Length |> Claim.equal 1
+//            
+//        let field01Case = cases.[0].[0]        
+//        let fieldCaseName = field01Case.ReferentName
+//        cases.[0].[fieldCaseName] |> Claim.equal field01Case
+//        field01Case.ReferentPosition |> Claim.equal 0
+//        field01Case.ValueType |> Claim.equal typeof<int>
+//        field01Case.ReferentName.Text |> Claim.equal "field01"
 
     [<Test>]
     let ``Found types by name``() =
@@ -181,3 +263,5 @@ module ClrMetadataProviderTest =
         let desc = t.Attributes 
                 |> List.find(fun a -> a.AttributeName = typeof<DescriptionAttribute>.ElementTypeName)
         desc.AppliedValues.["Description"] :?> string |> Claim.equal "This is RecordA"
+
+    

@@ -102,14 +102,14 @@ module SqlDataStore =
             member this.Get q : list<'T>= 
                 match q with
                 | TabularQuery(tabularName,columnNames) ->
-                    typeref<'T> |> Tabular.executeProxyQuery cs :?> list<'T>
+                    typeinfo<'T> |> Tabular.executeProxyQuery cs :?> list<'T>
                 | TableFunctionQuery(functionName, parameters) ->
                     []
                 | ProcedureQuery(procedureName, parameters) ->
                     []
             
             member this.Get() : list<'T> =
-                typeref<'T> |> Tabular.executeProxyQuery cs :?> list<'T>
+                typeinfo<'T> |> Tabular.executeProxyQuery cs :?> list<'T>
                 
             
             member this.Put items = 

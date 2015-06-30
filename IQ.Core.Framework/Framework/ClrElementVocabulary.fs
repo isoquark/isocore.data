@@ -73,6 +73,10 @@ module ClrElementVocabulary =
         Access : ClrAccess
         /// Specifies whether the field is static
         IsStatic : bool
+        /// Specifies the name of the field type
+        FieldType : ClrTypeName
+        /// The name of the type that declares the field
+        DeclaringType : ClrTypeName           
     }
 
     /// <summary>
@@ -87,6 +91,14 @@ module ClrElementVocabulary =
         ReflectedElement : ParameterInfo option
         /// The attributes applied to the parameter
         Attributes : ClrAttribution list
+        /// Specifies whether the parameter is required
+        CanOmit : bool   
+        /// Specifies the name of the parameter type
+        ParameterType : ClrTypeName    
+        /// The name of the method that declares the parameter
+        DeclaringMethod : ClrMemberName
+        /// Specifies whether the parameter represents a return
+        IsReturn : bool
     }
 
     /// <summary>
@@ -105,9 +117,28 @@ module ClrElementVocabulary =
         Access : ClrAccess
         /// Specifies whether the method is static
         IsStatic : bool
-        /// The methods parameters
+        /// The method parameters
         Parameters : ClrParameterDescription list
+        /// The method return type
+        ReturnType : ClrTypeName option
+        /// The attributes applied to the method return
+        ReturnAttributes : ClrAttribution list
+        /// The name of the type that declares the method
+        DeclaringType : ClrTypeName           
+
     }
+    with
+        member this.TryGetAttribute<'T when 'T :> Attribute>() =
+            let attribName = ClrTypeName(typeof<'T>.Name, typeof<'T>.FullName |> Some, typeof<'T>.AssemblyQualifiedName |> Some) 
+            this.Attributes |> List.tryFind(fun x -> x.AttributeName = attribName)
+        
+        member this.HasAttribute<'T when 'T:> Attribute>() = 
+            this.TryGetAttribute<'T>() |> Option.isSome
+
+        /// <summary>
+        /// Gets all non-return parameters
+        /// </summary>
+        member this.InputParameters = this.Parameters |> List.filter(fun x -> x.IsReturn |> not)
 
     /// <summary>
     /// Describes a constructor
@@ -127,6 +158,8 @@ module ClrElementVocabulary =
         IsStatic : bool
         /// The constructor parameters
         Parameters : ClrParameterDescription list
+        /// The name of the type that declares the constructor
+        DeclaringType : ClrTypeName           
     }
 
     /// <summary>
@@ -141,6 +174,24 @@ module ClrElementVocabulary =
         Position : int                
         /// The attributes applied to the event
         Attributes : ClrAttribution list
+        /// The name of the type that declares the event
+        DeclaringType : ClrTypeName           
+    }
+
+    /// <summary>
+    /// Describes a union case
+    /// </summary>
+    type ClrUnionCaseDescription = {
+        /// The name of the type
+        Name : ClrMemberName
+        /// The position of the type
+        Position : int    
+        /// The attributes applied to the case
+        Attributes : ClrAttribution list
+        /// The name of the type that declares the case
+        DeclaringType : ClrTypeName           
+        /// The reflected case, if applicable
+        ReflectedElement : UnionCaseInfo option
     }
     
     /// <summary>
@@ -202,16 +253,41 @@ module ClrElementVocabulary =
             | EventDescription(x) -> match x.ReflectedElement with |Some(x) -> x :> obj |> Some | None -> None
             | ConstructorDescription(x) -> match x.ReflectedElement with |Some(x) -> x :> obj |> Some | None -> None
 
+        /// <summary>
+        /// Gets the type that declares the memeber
+        /// </summary>
+        member this.DeclaringType =
+            match this with
+            | PropertyDescription(x) -> x.DeclaringType
+            | FieldDescription(x) -> x.DeclaringType
+            | MethodDescription(x) -> x.DeclaringType
+            | EventDescription(x) -> x.DeclaringType
+            | ConstructorDescription(x) -> x.DeclaringType
+
+        /// <summary>
+        /// Gets the top-level attributions
+        /// </summary>
+        /// <remarks>
+        /// Top-level, in this context, means attributes applied directly to the CLR element and not it's constituent pieces
+        /// such as property getters/settters, method parameters, etc.
+        /// </remarks>
+        member this.Attributes =
+            match this with
+            | PropertyDescription(x) -> x.Attributes
+            | FieldDescription(x) -> x.Attributes
+            | MethodDescription(x) -> x.Attributes
+            | EventDescription(x) -> x.Attributes
+            | ConstructorDescription(x) -> x.Attributes
+
+        member this.TryGetAttribute<'T when 'T :> Attribute>() =
+            let attribName = ClrTypeName(typeof<'T>.Name, typeof<'T>.FullName |> Some, typeof<'T>.AssemblyQualifiedName |> Some) 
+            this.Attributes |> List.tryFind(fun x -> x.AttributeName = attribName)
+        
+        member this.HasAttribute<'T when 'T:> Attribute>() = 
+            this.TryGetAttribute<'T>() |> Option.isSome
+            
+
                                     
-    /// <summary>
-    /// Describes a union case
-    /// </summary>
-    type ClrUnionCaseDescription = {
-        /// The name of the type
-        Name : ClrMemberName
-        /// The position of the type
-        Position : int    
-    }
     
     /// <summary>
     /// Describes a type
@@ -242,6 +318,10 @@ module ClrElementVocabulary =
         IsStatic : bool
         /// The attributes applied to the type
         Attributes : ClrAttribution list
+        /// Specifies the type of the encapsulated value; will be different from
+        /// the Name whenever dealing with options, collections and other
+        /// parametrized types
+        ItemValueType : ClrTypeName
     }
     with
         /// <summary>
@@ -289,6 +369,68 @@ module ClrElementVocabulary =
         | AssemblyDescription of description : ClrAssemblyDescription
         | ParameterDescription of description : ClrParameterDescription
         | UnionCaseDescription of description : ClrUnionCaseDescription
+    with
+        /// <summary>
+        /// Gets the top-level attributes applied to the element
+        /// </summary>
+        member this.Attributes =
+            match this with
+            | MemberDescription(x) -> x.Attributes
+            | TypeDescription(x) -> x.Attributes
+            | AssemblyDescription(x) -> x.Attributes
+            | ParameterDescription(x) -> x.Attributes
+            | UnionCaseDescription(x) -> x.Attributes
+
+        /// <summary>
+        /// Gets the name of the element
+        /// </summary>
+        member this.Name =
+            match this with
+            | MemberDescription(x) -> x.Name |> MemberElementName
+            | TypeDescription(x) -> x.Name |> TypeElementName
+            | AssemblyDescription(x) -> x.Name |> AssemblyElementName
+            | ParameterDescription(x) -> x.Name |> ParameterElementName
+            | UnionCaseDescription(x) -> x.Name |> MemberElementName
+
+        member this.DeclaringType =
+            match this with
+            | MemberDescription(x) -> x.DeclaringType |> Some
+            | TypeDescription(x) -> x.DeclaringType
+            | AssemblyDescription(x) -> None
+            | ParameterDescription(x) -> None
+            | UnionCaseDescription(x) -> x.DeclaringType |> Some
+            
+        member this.Position =
+            match this with
+            | MemberDescription(x) -> x.Position
+            | TypeDescription(x) -> x.Position
+            | AssemblyDescription(x) -> x.Position
+            | ParameterDescription(x) -> x.Position
+            | UnionCaseDescription(x) -> x.Position
+        
+        member this.ReflectedElement =
+            match this with
+            | MemberDescription(x) -> x.ReflectedElement
+            | TypeDescription(x) -> match x.ReflectedElement with |Some(y) -> y:> obj|>Some |None -> None
+            | AssemblyDescription(x) -> match x.ReflectedElement with |Some(y) -> y:> obj|>Some |None -> None
+            | ParameterDescription(x) -> match x.ReflectedElement with |Some(y) -> y:> obj|>Some |None -> None
+            | UnionCaseDescription(x) -> match x.ReflectedElement with |Some(y) -> y:> obj|>Some |None -> None
+
+        member this.Kind = 
+            match this with
+            | MemberDescription(x) -> 
+                match x.Kind with
+                | ClrMemberKind.Constructor -> ClrElementKind.Constructor
+                | ClrMemberKind.Event -> ClrElementKind.Event
+                | ClrMemberKind.Method -> ClrElementKind.Method
+                | ClrMemberKind.Property -> ClrElementKind.Property
+                | ClrMemberKind.StorageField -> ClrElementKind.StorageField
+                | _ -> nosupport()
+            | TypeDescription(x) -> ClrElementKind.Type
+            | AssemblyDescription(x) -> ClrElementKind.Assembly
+            | ParameterDescription(x) -> ClrElementKind.Parameter
+            | UnionCaseDescription(x) -> ClrElementKind.UnionCase
+            
        
     type IReflectionPrimitive =
         abstract Primitive:obj

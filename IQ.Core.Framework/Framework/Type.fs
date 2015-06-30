@@ -249,7 +249,9 @@ module Type =
         else if t.IsNotPublic || t.IsNestedAssembly then
             InternalAccess 
         else if t.IsNestedFamORAssem then
-            ProtectedInternalAccess 
+            ProtectedOrInternalAccess 
+        else if t.IsNestedFamily then
+            ProtectedAccess
         else
             nosupport()
         

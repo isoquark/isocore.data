@@ -53,17 +53,13 @@ module ClrElementTestTypes =
             a - b
 
 open ClrElementTestTypes
-
-module ClrElementTest = ()
-    
-
         
 [<TestContainer>]
 module ClrElementNameTests =
     [<Test>]
     let ``Retreived CLR type name from type``() =
         let t = typeof<RecordA>
-        let actual = clrtype<RecordA>.ElementTypeName
+        let actual = typeinfo<RecordA>.Name
         let expect = ClrTypeName(t.Name , t.FullName |> Some, t.AssemblyQualifiedName |> Some)
         actual |> Claim.equal expect
 
@@ -78,36 +74,30 @@ module ClrAssemblyTest =
 
     [<Test>]
     let ``Discovered type child elements``() =
-        let t = clrtype<ClassA>
-        let children = t.Element |> ClrElement.getChildren 
-        children |> Claim.listHasLength 6
+        typeinfo<ClassA>.Members.Length |> Claim.equal 6
     
     [<Test>]
     let ``Traversed CLR element hierarchy``() =
-        let elements = ResizeArray<ClrElement>()
-        let handler (e : ClrElement) =
+        let elements = ResizeArray<ClrElementDescription>()
+        let handler (e : ClrElementDescription) =
             e |> elements.Add
-        clrtype<RecordA>.Element |> ClrElement.walk handler
-        elements |> Seq.tryFind(fun x -> x.Name = FieldA1Name) |> Claim.isSome
-        elements |> Seq.tryFind(fun x -> x.Name = FieldA2Name) |> Claim.isSome
+        typeinfo<RecordA> |> TypeDescription |> ClrElementDescription.walk handler
 
     [<Test>]
     let ``Discovered attributed functions``() =
         let functions = ResizeArray<ClrElement>()
         
-        let handler (e : ClrElement) =
-            match e |> ClrElement.tryGetAttributeT<AttributeAAttribute> with
-            | Some(x) ->
-                e |> functions.Add
-            | None -> ()
-        
-        thisAssemblyElement().Element |> ClrElement.walk handler
-        let x = 1
+        //let handler (e : ClrElementDescription) =
+          
+
+//        let handler (e : ClrElement) =
+//            match e |> ClrElement.tryGetAttributeT<AttributeAAttribute> with
+//            | Some(x) ->
+//                e |> functions.Add
+//            | None -> ()
+//        
+//        thisAssemblyElement().Element |> ClrElement.walk handler
         ()
               
-        
-//    [<Test>]
-//    let ``Discovered attributed types within an assembly``() =
-//        ()
 
 

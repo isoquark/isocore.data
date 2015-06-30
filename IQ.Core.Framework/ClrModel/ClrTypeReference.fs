@@ -293,8 +293,8 @@ module ClrTypeReference =
     /// Reads an identified attribute from a type, if present
     /// </summary>
     /// <param name="t"></param>
-    let getAttribute<'T when 'T :> Attribute> (tref : ClrTypeReference) =
-         tref |> getReferent |>  ClrElement.tryGetAttributeT<'T>
+//    let getAttribute<'T when 'T :> Attribute> (tref : ClrTypeReference) =
+//         tref |> getReferent |>  ClrElement.tryGetAttributeT<'T>
                                
     let getDeclaringType(tref : ClrTypeReference) =
         let element = tref |> getTypeReferent
@@ -310,7 +310,7 @@ module ClrTypeReferenceExtensions =
     /// <summary>
     /// Creates a reference to the type identified by the supplied type parameter
     /// </summary>
-    let typeref<'T> = typeof<'T> |> ClrTypeReference.reference
+    //let typeref<'T> = typeof<'T> |> ClrTypeReference.reference
 
     /// <summary>
     /// Creates a property reference

@@ -45,8 +45,8 @@ module ClrElementReference =
     /// Reads an identified attribute from the element if applied
     /// </summary>
     /// <param name="element">The potentially attributed element</param>
-    let getAttribute<'T when 'T :> Attribute>(eref : ClrElementReference) =
-        eref |> getReferent |> ClrElement.tryGetAttributeT<'T>
+//    let getAttribute<'T when 'T :> Attribute>(eref : ClrElementReference) =
+//        eref |> getReferent |> ClrElement.tryGetAttributeT<'T>
 
     /// <summary>
     /// Gets the type that declares the referent
@@ -66,12 +66,6 @@ module ClrElementReference =
     /// <param name="t">The type to be expressed as an element</param>
     let fromTypeRef(t : ClrTypeReference) = t |> TypeReference
             
-    /// <summary>
-    /// Creates a CLR element reference from the type identified by the type parameter
-    /// </summary>
-    let fromType<'T> =
-        typeref<'T> |> fromTypeRef
-
     /// <summary>
     /// Gets the element that declares a specified element, if any
     /// </summary>
@@ -100,7 +94,7 @@ module ClrElementReferenceExtensions =
         member this.ReferentName = this |> ClrElementReference.getReferentName
         member this.Referent = this |> ClrElementReference.getReferent
         
-        member this.GetAttribute<'T when 'T :> Attribute>(element) = element |> ClrElementReference.getAttribute<'T>
+        //member this.GetAttribute<'T when 'T :> Attribute>(element) = element |> ClrElementReference.getAttribute<'T>
     
     /// <summary>
     /// Creates a reference to a CLR element

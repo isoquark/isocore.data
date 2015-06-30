@@ -58,12 +58,10 @@ module ``CsvReader Test`` =
         let path = thisAssembly() |> Assembly.writeTextResource resname (TestContext.getTempDir())
         let format = CsvReader.getDefaultFormat()
         let actual = path |> CsvReader.describeFile format
-        let fieldNames = match typeref<CsvTestCase1> with
-                         | RecordTypeReference(subject, fields) -> fields |> List.map(fun x -> x.ReferentName.Text)
-                         | _ -> 
-                            NotSupportedException() |> raise
+        let tinfo = typeinfo<CsvTestCase1>
+        let colNames = tinfo.Properties |> List.map(fun x -> x.Name.Text)
         let expect = {
-            CsvFileDescription.ColNames = fieldNames
+            CsvFileDescription.ColNames = colNames
             Format = format
             Filename = path
             FileSize = FileInfo(path).Length

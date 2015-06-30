@@ -29,7 +29,7 @@ module DataTable =
     /// <param name="description">The proxy description</param>
     let fromProxyDescription (description : DataObjectProxy) =        
         let table = new DataTable(description.DataElement.Name.ToSemanticString())
-        description.Columns |> List.iter(fun c -> table.Columns.Add(c.DataElement.Name, c.ProxyElement.PropertyType) |> ignore)
+        description.Columns |> List.iter(fun c -> table.Columns.Add(c.DataElement.Name, c.ProxyElement.ReflectedElement.Value.PropertyType) |> ignore)
         table
 
     /// <summary>
@@ -76,7 +76,7 @@ module DataTable =
         for value in values do
             let valueidx = value |>RecordValue.toValueIndex
             [|for column in columns do 
-                yield valueidx.[column.ProxyElement.ReferentName.Text] |> DataTypeConverter.toClrTransportValue column.DataElement.StorageType
+                yield valueidx.[column.ProxyElement.Name.Text] |> DataTypeConverter.toClrTransportValue column.DataElement.StorageType
             |] |> table.Rows.Add |> ignore
         table                
 
@@ -87,23 +87,38 @@ module DataTable =
     let fromProxyValuesT (values : 'T seq) =
          values |> Seq.map(fun x -> x :> obj) |> fromProxyValues (tabularproxy<'T> )
                 
+    let toProxyValues (typedesc : ClrTypeDescription) (dataTable : DataTable) =
+        match typedesc.CollectionKind with        
+        | Some(collectionKind) ->
+            let items = 
+                [for row in dataTable.Rows ->
+                    typedesc.ReflectedElement.Value |> RecordValue.fromValueArray row.ItemArray]
+            let itemType = typedesc.ReflectedElement.Value 
+            items |> Collection.create collectionKind itemType :?> IEnumerable
+        | _ ->
+            [for row in dataTable.Rows ->
+                
+                typedesc.ReflectedElement.Value |> RecordValue.fromValueArray row.ItemArray] :> IEnumerable
+            
+
+    
     /// <summary>
     /// Creates a list of records from a data table
     /// </summary>
     /// <param name="description">Describes the record</param>
     /// <param name="dataTable">The data table</param>
-    let toProxyValues (typeref : ClrTypeReference) (dataTable : DataTable) =
-        match typeref with
-        | CollectionTypeReference(subject, itemTypeRef, collectionKind) ->            
-            let items = 
-                [for row in dataTable.Rows ->
-                    itemTypeRef.TypeReferent.Type |> RecordValue.fromValueArray row.ItemArray]
-            items |> Collection.create collectionKind itemTypeRef.ReferentType.Type :?> IEnumerable
-        | _ ->
-            [for row in dataTable.Rows ->
-                typeref.TypeReferent.Type |> RecordValue.fromValueArray row.ItemArray] :> IEnumerable
+//    let toProxyValues (typeref : ClrTypeReference) (dataTable : DataTable) =
+//        match typeref with
+//        | CollectionTypeReference(subject, itemTypeRef, collectionKind) ->            
+//            let items = 
+//                [for row in dataTable.Rows ->
+//                    itemTypeRef.TypeReferent.Type |> RecordValue.fromValueArray row.ItemArray]
+//            items |> Collection.create collectionKind itemTypeRef.ReferentType.Type :?> IEnumerable
+//        | _ ->
+//            [for row in dataTable.Rows ->
+//                typeref.TypeReferent.Type |> RecordValue.fromValueArray row.ItemArray] :> IEnumerable
 
-    let toProxyValuesT<'T> (typeref : ClrTypeReference) (dataTable : DataTable) =
+    let toProxyValuesT<'T> (typeref : ClrTypeDescription) (dataTable : DataTable) =
         dataTable |> toProxyValues typeref :?> IEnumerable<'T>
 
  

@@ -33,3 +33,13 @@ module TypeTest =
         typeof<option<List<string>>>.ItemValueType |> Claim.equal typeof<string>
         typeof<string>.ItemValueType |> Claim.equal typeof<string>
 
+    [<Test>]
+    let ``Determined whether type is a collection type``() =
+        [1;2;3].GetType() |> Type.getTypeKind|> Claim.equal ClrTypeKind.Collection                    
+        [|1;2;3|].GetType() |> Type.getTypeKind|> Claim.equal ClrTypeKind.Collection
+
+    [<Test>]
+    let ``Determined collection kind``() =
+         [1;2;3].GetType() |>Type.getCollectionKind |> Claim.equal ClrCollectionKind.FSharpList
+         [|1;2;3|].GetType() |>Type.getCollectionKind |> Claim.equal ClrCollectionKind.Array
+         Some([|1;2;3|]).GetType()   |> Type.getCollectionKind |> Claim.equal ClrCollectionKind.Array

@@ -43,7 +43,7 @@ module DataProxyMetadata =
         if defaultClrStorageTypeMap.ContainsKey(t.ItemValueType) then
             defaultClrStorageTypeMap.[t.ItemValueType]
         else
-            NotSupportedException(sprintf "No default mapping exists for the %O type" t.ItemValueType) |> raise
+            TypedDocumentStorage(t)
 
     let private inferStorageTypeFromClrElement(proxyref : ClrElementReference) =
         let valueType =
@@ -57,38 +57,48 @@ module DataProxyMetadata =
             | _ -> NotSupportedException() |> raise
         valueType |> inferStorageTypeFromClrType
         
-    /// <summary>
-    /// Infers a <see cref"StorageType"/> from a CLR element
-    /// </summary>
-    /// <param name="element"></param>
-    let inferStorageType(proxyref : ClrElementReference) =
-        match proxyref |> ClrElementReference.getAttribute<StorageTypeAttribute> with
+    let inferStorageType(description : ClrElementDescription) =
+        match description |> ClrElementDescription.tryGetAttributeT<StorageTypeAttribute>  with
         | Some(attrib) -> 
             attrib.StorageType
         | None ->            
-            proxyref |> inferStorageTypeFromClrElement                                             
+            match description with
+            | MemberDescription(d) ->
+                match d with
+                | PropertyDescription(x) -> x.ReflectedElement.Value.PropertyType |> inferStorageTypeFromClrType
+                | FieldDescription(x) -> x.ReflectedElement.Value.FieldType |> inferStorageTypeFromClrType
+                | _ -> nosupport()
+            | ParameterDescription(d) ->
+                d.ReflectedElement.Value.ParameterType |> inferStorageTypeFromClrType
+            | TypeDescription(t) ->
+                t.ReflectedElement.Value |> inferStorageTypeFromClrType
+            | _ -> nosupport()
+
+        
 
     /// <summary>
     /// Infers the name of the schema in which the element lives or represents
     /// </summary>
     /// <param name="clrElement">The element from which to infer the schema name</param>
-    let inferSchemaName(proxyref : ClrElementReference) =              
+    let inferSchemaName(description: ClrElementDescription) =              
         let inferFromDeclaringType() =
-                match proxyref.DeclaringType with
+                match description.DeclaringType with
                 | Some(t) ->
-                    match t |> ClrTypeReference.getAttribute<SchemaAttribute> with
+                    let description = t |> FindTypeByName |>  ClrMetadataProvider.findType |> TypeDescription
+                   
+                    match description |> ClrElementDescription.tryGetAttributeT<SchemaAttribute>  with
                     | Some(a) ->
                         match a.Name with
                         | Some(n) ->
                             n
                         | None ->
-                            t.ReferentTypeName.SimpleName
+                            t.SimpleName
                     | None ->
-                        t.ReferentTypeName.SimpleName
+                        t.SimpleName
                 | None ->
                     NotSupportedException() |> raise                    
         
-        match proxyref |> ClrElementReference.getAttribute<SchemaAttribute> with        
+        match description |> ClrElementDescription.tryGetAttributeT<SchemaAttribute> with        
         | Some(a) ->
             match a.Name with
             | Some(name) -> 
@@ -97,7 +107,7 @@ module DataProxyMetadata =
                 inferFromDeclaringType()
 
         | None ->
-            match proxyref |> ClrElementReference.getAttribute<DataObjectAttribute> with
+            match description |> ClrElementDescription.tryGetAttributeT<DataObjectAttribute> with        
             | Some(a) ->
                 match a.SchemaName with
                 | Some(schemaName) -> 
@@ -111,70 +121,61 @@ module DataProxyMetadata =
     /// Infers a <see cref="DataObjectName"/> from a CLR element
     /// </summary>
     /// <param name="clrElement">The CLR element from which the object name will be inferred</param>
-    let inferDataObjectName(proxyref : ClrElementReference) =        
-        
-        let getElementName() =
-            match proxyref |> ClrElementReference.getReferentName with
-            | MemberElementName(n) ->n.Text
-            | ParameterElementName(n) -> n.Text           
-            | TypeElementName(n) -> n.SimpleName                    
-            | AssemblyElementName(n) ->
-                NotSupportedException() |> raise
-
-        match proxyref |> ClrElementReference.getAttribute<DataObjectAttribute> with
+    let inferDataObjectName(description : ClrElementDescription) =        
+        match description |> ClrElementDescription.tryGetAttributeT<DataObjectAttribute> with
         | Some(a) -> 
-            let schemaName = proxyref |> inferSchemaName
+            let schemaName = description |> inferSchemaName
             let localName = 
                 match a.Name with
                 | Some(x) -> 
                     x
                 | None ->
-                    getElementName()
+                    description.Name.SimpleName
             DataObjectName(schemaName, localName)
                     
         | None ->
-            let localName = getElementName()
-            let schemaName = proxyref |> inferSchemaName
-            DataObjectName(schemaName, localName)
+            let schemaName = description |> inferSchemaName
+            DataObjectName(schemaName, description.Name.SimpleName)
 
     
     /// <summary>
     /// Infers a <see cref"ColumnDescription"/>  from a CLR element
     /// </summary>
     /// <param name="clrElement">The CLR element from which the column description will be inferred</param>
-    let describeColumn(proxyref : ClrPropertyReference) =
-        let storageType = proxyref.ElementReference |> inferStorageType
-        match proxyref.Referent |> ClrElement.tryGetAttributeT<ColumnAttribute> with
+    let describeColumn(description: ClrPropertyDescription) =
+        let gDescription = description |> PropertyDescription |> MemberDescription
+        let storageType = gDescription |> inferStorageType
+        match gDescription |> ClrElementDescription.tryGetAttributeT<ColumnAttribute> with
         | Some(attrib) ->
             {
                 ColumnDescription.Name = 
                     match attrib.Name with 
                     | Some(name) -> name
-                    | None -> proxyref.ReferentName.Text
-                Position = proxyref.ReferentPosition |> defaultArg attrib.Position 
+                    | None -> description.Name.Text
+                Position = description.Position |> defaultArg attrib.Position 
                 StorageType = storageType
-                Nullable = proxyref.Referent |> ClrElement.asDataMember |> ClrDataMemberElement.getType |> Option.isOptionType
+                Nullable = description.IsOptional 
                 AutoValue = None
             }
 
         | None ->
             {
-                ColumnDescription.Name = proxyref.ReferentName.Text
-                Position = proxyref.ReferentPosition
+                ColumnDescription.Name = description.Name.Text
+                Position = description.Position
                 StorageType = storageType
-                Nullable = proxyref.Referent |> ClrElement.asDataMember |> ClrDataMemberElement.getType |> Option.isOptionType
+                Nullable = description.IsOptional 
                 AutoValue = None
             }
 
-    let private describeColumnProxy(clrElement : ClrPropertyReference) =
-        let column = clrElement |> describeColumn
-        ColumnProxyDescription(clrElement, column)
+    let private describeColumnProxy(description : ClrPropertyDescription) =
+        let column = description |> describeColumn
+        ColumnProxyDescription(description, column)
 
     /// <summary>
     /// Infers a collection of <see cref="ClrColumnProxyDescription"/> instances from a CLR type element
     /// </summary>
     /// <param name="clrElement">The CLR element from which the column descriptions will be inferred</param>
-    let  private describeColumnProxies(proxyref : ClrTypeReference) =
+    let  private describeColumnProxies(description : ClrTypeDescription) =
         
         let rec getProperties(tref : ClrTypeReference) =
             match tref with
@@ -214,39 +215,39 @@ module DataProxyMetadata =
             | StructTypeReference(subject, members) ->
                 NotSupportedException() |> raise
 
-        let properties = proxyref |> getProperties
-        if properties.Length = 0 then
-            NotSupportedException(sprintf "No columns were able to be inferred from the type %O" proxyref) |> raise
-        properties |> List.map describeColumnProxy
+        if description.Properties.Length = 0 then
+            NotSupportedException(sprintf "No columns were able to be inferred from the type %O" description) |> raise
+        description.Properties |> List.map describeColumnProxy
 
     /// <summary>
     /// Infers a collection of <see cref="ColumnDescription"/> instances from a CLR type element
     /// </summary>
     /// <param name="clrElement">The CLR element from which the column descriptions will be inferred</param>
-    let describeColumns (proxyref : ClrTypeReference) =
+    let describeColumns (proxyref : ClrTypeDescription) =
         proxyref |> describeColumnProxies |> List.map(fun x -> x.DataElement) 
 
     /// <summary>
     /// Infers a non-return RoutineParameterDescription from a CLR element
     /// </summary>
     /// <param name="clrElement">The CLR element from which the parameter description will be inferred</param>
-    let describeRoutineParameter(proxyref  : ClrMethodParameterReference) =
+    let describeRoutineParameter(description  : ClrParameterDescription) =
+        
         let name, direction, position = 
-            match proxyref.Subject.Element |> ClrElement.tryGetAttributeT<RoutineParameterAttribute> with
+            match description |> ParameterDescription |> ClrElementDescription.tryGetAttributeT<RoutineParameterAttribute> with
             | Some(attrib) ->
-                let position =  match attrib.Position with |Some(p) -> p |None -> proxyref.ReferentPosition
+                let position =  match attrib.Position with |Some(p) -> p |None -> description.Position
                 match attrib.Name with
                 |Some(name) ->
                     name, attrib.Direction, position
                 | None ->
-                    proxyref.Subject.Name.Text, attrib.Direction, position                
+                    description.Name.Text, attrib.Direction, position                
             | None ->
-                (proxyref.Subject.Name.Text, ParameterDirection.Input, proxyref.ReferentPosition)
+                (description.Name.Text, ParameterDirection.Input, description.Position)
         {
             RoutineParameterDescription.Name = name
             Position = position
             Direction = direction
-            StorageType = proxyref |> MethodParameterReference |> inferStorageType 
+            StorageType = description |> ParameterDescription|> inferStorageType 
         }
     
     
@@ -254,14 +255,17 @@ module DataProxyMetadata =
     /// Infers a return RoutineParameterDescription from a CLR element
     /// </summary>
     /// <param name="clrElement">The CLR element from which the parameter description will be inferred</param>
-    let describeReturnParameter(proxyref : ClrMethodReference) =
-        let storageType = match proxyref.MethodInfo |> MethodInfo.getReturnAttribute<StorageTypeAttribute> with
+    let describeReturnParameter(description : ClrMethodDescription) =
+        let eDescription   = description |> MethodDescription |> MemberDescription 
+        let storageType = match eDescription |> ClrElementDescription.tryGetAttributeT<StorageTypeAttribute> with
                                 | Some(attrib) -> 
                                     attrib.StorageType
                                 | None -> 
-                                    proxyref.ReturnType |> Option.get |> inferStorageTypeFromClrType
-        match proxyref.MethodInfo|> MethodInfo.getReturnAttribute<RoutineParameterAttribute> with            
+                                    description.ReturnType  |> Option.get |> FindTypeByName |>   ClrMetadataProvider.findType |> TypeDescription |>   inferStorageType
+        
+        match description.ReturnAttributes |> List.tryFind(fun x -> x.AttributeName = typeinfo<RoutineParameterAttribute>.Name) with
         |Some(attrib) ->
+            let attrib = attrib.AttributeInstance |> Option.get :?> RoutineParameterAttribute
             let position =  match attrib.Position with |Some(p) -> p |None -> -1
             {
                 RoutineParameterDescription.Name = attrib.Name |> Option.get                   
@@ -284,30 +288,23 @@ module DataProxyMetadata =
     /// Constructs a <see cref="ParameterProxyDescription"/> based on the CLR element that will proxy it
     /// </summary>
     /// <param name="clrElement">The field correlated with the proxy</param>
-    let private describeParameterProxy (proxyref : MethodInputOutputReference) =
+    let private describeParameterProxy (m : ClrMethodDescription) (description : ClrParameterDescription) =
         let parameter, pos =
-            match proxyref with
-            | MethodInputReference(methparam) ->
-                (methparam |> describeRoutineParameter), methparam.ParameterInfo.ParamerInfo.Position
-            | MethodOutputReference(methreturn) ->
-                methreturn |> describeReturnParameter, -1
-        ParameterProxyDescription(proxyref, pos, parameter)
+            match description.IsReturn with
+            | true ->
+                m |> describeReturnParameter, -1
+            | false ->
+                (description |> describeRoutineParameter), description.Position
+        ParameterProxyDescription(description, pos, parameter)
 
                 
-    let describeProcedureProxy(proxyref : ClrElementReference) =
-        let objectName = proxyref |> inferDataObjectName
-        match proxyref with
-        | MemberReference(m) -> 
+    let describeProcedureProxy(description : ClrElementDescription) =
+        let objectName = description |> inferDataObjectName
+        match description with
+        | MemberDescription(m) -> 
             match m with
-            | MethodMemberReference(m) ->
-                let parameters = 
-                    [for p in m.Parameters do
-                        yield p |> MethodInputReference
-                 
-                     if m.ReturnType |> Option.isSome then
-                        yield m |> MethodOutputReference                     
-                    ]  |> List.map describeParameterProxy
-            
+            | MethodDescription(m) ->
+                let parameters = m.Parameters |> List.map(fun x -> x |> describeParameterProxy m)
                 let procedure = {
                     ProcedureDescription.Name = objectName
                     Parameters = parameters |> List.map(fun p -> p.DataElement)
@@ -321,31 +318,32 @@ module DataProxyMetadata =
     /// Infers a Table Proxy Description
     /// </summary>
     /// <param name="proxyType">The type of proxy</param>
-    let describeTablularProxy(proxyref : ClrTypeReference) =
-        let objectName = proxyref |> ClrElementReference.fromTypeRef |> inferDataObjectName
-        let columnProxies = proxyref |> describeColumnProxies
+    let describeTablularProxy(description : ClrTypeDescription) =
+        let objectName = description |> TypeDescription |> inferDataObjectName
+        let columnProxies = description |> describeColumnProxies
         let table = {
             TabularDescription.Name = objectName
-            Description = proxyref.ReferentType.Type|> getMemberDescription
+            Description = description.ReflectedElement.Value|> getMemberDescription
             Columns = columnProxies |> List.map(fun p -> p.DataElement)
         }
-        TablularProxyDescription(proxyref, table, columnProxies) 
+        TablularProxyDescription(description, table, columnProxies) 
     
-    let describeTableFunctionProxy(proxyref : ClrElementReference) =
-        let objectName = proxyref |> inferDataObjectName
+    let describeTableFunctionProxy(description : ClrElementDescription) =
+        let objectName = description |> inferDataObjectName
         let parameterProxies, columnProxies, clrMethod, returnType =
-            match proxyref with
-            | MemberReference(m) -> 
+            match description with
+            | MemberDescription(m) -> 
                 match m with
-                | MethodMemberReference(m) ->
-                    m.Parameters |> List.map MethodInputReference |> List.mapi (fun i x ->  x |> describeParameterProxy ), 
-                    (match m.ReturnType with
-                    | Some(t) ->
-                        t |> ClrTypeReference.reference |> describeColumnProxies 
-                    | None ->
-                        NotSupportedException() |> raise),
+                | MethodDescription(m) ->
+                    
+                    let itemType = m.ReflectedElement.Value.ReturnType.ItemValueType.ElementTypeName 
+                                    |> FindTypeByName
+                                    |> ClrMetadataProvider.findType
+                    let itemTypeProxies = itemType |> describeColumnProxies                                        
+                    m.InputParameters |> List.mapi (fun i x ->  x |> describeParameterProxy m ), 
+                    itemTypeProxies,
                     m,
-                    m.ReturnType |> Option.get |> ClrTypeReference.reference
+                    m.ReturnType |> Option.get |> FindTypeByName |> ClrMetadataProvider.findType
                 | _ ->
                     NotSupportedException() |> raise
             | _ ->
@@ -359,31 +357,27 @@ module DataProxyMetadata =
         let resultProxy = TabularResultProxyDescription(returnType, tableFunction, columnProxies)
         TableFunctionProxyDescription(callProxy, resultProxy) |> TableFunctionProxy
 
-    let describeRoutineProxy (proxyref : ClrElementReference) =
-        match proxyref with
-        | MemberReference(x) ->
+    let describeRoutineProxy (description: ClrElementDescription) =
+        match description with
+        | MemberDescription(x) ->
                 match x with
-                | MethodMemberReference(m) ->
-                    if m.Referent |> ClrElement.hasAttributeT<ProcedureAttribute> then
-                        proxyref |> describeProcedureProxy
-                    else if m.Referent |> ClrElement.hasAttributeT<TableFunctionAttribute> then
-                        proxyref |> describeTableFunctionProxy
+                | MethodDescription(m) ->
+                    if description |> ClrElementDescription.hasAttributeT<ProcedureAttribute> then
+                        description |> describeProcedureProxy
+                    else if description |> ClrElementDescription.hasAttributeT<TableFunctionAttribute> then
+                        description |> describeTableFunctionProxy
                     else NotSupportedException() |> raise                        
                 | _ -> NotSupportedException() |> raise
         | _ -> NotSupportedException() |> raise
 
-    let describeRoutineProxies(proxyref : ClrTypeReference ) =
-        match proxyref with
-        | InterfaceTypeReference(subject, members) ->
-            [for m in members do
-                match m with
-                | MethodMemberReference(m) ->
-                    if m.Referent |> ClrElement.hasAttributeT<ProcedureAttribute> then
-                        yield m |> MethodMemberReference |> MemberReference |> describeProcedureProxy
-                    else if m.Referent |>ClrElement.hasAttributeT<TableFunctionAttribute> then
-                        yield m |> MethodMemberReference |> MemberReference |> describeTableFunctionProxy
-                | _ ->
-                    NotSupportedException() |> raise
+    let describeRoutineProxies(description : ClrElementDescription ) =
+        match description with
+        | TypeDescription(x) ->
+            [for m in x.Methods do
+                if m.HasAttribute<ProcedureAttribute>() then
+                    yield m |> MethodDescription |> MemberDescription |> describeProcedureProxy
+                else if m.HasAttribute<TableFunctionAttribute>() then
+                    yield m |> MethodDescription |> MemberDescription |> describeTableFunctionProxy
             ]
 
                 
@@ -392,7 +386,16 @@ module DataProxyMetadata =
         
                     
         
-        
+module TypeProxy =
+    let inferDataObjectName (typedesc : ClrTypeDescription) =
+        typedesc |> TypeDescription |> DataProxyMetadata.inferDataObjectName
+
+    let inferSchemaName (typedesc : ClrTypeDescription) =
+        typedesc |> TypeDescription |> DataProxyMetadata.inferSchemaName
+
+module TableFunctionProxy =    
+    let describe (m : ClrMethodDescription) =
+        m |> MethodDescription |> MemberDescription  |> DataProxyMetadata.describeTableFunctionProxy |> DataObjectProxy.unwrapTableFunctionProxy
 
 /// <summary>
 /// Convenience methods/operators intended to minimize syntactic clutter
@@ -400,11 +403,11 @@ module DataProxyMetadata =
 [<AutoOpen>]
 module DataProxyOperators =    
     let tabularproxy<'T> =
-        typeref<'T> |> DataProxyMetadata.describeTablularProxy
+        typeinfo<'T> |> DataProxyMetadata.describeTablularProxy
 
 
     let routineproxies<'T> =
-        typeref<'T> |> DataProxyMetadata.describeRoutineProxies
+        typeinfo<'T> |> TypeDescription |> DataProxyMetadata.describeRoutineProxies
             
 
            

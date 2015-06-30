@@ -68,10 +68,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <EmbeddedResource Include="Resources\EmbeddedResource01.txt" />
-    <Compile Include="ClrModel\ClrMethodTest.fs" />
-    <Compile Include="ClrModel\ClrCollectionTest.fs" />
     <Compile Include="LangTest.fs" />
     <Compile Include="TypeTest.fs" />
+    <Compile Include="ClrCollectionTest.fs" />
     <Compile Include="ClrMetadataProviderTest.fs" />
     <Compile Include="TransformerTest.fs" />
     <Compile Include="TxtTest.fs" />

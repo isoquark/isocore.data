@@ -224,30 +224,35 @@ module Transformer =
         let delegateIndex = createDelegateIndex()
         let category = defaultArg config.Category DefaultTransformerCategory
         let identifiers = ResizeArray<TransformationIdentifier>()
-        let handler (e : ClrElement) =
-            if e.Kind = ClrElementKind.Method && e.IsStatic then
-                match e |> ClrElement.tryGetAttributeT<TransformationAttribute> with
-                | Some(a) -> 
-                    if a.Category = category then
-                        let m = e |> ClrElement.asMethodElement
-                        let parameters = m.MethodInfo |> ClrMetadataProvider.getParameters
-                        if parameters.Length <> 1 || m.MethodInfo.ReturnType = typeof<Void> then
-                            failwith (sprintf "Method %O incorrectly identified as a conversion function" m)
+        let handler (e : ClrElementDescription) =
+            match e with
+            | MemberDescription(m) ->
+                match m with 
+                | MethodDescription(m) ->
+                    if m.IsStatic then
+                        match e |> ClrElementDescription.tryGetAttributeT<TransformationAttribute> with
+                        | Some(a) -> 
+                            if a.Category = category then                                
+                                let parameters = m.Parameters |>List.filter(fun p -> p.IsReturn = false)
+                                if parameters.Length <> 1 || m.ReflectedElement.Value.ReturnType = typeof<Void> then
+                                    failwith (sprintf "Method %O incorrectly identified as a conversion function" m)
                    
-                        let parameter = parameters.Head.ParamerInfo
-                        let srcType = parameter.ParameterType
-                        let dstType = m.MethodInfo.ReturnType
+                                let parameter = parameters.Head.ReflectedElement |> Option.get
+                                let srcType = parameter.ParameterType
+                                let dstType = m.ReturnType |> Option.get |> FindTypeByName |> ClrMetadataProvider.findType |> fun x -> x.ReflectedElement.Value
                     
-                        let del = m.MethodInfo |> createDelegate
-                        let key = createKey srcType dstType
-                        putTransform key del delegateIndex
+                                let del = m.ReflectedElement.Value |> createDelegate
+                                let key = createKey srcType dstType
+                                putTransform key del delegateIndex
                     
-                        TransformationIdentifier(a.Category, srcType.ElementTypeName, dstType.ElementTypeName) |> identifiers.Add
-                                                               
+                                TransformationIdentifier(a.Category, srcType.ElementTypeName, dstType.ElementTypeName) |> identifiers.Add
+                        | None ->
+                            ()                                                               
                 | _ -> ()
+            | _ -> ()
         
-        config.SearchAssemblies |> List.map ClrMetadataProvider.getAssemblyElement 
-                                |> List.iter (fun x -> x |> ClrElement.walk handler)
+        config.SearchAssemblies |> List.map (fun x -> x |> AppDomain.CurrentDomain.AcquireAssembly |> ClrMetadataProvider.describeAssembly)
+                                |> List.iter (fun x -> x |> AssemblyDescription |> ClrElementDescription.walk handler)
         delegateIndex, identifiers |> List.ofSeq
 
                    

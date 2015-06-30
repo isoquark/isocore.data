@@ -69,7 +69,7 @@ module CsvReader =
                 headers |> Array.map(fun header -> 
                     let colproxy = header |> getColumnProxy
                     colproxy.DataElement.Name, fun (value : string) -> 
-                        value |> Transformer.convert colproxy.ProxyElement.PropertyType
+                        value |> Transformer.convert colproxy.ProxyElement.ReflectedElement.Value.PropertyType
                 ) |> Map.ofArray
             | None ->
                 NotSupportedException("CSV file requires headers") |> raise
@@ -82,13 +82,14 @@ module CsvReader =
             value |> Txt.trim |> converters.[colname]
         
         let createValueMap (row : CsvRow) =
-            colnames |> Array.map(fun colname -> colname |> getColumnProxy |> fun c -> c.ProxyElement.ReferentName.Text, c.ProxyElement.ReferentPosition, colname|> row.GetColumn |> convert colname) 
+            colnames |> Array.map(fun colname -> colname |> getColumnProxy |> fun c -> 
+                                    c.ProxyElement.Name.Text, c.ProxyElement.Position, colname|> row.GetColumn |> convert colname) 
                      |> ValueIndex.create
 
         file.Rows |> Seq.map createValueMap 
                   |> Seq.map (fun valueMap -> 
                     match proxy.ProxyElement with
-                    |TypeReference(e) -> e.ReferentType.Type |> RecordValue.fromValueIndex valueMap :?> 'T
+                    |TypeDescription(t) -> t.ReflectedElement.Value |> RecordValue.fromValueIndex valueMap :?> 'T
                     | _ ->
                         ArgumentException() |> raise)
                     

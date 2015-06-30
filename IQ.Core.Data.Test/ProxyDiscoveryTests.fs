@@ -58,16 +58,18 @@ module ``Proxy Discovery`` =
         tableActual |> Claim.equal tableExpect
         
         let recordActual = proxy.ProxyElement
-        let recordExpect = typeref<RecordA>
-        recordActual |> Claim.equal typeref<RecordA>
+        let recordExpect = typeinfo<RecordA>
+        recordActual |> Claim.equal typeinfo<RecordA>
+
+        let proxyColumnsExpect = recordExpect.Properties |> List.mapi(fun pos p -> ColumnProxyDescription(p, tableExpect.[pos]))
         
-        let proxyColumnsExpect = 
-            match recordExpect with
-            | RecordTypeReference(subject, fields) ->
-                [for i in 0..fields.Length-1 ->
-                    ColumnProxyDescription(fields.[i], tableExpect.[i])]
-            | _ ->
-                NotSupportedException() |> raise
+//        let proxyColumnsExpect = 
+//            match recordExpect with
+//            | RecordTypeReference(subject, fields) ->
+//                [for i in 0..fields.Length-1 ->
+//                    ColumnProxyDescription(fields.[i], tableExpect.[i])]
+//            | _ ->
+//                NotSupportedException() |> raise
         
         let proxyColumsActual = proxy.Columns
         proxyColumsActual |> Claim.equal proxyColumsActual
@@ -153,40 +155,28 @@ module ``Proxy Discovery`` =
 
     [<Test>]
     let ``Inferred schema name from table proxy``() =
-        typeref<RecordA> |> ClrElementReference.fromTypeRef |> DataProxyMetadata.inferSchemaName |> Claim.equal "MySchema"
+        typeinfo<ModuleB.RecordA> |> TypeDescription |> DataProxyMetadata.inferSchemaName |> Claim.equal "MySchema"
 
 
     [<Test>]
     let ``Inferred schema name from enclosing module``() =
-        ClrElementReference.fromType<RecordA> |>  DataProxyMetadata.inferSchemaName |> Claim.equal "MySchema"
-        ClrElementReference.fromType<ModuleA.RecordA> |> DataProxyMetadata.inferSchemaName |> Claim.equal "ModuleA"
-        ClrElementReference.fromType<ModuleB.RecordA> |> DataProxyMetadata.inferSchemaName |> Claim.equal "MySchema"
+        typeinfo<RecordA> |> TypeProxy.inferSchemaName |> Claim.equal "MySchema"
+        typeinfo<ModuleA.RecordA> |> TypeProxy.inferSchemaName |> Claim.equal "ModuleA"
+        typeinfo<ModuleB.RecordA> |> TypeProxy.inferSchemaName |> Claim.equal "MySchema"
 
     [<Test>]
     let ``Inferred data object names``() =
-        ClrElementReference.fromType<RecordA> |>  DataProxyMetadata.inferDataObjectName |> Claim.equal (DataObjectName("MySchema", "RecordA"))
-        ClrElementReference.fromType<ModuleA.RecordA> |> DataProxyMetadata.inferDataObjectName |> Claim.equal (DataObjectName("ModuleA", "RecordA"))
-        ClrElementReference.fromType<ModuleB.RecordA> |> DataProxyMetadata.inferDataObjectName |> Claim.equal (DataObjectName("MySchema", "RecordA"))
+        typeinfo<RecordA> |> TypeProxy.inferDataObjectName |> Claim.equal (DataObjectName("MySchema", "RecordA"))
+        typeinfo<ModuleA.RecordA> |> TypeProxy.inferDataObjectName |> Claim.equal (DataObjectName("ModuleA", "RecordA"))
+        typeinfo<ModuleB.RecordA> |> TypeProxy.inferDataObjectName |> Claim.equal (DataObjectName("MySchema", "RecordA"))
 
     [<Test>]
     let ``Described [SqlTest].[fTable04Before] table function from proxy``() =
         let dbElementName = thisMethod() |> ProxyTestCaseMethod.getDbObjectName
         dbElementName |> Claim.equal (DataObjectName("SqlTest", "fTable04Before"))
-        let methodref = match typeref<ISqlTestRoutines>  with
-                          | InterfaceTypeReference(subject, members) ->
-                            members |>  List.find(fun m -> m.ReferentName.Text = dbElementName.LocalName)
-                            |> fun x ->
-                                 match x with
-                                 |MethodMemberReference(y) -> y
-                                 |_ ->
-                                    failwith "Not a method"
-                          | _ ->
+        let m = typeinfo<ISqlTestRoutines> |> fun x -> x.Methods |> List.find(fun m -> m.Name = ClrMemberName(dbElementName.LocalName))
         
-                            NotSupportedException() |> raise
-        let proxy = methodref |> MethodMemberReference
-                              |> MemberReference
-                              |> DataProxyMetadata.describeTableFunctionProxy
-                              |> DataObjectProxy.unwrapTableFunctionProxy
+        let proxy = m |> TableFunctionProxy.describe
 
         proxy.CallProxy.DataElement.Name |> Claim.equal dbElementName
         proxy.CallProxy.Parameters.Length |> Claim.equal 1

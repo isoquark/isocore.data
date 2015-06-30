@@ -14,6 +14,15 @@ module Member =
         | :? ConstructorInfo -> ClrMemberKind.Constructor
         | _ -> nosupport()
 
+    /// <summary>
+    /// Retrieves an arbitrary number of attributes of the same type applied to a member
+    /// </summary>
+    /// <param name="subject">The type to examine</param>
+    let getAttributesT<'T when 'T :> Attribute>(subject : MemberInfo) =
+        [for a in Attribute.GetCustomAttributes(subject, typeof<'T>) -> a :?> 'T]
+
+
+
 /// <summary>
 /// Defines System.MethodInfo helpers
 /// </summary>
@@ -30,6 +39,13 @@ module MethodInfo =
             None
 
     /// <summary>
+    /// Retrieves attributes applied to a method reutrn
+    /// </summary>
+    /// <param name="subject">The method to examine</param>
+    let getReturnAttributes (subject : MethodInfo) =
+        subject.ReturnTypeCustomAttributes.GetCustomAttributes(true) |> Array.map(fun x -> x :?> Attribute) |> List.ofArray
+
+    /// <summary>
     /// Gets the methods access specificer
     /// </summary>
     /// <param name="m"></param>
@@ -43,7 +59,11 @@ module MethodInfo =
         else if m.IsAssembly then
             InternalAccess
         else if m.IsFamilyOrAssembly then
-            ProtectedInternalAccess
+            ProtectedOrInternalAccess
+        else if m.IsFamilyAndAssembly then
+            ProtectedAndInternalAccess
+        else if m.IsFamily then
+            ProtectedAccess
         else
             nosupport()
 
@@ -54,14 +74,20 @@ module FieldInfo =
     /// </summary>
     /// <param name="m"></param>
     let getAccess (m : FieldInfo) =
+        if m = null then
+            ArgumentException() |> raise
         if m.IsPublic then
             PublicAccess 
         else if m.IsPrivate then
-            PrivateAccess
+            PrivateAccess 
         else if m.IsAssembly then
             InternalAccess
         else if m.IsFamilyOrAssembly then
-            ProtectedInternalAccess
+            ProtectedOrInternalAccess
+        else if m.IsFamilyAndAssembly then
+            ProtectedAndInternalAccess
+        else if m.IsFamily then
+            ProtectedAccess
         else
             nosupport()
 
@@ -71,14 +97,20 @@ module ConstructorInfo =
     /// </summary>
     /// <param name="m"></param>
     let getAccess (m : ConstructorInfo) =
+        if m = null then
+            ArgumentException() |> raise
         if m.IsPublic then
             PublicAccess 
         else if m.IsPrivate then
-            PrivateAccess
+            PrivateAccess 
         else if m.IsAssembly then
             InternalAccess
         else if m.IsFamilyOrAssembly then
-            ProtectedInternalAccess
+            ProtectedOrInternalAccess
+        else if m.IsFamilyAndAssembly then
+            ProtectedAndInternalAccess
+        else if m.IsFamily then
+            ProtectedAccess
         else
             nosupport()
 

@@ -75,23 +75,17 @@ module internal Routine =
         table        
 
     let private getMethodParameterName(proxy : ParameterProxyDescription) =
-        match proxy with
-        | ParameterProxyDescription(proxy=x) ->
-            match x with
-            | MethodInputReference(m) ->
-                m.Subject.Name.Text
-            | MethodOutputReference(m) ->
-                "Return" 
+        if proxy.ProxyElement.IsReturn then "Return" else proxy.ProxyElement.Name.Text
 
     let private findMethodProxy (proxies : DataObjectProxy list) targetMethod =
         let describeProxy m  =
             proxies |> List.tryFind
                 (
                     fun p -> match p.ProxyElement with                                
-                                | MemberReference(x) -> 
+                                | MemberDescription(x) -> 
                                     match x with
-                                    | MethodMemberReference(x) ->
-                                        x.Subject.Element = m
+                                    | MethodDescription(x) ->
+                                        x.ReflectedElement.Value = m
                                     | _ -> ArgumentException() |> raise
                                 | _ -> ArgumentException() |> raise) 
 
@@ -139,7 +133,7 @@ module internal Routine =
     let private createInvoker<'TContract,'TConfig> =
         let proxies = routineproxies<'TContract> 
         let findProxy (mii : MethodInvocationInfo) = 
-            mii.Method.Element |>  findMethodProxy proxies
+            mii.Method |>  findMethodProxy proxies
                             
         let invoke(mii : MethodInvocationInfo) =
             let proxy = mii |> findProxy 
@@ -166,15 +160,15 @@ module internal Routine =
                     result |> DataTable.toProxyValues proxy.ResultProxy.ProxyElement :> obj |> Some
                 else
                     let result = proxy.DataElement|> executeTableFunction mii.ConnectionString routineArgs
-                    match proxy.ResultProxy.ProxyElement with
-                    | CollectionTypeReference(subject, itemTypeRef, collectionKind) ->            
+                    let typedesc = proxy.ResultProxy.ProxyElement
+                    match typedesc.CollectionKind with
+                    | Some(collectionKind) ->
+                        let itemType = (typedesc.Name |> ClrMetadataProvider.findNamedType).ItemValueType
                         let items = 
                             [for row in result ->
-                                itemTypeRef.ReferentType.Type |> RecordValue.fromValueArray row]
-                        items |> Collection.create collectionKind itemTypeRef.ReferentType.Type |> Some
-                    | _ -> NotSupportedException() |> raise
-                        
-                    
+                                itemType |> RecordValue.fromValueArray row]
+                        items |> Collection.create collectionKind itemType |> Some                    
+                    | _ -> NotSupportedException() |> raise                                            
             | _ -> nosupport()
             
                 

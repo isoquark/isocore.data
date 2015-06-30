@@ -309,14 +309,16 @@ module Lang =
         | PublicAccess
         /// Indicates that the target is visible only to subclasses
         /// Not supported in F#
-        | ProtectedAcces
+        | ProtectedAccess
         /// Indicates that the target is not visible outside its defining scope
         | PrivateAccess
         /// Indicates that the target is visible throughout the assembly in which it is defined
         | InternalAccess
         /// Indicates that the target is visible to subclasses and the defining assembly
         /// Not supported in F#
-        | ProtectedInternalAccess
+        | ProtectedOrInternalAccess
+        /// Indicates that the target is visible to subclasses in the defining assemlby
+        | ProtectedAndInternalAccess
         
     /// <summary>
     /// Represents a type name
@@ -324,6 +326,11 @@ module Lang =
     [<DebuggerDisplay("{Text, nq}")>]
     type ClrTypeName = ClrTypeName of simpleName : string * fullName : string option * assemblyQualifiedName : string option
     with
+        /// <summary>
+        /// Gets the simple name of the type
+        /// </summary>
+        member this.SimpleName = match this with ClrTypeName(simpleName=x) -> x
+
         member this.Text = 
             match this with 
                 ClrTypeName(simpleName, fullName, aqn) ->
@@ -342,6 +349,9 @@ module Lang =
     /// </summary>
     type ClrAssemblyName = ClrAssemblyName of simpleName : string * fullName : string option
     with
+        /// <summary>
+        /// Gets the simple name of the assembly
+        /// </summary>
         member this.SimpleName = match this with ClrAssemblyName(simpleName=x) -> x
         member this.FullName = match this with ClrAssemblyName(fullName=x) -> x
         member this.Text =
@@ -387,6 +397,13 @@ module Lang =
                 | MemberElementName(x) -> x.Text
                 | ParameterElementName(x) -> x.Text
         override this.ToString() = this.Text
+        member this.SimpleName =
+            match this with 
+                | AssemblyElementName(x) -> x.SimpleName
+                | TypeElementName(x) -> x.SimpleName
+                | MemberElementName(x) -> x.Text
+                | ParameterElementName(x) -> x.Text
+            
 
 
 
