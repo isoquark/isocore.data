@@ -6,7 +6,7 @@ open IQ.Core.TestFramework
 open IQ.Core.Framework
 
 [<TestContainer>]
-module ClrTypeValueTest =
+module RecordValueTest =
 
     type private RecordA = {
         FieldA1 : int

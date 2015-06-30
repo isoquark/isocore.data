@@ -89,7 +89,6 @@
     <Compile Include="ClrModel\ClrMemberReference.fs" />
     <Compile Include="ClrModel\ClrTypeReference.fs" />
     <Compile Include="ClrModel\ClrElementReference.fs" />
-    <Compile Include="ClrModel\ClrTypeValue.fs" />
     <Compile Include="ClrModel\FSharpVocabulary.fs" />
     <None Include="Data\Resources\DefaultClrStorageTypeMap.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

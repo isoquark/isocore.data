@@ -68,7 +68,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <EmbeddedResource Include="Resources\EmbeddedResource01.txt" />
-    <Compile Include="ClrModel\ClrTypeValueTest.fs" />
     <Compile Include="ClrModel\ClrMethodTest.fs" />
     <Compile Include="ClrModel\ClrCollectionTest.fs" />
     <Compile Include="LangTest.fs" />
@@ -78,6 +77,7 @@
     <Compile Include="TxtTest.fs" />
     <Compile Include="ConnectionStringTest.fs" />
     <Compile Include="ClrElementTest.fs" />
+    <Compile Include="RecordValueTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
