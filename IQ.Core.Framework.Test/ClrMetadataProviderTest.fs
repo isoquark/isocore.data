@@ -123,6 +123,7 @@ module ClrMetadataProviderTest =
 
     type private UnionA = UnionA of field01 : int * field02 : decimal * field03 : DateTime        
     
+    [<Test>]
     let ``Described union``() =
         let u = typeinfo<UnionA>
         u.ReflectedElement  |> Option.get|> Claim.equal typeof<UnionA>
@@ -140,3 +141,9 @@ module ClrMetadataProviderTest =
             field01Case.ReferentName.Text |> Claim.equal "field01"
         | _ ->
             Claim.assertFail()
+
+    [<Test>]
+    let ``Found types by name``() =
+        let results = typeof<UnionA>.ElementTypeName |> FindTypeByName |> ClrMetadataProvider.findTypes
+        results |> List.isEmpty |> Claim.isFalse
+        Claim.equal typeof<UnionA>.ElementTypeName results.Head.Name

@@ -132,6 +132,23 @@ module ClrElementVocabulary =
                     
             
     
+    type ClrUnionCaseDescription = {
+        /// The name of the type
+        Name : ClrMemberName
+
+        /// The position of the type
+        Position : int
+    
+    }
+
+    type ClrParameterDescription = {
+        /// The name of the type
+        Name : ClrParameterElementName
+
+        /// The position of the type
+        Position : int
+    
+    }
     
 
     /// <summary>
@@ -200,6 +217,12 @@ module ClrElementVocabulary =
         Types : ClrTypeDescription list
     }
 
+    type ClrElementDescription =
+        | MemberDescription of description : ClrMemberDescription
+        | TypeDescription of description : ClrTypeDescription
+        | AssemblyDescription of description : ClrAssemblyDescription
+        | ParameterDescription of description : ClrParameterDescription
+        | UnionCaseDescription of description : ClrUnionCaseDescription
        
     type IReflectionPrimitive =
         abstract Primitive:obj
@@ -314,6 +337,12 @@ module ClrElementVocabulary =
                 | UnionCaseElement (element=x) ->  x.ToString()
 
 
+    /// <summary>
+    /// Represents the intent to select a collection of types
+    /// </summary>
+    type ClrTypeQuery =
+        | FindTypeByName of name : ClrTypeName
+
 module ClrElementKind =
 
     /// <summary>
@@ -363,6 +392,34 @@ module ClrElementClassification =
                 ClrElementKind.Parameter
             | UnionCaseElement(_) ->
                 ClrElementKind.UnionCase
+
+        /// <summary>
+        /// Classifies the described element
+        /// </summary>
+        /// <param name="element">The element to classify</param>
+        let getKind2 description =
+            match description with
+            | MemberDescription(description=x) -> 
+                match x with
+                    | PropertyDescription(_) ->
+                       ClrElementKind.Property
+                    | FieldDescription(_) -> 
+                        ClrElementKind.StorageField
+                    | MethodDescription(_) ->
+                        ClrElementKind.Method
+                    | ConstructorDescription(_) ->
+                        ClrElementKind.Constructor
+                    | EventDescription(_) ->
+                        ClrElementKind.Event
+            | TypeDescription(description=x) -> 
+                ClrElementKind.Type
+            | AssemblyDescription(_) ->
+                ClrElementKind.Assembly
+            | ParameterDescription(_) ->
+                ClrElementKind.Parameter
+            | UnionCaseDescription(_) ->
+                ClrElementKind.UnionCase
+         
 
 
         /// <summary>

@@ -47,6 +47,8 @@ module ClrElement =
         | UnionCaseElement(element=x) ->
             x.UnionCaseInfo.DeclaringType |> ClrMetadataProvider.getType |> Some
 
+    //let getDeclaringType2 (element : ClrElementDescription)
+
 
     /// <summary>
     /// Gets the assembly in which the element is defined

@@ -108,6 +108,9 @@ module ClrMetadataProvider =
     
     let private assemblyDescriptions = ConcurrentDictionary<Assembly, ClrAssemblyDescription>()        
     
+    let private getTypeDescriptions() = 
+        [for a in assemblyDescriptions.Values do yield! a.Types]
+
 
    
     let describeAssembly (a : Assembly) =        
@@ -207,12 +210,13 @@ module ClrMetadataProvider =
             | PropertyDescription(d) -> d.ReflectedElement = (Some(p))
             | _ -> false)
         
-        
-
-                  
-
-           
-
+    let findTypes(q : ClrTypeQuery) =
+        match q with
+        | FindTypeByName(name) ->
+            match getTypeDescriptions() |> List.tryFind(fun x -> x.Name = name) with
+            | Some(x) -> [x]
+            | None -> []
+                                       
     
 [<AutoOpen>]
 module ClrDescriptionExtensions =
