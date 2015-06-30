@@ -56,7 +56,7 @@ module TestContext =
     let private BaseDirectory = @"C:\Temp\IQ\Tests\"
 
     let inline getTempDir() =
-        let dir = Path.Combine(BaseDirectory, thisAssembly().ShortName)
+        let dir = Path.Combine(BaseDirectory, thisAssembly().SimpleName)
         if dir |> Directory.Exists |> not then
             dir |> Directory.CreateDirectory |> ignore
         dir

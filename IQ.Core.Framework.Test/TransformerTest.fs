@@ -44,11 +44,13 @@ module TransformerTest =
         Some(3L) |> Transformer.convert (typeof<int>) |> Claim.equal (3 :> obj)
         option<int>.None |> Transformer.convert typeof<int> |> Claim.isNull
 
-    let transformer = DataConverterConfig([thisAssemblyElement().Name],None) |> Transformer.get
+    
+    
+    let transformer = DataConverterConfig([thisAssembly().AssemblyName],None) |> Transformer.get
 
     [<Test>]
     let ``Discovered transformations``() =
-        let transformer = DataConverterConfig([thisAssemblyElement().Name],None) |> Transformer.get
+        let transformer = DataConverterConfig([thisAssembly().AssemblyName],None) |> Transformer.get
         let transformations  = transformer.GetKnownTransformations()
         
         let c1Info = funcinfo<@fun () -> TestTransformations.stringToDate@>

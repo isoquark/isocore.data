@@ -279,7 +279,7 @@ module DataProxyMetadata =
                 match m with
                 | MethodDescription(m) ->
                     
-                    let itemType = m.ReflectedElement.Value.ReturnType.ItemValueType.ElementTypeName 
+                    let itemType = m.ReflectedElement.Value.ReturnType.ItemValueType.TypeName 
                                     |> FindTypeByName
                                     |> ClrMetadataProvider.findType
                     let itemTypeProxies = itemType |> describeColumnProxies                                        

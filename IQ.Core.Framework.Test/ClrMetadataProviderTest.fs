@@ -83,9 +83,9 @@ module ClrMetadataProviderTest =
         m.Parameters.[1].CanOmit |> Claim.isFalse
         m.Parameters.[1].Name.Text |> Claim.equal "p2"
         m.Parameters.[1].ParameterType.SimpleName |> Claim.equal typeof<int>.Name
-        m.ReturnType |> Option.get |> Claim.equal typeof<int64>.ElementTypeName
+        m.ReturnType |> Option.get |> Claim.equal typeof<int64>.TypeName
         m.ReturnAttributes.Length |> Claim.equal 1
-        m.ReturnAttributes.Head.AttributeName |> Claim.equal typeof<MyAttribute>.ElementTypeName
+        m.ReturnAttributes.Head.AttributeName |> Claim.equal typeof<MyAttribute>.TypeName
 
     [<Test>]
     let ``Described tupled methods``() =
@@ -109,11 +109,11 @@ module ClrMetadataProviderTest =
         m.Parameters.Length |> Claim.equal 3
         m.Parameters.[0].CanOmit |> Claim.isFalse
         m.Parameters.[0].Name.Text |> Claim.equal "p1"
-        m.Parameters.[0].ParameterType |> Claim.equal typeof<string>.ElementTypeName
+        m.Parameters.[0].ParameterType |> Claim.equal typeof<string>.TypeName
         m.Parameters.[1].CanOmit |> Claim.isFalse
         m.Parameters.[1].Name.Text |> Claim.equal "p2"        
-        m.Parameters.[1].ParameterType |> Claim.equal typeof<option<int>>.ElementTypeName
-        m.ReturnType |> Option.get |> Claim.equal typeof<DateTime>.ElementTypeName
+        m.Parameters.[1].ParameterType |> Claim.equal typeof<option<int>>.TypeName
+        m.ReturnType |> Option.get |> Claim.equal typeof<DateTime>.TypeName
 
     [<Test>]
     let ``Described interfaces``() =
@@ -140,7 +140,7 @@ module ClrMetadataProviderTest =
         m.Name |> Claim.equal mName
         m.Parameters.Length |> Claim.equal 3
         m.Parameters.[1].CanOmit |> Claim.isTrue
-        m.ReturnType|> Option.get |> Claim.equal typeof<int64>.ElementTypeName
+        m.ReturnType|> Option.get |> Claim.equal typeof<int64>.TypeName
 
 
     [<Test>]
@@ -152,8 +152,8 @@ module ClrMetadataProviderTest =
             {
                 Name = p1Name
                 Position = 0
-                DeclaringType = typeof<ClassA>.ElementTypeName
-                ValueType = typeof<DateTime>.ElementTypeName
+                DeclaringType = typeof<ClassA>.TypeName
+                ValueType = typeof<DateTime>.TypeName
                 IsOptional = false
                 CanWrite = false
                 WriteAccess = None
@@ -172,8 +172,8 @@ module ClrMetadataProviderTest =
         let p2Expect = {
             Name = p2Info.Name |> ClrMemberName
             Position = 1
-            DeclaringType = typeof<ClassA>.ElementTypeName
-            ValueType = typeof<int>.ElementTypeName
+            DeclaringType = typeof<ClassA>.TypeName
+            ValueType = typeof<int>.TypeName
             IsOptional = false
             CanWrite = true
             WriteAccess = PublicAccess |> Some
@@ -192,8 +192,8 @@ module ClrMetadataProviderTest =
             {
                 Name = p3Name
                 Position = 2
-                DeclaringType = typeof<ClassA>.ElementTypeName
-                ValueType = typeof<option<int64>>.ElementTypeName
+                DeclaringType = typeof<ClassA>.TypeName
+                ValueType = typeof<option<int64>>.TypeName
                 IsOptional = true
                 CanWrite = false
                 WriteAccess = None
@@ -208,8 +208,8 @@ module ClrMetadataProviderTest =
         let p3Actual = match infomap.[p3Name]  with | PropertyDescription(x) -> x | _ -> nosupport()
         p3Actual.Name |> Claim.equal p3Name
         p3Actual.Position |> Claim.equal 2
-        p3Actual.DeclaringType |> Claim.equal typeof<ClassA>.ElementTypeName
-        p3Actual.ValueType |> Claim.equal typeof<option<int64>>.ElementTypeName
+        p3Actual.DeclaringType |> Claim.equal typeof<ClassA>.TypeName
+        p3Actual.ValueType |> Claim.equal typeof<option<int64>>.TypeName
         p3Actual.IsOptional |> Claim.isTrue
         p3Actual.CanWrite |> Claim.isFalse
         p3Actual.CanRead |> Claim.isTrue
@@ -245,9 +245,9 @@ module ClrMetadataProviderTest =
 
     [<Test>]
     let ``Found types by name``() =
-        let results = typeof<UnionA>.ElementTypeName |> FindTypeByName |> ClrMetadataProvider.findTypes
+        let results = typeof<UnionA>.TypeName |> FindTypeByName |> ClrMetadataProvider.findTypes
         results |> List.isEmpty |> Claim.isFalse
-        Claim.equal typeof<UnionA>.ElementTypeName results.Head.Name
+        Claim.equal typeof<UnionA>.TypeName results.Head.Name
 
     module ModuleB =
         [<Description("This is RecordA")>]
@@ -261,7 +261,7 @@ module ClrMetadataProviderTest =
     let ``Discovered attributes on type``() =
         let t = typeinfo<ModuleB.RecordA>
         let desc = t.Attributes 
-                |> List.find(fun a -> a.AttributeName = typeof<DescriptionAttribute>.ElementTypeName)
+                |> List.find(fun a -> a.AttributeName = typeof<DescriptionAttribute>.TypeName)
         desc.AppliedValues.["Description"] :?> string |> Claim.equal "This is RecordA"
 
     

@@ -110,7 +110,7 @@ module TransformerVocabulary =
 
  module TransformationIdentifier =
     let create<'TSrc,'TDst>(category) =
-        TransformationIdentifier(category, clrtype<'TSrc>.ElementTypeName, clrtype<'TDst>.ElementTypeName)
+        TransformationIdentifier(category, typeof<'TSrc>.TypeName, typeof<'TDst>.TypeName)
 
     let createDefault<'TSrc,'TDst>() =
         create<'TSrc,'TDst>(DefaultTransformerCategory)
@@ -245,7 +245,7 @@ module Transformer =
                                 let key = createKey srcType dstType
                                 putTransform key del delegateIndex
                     
-                                TransformationIdentifier(a.Category, srcType.ElementTypeName, dstType.ElementTypeName) |> identifiers.Add
+                                TransformationIdentifier(a.Category, srcType.TypeName, dstType.TypeName) |> identifiers.Add
                         | None ->
                             ()                                                               
                 | _ -> ()

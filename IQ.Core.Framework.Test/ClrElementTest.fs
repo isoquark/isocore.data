@@ -83,21 +83,3 @@ module ClrAssemblyTest =
             e |> elements.Add
         typeinfo<RecordA> |> TypeDescription |> ClrElementDescription.walk handler
 
-    [<Test>]
-    let ``Discovered attributed functions``() =
-        let functions = ResizeArray<ClrElement>()
-        
-        //let handler (e : ClrElementDescription) =
-          
-
-//        let handler (e : ClrElement) =
-//            match e |> ClrElement.tryGetAttributeT<AttributeAAttribute> with
-//            | Some(x) ->
-//                e |> functions.Add
-//            | None -> ()
-//        
-//        thisAssemblyElement().Element |> ClrElement.walk handler
-        ()
-              
-
-
