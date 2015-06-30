@@ -38,26 +38,14 @@ module DataProxyMetadata =
             (Attribute.GetCustomAttribute(m, typeof<DescriptionAttribute>) :?> DescriptionAttribute).Description |> Some
         else
             None        
-
-    let private inferStorageTypeFromClrType (t : Type) =
-        if defaultClrStorageTypeMap.ContainsKey(t.ItemValueType) then
-            defaultClrStorageTypeMap.[t.ItemValueType]
-        else
-            TypedDocumentStorage(t)
-
-    let private inferStorageTypeFromClrElement(proxyref : ClrElementReference) =
-        let valueType =
-            match proxyref with
-            | MemberReference(x) ->
-                match x with
-                | DataMemberReference(x) -> x.MemberType
-                | _ -> NotSupportedException() |> raise                
-            | MethodParameterReference(x) -> 
-                x.ParameterType
-            | _ -> NotSupportedException() |> raise
-        valueType |> inferStorageTypeFromClrType
         
     let inferStorageType(description : ClrElementDescription) =
+        let fromClrType (t : Type) =
+            if defaultClrStorageTypeMap.ContainsKey(t.ItemValueType) then
+                defaultClrStorageTypeMap.[t.ItemValueType]
+            else
+                TypedDocumentStorage(t)
+
         match description |> ClrElementDescription.tryGetAttributeT<StorageTypeAttribute>  with
         | Some(attrib) -> 
             attrib.StorageType
@@ -65,13 +53,13 @@ module DataProxyMetadata =
             match description with
             | MemberDescription(d) ->
                 match d with
-                | PropertyDescription(x) -> x.ReflectedElement.Value.PropertyType |> inferStorageTypeFromClrType
-                | FieldDescription(x) -> x.ReflectedElement.Value.FieldType |> inferStorageTypeFromClrType
+                | PropertyDescription(x) -> x.ReflectedElement.Value.PropertyType |> fromClrType
+                | FieldDescription(x) -> x.ReflectedElement.Value.FieldType |> fromClrType
                 | _ -> nosupport()
             | ParameterDescription(d) ->
-                d.ReflectedElement.Value.ParameterType |> inferStorageTypeFromClrType
+                d.ReflectedElement.Value.ParameterType |> fromClrType
             | TypeDescription(t) ->
-                t.ReflectedElement.Value |> inferStorageTypeFromClrType
+                t.ReflectedElement.Value |> fromClrType
             | _ -> nosupport()
 
         
@@ -176,55 +164,10 @@ module DataProxyMetadata =
     /// </summary>
     /// <param name="clrElement">The CLR element from which the column descriptions will be inferred</param>
     let  private describeColumnProxies(description : ClrTypeDescription) =
-        
-        let rec getProperties(tref : ClrTypeReference) =
-            match tref with
-            | RecordTypeReference(subject,fields) ->
-                fields
-            | InterfaceTypeReference(subject, members) ->
-                members |> List.map(fun m -> 
-                    match m with
-                    | DataMemberReference(m) -> 
-                        match m with
-                        | PropertyMemberReference(p) -> p   
-                        | _ -> nosupport()                     
-                    | _ -> nosupport()
-                )
-            | ClassTypeReference(subject, members) ->
-                members |> List.map(fun m -> 
-                    match m with
-                    | DataMemberReference(m) -> 
-                        match m with
-                        | PropertyMemberReference(p) -> p   
-                        | _ -> nosupport()                     
-                    | _ -> nosupport()
-                )
-            | UnionTypeReference(subject, cases) ->
-                if cases.Length = 1 then
-                    //Assume that the columns are defined by the case fields
-                    cases.[0].Fields
-                else
-                    //Assume that the columns are defined by the case labels
-                    [for case in cases ->
-                        if case.Fields.Length <> 1 then
-                            NotSupportedException() |> raise
-                        case.Fields.[0]
-                    ]
-            | CollectionTypeReference(subject,itemType,collectionKind) ->
-                itemType |> getProperties
-            | StructTypeReference(subject, members) ->
-                NotSupportedException() |> raise
-
         if description.Properties.Length = 0 then
             NotSupportedException(sprintf "No columns were able to be inferred from the type %O" description) |> raise
         description.Properties |> List.map describeColumnProxy
 
-    /// <summary>
-    /// Infers a collection of <see cref="ColumnDescription"/> instances from a CLR type element
-    /// </summary>
-    /// <param name="clrElement">The CLR element from which the column descriptions will be inferred</param>
-    let describeColumns (proxyref : ClrTypeDescription) =
-        proxyref |> describeColumnProxies |> List.map(fun x -> x.DataElement) 
 
     /// <summary>
     /// Infers a non-return RoutineParameterDescription from a CLR element

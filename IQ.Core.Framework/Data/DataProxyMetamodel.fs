@@ -13,12 +13,12 @@ open IQ.Core.Framework
 [<AutoOpen>]
 module DataProxyMetamodel = 
 
-    /// <summary>
-    /// References a method parameter or return
-    /// </summary>
-    type MethodInputOutputReference =
-    | MethodInputReference of ClrMethodParameterReference
-    | MethodOutputReference of ClrMethodReference
+//    /// <summary>
+//    /// References a method parameter or return
+//    /// </summary>
+//    type MethodInputOutputReference =
+//    | MethodInputReference of ClrMethodParameterReference
+//    | MethodOutputReference of ClrMethodReference
     
     /// <summary>
     /// Describes a column proxy

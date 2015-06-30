@@ -57,6 +57,7 @@ module internal DataTypeConverter =
         | CustomTableStorage(name) -> typeof<obj>
         | CustomObjectStorage(name,t) -> typeof<obj>
         | CustomPrimitiveStorage(name) -> typeof<obj>
+        | TypedDocumentStorage(t) -> typeof<obj>
 
     [<TransformationAttribute>]
     let private timespanToTicks (ts : TimeSpan) =
