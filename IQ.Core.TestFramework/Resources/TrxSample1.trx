@@ -1,0 +1,309 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestRun id="28941ca6-45e8-4036-ad65-34d4ab83f27c" name="Administrator@EXABOX 2015-06-29 09:49:13" runUser="EXABOX\Administrator" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2015-06-29T09:49:13.0302754-05:00" queuing="2015-06-29T09:49:13.0302754-05:00" start="2015-06-29T09:49:13.0362757-05:00" finish="2015-06-29T09:49:16.7324871-05:00" />
+  <TestSettings name="default" id="83039a1e-fb4f-4278-a889-e46f50949440">
+    <Execution>
+      <TestTypeSpecific />
+    </Execution>
+    <Deployment runDeploymentRoot="Administrator_EXABOX 2015-06-29 09_49_13" />
+    <Properties />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="8e25e442-f800-493b-80db-96cf02bc5c7b" testId="b914f5b1-928d-41fc-a764-3a630578cbc3" testName="Discovered attributed functions" computerName="EXABOX" duration="00:00:00.0610000" startTime="2015-06-29T09:49:13.0942790-05:00" endTime="2015-06-29T09:49:13.0922789-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8e25e442-f800-493b-80db-96cf02bc5c7b" />
+    <UnitTestResult executionId="3bcf328e-f022-407e-aa6a-ee1a8029414d" testId="ea689486-8868-4c98-ae63-b7139f602260" testName="Discovered type child elements" computerName="EXABOX" duration="00:00:00.0140000" startTime="2015-06-29T09:49:13.1042796-05:00" endTime="2015-06-29T09:49:13.1042796-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3bcf328e-f022-407e-aa6a-ee1a8029414d" />
+    <UnitTestResult executionId="a7f3af7e-8279-4682-b51c-f1b365caadd1" testId="f993cd09-7903-4834-a7b3-71a7335388d4" testName="Extracted embedded text resource from assembly" computerName="EXABOX" duration="00:00:00.0060000" startTime="2015-06-29T09:49:13.1052797-05:00" endTime="2015-06-29T09:49:13.1052797-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a7f3af7e-8279-4682-b51c-f1b365caadd1" />
+    <UnitTestResult executionId="f51b4d94-6eb7-48bf-8f40-3392c2d140b9" testId="b1c8a443-e337-48a6-8a40-e8362ae590be" testName="Traversed CLR element hierarchy" computerName="EXABOX" duration="00:00:00.1110000" startTime="2015-06-29T09:49:13.1052797-05:00" endTime="2015-06-29T09:49:13.1052797-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f51b4d94-6eb7-48bf-8f40-3392c2d140b9" />
+    <UnitTestResult executionId="60ee5297-e890-4eae-b278-0daf8dd5947b" testId="e68af9a7-8bb3-42e9-ab7d-6fa93ca27a86" testName="Created array via reflection" computerName="EXABOX" duration="00:00:00.0130000" startTime="2015-06-29T09:49:13.1052797-05:00" endTime="2015-06-29T09:49:13.1052797-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="60ee5297-e890-4eae-b278-0daf8dd5947b" />
+    <UnitTestResult executionId="5da4a18f-ad93-4af1-8dee-9edd58697e98" testId="5a36bbbe-43c2-44d8-96b5-7e17ca8c9188" testName="Created F# list via reflection" computerName="EXABOX" duration="00:00:00.0090000" startTime="2015-06-29T09:49:14.4883588-05:00" endTime="2015-06-29T09:49:14.4883588-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5da4a18f-ad93-4af1-8dee-9edd58697e98" />
+    <UnitTestResult executionId="2b54ed4a-11d6-4c87-b4f5-04242f8f0e20" testId="63cb841a-966c-4941-b5d1-71e760e5da17" testName="Created generic list via reflection" computerName="EXABOX" duration="00:00:00.0020000" startTime="2015-06-29T09:49:14.4893588-05:00" endTime="2015-06-29T09:49:14.4893588-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2b54ed4a-11d6-4c87-b4f5-04242f8f0e20" />
+    <UnitTestResult executionId="050967a8-ef8f-4655-8f33-dce0cc49ad61" testId="70f1b672-fb34-4853-9b26-4b1041ccc583" testName="Determined collection kind" computerName="EXABOX" duration="00:00:00.0030000" startTime="2015-06-29T09:49:14.4893588-05:00" endTime="2015-06-29T09:49:14.4893588-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="050967a8-ef8f-4655-8f33-dce0cc49ad61" />
+    <UnitTestResult executionId="72987e19-ffe8-4389-bccd-55faa75d674d" testId="34edd86a-e2d7-47af-a2de-be9937c57650" testName="Determined whether type is a collection type" computerName="EXABOX" duration="00:00:00.0030000" startTime="2015-06-29T09:49:14.4893588-05:00" endTime="2015-06-29T09:49:14.4893588-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="72987e19-ffe8-4389-bccd-55faa75d674d" />
+    <UnitTestResult executionId="a1dc82c2-37dd-4a9a-96e4-7221eff99ba1" testId="870b101f-dc9b-43d8-8906-4e5804df083a" testName="Referenced collection type" computerName="EXABOX" duration="00:00:01.6120000" startTime="2015-06-29T09:49:14.6773696-05:00" endTime="2015-06-29T09:49:14.6773696-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a1dc82c2-37dd-4a9a-96e4-7221eff99ba1" />
+    <UnitTestResult executionId="e1260023-4f52-4c93-90bc-72833c1f9ba4" testId="e0489ee4-6b43-4356-a2ac-bb74756996d3" testName="Retreived CLR type name from type" computerName="EXABOX" duration="00:00:00.0020000" startTime="2015-06-29T09:49:14.6773696-05:00" endTime="2015-06-29T09:49:14.6773696-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e1260023-4f52-4c93-90bc-72833c1f9ba4" />
+    <UnitTestResult executionId="0df88e34-be3b-4b2d-8429-fdca7ac6d3e7" testId="4b22b6d8-0bbd-400a-8c4c-a2af7398671e" testName="Described interface with both property and method declarations" computerName="EXABOX" duration="00:00:00.0090000" startTime="2015-06-29T09:49:14.6783696-05:00" endTime="2015-06-29T09:49:14.6783696-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0df88e34-be3b-4b2d-8429-fdca7ac6d3e7" />
+    <UnitTestResult executionId="6ff3c546-7c6d-4961-a5e4-1f1a34bea23b" testId="1f607687-ef48-4508-9e06-91a72ad32071" testName="Described methods with optional parameters" computerName="EXABOX" duration="00:00:00.0110000" startTime="2015-06-29T09:49:14.6783696-05:00" endTime="2015-06-29T09:49:14.6783696-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6ff3c546-7c6d-4961-a5e4-1f1a34bea23b" />
+    <UnitTestResult executionId="3a0c038e-47e6-41a6-865e-1302cfaa57c1" testId="49a4b5d2-f8dc-4755-99a7-6d53f61638a0" testName="Described non-tupled method - variation 1" computerName="EXABOX" duration="00:00:00.0050000" startTime="2015-06-29T09:49:14.6783696-05:00" endTime="2015-06-29T09:49:14.6783696-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3a0c038e-47e6-41a6-865e-1302cfaa57c1" />
+    <UnitTestResult executionId="3387b844-99bd-4337-8857-6fa4fadffbec" testId="0332341c-8882-471d-a664-3037bb60c6f3" testName="Described non-tupled method - variation 2" computerName="EXABOX" duration="00:00:00.0010000" startTime="2015-06-29T09:49:14.6783696-05:00" endTime="2015-06-29T09:49:14.6783696-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="3387b844-99bd-4337-8857-6fa4fadffbec" />
+    <UnitTestResult executionId="6fe42d3b-a81f-4d3d-9eaa-aa6a2dbdafaf" testId="d56c18dd-a019-45b1-adb5-689dfe9d6b21" testName="Described tupled methods" computerName="EXABOX" duration="00:00:00.0000001" startTime="2015-06-29T09:49:14.6783696-05:00" endTime="2015-06-29T09:49:14.6783696-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6fe42d3b-a81f-4d3d-9eaa-aa6a2dbdafaf" />
+    <UnitTestResult executionId="80051c99-1549-480f-9ba6-d9c2d67d0a98" testId="561b386d-a6dd-47e7-aea8-54b2be92048d" testName="Created property descriptions from record" computerName="EXABOX" duration="00:00:00.0060000" startTime="2015-06-29T09:49:14.6793697-05:00" endTime="2015-06-29T09:49:14.6793697-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="80051c99-1549-480f-9ba6-d9c2d67d0a98" />
+    <UnitTestResult executionId="d1fd2c72-e825-472c-9090-2de27ad43c2b" testId="2858e35b-1a7d-4d56-9002-bdf16f6674a1" testName="Created class reference" computerName="EXABOX" duration="00:00:00.0050000" startTime="2015-06-29T09:49:14.6793697-05:00" endTime="2015-06-29T09:49:14.6793697-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d1fd2c72-e825-472c-9090-2de27ad43c2b" />
+    <UnitTestResult executionId="13e87c03-74d5-4833-b4a0-cdb6c1fff896" testId="94b5322e-772b-44cf-a038-0264b8c26c31" testName="Created record reference - No optional fields" computerName="EXABOX" duration="00:00:00.0040000" startTime="2015-06-29T09:49:14.6793697-05:00" endTime="2015-06-29T09:49:14.6793697-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="13e87c03-74d5-4833-b4a0-cdb6c1fff896" />
+    <UnitTestResult executionId="cd138c40-057d-4c26-9d9e-52081655faca" testId="4b63062b-2403-4718-997f-e1fe2664c0ce" testName="Created record reference - Optional fields" computerName="EXABOX" duration="00:00:00.0010000" startTime="2015-06-29T09:49:14.7313727-05:00" endTime="2015-06-29T09:49:14.7313727-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cd138c40-057d-4c26-9d9e-52081655faca" />
+    <UnitTestResult executionId="0819b892-5f83-4ee0-bfe9-7b5da1c6bab4" testId="dafa658a-f766-46d4-af81-1be20c7eee53" testName="Created union reference - single-case" computerName="EXABOX" duration="00:00:00.0150000" startTime="2015-06-29T09:49:14.7313727-05:00" endTime="2015-06-29T09:49:14.7313727-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0819b892-5f83-4ee0-bfe9-7b5da1c6bab4" />
+    <UnitTestResult executionId="b0af2610-d624-43af-b355-88fe159c78e8" testId="783f79ba-fdc9-4f8e-a333-bf7fe554f2ea" testName="Determined the item value type of a type" computerName="EXABOX" duration="00:00:00.0010000" startTime="2015-06-29T09:49:14.7313727-05:00" endTime="2015-06-29T09:49:14.7313727-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b0af2610-d624-43af-b355-88fe159c78e8" />
+    <UnitTestResult executionId="5c6083d8-f86b-4e0f-aa11-b828254c04cb" testId="3c3fde78-848f-4295-a842-50aafaa0f2eb" testName="Create value map from record - Optional fields" computerName="EXABOX" duration="00:00:00.0130000" startTime="2015-06-29T09:49:14.7313727-05:00" endTime="2015-06-29T09:49:14.7313727-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5c6083d8-f86b-4e0f-aa11-b828254c04cb" />
+    <UnitTestResult executionId="b42df574-ba98-4422-a278-33c236f7f732" testId="ce7b2fe7-33e0-459c-b1b5-db87a2ceb865" testName="Created record from value map - No optional fields" computerName="EXABOX" duration="00:00:00.0050000" startTime="2015-06-29T09:49:14.7323727-05:00" endTime="2015-06-29T09:49:14.7323727-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b42df574-ba98-4422-a278-33c236f7f732" />
+    <UnitTestResult executionId="46d2a518-0e11-4330-ab75-f89c56897c42" testId="0eb30eaa-ddd7-4c6e-90f9-6b0725d0b4de" testName="Created record from value map - Optional fields" computerName="EXABOX" duration="00:00:00.0010000" startTime="2015-06-29T09:49:14.7323727-05:00" endTime="2015-06-29T09:49:14.7323727-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="46d2a518-0e11-4330-ab75-f89c56897c42" />
+    <UnitTestResult executionId="1d4fd22f-788e-40be-a9b4-42067afd2c1d" testId="46df1175-72d0-4371-a47a-558851cf1776" testName="Created record value from array - No optional fields" computerName="EXABOX" duration="00:00:00.0010000" startTime="2015-06-29T09:49:14.7323727-05:00" endTime="2015-06-29T09:49:14.7323727-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="1d4fd22f-788e-40be-a9b4-42067afd2c1d" />
+    <UnitTestResult executionId="82884423-6d69-4aa4-9e1c-c1661c8de32e" testId="a25752a3-1184-4216-b740-c885e8483374" testName="Created value array from record - No optional fields" computerName="EXABOX" duration="00:00:00.0040000" startTime="2015-06-29T09:49:14.7323727-05:00" endTime="2015-06-29T09:49:14.7323727-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="82884423-6d69-4aa4-9e1c-c1661c8de32e" />
+    <UnitTestResult executionId="94f8db43-7474-4421-800d-500e0054829b" testId="98de8c25-816d-416c-a5e6-90357672ec9c" testName="Formatted connection string" computerName="EXABOX" duration="00:00:00.0010000" startTime="2015-06-29T09:49:14.7323727-05:00" endTime="2015-06-29T09:49:14.7323727-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="94f8db43-7474-4421-800d-500e0054829b" />
+    <UnitTestResult executionId="9be09fd8-107c-4fba-8688-b957d620104e" testId="0910290a-48c1-4c8a-a30f-6cdfb71ef66e" testName="Parsed connection string" computerName="EXABOX" duration="00:00:00.0010000" startTime="2015-06-29T09:49:14.7333728-05:00" endTime="2015-06-29T09:49:14.7333728-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9be09fd8-107c-4fba-8688-b957d620104e" />
+    <UnitTestResult executionId="6cdfce41-8f9e-4c07-a926-24c2cc67d874" testId="54dc0770-57be-40cd-84d3-757b6fd055c1" testName="Created union values via reflection" computerName="EXABOX" duration="00:00:00.0040000" startTime="2015-06-29T09:49:15.5694206-05:00" endTime="2015-06-29T09:49:15.5694206-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6cdfce41-8f9e-4c07-a926-24c2cc67d874" />
+    <UnitTestResult executionId="cbb7f99a-314c-4aa5-9902-4035ad5d514e" testId="46dca0ec-a739-4441-ae83-2ea7e0985346" testName="Determined collection value type" computerName="EXABOX" duration="00:00:00.0010000" startTime="2015-06-29T09:49:15.5694206-05:00" endTime="2015-06-29T09:49:15.5694206-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="cbb7f99a-314c-4aa5-9902-4035ad5d514e" />
+    <UnitTestResult executionId="47501dde-b1b1-4369-a737-8dda16fc4b18" testId="194ffe4c-d495-4d83-8020-b880de297b50" testName="Determined whether values were option values" computerName="EXABOX" duration="00:00:00.0000001" startTime="2015-06-29T09:49:15.5694206-05:00" endTime="2015-06-29T09:49:15.5694206-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="47501dde-b1b1-4369-a737-8dda16fc4b18" />
+    <UnitTestResult executionId="f4682ef5-3a0c-43eb-9d91-1b944fce9333" testId="d176933c-4d22-4d54-a9cc-4db002c768e0" testName="Unwrapped option values" computerName="EXABOX" duration="00:00:00.0030000" startTime="2015-06-29T09:49:15.5694206-05:00" endTime="2015-06-29T09:49:15.5694206-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f4682ef5-3a0c-43eb-9d91-1b944fce9333" />
+    <UnitTestResult executionId="db3a93e5-48a3-4c74-a8bd-dcb398be3918" testId="80ad4402-0db4-4036-bf18-f5792351130c" testName="Converted optional and non-optional values" computerName="EXABOX" duration="00:00:00.0970000" startTime="2015-06-29T09:49:15.5694206-05:00" endTime="2015-06-29T09:49:15.5694206-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="db3a93e5-48a3-4c74-a8bd-dcb398be3918" />
+    <UnitTestResult executionId="a28e44cc-60e8-42bb-831b-c9ed561181d4" testId="edc0c1c8-4d2c-4fd7-b4b1-48eca0beff02" testName="Discovered transformations" computerName="EXABOX" duration="00:00:00.0110000" startTime="2015-06-29T09:49:15.5704206-05:00" endTime="2015-06-29T09:49:15.5704206-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a28e44cc-60e8-42bb-831b-c9ed561181d4" />
+    <UnitTestResult executionId="db807285-3097-482f-8a74-8a875f943c4d" testId="50b01ad4-ed0f-404f-a00d-ac3ebaf6be8d" testName="Executed delegate invocation benchmarks" computerName="EXABOX" duration="00:00:00.5070000" startTime="2015-06-29T09:49:15.5704206-05:00" endTime="2015-06-29T09:49:15.5704206-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="db807285-3097-482f-8a74-8a875f943c4d" />
+    <UnitTestResult executionId="8a1d4382-46e6-416b-b598-ad612ea0db13" testId="45624eea-c575-4c17-8757-2b335fb00e25" testName="Executed transformation benchmarks" computerName="EXABOX" duration="00:00:00.1780000" startTime="2015-06-29T09:49:15.5704206-05:00" endTime="2015-06-29T09:49:15.5704206-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8a1d4382-46e6-416b-b598-ad612ea0db13" />
+    <UnitTestResult executionId="7e693bca-98a7-449d-90c1-471790f65f81" testId="42133c30-b0af-4db2-8c31-07c99511a641" testName="Executed transformations via typed transformer" computerName="EXABOX" duration="00:00:00.0020000" startTime="2015-06-29T09:49:15.5714207-05:00" endTime="2015-06-29T09:49:15.5714207-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7e693bca-98a7-449d-90c1-471790f65f81" />
+    <UnitTestResult executionId="daf49ad2-a5d2-4ec6-a2e0-ccc279e66ebb" testId="12767d3d-3b4a-4dca-ac48-5011388c85d5" testName="Executed transformations via untyped transformer" computerName="EXABOX" duration="00:00:00.0200000" startTime="2015-06-29T09:49:15.5714207-05:00" endTime="2015-06-29T09:49:15.5714207-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="daf49ad2-a5d2-4ec6-a2e0-ccc279e66ebb" />
+    <UnitTestResult executionId="e536e68e-d697-4b76-9909-8097fa1eea1f" testId="3d275d8e-5bd8-4512-aba1-d9f5274799b2" testName="Created delimited list" computerName="EXABOX" duration="00:00:00.0000001" startTime="2015-06-29T09:49:16.7224865-05:00" endTime="2015-06-29T09:49:16.7224865-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e536e68e-d697-4b76-9909-8097fa1eea1f" />
+    <UnitTestResult executionId="7f45937f-8e76-43d5-80a3-79f84d5cbb45" testId="b922ce0e-e338-4770-916a-e08ac5095c77" testName="Found text between two markers" computerName="EXABOX" duration="00:00:00.0010000" startTime="2015-06-29T09:49:16.7224865-05:00" endTime="2015-06-29T09:49:16.7224865-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="7f45937f-8e76-43d5-80a3-79f84d5cbb45" />
+    <UnitTestResult executionId="0a00cfcc-5435-4605-bcca-7ddcfd810f62" testId="4db4928c-4540-4fe5-a044-71c44ecb437f" testName="Found text beween two indices" computerName="EXABOX" duration="00:00:00.0000001" startTime="2015-06-29T09:49:16.7224865-05:00" endTime="2015-06-29T09:49:16.7224865-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0a00cfcc-5435-4605-bcca-7ddcfd810f62" />
+    <UnitTestResult executionId="75866bc7-17dd-4d14-b059-0b2395611c80" testId="9cc04636-f1b4-401b-8980-18faf99d6607" testName="Found text to the right of a marker" computerName="EXABOX" duration="00:00:00.0000001" startTime="2015-06-29T09:49:16.7234866-05:00" endTime="2015-06-29T09:49:16.7234866-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="75866bc7-17dd-4d14-b059-0b2395611c80" />
+    <UnitTestResult executionId="bb5fbb5e-4414-40a1-a889-442b7cb45528" testId="04fd2abf-b6a5-43d1-833a-e0b41caae5c3" testName="Matched regular expression groups" computerName="EXABOX" duration="00:00:00.0540000" startTime="2015-06-29T09:49:16.7234866-05:00" endTime="2015-06-29T09:49:16.7234866-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="bb5fbb5e-4414-40a1-a889-442b7cb45528" />
+    <UnitTestResult executionId="6a8203db-f798-422f-9410-606012bd0e3d" testId="5411a5b0-285d-45af-ba76-eae43d59cccb" testName="Removed character from text" computerName="EXABOX" duration="00:00:00.0000001" startTime="2015-06-29T09:49:16.7244867-05:00" endTime="2015-06-29T09:49:16.7244867-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6a8203db-f798-422f-9410-606012bd0e3d" />
+    <UnitTestResult executionId="b16d7bc2-f33d-46d2-b6fb-7ab07e123112" testId="8632d708-b1cf-41fe-b429-3753d49044e6" testName="Discovered nested types" computerName="EXABOX" duration="00:00:00.0000001" startTime="2015-06-29T09:49:16.7244867-05:00" endTime="2015-06-29T09:49:16.7244867-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b16d7bc2-f33d-46d2-b6fb-7ab07e123112" />
+    <UnitTestResult executionId="c7830fc2-3c8b-4e8b-961d-4abd1f40a864" testId="dbb73102-18e8-4174-ae33-c752775e6d3f" testName="Loaded type from name" computerName="EXABOX" duration="00:00:00.0000001" startTime="2015-06-29T09:49:16.7244867-05:00" endTime="2015-06-29T09:49:16.7244867-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="c7830fc2-3c8b-4e8b-961d-4abd1f40a864" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="Discovered attributed functions" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="b914f5b1-928d-41fc-a764-3a630578cbc3">
+      <Execution id="8e25e442-f800-493b-80db-96cf02bc5c7b" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrAssemblyTest" name="Discovered attributed functions" />
+    </UnitTest>
+    <UnitTest name="Discovered type child elements" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="ea689486-8868-4c98-ae63-b7139f602260">
+      <Execution id="3bcf328e-f022-407e-aa6a-ee1a8029414d" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrAssemblyTest" name="Discovered type child elements" />
+    </UnitTest>
+    <UnitTest name="Extracted embedded text resource from assembly" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="f993cd09-7903-4834-a7b3-71a7335388d4">
+      <Execution id="a7f3af7e-8279-4682-b51c-f1b365caadd1" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrAssemblyTest" name="Extracted embedded text resource from assembly" />
+    </UnitTest>
+    <UnitTest name="Traversed CLR element hierarchy" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="b1c8a443-e337-48a6-8a40-e8362ae590be">
+      <Execution id="f51b4d94-6eb7-48bf-8f40-3392c2d140b9" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrAssemblyTest" name="Traversed CLR element hierarchy" />
+    </UnitTest>
+    <UnitTest name="Created array via reflection" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="e68af9a7-8bb3-42e9-ab7d-6fa93ca27a86">
+      <Execution id="60ee5297-e890-4eae-b278-0daf8dd5947b" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrCollectionTest" name="Created array via reflection" />
+    </UnitTest>
+    <UnitTest name="Created F# list via reflection" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="5a36bbbe-43c2-44d8-96b5-7e17ca8c9188">
+      <Execution id="5da4a18f-ad93-4af1-8dee-9edd58697e98" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrCollectionTest" name="Created F# list via reflection" />
+    </UnitTest>
+    <UnitTest name="Created generic list via reflection" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="63cb841a-966c-4941-b5d1-71e760e5da17">
+      <Execution id="2b54ed4a-11d6-4c87-b4f5-04242f8f0e20" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrCollectionTest" name="Created generic list via reflection" />
+    </UnitTest>
+    <UnitTest name="Determined collection kind" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="70f1b672-fb34-4853-9b26-4b1041ccc583">
+      <Execution id="050967a8-ef8f-4655-8f33-dce0cc49ad61" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrCollectionTest" name="Determined collection kind" />
+    </UnitTest>
+    <UnitTest name="Determined whether type is a collection type" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="34edd86a-e2d7-47af-a2de-be9937c57650">
+      <Execution id="72987e19-ffe8-4389-bccd-55faa75d674d" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrCollectionTest" name="Determined whether type is a collection type" />
+    </UnitTest>
+    <UnitTest name="Referenced collection type" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="870b101f-dc9b-43d8-8906-4e5804df083a">
+      <Execution id="a1dc82c2-37dd-4a9a-96e4-7221eff99ba1" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrCollectionTest" name="Referenced collection type" />
+    </UnitTest>
+    <UnitTest name="Retreived CLR type name from type" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="e0489ee4-6b43-4356-a2ac-bb74756996d3">
+      <Execution id="e1260023-4f52-4c93-90bc-72833c1f9ba4" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrElementNameTests" name="Retreived CLR type name from type" />
+    </UnitTest>
+    <UnitTest name="Described interface with both property and method declarations" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="4b22b6d8-0bbd-400a-8c4c-a2af7398671e">
+      <Execution id="0df88e34-be3b-4b2d-8429-fdca7ac6d3e7" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrInterfaceTest" name="Described interface with both property and method declarations" />
+    </UnitTest>
+    <UnitTest name="Described methods with optional parameters" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="1f607687-ef48-4508-9e06-91a72ad32071">
+      <Execution id="6ff3c546-7c6d-4961-a5e4-1f1a34bea23b" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrMethodTest" name="Described methods with optional parameters" />
+    </UnitTest>
+    <UnitTest name="Described non-tupled method - variation 1" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="49a4b5d2-f8dc-4755-99a7-6d53f61638a0">
+      <Execution id="3a0c038e-47e6-41a6-865e-1302cfaa57c1" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrMethodTest" name="Described non-tupled method - variation 1" />
+    </UnitTest>
+    <UnitTest name="Described non-tupled method - variation 2" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="0332341c-8882-471d-a664-3037bb60c6f3">
+      <Execution id="3387b844-99bd-4337-8857-6fa4fadffbec" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrMethodTest" name="Described non-tupled method - variation 2" />
+    </UnitTest>
+    <UnitTest name="Described tupled methods" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="d56c18dd-a019-45b1-adb5-689dfe9d6b21">
+      <Execution id="6fe42d3b-a81f-4d3d-9eaa-aa6a2dbdafaf" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrMethodTest" name="Described tupled methods" />
+    </UnitTest>
+    <UnitTest name="Created property descriptions from record" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="561b386d-a6dd-47e7-aea8-54b2be92048d">
+      <Execution id="80051c99-1549-480f-9ba6-d9c2d67d0a98" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrPropertyTest" name="Created property descriptions from record" />
+    </UnitTest>
+    <UnitTest name="Created class reference" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="2858e35b-1a7d-4d56-9002-bdf16f6674a1">
+      <Execution id="d1fd2c72-e825-472c-9090-2de27ad43c2b" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrTypeReferenceTest" name="Created class reference" />
+    </UnitTest>
+    <UnitTest name="Created record reference - No optional fields" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="94b5322e-772b-44cf-a038-0264b8c26c31">
+      <Execution id="13e87c03-74d5-4833-b4a0-cdb6c1fff896" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrTypeReferenceTest" name="Created record reference - No optional fields" />
+    </UnitTest>
+    <UnitTest name="Created record reference - Optional fields" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="4b63062b-2403-4718-997f-e1fe2664c0ce">
+      <Execution id="cd138c40-057d-4c26-9d9e-52081655faca" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrTypeReferenceTest" name="Created record reference - Optional fields" />
+    </UnitTest>
+    <UnitTest name="Created union reference - single-case" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="dafa658a-f766-46d4-af81-1be20c7eee53">
+      <Execution id="0819b892-5f83-4ee0-bfe9-7b5da1c6bab4" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrTypeReferenceTest" name="Created union reference - single-case" />
+    </UnitTest>
+    <UnitTest name="Determined the item value type of a type" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="783f79ba-fdc9-4f8e-a333-bf7fe554f2ea">
+      <Execution id="b0af2610-d624-43af-b355-88fe159c78e8" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrTypeReferenceTest" name="Determined the item value type of a type" />
+    </UnitTest>
+    <UnitTest name="Create value map from record - Optional fields" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="3c3fde78-848f-4295-a842-50aafaa0f2eb">
+      <Execution id="5c6083d8-f86b-4e0f-aa11-b828254c04cb" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrTypeValueTest" name="Create value map from record - Optional fields" />
+    </UnitTest>
+    <UnitTest name="Created record from value map - No optional fields" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="ce7b2fe7-33e0-459c-b1b5-db87a2ceb865">
+      <Execution id="b42df574-ba98-4422-a278-33c236f7f732" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrTypeValueTest" name="Created record from value map - No optional fields" />
+    </UnitTest>
+    <UnitTest name="Created record from value map - Optional fields" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="0eb30eaa-ddd7-4c6e-90f9-6b0725d0b4de">
+      <Execution id="46d2a518-0e11-4330-ab75-f89c56897c42" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrTypeValueTest" name="Created record from value map - Optional fields" />
+    </UnitTest>
+    <UnitTest name="Created record value from array - No optional fields" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="46df1175-72d0-4371-a47a-558851cf1776">
+      <Execution id="1d4fd22f-788e-40be-a9b4-42067afd2c1d" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrTypeValueTest" name="Created record value from array - No optional fields" />
+    </UnitTest>
+    <UnitTest name="Created value array from record - No optional fields" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="a25752a3-1184-4216-b740-c885e8483374">
+      <Execution id="82884423-6d69-4aa4-9e1c-c1661c8de32e" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ClrTypeValueTest" name="Created value array from record - No optional fields" />
+    </UnitTest>
+    <UnitTest name="Formatted connection string" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="98de8c25-816d-416c-a5e6-90357672ec9c">
+      <Execution id="94f8db43-7474-4421-800d-500e0054829b" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ConnectionStringTest" name="Formatted connection string" />
+    </UnitTest>
+    <UnitTest name="Parsed connection string" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="0910290a-48c1-4c8a-a30f-6cdfb71ef66e">
+      <Execution id="9be09fd8-107c-4fba-8688-b957d620104e" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.ConnectionStringTest" name="Parsed connection string" />
+    </UnitTest>
+    <UnitTest name="Created union values via reflection" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="54dc0770-57be-40cd-84d3-757b6fd055c1">
+      <Execution id="6cdfce41-8f9e-4c07-a926-24c2cc67d874" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.LangTest" name="Created union values via reflection" />
+    </UnitTest>
+    <UnitTest name="Determined collection value type" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="46dca0ec-a739-4441-ae83-2ea7e0985346">
+      <Execution id="cbb7f99a-314c-4aa5-9902-4035ad5d514e" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.LangTest" name="Determined collection value type" />
+    </UnitTest>
+    <UnitTest name="Determined whether values were option values" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="194ffe4c-d495-4d83-8020-b880de297b50">
+      <Execution id="47501dde-b1b1-4369-a737-8dda16fc4b18" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.LangTest" name="Determined whether values were option values" />
+    </UnitTest>
+    <UnitTest name="Unwrapped option values" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="d176933c-4d22-4d54-a9cc-4db002c768e0">
+      <Execution id="f4682ef5-3a0c-43eb-9d91-1b944fce9333" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.LangTest" name="Unwrapped option values" />
+    </UnitTest>
+    <UnitTest name="Converted optional and non-optional values" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="80ad4402-0db4-4036-bf18-f5792351130c">
+      <Execution id="db3a93e5-48a3-4c74-a8bd-dcb398be3918" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.TransformerTest" name="Converted optional and non-optional values" />
+    </UnitTest>
+    <UnitTest name="Discovered transformations" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="edc0c1c8-4d2c-4fd7-b4b1-48eca0beff02">
+      <Execution id="a28e44cc-60e8-42bb-831b-c9ed561181d4" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.TransformerTest" name="Discovered transformations" />
+    </UnitTest>
+    <UnitTest name="Executed delegate invocation benchmarks" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="50b01ad4-ed0f-404f-a00d-ac3ebaf6be8d">
+      <Execution id="db807285-3097-482f-8a74-8a875f943c4d" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.TransformerTest" name="Executed delegate invocation benchmarks" />
+    </UnitTest>
+    <UnitTest name="Executed transformation benchmarks" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="45624eea-c575-4c17-8757-2b335fb00e25">
+      <Execution id="8a1d4382-46e6-416b-b598-ad612ea0db13" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.TransformerTest" name="Executed transformation benchmarks" />
+    </UnitTest>
+    <UnitTest name="Executed transformations via typed transformer" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="42133c30-b0af-4db2-8c31-07c99511a641">
+      <Execution id="7e693bca-98a7-449d-90c1-471790f65f81" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.TransformerTest" name="Executed transformations via typed transformer" />
+    </UnitTest>
+    <UnitTest name="Executed transformations via untyped transformer" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="12767d3d-3b4a-4dca-ac48-5011388c85d5">
+      <Execution id="daf49ad2-a5d2-4ec6-a2e0-ccc279e66ebb" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.TransformerTest" name="Executed transformations via untyped transformer" />
+    </UnitTest>
+    <UnitTest name="Created delimited list" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="3d275d8e-5bd8-4512-aba1-d9f5274799b2">
+      <Execution id="e536e68e-d697-4b76-9909-8097fa1eea1f" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.TxtTest" name="Created delimited list" />
+    </UnitTest>
+    <UnitTest name="Found text between two markers" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="b922ce0e-e338-4770-916a-e08ac5095c77">
+      <Execution id="7f45937f-8e76-43d5-80a3-79f84d5cbb45" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.TxtTest" name="Found text between two markers" />
+    </UnitTest>
+    <UnitTest name="Found text beween two indices" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="4db4928c-4540-4fe5-a044-71c44ecb437f">
+      <Execution id="0a00cfcc-5435-4605-bcca-7ddcfd810f62" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.TxtTest" name="Found text beween two indices" />
+    </UnitTest>
+    <UnitTest name="Found text to the right of a marker" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="9cc04636-f1b4-401b-8980-18faf99d6607">
+      <Execution id="75866bc7-17dd-4d14-b059-0b2395611c80" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.TxtTest" name="Found text to the right of a marker" />
+    </UnitTest>
+    <UnitTest name="Matched regular expression groups" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="04fd2abf-b6a5-43d1-833a-e0b41caae5c3">
+      <Execution id="bb5fbb5e-4414-40a1-a889-442b7cb45528" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.TxtTest" name="Matched regular expression groups" />
+    </UnitTest>
+    <UnitTest name="Removed character from text" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="5411a5b0-285d-45af-ba76-eae43d59cccb">
+      <Execution id="6a8203db-f798-422f-9410-606012bd0e3d" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.TxtTest" name="Removed character from text" />
+    </UnitTest>
+    <UnitTest name="Discovered nested types" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="8632d708-b1cf-41fe-b429-3753d49044e6">
+      <Execution id="b16d7bc2-f33d-46d2-b6fb-7ab07e123112" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.TypeTest" name="Discovered nested types" />
+    </UnitTest>
+    <UnitTest name="Loaded type from name" storage="c:\dev\isoquark\iq\iq.core.framework.test\bin\debug\iq.core.framework.test.dll" id="dbb73102-18e8-4174-ae33-c752775e6d3f">
+      <Execution id="c7830fc2-3c8b-4e8b-961d-4abd1f40a864" />
+      <TestMethod codeBase="C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dll" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter" className="IQ.Core.Framework.Test.TypeTest" name="Loaded type from name" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="b914f5b1-928d-41fc-a764-3a630578cbc3" executionId="8e25e442-f800-493b-80db-96cf02bc5c7b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ea689486-8868-4c98-ae63-b7139f602260" executionId="3bcf328e-f022-407e-aa6a-ee1a8029414d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="f993cd09-7903-4834-a7b3-71a7335388d4" executionId="a7f3af7e-8279-4682-b51c-f1b365caadd1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b1c8a443-e337-48a6-8a40-e8362ae590be" executionId="f51b4d94-6eb7-48bf-8f40-3392c2d140b9" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e68af9a7-8bb3-42e9-ab7d-6fa93ca27a86" executionId="60ee5297-e890-4eae-b278-0daf8dd5947b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5a36bbbe-43c2-44d8-96b5-7e17ca8c9188" executionId="5da4a18f-ad93-4af1-8dee-9edd58697e98" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="63cb841a-966c-4941-b5d1-71e760e5da17" executionId="2b54ed4a-11d6-4c87-b4f5-04242f8f0e20" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="70f1b672-fb34-4853-9b26-4b1041ccc583" executionId="050967a8-ef8f-4655-8f33-dce0cc49ad61" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="34edd86a-e2d7-47af-a2de-be9937c57650" executionId="72987e19-ffe8-4389-bccd-55faa75d674d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="870b101f-dc9b-43d8-8906-4e5804df083a" executionId="a1dc82c2-37dd-4a9a-96e4-7221eff99ba1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e0489ee4-6b43-4356-a2ac-bb74756996d3" executionId="e1260023-4f52-4c93-90bc-72833c1f9ba4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4b22b6d8-0bbd-400a-8c4c-a2af7398671e" executionId="0df88e34-be3b-4b2d-8429-fdca7ac6d3e7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1f607687-ef48-4508-9e06-91a72ad32071" executionId="6ff3c546-7c6d-4961-a5e4-1f1a34bea23b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="49a4b5d2-f8dc-4755-99a7-6d53f61638a0" executionId="3a0c038e-47e6-41a6-865e-1302cfaa57c1" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0332341c-8882-471d-a664-3037bb60c6f3" executionId="3387b844-99bd-4337-8857-6fa4fadffbec" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d56c18dd-a019-45b1-adb5-689dfe9d6b21" executionId="6fe42d3b-a81f-4d3d-9eaa-aa6a2dbdafaf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="561b386d-a6dd-47e7-aea8-54b2be92048d" executionId="80051c99-1549-480f-9ba6-d9c2d67d0a98" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="2858e35b-1a7d-4d56-9002-bdf16f6674a1" executionId="d1fd2c72-e825-472c-9090-2de27ad43c2b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="94b5322e-772b-44cf-a038-0264b8c26c31" executionId="13e87c03-74d5-4833-b4a0-cdb6c1fff896" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4b63062b-2403-4718-997f-e1fe2664c0ce" executionId="cd138c40-057d-4c26-9d9e-52081655faca" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="dafa658a-f766-46d4-af81-1be20c7eee53" executionId="0819b892-5f83-4ee0-bfe9-7b5da1c6bab4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="783f79ba-fdc9-4f8e-a333-bf7fe554f2ea" executionId="b0af2610-d624-43af-b355-88fe159c78e8" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3c3fde78-848f-4295-a842-50aafaa0f2eb" executionId="5c6083d8-f86b-4e0f-aa11-b828254c04cb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ce7b2fe7-33e0-459c-b1b5-db87a2ceb865" executionId="b42df574-ba98-4422-a278-33c236f7f732" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0eb30eaa-ddd7-4c6e-90f9-6b0725d0b4de" executionId="46d2a518-0e11-4330-ab75-f89c56897c42" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="46df1175-72d0-4371-a47a-558851cf1776" executionId="1d4fd22f-788e-40be-a9b4-42067afd2c1d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="a25752a3-1184-4216-b740-c885e8483374" executionId="82884423-6d69-4aa4-9e1c-c1661c8de32e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="98de8c25-816d-416c-a5e6-90357672ec9c" executionId="94f8db43-7474-4421-800d-500e0054829b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="0910290a-48c1-4c8a-a30f-6cdfb71ef66e" executionId="9be09fd8-107c-4fba-8688-b957d620104e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="54dc0770-57be-40cd-84d3-757b6fd055c1" executionId="6cdfce41-8f9e-4c07-a926-24c2cc67d874" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="46dca0ec-a739-4441-ae83-2ea7e0985346" executionId="cbb7f99a-314c-4aa5-9902-4035ad5d514e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="194ffe4c-d495-4d83-8020-b880de297b50" executionId="47501dde-b1b1-4369-a737-8dda16fc4b18" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="d176933c-4d22-4d54-a9cc-4db002c768e0" executionId="f4682ef5-3a0c-43eb-9d91-1b944fce9333" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="80ad4402-0db4-4036-bf18-f5792351130c" executionId="db3a93e5-48a3-4c74-a8bd-dcb398be3918" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="edc0c1c8-4d2c-4fd7-b4b1-48eca0beff02" executionId="a28e44cc-60e8-42bb-831b-c9ed561181d4" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="50b01ad4-ed0f-404f-a00d-ac3ebaf6be8d" executionId="db807285-3097-482f-8a74-8a875f943c4d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="45624eea-c575-4c17-8757-2b335fb00e25" executionId="8a1d4382-46e6-416b-b598-ad612ea0db13" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="42133c30-b0af-4db2-8c31-07c99511a641" executionId="7e693bca-98a7-449d-90c1-471790f65f81" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="12767d3d-3b4a-4dca-ac48-5011388c85d5" executionId="daf49ad2-a5d2-4ec6-a2e0-ccc279e66ebb" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="3d275d8e-5bd8-4512-aba1-d9f5274799b2" executionId="e536e68e-d697-4b76-9909-8097fa1eea1f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="b922ce0e-e338-4770-916a-e08ac5095c77" executionId="7f45937f-8e76-43d5-80a3-79f84d5cbb45" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="4db4928c-4540-4fe5-a044-71c44ecb437f" executionId="0a00cfcc-5435-4605-bcca-7ddcfd810f62" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="9cc04636-f1b4-401b-8980-18faf99d6607" executionId="75866bc7-17dd-4d14-b059-0b2395611c80" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="04fd2abf-b6a5-43d1-833a-e0b41caae5c3" executionId="bb5fbb5e-4414-40a1-a889-442b7cb45528" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="5411a5b0-285d-45af-ba76-eae43d59cccb" executionId="6a8203db-f798-422f-9410-606012bd0e3d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="8632d708-b1cf-41fe-b429-3753d49044e6" executionId="b16d7bc2-f33d-46d2-b6fb-7ab07e123112" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="dbb73102-18e8-4174-ae33-c752775e6d3f" executionId="c7830fc2-3c8b-4e8b-961d-4abd1f40a864" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="47" executed="47" passed="47" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>NUnit VS Adapter 2.0.0.0 executing tests is startedLoading tests from C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dllRun started: C:\Dev\isoquark\IQ\IQ.Core.Framework.Test\bin\Debug\IQ.Core.Framework.Test.dllNUnit VS Adapter 2.0.0.0 executing tests is finished</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

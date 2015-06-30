@@ -20,17 +20,13 @@ module DataMetamodel =
     [<DebuggerDisplay("{Position} {Name,nq} {StorageType}")>]
     type ColumnDescription = {
         /// The column's name
-        Name : string
-        
+        Name : string        
         /// The column's position relative to the other columns
         Position : int
-
         /// The column's data type
-        StorageType : StorageType
-                
+        StorageType : StorageType                
         /// Specifies whether the column allows null
-        Nullable : bool   
-        
+        Nullable : bool           
         /// Specifies the means by which the column is automatically populated, if applicable 
         AutoValue : AutoValueKind option    
     }
@@ -40,11 +36,9 @@ module DataMetamodel =
     /// </summary>
     type TabularDescription = {
         /// The name of the table
-        Name : DataObjectName
-        
+        Name : DataObjectName        
         /// Specifies the  purpose of the table
         Description : string option
-
         /// The columns in the table
         Columns : ColumnDescription list
     }
@@ -55,16 +49,12 @@ module DataMetamodel =
     type RoutineParameterDescription = {
         /// The parameter's name
         Name : string
-    
         /// The parameter's position relative to the other columns
         Position : int
-
         /// The column's data type
         StorageType : StorageType
-
         /// The direction of the parameter
         Direction : ParameterDirection
-
     }
 
     /// <summary>
@@ -73,7 +63,6 @@ module DataMetamodel =
     type ProcedureDescription = {
         /// The name of the procedure
         Name : DataObjectName
-
         /// The parameters
         Parameters : RoutineParameterDescription list
     }
@@ -83,16 +72,17 @@ module DataMetamodel =
     /// </summary>
     type TableFunctionDescription = {
         /// The name of the procedure
-        Name : DataObjectName
-    
+        Name : DataObjectName    
         /// The parameters
         Parameters : RoutineParameterDescription list
-
         /// The columns in the result set
         Columns : ColumnDescription list
     }
 
 
+    /// <summary>
+    /// Unifies data object types
+    /// </summary>
     type DataObjectDescription =
     | TableFunctionObject of TableFunctionDescription
     | ProcedureObject of ProcedureDescription

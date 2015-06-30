@@ -13,13 +13,6 @@ open IQ.Core.Framework
 [<AutoOpen>]
 module DataProxyMetamodel = 
 
-//    /// <summary>
-//    /// References a method parameter or return
-//    /// </summary>
-//    type MethodInputOutputReference =
-//    | MethodInputReference of ClrMethodParameterReference
-//    | MethodOutputReference of ClrMethodReference
-    
     /// <summary>
     /// Describes a column proxy
     /// </summary>
@@ -110,9 +103,7 @@ module DataProxyMetamodel =
         /// </summary>
         member private this.DebuggerDisplay = 
             sprintf "@%s %O" this.DataElement.Name this.DataElement.StorageType
-            
-
-    
+                
     /// <summary>
     /// Describes a proxy for a stored procedure
     /// </summary>
@@ -170,14 +161,16 @@ module DataProxyMetamodel =
     
 
     /// <summary>
-    /// Unifies data object proxy description types
+    /// Unifies proxy description types
     /// </summary>
     type DataObjectProxy =
     | TabularProxy of TabularProxyDescription
     | ProcedureProxy of ProcedureProxyDescription
     | TableFunctionProxy of TableFunctionProxyDescription
 
-
+/// <summary>
+/// Defines <see cref="DataObjectProxy"/> helpers
+/// </summary>
 module DataObjectProxy =
     let getColumns (subject : DataObjectProxy)  =
         match subject with
@@ -232,9 +225,7 @@ module DataObjectProxy =
         | ProcedureProxy(proxy) -> proxy
         | _ ->
             ArgumentException() |> raise
-        
-        
-
+                
 /// <summary>
 /// Defines operators and augmentations for the types in the DataProxyMetamodel module
 /// </summary>

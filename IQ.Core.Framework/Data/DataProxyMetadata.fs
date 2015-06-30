@@ -1,7 +1,6 @@
 ﻿namespace IQ.Core.Data
 
 open System
-//open System.ComponentModel
 open System.Reflection
 open System.Data
 open System.Text.RegularExpressions
@@ -61,8 +60,6 @@ module DataProxyMetadata =
             | TypeDescription(t) ->
                 t.ReflectedElement.Value |> fromClrType
             | _ -> nosupport()
-
-        
 
     /// <summary>
     /// Infers the name of the schema in which the element lives or represents
@@ -124,7 +121,6 @@ module DataProxyMetadata =
         | None ->
             let schemaName = description |> inferSchemaName
             DataObjectName(schemaName, description.Name.SimpleName)
-
     
     /// <summary>
     /// Infers a <see cref"ColumnDescription"/>  from a CLR element
@@ -224,9 +220,7 @@ module DataProxyMetadata =
                 Direction = ParameterDirection.ReturnValue
                 StorageType = storageType
             }
-    
-
-                                                 
+                                                                 
     /// <summary>
     /// Constructs a <see cref="ParameterProxyDescription"/> based on the CLR element that will proxy it
     /// </summary>
@@ -322,13 +316,10 @@ module DataProxyMetadata =
                 else if m.HasAttribute<TableFunctionAttribute>() then
                     yield m |> MethodDescription |> MemberDescription |> describeTableFunctionProxy
             ]
-
                 
         | _ ->
              NotSupportedException() |> raise           
-        
-                    
-        
+                                   
 module TypeProxy =
     let inferDataObjectName (typedesc : ClrTypeDescription) =
         typedesc |> TypeDescription |> DataProxyMetadata.inferDataObjectName
@@ -352,6 +343,8 @@ module DataProxyOperators =
     let routineproxies<'T> =
         typeinfo<'T> |> TypeDescription |> DataProxyMetadata.describeRoutineProxies
             
+    let fromProxyType<'T> =
+        tabularproxy<'T> |> TabularProxy
 
            
 
