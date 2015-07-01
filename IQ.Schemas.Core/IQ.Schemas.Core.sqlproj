@@ -83,12 +83,13 @@
     <Build Include="Metadata\Views\vUserColumn.sql" />
     <Build Include="Metadata\Tables\IntrinsicTypeMap.sql" />
     <Build Include="Core\Core.sql" />
-    <Build Include="Core\Tables\StorageKind.sql" />
+    <Build Include="Core\Tables\DataKind.sql" />
     <Build Include="Metadata\Functions\fGetParameters.sql" />
     <Build Include="Metadata\Views\vUserProcedure.sql" />
     <Build Include="Metadata\Views\vProcedure.sql" />
     <Build Include="Metadata\Views\vProcedureParameter.sql" />
     <Build Include="Metadata\Views\vSequence.sql" />
+    <Build Include="Core\Tables\BenchmarkResult.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">
@@ -102,7 +103,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Core\Data\Data.sql" />
-    <None Include="Core\Data\StorageKind.sql" />
+    <None Include="Core\Data\DataKind.sql" />
     <None Include="Core.publish.xml" />
   </ItemGroup>
   <ItemGroup>

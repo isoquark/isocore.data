@@ -1,4 +1,4 @@
-﻿merge into Core.StorageKind as Dst using(values
+﻿merge into Core.DataKind as Dst using(values
 	(0, 'Unspecified', 'Storage type is unknown'),
 	(10, 'Bit', 'A single bit with may either have the value 0 or 1'),
 	(20, 'UInt8', 'An unsigned 8-bit integer'),

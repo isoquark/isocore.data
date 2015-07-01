@@ -28,4 +28,25 @@
     <Property Name="ParentElementType" Value="SqlSchema" />
     <Property Name="NewName" Value="vProcedureParameter" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="7e5ab10b-e73d-483a-afdd-9b9778fc8a2a" ChangeDateTime="07/01/2015 22:17:03">
+    <Property Name="ElementName" Value="[Core].[StorageKind]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[Core]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="DataKind" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="ae0aee44-6e81-46bc-b301-6ec600ae60cd" ChangeDateTime="07/01/2015 22:17:25">
+    <Property Name="ElementName" Value="[Core].[PK_StorageType]" />
+    <Property Name="ElementType" Value="SqlPrimaryKeyConstraint" />
+    <Property Name="ParentElementName" Value="[Core].[DataKind]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PK_DataKind" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="70465afb-e39f-49bf-a350-e6d93cf5bfb5" ChangeDateTime="07/01/2015 22:17:38">
+    <Property Name="ElementName" Value="[Core].[UQ_StorageType]" />
+    <Property Name="ElementType" Value="SqlUniqueConstraint" />
+    <Property Name="ParentElementName" Value="[Core].[DataKind]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="UQ_DataKind" />
+  </Operation>
 </Operations>
