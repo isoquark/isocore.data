@@ -10,7 +10,7 @@
     <RootNamespace>IQ.Data.Sql.Core.Test</RootNamespace>
     <AssemblyName>IQ.Core.Data.Sql.Test</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFSharpCoreVersion>4.3.1.0</TargetFSharpCoreVersion>
+    <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
     <Name>IQ.Core.Data.Sql.Test</Name>
     <NuGetPackageImportStamp>9918ff4b</NuGetPackageImportStamp>
     <SccProjectName>SAK</SccProjectName>
@@ -19,6 +19,7 @@
     <SccLocalPath>SAK</SccLocalPath>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>

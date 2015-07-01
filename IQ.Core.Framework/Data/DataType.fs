@@ -162,14 +162,14 @@ module DataTypeVocabulary =
         | Int16DataType
         | Int32DataType
         | Int64DataType
-        | BinaryFixedDataType of length : int
-        | BinaryVariableDataType of length : int
+        | BinaryFixedDataType of len : int
+        | BinaryVariableDataType of maxlen : int
         | BinaryMaxDataType
-        | AnsiTextFixedDataType of length : int
-        | AnsiTextVariableDataType of length : int
+        | AnsiTextFixedDataType of len : int
+        | AnsiTextVariableDataType of maxlen : int
         | AnsiTextMaxDataType
-        | UnicodeTextFixedDataType of length : int
-        | UnicodeTextVariableDataType of length : int
+        | UnicodeTextFixedDataType of len : int
+        | UnicodeTextVariableDataType of maxlen : int
         | UnicodeTextMaxDataType
         | DateTime32DataType
         | DateTime64DataType
@@ -203,28 +203,23 @@ module DataTypeVocabulary =
             | Int8DataType -> Int8DataTypeName
             | Int16DataType -> Int16DataTypeName
             | Int32DataType -> Int32DataTypeName
-            | Int64DataType -> Int64DataTypeName            
-            
+            | Int64DataType -> Int64DataTypeName                        
             | BinaryFixedDataType(length) -> length |> sprintf "%s(%i)" BinaryFixedDataTypeName
             | BinaryVariableDataType(length) -> length |> sprintf "%s(%i)" BinaryVariableDataTypeName
-            | BinaryMaxDataType -> BinaryMaxDataTypeName
-            
+            | BinaryMaxDataType -> BinaryMaxDataTypeName            
             | AnsiTextFixedDataType(length) -> length |> sprintf "%s(%i)" AnsiTextFixedDataTypeName
             | AnsiTextVariableDataType(length) -> length |> sprintf "%s(%i)" AnsiTextVariableDataTypeName
-            | AnsiTextMaxDataType -> AnsiTextMaxDataTypeName
-            
+            | AnsiTextMaxDataType -> AnsiTextMaxDataTypeName            
             | UnicodeTextFixedDataType(length) -> length |> sprintf "%s(%i)" UnicodeTextFixedDataTypeName
             | UnicodeTextVariableDataType(length) -> length |> sprintf "%s(%i)" UnicodeTextVariableDataTypeName
-            | UnicodeTextMaxDataType -> UnicodeTextMaxDataTypeName
-            
+            | UnicodeTextMaxDataType -> UnicodeTextMaxDataTypeName            
             | DateTime32DataType -> DateTime32DataTypeName
             | DateTime64DataType -> DateTime64DataTypeName
             | DateTimeDataType(precision)-> precision |> sprintf "%s(%i)" DateTimeDataTypeName
             | DateTimeOffsetDataType -> DateTimeOffsetDataTypeName
             | TimeOfDayDataType -> TimeOfDayDataTypeName
             | DateDataType -> DateDataTypeName
-            | TimespanDataType -> TimespanDataTypeName
-            
+            | TimespanDataType -> TimespanDataTypeName            
             | Float32DataType -> Float32DataTypeName
             | Float64DataType -> Float64DataTypeName
             | DecimalDataType(precision,scale) -> sprintf "%s(%i,%i)" DecimalDataTypeName precision scale
@@ -247,8 +242,88 @@ module DataTypeVocabulary =
         | BitValue of bool
         | UInt8Value of uint8
         | UInt16Value of uint16
+        | UInt32Value of uint32
+        | UInt64Value of uint64
+        | Int8Value of int8
+        | Int16Value of int16
+        | Int32Value of int32
+        | Int64Value of int64
+        | BinaryFixedValue of uint8[] 
+        | BinaryVariableValue of uint8[]
+        | BinaryMaxValue of uint8
+        | AnsiTextFixedValue of string
+        | AnsiTextVariableValue of string
+        | AnsiTextMaxValue of string
+        | UnicodeTextFixedValue of string
+        | UnicodeTextVariableValue of string
+        | UnicodeMaxValue of string
+        | DateTime32Value of DateTime
+        | DateTime64Value of DateTime
+        | DateTimeValue of DateTime
+        | DateTimeOffsetValue of DateTimeOffset
+        | TimeOfDayValue of DateTime
+        | DateValue of DateTime
+        | TimespanValue of TimeSpan
+        | Float32DValue of float32
+        | Float64Value of float
+        | DecimalValue of decimal
+        | MoneyValue of decimal
+        | GuidValue of Guid
+        | XmlValue of string
+        | VariantValue of obj
+        | CustomTableValue of obj
+        | CustomObjectValue of obj
+        | CustomPrimitiveValue of obj
+        | TypedDocumentValue of string
+
+    type DataPoint = | DataPoint of v : DataValue * t : DataType 
+        
+        
+    
     
 open DataTypeNames
+
+module DataValue =
+    let inline private cast<'T>(o : obj) = o :?> 'T
+    
+    let unwrap<'T>(v : DataValue) =
+        match v with
+        | BitValue(x) -> x |> cast<'T>
+        | UInt8Value(x) -> x |> cast<'T> 
+        | UInt16Value(x) -> x |> cast<'T>
+        | UInt32Value(x) -> x |> cast<'T>
+        | UInt64Value(x) -> x |> cast<'T>
+        | Int8Value(x) -> x |> cast<'T>
+        | Int16Value(x) -> x |> cast<'T>
+        | Int32Value(x) -> x |> cast<'T>
+        | Int64Value(x) -> x |> cast<'T>
+        | BinaryFixedValue(x) -> x |> cast<'T>
+        | BinaryVariableValue(x) -> x |> cast<'T>
+        | BinaryMaxValue(x) -> x |> cast<'T>
+        | AnsiTextFixedValue(x) -> x |> cast<'T>
+        | AnsiTextVariableValue(x) -> x |> cast<'T>
+        | AnsiTextMaxValue(x) -> x |> cast<'T>
+        | UnicodeTextFixedValue(x) -> x |> cast<'T>
+        | UnicodeTextVariableValue(x) -> x |> cast<'T>
+        | UnicodeMaxValue(x) -> x |> cast<'T>
+        | DateTime32Value(x) -> x |> cast<'T>
+        | DateTime64Value(x) -> x |> cast<'T>
+        | DateTimeValue(x) -> x |> cast<'T>
+        | DateTimeOffsetValue(x) -> x |> cast<'T>
+        | TimeOfDayValue(x) -> x |> cast<'T>
+        | DateValue(x) -> x |> cast<'T>
+        | TimespanValue(x) -> x |> cast<'T>
+        | Float32DValue(x) -> x |> cast<'T>
+        | Float64Value(x) -> x |> cast<'T>
+        | DecimalValue(x) -> x |> cast<'T>
+        | MoneyValue(x) -> x |> cast<'T>
+        | GuidValue(x) -> x |> cast<'T>
+        | XmlValue(x) -> x |> cast<'T>
+        | VariantValue(x) -> x |> cast<'T>
+        | CustomTableValue(x) -> x |> cast<'T>
+        | CustomObjectValue(x) -> x |> cast<'T>
+        | CustomPrimitiveValue(x) -> x |> cast<'T>
+        | TypedDocumentValue(x) -> x |> cast<'T>
 
 module DataKind =
         [<Literal>]
@@ -333,8 +408,7 @@ module DataType =
             | DateTimeOffsetDataType -> DataKind.DateTimeOffset
             | TimeOfDayDataType -> DataKind.TimeOfDay
             | DateDataType -> DataKind.Date
-            | TimespanDataType -> DataKind.Timespan
-            
+            | TimespanDataType -> DataKind.Timespan            
             | Float32DataType -> DataKind.Float32
             | Float64DataType -> DataKind.Float64
             | DecimalDataType(precision,scale) -> DataKind.Decimal
@@ -493,3 +567,7 @@ module DataTypeExtensions =
         member this.DefaultLength = this |> DataKind.getDefaultLength
         member this.DefaultPrecision = this |> DataKind.getDefaultPrecision
         member this.DefaultScale = this |> DataKind.getDefaultScale        
+
+    type DataValue
+    with
+        member this.Unwrap<'T>() = this |> DataValue.unwrap<'T>
