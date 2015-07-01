@@ -69,14 +69,15 @@
     </None>
     <EmbeddedResource Include="Resources\EmbeddedResource01.txt" />
     <Compile Include="LangTest.fs" />
-    <Compile Include="TypeTest.fs" />
-    <Compile Include="ClrCollectionTest.fs" />
+    <Compile Include="TxtTest.fs" />
+    <Compile Include="ClrUtilitiesTest.fs" />
     <Compile Include="ClrMetadataProviderTest.fs" />
     <Compile Include="TransformerTest.fs" />
-    <Compile Include="TxtTest.fs" />
     <Compile Include="ConnectionStringTest.fs" />
     <Compile Include="ClrElementTest.fs" />
     <Compile Include="RecordValueTest.fs" />
+    <Compile Include="Synthetics\OrderedSequence.fs" />
+    <Compile Include="Data\DataStorageTypeTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

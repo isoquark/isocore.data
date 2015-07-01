@@ -60,7 +60,7 @@ module ProxyTestCases =
     type Table01 = {
         [<Description("Col01 Description Text")>]
             
-        [<StorageType(StorageKind.Int32)>]
+        [<DataTypeAttribute(DataKind.Int32)>]
         Col01 : uint16
         [<Description("Col02 Description Text")>]
         Col02 : int64 option
@@ -90,7 +90,7 @@ module ProxyTestCases =
             DataTypeName : string
             SchemaId : int
             SchemaName : string   
-            [<StorageType(StorageKind.Int16)>]
+            [<DataTypeAttribute(DataKind.Int16)>]
             MaxLength : decimal
             Precision : uint8
             Scale : uint8

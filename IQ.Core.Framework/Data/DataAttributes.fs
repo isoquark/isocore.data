@@ -41,7 +41,7 @@ module DataAttributes =
     [<Literal>]
     let private UnspecifiedLength = -1
     [<Literal>]
-    let private UnspecifiedStorage = StorageKind.Unspecified
+    let private UnspecifiedStorage = DataKind.Unspecified
     let private UnspecifiedType = Unchecked.defaultof<Type>
     [<Literal>]
     let private UnspecifiedPosition = -1
@@ -121,33 +121,33 @@ module DataAttributes =
     /// <summary>
     /// Specifies storage characteristics
     /// </summary>
-    type StorageTypeAttribute(storageKind, length, precision, scale, clrType, customTypeSchemaName, customTypeName) =
+    type DataTypeAttribute(dataKind, length, precision, scale, clrType, customTypeSchemaName, customTypeName) =
         inherit DataAttribute()
 
         //For any kind of data that doesn't require additional information to instantiate a value, e.g., Int32, Bit and so forth
-        new (storageKind) =
-            StorageTypeAttribute(storageKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale, UnspecifiedType, UnspecifiedName, UnspecifiedName)
+        new (dataKind) =
+            DataTypeAttribute(dataKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale, UnspecifiedType, UnspecifiedName, UnspecifiedName)
         //For variable-length or fixed-length text and binary data types that whose length has a specified upper bound
-        new (storageKind, length) =
-            StorageTypeAttribute(storageKind, length, UnspecifiedPrecision, UnspecifiedScale, UnspecifiedType, UnspecifiedName, UnspecifiedName)                        
+        new (dataKind, length) =
+            DataTypeAttribute(dataKind, length, UnspecifiedPrecision, UnspecifiedScale, UnspecifiedType, UnspecifiedName, UnspecifiedName)                        
         //For data types that have a specifiable precision
-        new (storageKind, precision) =
-            StorageTypeAttribute(storageKind, UnspecifiedLength, precision, UnspecifiedScale, UnspecifiedType, UnspecifiedName, UnspecifiedName)                
+        new (dataKind, precision) =
+            DataTypeAttribute(dataKind, UnspecifiedLength, precision, UnspecifiedScale, UnspecifiedType, UnspecifiedName, UnspecifiedName)                
         //For data types that have both specifiable precision and scale
-        new (storageKind, precision, scale) =
-            StorageTypeAttribute(storageKind, UnspecifiedLength, precision, scale, UnspecifiedType, UnspecifiedName, UnspecifiedName)
+        new (dataKind, precision, scale) =
+            DataTypeAttribute(dataKind, UnspecifiedLength, precision, scale, UnspecifiedType, UnspecifiedName, UnspecifiedName)
         //For Geography, Geometry and Hierarchy types
-        new (storageKind, clrType) =
-            StorageTypeAttribute(storageKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale, clrType, UnspecifiedName, UnspecifiedName)
+        new (dataKind, clrType) =
+            DataTypeAttribute(dataKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale, clrType, UnspecifiedName, UnspecifiedName)
         //For CustomObject
-        new (storageKind, clrType, customTypeSchemaName, customTypeName) =
-            StorageTypeAttribute(storageKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale,  clrType, customTypeSchemaName, customTypeName)
+        new (dataKind, clrType, customTypeSchemaName, customTypeName) =
+            DataTypeAttribute(dataKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale,  clrType, customTypeSchemaName, customTypeName)
         //For CustomTable | CustomPrimitive
-        new (storageKind, customTypeSchemaName, customTypeName) =
-            StorageTypeAttribute(storageKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale,  UnspecifiedType, customTypeSchemaName, customTypeName)
+        new (dataKind, customTypeSchemaName, customTypeName) =
+            DataTypeAttribute(dataKind, UnspecifiedLength, UnspecifiedPrecision, UnspecifiedScale,  UnspecifiedType, customTypeSchemaName, customTypeName)
         
         /// Indicates the kind of storage
-        member this.StorageKind : StorageKind = storageKind
+        member this.DataKind : DataKind = dataKind
         
         /// Indicates the length of the data type if specified
         member this.Length = if length = UnspecifiedLength then None else Some(length)
@@ -172,58 +172,58 @@ module DataAttributes =
         /// Infers the storage type from a supplied attribute
         /// </summary>
         /// <param name="attrib">The attribute that describes the type of storage</param>
-        member this.StorageType =
+        member this.DataType =
             let attrib = this
-            match this.StorageKind with
-            | StorageKind.Bit ->BitStorage
-            | StorageKind.UInt8 -> UInt8Storage
-            | StorageKind.UInt16 -> UInt16Storage
-            | StorageKind.UInt32 -> UInt32Storage
-            | StorageKind.UInt64 -> UInt64Storage
-            | StorageKind.Int8 -> Int8Storage
-            | StorageKind.Int16 -> Int16Storage
-            | StorageKind.Int32 -> Int32Storage
-            | StorageKind.Int64 -> Int64Storage
-            | StorageKind.Float32 -> Float32Storage
-            | StorageKind.Float64 -> Float64Storage
-            | StorageKind.Money -> MoneyStorage
-            | StorageKind.Guid -> GuidStorage
-            | StorageKind.AnsiTextMax -> AnsiTextMaxStorage
-            | StorageKind.DateTime32 -> DateTime32Storage
-            | StorageKind.DateTime64 -> DateTime64Storage
-            | StorageKind.DateTimeOffset -> DateTimeOffsetStorage
-            | StorageKind.TimeOfDay -> TimeOfDayStorage
-            | StorageKind.Variant -> VariantStorage
-            | StorageKind.UnicodeTextMax -> UnicodeTextMaxStorage
-            | StorageKind.BinaryFixed -> 
-                BinaryFixedStorage( defaultArg attrib.Length StorageKind.BinaryFixed.DefaultLength)
-            | StorageKind.BinaryVariable -> 
-                BinaryVariableStorage (defaultArg attrib.Length StorageKind.BinaryVariable.DefaultLength)
-            | StorageKind.BinaryMax -> BinaryMaxStorage
-            | StorageKind.AnsiTextFixed -> 
-                AnsiTextFixedStorage(defaultArg attrib.Length StorageKind.AnsiTextFixed.DefaultLength)
-            | StorageKind.AnsiTextVariable -> 
-                AnsiTextVariableStorage(defaultArg attrib.Length StorageKind.AnsiTextVariable.DefaultLength)
-            | StorageKind.UnicodeTextFixed -> 
-                UnicodeTextFixedStorage(defaultArg attrib.Length StorageKind.UnicodeTextFixed.DefaultLength)
-            | StorageKind.UnicodeTextVariable -> 
-                UnicodeTextVariableStorage(defaultArg attrib.Length StorageKind.UnicodeTextVariable.DefaultLength)
-            | StorageKind.DateTime -> 
-                DateTimeStorage(defaultArg attrib.Precision StorageKind.DateTime.DefaultPrecision)  
-            | StorageKind.Date -> DateStorage
-            | StorageKind.Decimal -> 
-                DecimalStorage(
-                    defaultArg attrib.Precision StorageKind.Decimal.DefaultPrecision, 
-                    defaultArg attrib.Scale StorageKind.Decimal.DefaultScale)
-            | StorageKind.Xml -> XmlStorage("")
-            | StorageKind.CustomTable -> 
-                CustomTableStorage(attrib.CustomTypeName |> Option.get)
-            | StorageKind.CustomPrimitive -> 
-                CustomPrimitiveStorage(attrib.CustomTypeName |> Option.get)
-            | StorageKind.CustomObject | StorageKind.Geography | StorageKind.Geometry | StorageKind.Hierarchy ->          
-                CustomObjectStorage(attrib.CustomTypeName |> Option.get, attrib.ClrType |> Option.get)
+            match this.DataKind with
+            | DataKind.Bit ->BitDataType
+            | DataKind.UInt8 -> UInt8DataType
+            | DataKind.UInt16 -> UInt16DataType
+            | DataKind.UInt32 -> UInt32DataType
+            | DataKind.UInt64 -> UInt64DataType
+            | DataKind.Int8 -> Int8DataType
+            | DataKind.Int16 -> Int16DataType
+            | DataKind.Int32 -> Int32DataType
+            | DataKind.Int64 -> Int64DataType
+            | DataKind.Float32 -> Float32DataType
+            | DataKind.Float64 -> Float64DataType
+            | DataKind.Money -> MoneyDataType
+            | DataKind.Guid -> GuidDataType
+            | DataKind.AnsiTextMax -> AnsiTextMaxDataType
+            | DataKind.DateTime32 -> DateTime32DataType
+            | DataKind.DateTime64 -> DateTime64DataType
+            | DataKind.DateTimeOffset -> DateTimeOffsetDataType
+            | DataKind.TimeOfDay -> TimeOfDayDataType
+            | DataKind.Variant -> VariantDataType
+            | DataKind.UnicodeTextMax -> UnicodeTextMaxDataType
+            | DataKind.BinaryFixed -> 
+                BinaryFixedDataType( defaultArg attrib.Length DataKind.BinaryFixed.DefaultLength)
+            | DataKind.BinaryVariable -> 
+                BinaryVariableDataType (defaultArg attrib.Length DataKind.BinaryVariable.DefaultLength)
+            | DataKind.BinaryMax -> BinaryMaxDataType
+            | DataKind.AnsiTextFixed -> 
+                AnsiTextFixedDataType(defaultArg attrib.Length DataKind.AnsiTextFixed.DefaultLength)
+            | DataKind.AnsiTextVariable -> 
+                AnsiTextVariableDataType(defaultArg attrib.Length DataKind.AnsiTextVariable.DefaultLength)
+            | DataKind.UnicodeTextFixed -> 
+                UnicodeTextFixedDataType(defaultArg attrib.Length DataKind.UnicodeTextFixed.DefaultLength)
+            | DataKind.UnicodeTextVariable -> 
+                UnicodeTextVariableDataType(defaultArg attrib.Length DataKind.UnicodeTextVariable.DefaultLength)
+            | DataKind.DateTime -> 
+                DateTimeDataType(defaultArg attrib.Precision DataKind.DateTime.DefaultPrecision)  
+            | DataKind.Date -> DateDataType
+            | DataKind.Decimal -> 
+                DecimalDataType(
+                    defaultArg attrib.Precision DataKind.Decimal.DefaultPrecision, 
+                    defaultArg attrib.Scale DataKind.Decimal.DefaultScale)
+            | DataKind.Xml -> XmlDataType("")
+            | DataKind.CustomTable -> 
+                CustomTableDataType(attrib.CustomTypeName |> Option.get)
+            | DataKind.CustomPrimitive -> 
+                CustomPrimitiveDataType(attrib.CustomTypeName |> Option.get)
+            | DataKind.CustomObject | DataKind.Geography | DataKind.Geometry | DataKind.Hierarchy ->          
+                CustomObjectDataType(attrib.CustomTypeName |> Option.get, attrib.ClrType |> Option.get)
             | _ ->
-                NotSupportedException(sprintf "The storage kind %A is not recognized" attrib.StorageKind) |> raise
+                NotSupportedException(sprintf "The data type %A is not recognized" attrib.DataKind) |> raise
             
 
     /// <summary>

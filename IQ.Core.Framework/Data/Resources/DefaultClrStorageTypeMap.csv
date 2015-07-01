@@ -1,4 +1,4 @@
-ClrTypeName|StorageType
+ClrTypeName|DataType
 System.Boolean|Bit
 System.Byte|UInt8
 System.Byte[]|BinaryMax

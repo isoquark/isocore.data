@@ -1,4 +1,4 @@
-StorageKindName|Length|Precision|Scale
+DataTypeName|Length|Precision|Scale
 BinaryFixed|250|| 
 BinaryVariable|250||
 AnsiTextFixed|250||

@@ -14,6 +14,7 @@ open Microsoft.FSharp.Quotations.Patterns
 [<AutoOpen>]
 module ClrElementVocabulary = 
 
+
     type ClrAttribution = {
         /// The name of the attribute
         AttributeName : ClrTypeName
@@ -22,6 +23,13 @@ module ClrElementVocabulary =
         /// The attribute instance if applicable
         AttributeInstance : Attribute option
     }
+
+    type IClrElementDescription =
+        abstract Name : ClrElementName
+        abstract Position : int
+        abstract ReflectedElemment : obj option
+        abstract Attributions : ClrAttribution list
+        abstract DeclaringType : ClrTypeName option
     
     /// <summary>
     /// Describes a property
@@ -252,7 +260,7 @@ module ClrElementVocabulary =
             | MethodDescription(x) -> match x.ReflectedElement with |Some(x) -> x :> obj |> Some | None -> None
             | EventDescription(x) -> match x.ReflectedElement with |Some(x) -> x :> obj |> Some | None -> None
             | ConstructorDescription(x) -> match x.ReflectedElement with |Some(x) -> x :> obj |> Some | None -> None
-
+        
         /// <summary>
         /// Gets the type that declares the memeber
         /// </summary>
@@ -278,17 +286,7 @@ module ClrElementVocabulary =
             | MethodDescription(x) -> x.Attributes
             | EventDescription(x) -> x.Attributes
             | ConstructorDescription(x) -> x.Attributes
-
-        member this.TryGetAttribute<'T when 'T :> Attribute>() =
-            let attribName = ClrTypeName(typeof<'T>.Name, typeof<'T>.FullName |> Some, typeof<'T>.AssemblyQualifiedName |> Some) 
-            this.Attributes |> List.tryFind(fun x -> x.AttributeName = attribName)
-        
-        member this.HasAttribute<'T when 'T:> Attribute>() = 
-            this.TryGetAttribute<'T>() |> Option.isSome
-            
-
-                                    
-    
+                                                    
     /// <summary>
     /// Describes a type
     /// </summary>
@@ -343,6 +341,27 @@ module ClrElementVocabulary =
                 | MethodDescription(x) -> yield x
                 |_ ->()
             ]
+
+        /// <summary>
+        /// Gets the fields declared by the type
+        /// </summary>
+        member this.Fields =
+            [for x in this.Members do
+                match x with
+                | FieldDescription(x) -> yield x
+                |_ ->()
+            ]
+
+        /// <summary>
+        /// Gets the fields declared by the type
+        /// </summary>
+        member this.Events =
+            [for x in this.Members do
+                match x with
+                | EventDescription(x) -> yield x
+                |_ ->()
+            ]
+
 
     /// <summary>
     /// Describes an assembly
@@ -430,6 +449,13 @@ module ClrElementVocabulary =
             | AssemblyDescription(x) -> ClrElementKind.Assembly
             | ParameterDescription(x) -> ClrElementKind.Parameter
             | UnionCaseDescription(x) -> ClrElementKind.UnionCase
+
+        member this.TryGetAttribute<'T when 'T :> Attribute>() =
+            let attribName = ClrTypeName(typeof<'T>.Name, typeof<'T>.FullName |> Some, typeof<'T>.AssemblyQualifiedName |> Some) 
+            this.Attributes |> List.tryFind(fun x -> x.AttributeName = attribName)
+        
+        member this.HasAttribute<'T when 'T:> Attribute>() = 
+            this.TryGetAttribute<'T>() |> Option.isSome
                       
     /// <summary>
     /// Represents the intent to select a collection of types
@@ -438,6 +464,7 @@ module ClrElementVocabulary =
         | FindTypeByName of name : ClrTypeName
 
 module ClrElementKind =
+
 
     /// <summary>
     /// Classifies the described element

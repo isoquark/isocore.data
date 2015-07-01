@@ -65,7 +65,6 @@
     <Compile Include="DataTableTest.fs" />
     <Compile Include="DataObjectNameTest.fs" />
     <Compile Include="CsvReaderTest.fs" />
-    <Compile Include="DataStorageTypeTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Text.RegexProvider">

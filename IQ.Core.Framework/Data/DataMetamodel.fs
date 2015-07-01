@@ -24,7 +24,7 @@ module DataMetamodel =
         /// The column's position relative to the other columns
         Position : int
         /// The column's data type
-        StorageType : StorageType                
+        StorageType : DataType                
         /// Specifies whether the column allows null
         Nullable : bool           
         /// Specifies the means by which the column is automatically populated, if applicable 
@@ -52,7 +52,7 @@ module DataMetamodel =
         /// The parameter's position relative to the other columns
         Position : int
         /// The column's data type
-        StorageType : StorageType
+        StorageType : DataType
         /// The direction of the parameter
         Direction : ParameterDirection
     }

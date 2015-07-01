@@ -34,21 +34,21 @@ module ``Proxy Discovery`` =
                 { 
                   Name = (propname<@ fun (x : RecordA) -> x.AField1 @>).Text
                   Position = 0
-                  StorageType = Int32Storage
+                  StorageType = Int32DataType
                   Nullable = false  
                   AutoValue = None              
                 }
                 { 
                   Name = (propname<@ fun (x : RecordA) -> x.AField2 @>).Text
                   Position = 1
-                  StorageType = BitStorage
+                  StorageType = BitDataType
                   Nullable = false                
                   AutoValue = None              
                 }
                 { 
                   Name = (propname<@ fun (x : RecordA) -> x.AField3 @>).Text
                   Position = 2
-                  StorageType = Int64Storage
+                  StorageType = Int64DataType
                   Nullable = true
                   AutoValue = None              
                 }
@@ -76,11 +76,11 @@ module ``Proxy Discovery`` =
         
     
     type private RecordB = {
-        [<StorageType(StorageKind.DateTime, 5uy); Column("BField_1")>]
+        [<DataTypeAttribute(DataKind.DateTime, 5uy); Column("BField_1")>]
         BField1 : DateTime
-        [<StorageType(StorageKind.DateTime, 4uy)>]
+        [<DataTypeAttribute(DataKind.DateTime, 4uy)>]
         BField2 : DateTime option
-        [<StorageType(StorageKind.DateTime); Column("BField_3")>]
+        [<DataTypeAttribute(DataKind.DateTime); Column("BField_3")>]
         BField3 : DateTime
         BField4 : DateTime
     }
@@ -90,10 +90,10 @@ module ``Proxy Discovery`` =
         let proxy = tabularproxy<RecordB> 
         proxy.Columns.Length |> Claim.equal 4
 
-        proxy.[0].DataElement.StorageType |> Claim.equal (DateTimeStorage(5uy))
-        proxy.[1].DataElement.StorageType |> Claim.equal (DateTimeStorage(4uy))
-        proxy.[2].DataElement.StorageType |> Claim.equal (DateTimeStorage(StorageKind.DateTime.DefaultPrecision))
-        proxy.[3].DataElement.StorageType |> Claim.equal (DateTimeStorage(StorageKind.DateTime.DefaultPrecision))
+        proxy.[0].DataElement.StorageType |> Claim.equal (DateTimeDataType(5uy))
+        proxy.[1].DataElement.StorageType |> Claim.equal (DateTimeDataType(4uy))
+        proxy.[2].DataElement.StorageType |> Claim.equal (DateTimeDataType(DataKind.DateTime.DefaultPrecision))
+        proxy.[3].DataElement.StorageType |> Claim.equal (DateTimeDataType(DataKind.DateTime.DefaultPrecision))
 
 
     [<Test>]
@@ -119,15 +119,15 @@ module ``Proxy Discovery`` =
 
         let param01 = proc.FindParameter "col01"
         param01.Direction |> Claim.equal ParameterDirection.Output
-        param01.StorageType |> Claim.equal Int32Storage
+        param01.StorageType |> Claim.equal Int32DataType
         
         let param02 = proc.FindParameter "col02"
         param02.Direction |> Claim.equal ParameterDirection.Input
-        param02.StorageType |> Claim.equal (DateTimeStorage(7uy))
+        param02.StorageType |> Claim.equal (DateTimeDataType(7uy))
 
         let param03 = proc.FindParameter "col03"
         param03.Direction |> Claim.equal ParameterDirection.Input
-        param03.StorageType |> Claim.equal Int64Storage        
+        param03.StorageType |> Claim.equal Int64DataType       
 
 
     [<Table("MySchema")>]
@@ -183,7 +183,7 @@ module ``Proxy Discovery`` =
         let param1 = proxy.CallProxy.Parameters.[0]
         param1.DataElement.Name |> Claim.equal "startDate"
         param1.DataElement.Position |> Claim.equal 0
-        param1.DataElement.StorageType |> Claim.equal (DateTimeStorage(7uy))
+        param1.DataElement.StorageType |> Claim.equal (DateTimeDataType(7uy))
 
         let resultProxy = proxy.ResultProxy
         resultProxy.Columns.Length |> Claim.equal 4

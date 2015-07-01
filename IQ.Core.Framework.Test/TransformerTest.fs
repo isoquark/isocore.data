@@ -99,6 +99,16 @@ module TransformerTest =
                        
         ()
 
+    type Transformation(src, dst, t) =
+        member this.SrcType : Type = src
+        member this.DstType : Type = dst
+        member this.T : Func<obj,obj>  = t
+
+     
+    
+
+
+
     [<Test; BenchmarkTrait>]
     let ``Executed transformation benchmarks``() =
                 

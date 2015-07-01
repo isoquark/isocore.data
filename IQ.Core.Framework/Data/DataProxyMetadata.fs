@@ -24,7 +24,7 @@ module DataProxyMetadata =
         let mapdata = DefaultClrTypeMap.Load(DefaultClrTypeMapResource)
         [for row in mapdata.Rows ->
             try
-                Type.GetType(row.ClrTypeName, true), row.StorageType |> StorageType.parse |> Option.get
+                Type.GetType(row.ClrTypeName, true), row.DataType |> DataType.parse |> Option.get
             with
                 e ->
                     reraise()
@@ -43,11 +43,11 @@ module DataProxyMetadata =
             if defaultClrStorageTypeMap.ContainsKey(t.ItemValueType) then
                 defaultClrStorageTypeMap.[t.ItemValueType]
             else
-                TypedDocumentStorage(t)
+                TypedDocumentDataType(t)
 
-        match description |> ClrElementDescription.tryGetAttributeT<StorageTypeAttribute>  with
+        match description |> ClrElementDescription.tryGetAttributeT<DataTypeAttribute>  with
         | Some(attrib) -> 
-            attrib.StorageType
+            attrib.DataType
         | None ->            
             match description with
             | MemberDescription(d) ->
@@ -196,9 +196,9 @@ module DataProxyMetadata =
     /// <param name="clrElement">The CLR element from which the parameter description will be inferred</param>
     let describeReturnParameter(description : ClrMethodDescription) =
         let eDescription   = description |> MethodDescription |> MemberDescription 
-        let storageType = match eDescription |> ClrElementDescription.tryGetAttributeT<StorageTypeAttribute> with
+        let storageType = match eDescription |> ClrElementDescription.tryGetAttributeT<DataTypeAttribute> with
                                 | Some(attrib) -> 
-                                    attrib.StorageType
+                                    attrib.DataType
                                 | None -> 
                                     description.ReturnType  |> Option.get |> FindTypeByName |>   ClrMetadataProvider.findType |> TypeDescription |>   inferStorageType
         

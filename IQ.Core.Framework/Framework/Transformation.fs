@@ -36,11 +36,10 @@ module TransformerVocabulary =
             sprintf "%s:%s-->%s" this.Category this.DstType.SimpleName this.SrcType.SimpleName
 //        static member Parse text = 
 //            let m = IdRegex().Match(text)                                   
-//            TransformationIdentifier(m.Category.Value, m.SrcType.Value, m.DstType.Value)
+//            TransformationIdentifier(m.Category.Value, m.SrcType.Value, m.DstType)
             
 
      
-    type TransformationFunction<'TSrc,'TDst> = 'TSrc->'TDst
     
     type TransformationFunction = obj -> obj
       
@@ -204,6 +203,7 @@ module Transformer =
         Expression.Lambda<Func<obj,obj>>(result, input).Compile()
 
     type private TransformationDelegate = Func<obj,obj>           
+    
     type private Key = uint64
     type private TransformationIndex = Dictionary<Key, TransformationDelegate>
     let private createDelegateIndex() = TransformationIndex()    
@@ -219,7 +219,19 @@ module Transformer =
         idx.[key] <- del
 
     
-                
+//    type Transformation(src, dst, f) =
+//        member this.SrcType : Type = src
+//        member this.DstType : Type = dst
+//        member this.F : Func<obj,obj>  = f
+//    
+//    let private transformations = ResizeArray<Transformation>()
+//    let inline private putT srcType dstType f =
+//        transformations.Add(Transformation(srcType,dstType,f))
+//    let inline private getT srcType dstType =
+//        transformations.First(fun x -> x.SrcType = srcType && x.DstType = dstType).F
+        
+
+                   
     let private discover(config : TransformerConfig) =
         let delegateIndex = createDelegateIndex()
         let category = defaultArg config.Category DefaultTransformerCategory
@@ -265,6 +277,7 @@ module Transformer =
             let srcType = srcValue.GetType()
             (getTransform srcType dstType delegates).Invoke(srcValue)
 
+
             
         interface ITransformer with
             member this.Transform dstType srcValue =               
@@ -274,8 +287,8 @@ module Transformer =
                     then Seq.empty
                 else
                     let srcType = srcValues |> Seq.nth 0 |> fun x -> x.GetType()
-                    let transform = getTransform srcType dstType delegates
-                    srcValues |> Seq.map transform.Invoke
+                    let t = getTransform srcType dstType delegates
+                    srcValues |> Seq.map t.Invoke
             member this.GetTargetTypes srcType  = []
             member this.GetKnownTransformations() = identifiers
         interface ITypedTransformer with
@@ -286,8 +299,6 @@ module Transformer =
            
     let get(config : TransformerConfig) =        
         Realization(config) :> ITransformer
-
-        
 
 [<AutoOpen>]
 module ConvertExtensions =

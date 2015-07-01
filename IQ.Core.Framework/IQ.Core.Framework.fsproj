@@ -65,7 +65,7 @@
     <None Include="packages.config" />
     <Content Include="app.config" />
     <Compile Include="Framework\Lang.fs" />
-    <Compile Include="Framework\Regex.fs" />
+    <Compile Include="Framework\Txt.fs" />
     <Compile Include="Framework\ValueIndex.fs" />
     <Compile Include="Framework\ClrUtilities.fs" />
     <Compile Include="Framework\ClrElementVocabulary.fs" />
@@ -73,7 +73,6 @@
     <Compile Include="Framework\Transformation.fs" />
     <Compile Include="Framework\RecordValue.fs" />
     <Compile Include="Framework\CompositionRoot.fs" />
-    <Compile Include="Framework\Txt.fs" />
     <Compile Include="Framework\Configuration.fs" />
     <Compile Include="Framework\ConnectionString.fs" />
     <Compile Include="Framework\DynamicContract.fs" />
@@ -84,9 +83,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Compile Include="Data\AssemblyInfo.fs" />
-    <Compile Include="Data\StorageKind.fs" />
     <Compile Include="Data\DataObjectName.fs" />
-    <Compile Include="Data\DataStorageType.fs" />
+    <Compile Include="Data\DataType.fs" />
     <Compile Include="Data\DataAttributes.fs" />
     <Compile Include="Data\DataMetamodel.fs" />
     <Compile Include="Data\DataProxyMetamodel.fs" />
@@ -94,6 +92,7 @@
     <Compile Include="Data\DataTypeConverter.fs" />
     <Compile Include="Data\DataTable.fs" />
     <Compile Include="Data\CsvData.fs" />
+    <Compile Include="Synthetics\OrderedSequence.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Autofac">

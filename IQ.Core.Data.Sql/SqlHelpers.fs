@@ -120,5 +120,5 @@ module internal SqlParameter =
                 else
                     NotSupportedException() |> raise
         p.Direction <- d.Direction
-        p.SqlDbType <- d.StorageType |> StorageType.toSqlDbType   
+        p.SqlDbType <- d.StorageType |> DataType.toSqlDbType   
         p     
