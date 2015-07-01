@@ -57,10 +57,7 @@ module ``Channel and Service Hosting Tests`` =
         _hostFactory.StopRun()
 
     let inputName = 
-        let nameObj = new DataContract.Name()
-        nameObj.FirstName <- firstName
-        nameObj.LastName <- lastName
-        nameObj
+          { FirstName = firstName; LastName = lastName; MiddleInitial = 'X' }
 
     let cm = ServiceFacade.create()
     let cmCs = ServiceFacadeCSharp.create()
@@ -99,10 +96,21 @@ module ``Channel and Service Hosting Tests`` =
     [<Test>]
     let ``Invoke OneWay Service With Action and Endpoint Name``() =
         cm.Invoke (svcOpActionOneWay, epnOpt)
+        validateResult result
 
     [<Test>]
     let ``Invoke OneWay Service With Action and Without Endpoint Name``() =
         cm.Invoke svcOpActionOneWay
+        validateResult result
+
+    [<Test>] 
+    let ``FAIL Invoke Service With Func and Invalid Endpoint Name``() =
+        (fun () -> cm.InvokeFun (svcOpFunc, Some "invalid endpoint name") |> ignore)  |> Claim.failWith<ApplicationException> 
+
+    [<Test>] 
+    let ``FAIL Invoke Service With Action and Invalid Endpoint Name``() =
+        (fun () -> cm.InvokeFun (svcOpAction, Some "invalid endpoint name") |> ignore)  |> Claim.failWith<ApplicationException> 
+
 
     //CSharp interface tests
     [<Test>]
@@ -125,10 +133,13 @@ module ``Channel and Service Hosting Tests`` =
         let r = cmCs.Invoke svcOpFuncCs
         validateResult r
 
-    [<Test>] //TODO: how to do ExpectedException
-    let ``Invoke Service With Func and Invalid Endpoint Name As String``() =
-        let r = cm.InvokeFun (svcOpFunc, epnOpt) //exception here
-        validateResult r
+    [<Test>] 
+    let ``FAIL CSharp Invoke Service With Func and Invalid Endpoint Name``() =
+        (fun () -> cmCs.Invoke (svcOpFuncCs, "invalid endpoint name") |> ignore)  |> Claim.failWith<ApplicationException> 
+
+    [<Test>] 
+    let ``FAIL CSharp Invoke Service With Action and Invalid Endpoint Name``() =
+        (fun () -> cmCs.Invoke (svcOpActionCs, "invalid endpoint name") |> ignore)  |> Claim.failWith<ApplicationException> 
 
 
 

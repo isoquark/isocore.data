@@ -92,6 +92,7 @@
       <Project>{f9d5cbbf-94dc-43be-bffe-7987d14040b8}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Activation" />
   </ItemGroup>
