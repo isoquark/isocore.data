@@ -62,15 +62,7 @@ module ``Proxy Discovery`` =
         recordActual |> Claim.equal typeinfo<RecordA>
 
         let proxyColumnsExpect = recordExpect.Properties |> List.mapi(fun pos p -> ColumnProxyDescription(p, tableExpect.[pos]))
-        
-//        let proxyColumnsExpect = 
-//            match recordExpect with
-//            | RecordTypeReference(subject, fields) ->
-//                [for i in 0..fields.Length-1 ->
-//                    ColumnProxyDescription(fields.[i], tableExpect.[i])]
-//            | _ ->
-//                NotSupportedException() |> raise
-        
+                
         let proxyColumsActual = proxy.Columns
         proxyColumsActual |> Claim.equal proxyColumsActual
         

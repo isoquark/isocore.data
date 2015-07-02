@@ -263,8 +263,11 @@ module Transformer =
                 | _ -> ()
             | _ -> ()
         
-        config.SearchAssemblies |> List.map (fun x -> x |> AppDomain.CurrentDomain.AcquireAssembly |> ClrMetadataProvider.describeAssembly)
+        
+        config.SearchAssemblies |> List.map(fun x -> x |> ClrMetadata().DescribeAssembly) 
                                 |> List.iter (fun x -> x |> AssemblyDescription |> ClrElementDescription.walk handler)
+
+
         delegateIndex, identifiers |> List.ofSeq
 
                    

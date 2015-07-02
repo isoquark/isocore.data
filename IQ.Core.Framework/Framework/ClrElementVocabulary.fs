@@ -14,8 +14,12 @@ open Microsoft.FSharp.Quotations.Patterns
 [<AutoOpen>]
 module ClrElementVocabulary = 
 
-
+    /// <summary>
+    /// Represents an association between an attribute and the element to which it applies
+    /// </summary>
     type ClrAttribution = {
+        /// The element to which the attribute is applied
+        Target : ClrElementName
         /// The name of the attribute
         AttributeName : ClrTypeName
         /// The values applied by the attribute
@@ -23,6 +27,8 @@ module ClrElementVocabulary =
         /// The attribute instance if applicable
         AttributeInstance : Attribute option
     }
+
+    type ClrAttributionIndex = ClrAttributionIndex of attribToAttribution : Map<ClrTypeName, ClrAttribution>
 
     type IClrElementDescription =
         abstract Name : ClrElementName
@@ -68,7 +74,7 @@ module ClrElementVocabulary =
     /// <summary>
     /// Describes a field
     /// </summary>
-    type ClrStorageFieldDescription = {
+    type ClrFieldDescription = {
         /// The name of the property 
         Name : ClrMemberName        
         /// The reflected property, if applicable
@@ -84,7 +90,11 @@ module ClrElementVocabulary =
         /// Specifies the name of the field type
         FieldType : ClrTypeName
         /// The name of the type that declares the field
-        DeclaringType : ClrTypeName           
+        DeclaringType : ClrTypeName   
+        /// Specifies whether the field is a literal value
+        IsLiteral : bool
+        /// The value of the literal encoded as a string, if applicable
+        LiteralValue : string option        
     }
 
     /// <summary>
@@ -130,6 +140,7 @@ module ClrElementVocabulary =
         /// The method return type
         ReturnType : ClrTypeName option
         /// The attributes applied to the method return
+        /// TODO: calculate this from the return parameter attributes
         ReturnAttributes : ClrAttribution list
         /// The name of the type that declares the method
         DeclaringType : ClrTypeName           
@@ -208,7 +219,7 @@ module ClrElementVocabulary =
     [<DebuggerDisplay("{Name}")>]
     type ClrMemberDescription =
     | PropertyDescription of ClrPropertyDescription
-    | FieldDescription of ClrStorageFieldDescription
+    | FieldDescription of ClrFieldDescription
     | MethodDescription of ClrMethodDescription
     | EventDescription of ClrEventDescription
     | ConstructorDescription of ClrConstructorDescription
@@ -287,6 +298,7 @@ module ClrElementVocabulary =
             | EventDescription(x) -> x.Attributes
             | ConstructorDescription(x) -> x.Attributes
                                                     
+    
     /// <summary>
     /// Describes a type
     /// </summary>
@@ -362,6 +374,21 @@ module ClrElementVocabulary =
                 |_ ->()
             ]
 
+
+
+    type ClrEnumDescription = ClrEnumDescription of t : ClrTypeDescription
+    with 
+        member private this.Type = match this with ClrEnumDescription(t = x) -> x
+        /// The name of the type
+        member this.Name  = this.Type.Name
+        /// The position of the type
+        member this.Position = this.Type.Position
+        /// The reflected type, if applicable        
+        member this.ReflectedElement = this.ReflectedElement
+        /// The name of the type that declares the type, if any
+        member this.DeclaringType = this.DeclaringType
+
+        
 
     /// <summary>
     /// Describes an assembly
@@ -458,13 +485,30 @@ module ClrElementVocabulary =
             this.TryGetAttribute<'T>() |> Option.isSome
                       
     /// <summary>
-    /// Represents the intent to select a collection of types
+    /// Represents the intent to select one or more type descrptions
     /// </summary>
     type ClrTypeQuery =
         | FindTypeByName of name : ClrTypeName
 
-module ClrElementKind =
+    /// <summary>
+    /// Represents the intent to select one or more properties from the identified types
+    /// </summary>
+    type ClrPropertyQuery = 
+        | FindPropertyByName of name : ClrMemberName * typeQuery : ClrTypeQuery
+        | FindPropertiesByType of typeQuery : ClrTypeQuery
+         
 
+    /// <summary>
+    /// Represents the intent to fetch one ore more assembly descrptions
+    /// </summary>
+    type ClrAssemblyQuery =
+        | FindAssemblyByName of name : ClrAssemblyName
+
+module ClrAttribution =
+    let tryFind (attribType  : Type) (attributions : ClrAttribution seq)= 
+        attributions |> Seq.tryFind(fun x -> x.AttributeInstance |> Option.get |> fun instance -> instance |> attribType.IsInstanceOfType)
+
+module ClrElementKind =
 
     /// <summary>
     /// Classifies the described element

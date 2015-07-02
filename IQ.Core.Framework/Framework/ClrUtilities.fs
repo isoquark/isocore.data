@@ -80,6 +80,10 @@ module ClrUtilityVocabulary =
         /// Classifies a type as a nulluable value type, e.g., Nullable<int>
         /// </summary>
         | NullableValue = 8
+        /// <summary>
+        /// Classifies a type as an enum
+        /// </summary>
+        | Enum = 9
 
     /// <summary>
     /// Classifies CLR elements
@@ -333,6 +337,8 @@ module ReflectedKind =
         | :? ParameterInfo -> ReflectedKind.Parameter
         | :? UnionCaseInfo -> ReflectedKind.UnionCase
         | _ -> nosupport()
+
+
 
 /// <summary>
 /// Defines operations for working with collections
@@ -596,7 +602,7 @@ module Type =
     /// <param name="f">The field to examine</param>
     let private isDeclaredMethod (m : MethodInfo) =
         let isGetOrSet (m : MethodInfo) =
-            (m.IsSpecialName && m.Name.StartsWith "get_") || (m.IsSpecialName && m.Name.StartsWith "set_")
+            (m.Name.StartsWith "get_") || (m.Name.StartsWith "set_") || m.IsSpecialName
         m |> isGetOrSet |> not
 
     /// <summary>
@@ -623,7 +629,7 @@ module Type =
     /// </summary>
     /// <param name="f">The field to examine</param>
     let private isDeclaredField (f : FieldInfo) =
-        (f.DeclaringType |> isRecordType |> not) && (f.DeclaringType |> isUnionType |> not)
+        (f.DeclaringType |> isRecordType |> not) && (f.DeclaringType |> isUnionType |> not) && (f.IsSpecialName |> not)
 
             
     /// <summary>
@@ -679,7 +685,7 @@ module Type =
     /// Classifies a type
     /// </summary>
     /// <param name="t">The type to classify</param>
-    let getTypeKind t =
+    let getKind (t : Type) =
         if t |> isCollectionType then
             ClrTypeKind.Collection
         else if t |> isRecordType then
@@ -694,6 +700,8 @@ module Type =
             ClrTypeKind.Interface
         else if t.IsClass then
             ClrTypeKind.Class
+        else if t.IsEnum then
+            ClrTypeKind.Enum
         else if t.IsValueType then
             ClrTypeKind.Struct
         else
@@ -763,7 +771,34 @@ module Member =
 
 
 /// <summary>
-/// Defines System.MethodInfo helpers
+/// Defines <see cref="System.Reflection.MethodBase"/> helpers
+/// </summary>
+module MethodBase =
+    /// <summary>
+    /// Gets the methods access specificer
+    /// </summary>
+    /// <param name="m">The method to examine</param>
+    let getAccess (m : MethodBase) =
+        if m = null then
+            ArgumentException() |> raise
+        if m.IsPublic then
+            PublicAccess 
+        else if m.IsPrivate then
+            PrivateAccess 
+        else if m.IsAssembly then
+            InternalAccess
+        else if m.IsFamilyOrAssembly then
+            ProtectedOrInternalAccess
+        else if m.IsFamilyAndAssembly then
+            ProtectedAndInternalAccess
+        else if m.IsFamily then
+            ProtectedAccess
+        else
+            nosupport()
+    
+
+/// <summary>
+/// Defines <see cref="System.Reflection.MethodInfo"/> helpers
 /// </summary>
 module MethodInfo =
     /// <summary>
@@ -783,28 +818,6 @@ module MethodInfo =
     /// <param name="subject">The method to examine</param>
     let getReturnAttributes (subject : MethodInfo) =
         subject.ReturnTypeCustomAttributes.GetCustomAttributes(true) |> Array.map(fun x -> x :?> Attribute) |> List.ofArray
-
-    /// <summary>
-    /// Gets the methods access specificer
-    /// </summary>
-    /// <param name="m">The method to examine</param>
-    let getAccess (m : MethodInfo) =
-        if m = null then
-            ArgumentException() |> raise
-        if m.IsPublic then
-            PublicAccess 
-        else if m.IsPrivate then
-            PrivateAccess 
-        else if m.IsAssembly then
-            InternalAccess
-        else if m.IsFamilyOrAssembly then
-            ProtectedOrInternalAccess
-        else if m.IsFamilyAndAssembly then
-            ProtectedAndInternalAccess
-        else if m.IsFamily then
-            ProtectedAccess
-        else
-            nosupport()
 
 
 module FieldInfo =
@@ -886,36 +899,8 @@ module Assembly =
             ArgumentException(sprintf "Resource %s not found" shortName) |> raise
         path
 
-    /// <summary>
-    /// Determines whether a named assembly has been loaded
-    /// </summary>
-    /// <param name="name">The name of the assembly</param>
-    let isLoaded (name : AssemblyName) =
-        AppDomain.CurrentDomain.GetAssemblies() 
-            |> Array.map(fun a -> a.GetName()) 
-            |> Array.exists (fun n -> n = name)
-    
     
 
-    /// <summary>
-    /// Recursively loads assembly references into the application domain
-    /// </summary>
-    /// <param name="subject">The staring assembly</param>
-    let rec loadReferences (filter : string option) (subject : Assembly) =
-        let references = subject.GetReferencedAssemblies()
-        let filtered = match filter with
-                        | Some(filter) -> 
-                            references |> Array.filter(fun x -> x.Name.StartsWith(filter)) 
-                        | None ->
-                            references
-
-        filtered |> Array.iter(fun name ->
-            if name |> isLoaded |>not then
-                name |> AppDomain.CurrentDomain.Load |> loadReferences filter
-        )
-
-    let getTypes(subject : Assembly) =
-        subject.GetTypes() |> List.ofArray
         
 
 
@@ -961,6 +946,7 @@ module AppDomain =
         | Some(a) -> a
         | None -> 
             AssemblyName(name.Text) |> domain.Load
+
 
 
 [<AutoOpen>]
@@ -1039,8 +1025,26 @@ module ReflectionExtensions =
     /// </summary>
     let props<'T> = typeof<'T> |> Type.getProperties
             
+    
+    /// <summary>
+    /// Defines augmentations for the <see cref="System.Type"/> type
+    /// </summary>
     type Type
     with
+        /// <summary>
+        /// Gets the type name
+        /// </summary>
+        member this.TypeName = 
+                ClrTypeName(this.Name, this.FullName |> Some, this.AssemblyQualifiedName |> Some)
+
+        /// <summary>
+        /// Gets the element name of the type
+        /// </summary>
+        member this.ElementName =  this.TypeName |> TypeElementName
+
+        /// <summary>
+        /// Specifies whether the type is of the form option<_>
+        /// </summary>
         member this.IsOptionType = this |> Option.isOptionType
 
         /// <summary>
@@ -1048,13 +1052,16 @@ module ReflectionExtensions =
         /// </summary>
         member this.ItemValueType = this |> Type.getItemValueType
 
-        member this.TypeName = 
-                ClrTypeName(this.Name, this.FullName |> Some, this.AssemblyQualifiedName |> Some)
 
         /// <summary>
         /// Gets the access specifier applied to the type
         /// </summary>
         member this.Access = this |> Type.getAccess
+
+        /// <summary>
+        /// Gets the type kind
+        /// </summary>
+        member this.Kind = this |> Type.getKind
 
 
     /// <summary>
@@ -1064,14 +1071,24 @@ module ReflectionExtensions =
     with
         member this.AcquireAssembly (name : ClrAssemblyName) =
             this |> AppDomain.acquireAssembly name
-
+    
 
     /// <summary>
     /// Defines augmentations for the <see cref="System.Assembly"/> type
     /// </summary>
     type Assembly
     with
+        /// <summary>
+        /// Gets the assembly name
+        /// </summary>
         member this.AssemblyName = ClrAssemblyName(this.GetName().Name, this.FullName |> Some)
+        /// <summary>
+        /// Gets the element name of the assembly
+        /// </summary>
+        member this.ElementName =  this.AssemblyName |> AssemblyElementName
+        /// <summary>
+        /// Gets the short/simple name of the assembly
+        /// </summary>
         member this.SimpleName = this.GetName().Name
 
     /// <summary>
@@ -1079,35 +1096,84 @@ module ReflectionExtensions =
     /// </summary>
     type PropertyInfo
     with
-        member this.ValueType = this.PropertyType |> Type.getItemValueType
+        /// <summary>
+        /// Gets the member name of the field
+        /// </summary>
+        member this.MemberName = this.Name |> ClrMemberName
+        /// <summary>
+        /// Gets the element name of the field
+        /// </summary>
+        member this.ElementName =  this.MemberName |> MemberElementName
+        /// <summary>
+        /// Gets the ensconced property type
+        /// </summary>
+        member this.ItemValueType = this.PropertyType |> Type.getItemValueType
 
     /// <summary>
     /// Defines augmentations for the <see cref="System.Reflection.FieldInfo"/> type
     /// </summary>
     type FieldInfo
     with
-        member this.ValueType = this.FieldType |> Type.getItemValueType
+        /// <summary>
+        /// Gets the member name of the field
+        /// </summary>
+        member this.MemberName = this.Name |> ClrMemberName
+        /// <summary>
+        /// Gets the element name of the field
+        /// </summary>
+        member this.ElementName =  this.MemberName |> MemberElementName
+        /// <summary>
+        /// Gets the ensconced field type
+        /// </summary>
+        member this.ItemValueType = this.FieldType |> Type.getItemValueType
         /// <summary>
         /// Gets the access specifier applied to the field
         /// </summary>
         member this.Access = this |> FieldInfo.getAccess
 
     /// <summary>
-    /// Defines augmentations for the <see cref="System.Reflection.MethodInfo"/> type
+    /// Defines augmentations for the <see cref="System.Reflection.MethodBase"/> type
     /// </summary>
-    type MethodInfo
+    type MethodBase
     with
         /// <summary>
-        /// Gets the access specifier applied to the method
+        /// Gets the member name of the method/constructor
         /// </summary>
-        member this.Access = this |> MethodInfo.getAccess
-
+        member this.MemberName = this.Name |> ClrMemberName
+        /// <summary>
+        /// Gets the element name of the method/constructor
+        /// </summary>
+        member this.ElementName = this.MemberName |> MemberElementName
+        /// <summary>
+        /// Gets the access specifier applied to the method/constructor
+        /// </summary>
+        member this.Access = this |> MethodBase.getAccess
+        
     /// <summary>
-    /// Defines augmentations for the <see cref="System.Reflection.ConstructorInfo"/> type
+    /// Defines augmentations for the <see cref="System.Reflection.ParameterInfo"/> type
     /// </summary>
-    type ConstructorInfo
+    type ParameterInfo
     with
         /// <summary>
-        /// Gets the access specifier applied to the constructor
+        /// Gets the parameter name
         /// </summary>
-        member this.Access = this |> ConstructorInfo.getAccess
+        member this.ParameterName = this.Name |> ClrParameterName
+        /// <summary>
+        /// Gets the element name of the parameter
+        /// </summary>
+        member this.ElementName =  this.ParameterName |> ParameterElementName
+        
+    /// <summary>
+    /// Defines augmentations for the <see cref="System.Reflection.EventInfo"/> type
+    /// </summary>
+    type EventInfo
+    with
+        /// <summary>
+        /// Gets the member name of the parameter
+        /// </summary>
+        member this.MemberName = this.Name |> ClrMemberName
+        /// <summary>
+        /// Gets the element name of the parameter
+        /// </summary>
+        member this.ElementName =  this.MemberName |> MemberElementName
+        

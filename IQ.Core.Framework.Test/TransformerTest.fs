@@ -50,11 +50,10 @@ module TransformerTest =
 
     
     
-    let transformer = DataConverterConfig([thisAssembly().AssemblyName],None) |> Transformer.get
+    let private transformer = DataConverterConfig([thisAssembly().AssemblyName],None) |> Transformer.get
 
     [<Test>]
     let ``Discovered transformations``() =
-        let transformer = DataConverterConfig([thisAssembly().AssemblyName],None) |> Transformer.get
         let transformations  = transformer.GetKnownTransformations()
         
         let c1Info = funcinfo<@fun () -> TestTransformations.stringToDate@>

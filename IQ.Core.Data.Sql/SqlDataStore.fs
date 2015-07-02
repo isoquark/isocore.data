@@ -89,6 +89,7 @@ module internal SqlStoreCommand =
 
 
 
+
  
        
 /// <summary>
@@ -96,7 +97,7 @@ module internal SqlStoreCommand =
 /// </summary>
 module SqlDataStore =    
         
-    type private SqlDataStore(csSqlDataStore : ConnectionString) =
+    type internal Realization(csSqlDataStore : ConnectionString) =
         let cs = SqlConnectionString(csSqlDataStore.Components) |> fun x -> x.Text
         interface ISqlDataStore with
             member this.Get q : list<'T>= 
@@ -132,5 +133,7 @@ module SqlDataStore =
     /// </summary>
     /// <param name="cs">Connection string that identifies the data store</param>
     let access (cs) =
-        SqlDataStore(cs) :> ISqlDataStore
+        Realization(cs) :> ISqlDataStore
+
+
 

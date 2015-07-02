@@ -66,6 +66,8 @@
     <None Include="packages.config" />
     <Content Include="app.config" />
     <Compile Include="Framework\Lang.fs" />
+    <Compile Include="Framework\Configuration.fs" />
+    <Compile Include="Framework\CompositionRoot.fs" />
     <Compile Include="Framework\Txt.fs" />
     <Compile Include="Framework\ValueIndex.fs" />
     <Compile Include="Framework\ClrUtilities.fs" />
@@ -73,8 +75,6 @@
     <Compile Include="Framework\ClrMetadataProvider.fs" />
     <Compile Include="Framework\Transformation.fs" />
     <Compile Include="Framework\RecordValue.fs" />
-    <Compile Include="Framework\CompositionRoot.fs" />
-    <Compile Include="Framework\Configuration.fs" />
     <Compile Include="Framework\ConnectionString.fs" />
     <Compile Include="Framework\DynamicContract.fs" />
     <None Include="Data\Resources\DefaultClrStorageTypeMap.csv">
@@ -94,6 +94,7 @@
     <Compile Include="Data\DataTable.fs" />
     <Compile Include="Data\CsvData.fs" />
     <Compile Include="Synthetics\OrderedSequence.fs" />
+    <Compile Include="CoreServices.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Autofac">

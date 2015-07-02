@@ -16,8 +16,8 @@ module ClrMetadataProviderVocbulary =
 
     type IClrMetadataProvider =
         abstract DescribeTypes:ClrTypeQuery->ClrTypeDescription list
-        
-
+        abstract DescribeAssemblies:ClrAssemblyQuery->ClrAssemblyDescription list
+        abstract DescribeProperties:ClrPropertyQuery->ClrPropertyDescription list
 
 /// <summary>
 /// Realizes client API for CLR metadata discovery
@@ -26,10 +26,18 @@ module ClrMetadataProvider =
     
     let private assemblyDescriptions = ConcurrentDictionary<Assembly, ClrAssemblyDescription>()        
     
-    let private getTypeDescriptions() = 
-        [for a in assemblyDescriptions.Values do yield! a.Types]
+    let private typeIndex = ConcurrentDictionary<ClrTypeName, ClrTypeDescription>()
+
+
+    let private getAssemblyDescriptions() =
+        assemblyDescriptions.Values |> List.ofSeq
    
-    let private createAttributions(attributes : Attribute seq) =
+    /// <summary>
+    /// Creates an attribution for supplied target and attributes
+    /// </summary>
+    /// <param name="target">Identifies the element to which the attributes apply</param>
+    /// <param name="attributes">The applied attributes</param>
+    let private createAttributions (target : ClrElementName) (attributes : Attribute seq) =
         
         let getValue (attrib : Attribute) (p : PropertyInfo) =
             try
@@ -44,10 +52,10 @@ module ClrMetadataProvider =
         
         [for attribute in attributes do
             let attribType = attribute.GetType()
-            let attribName = ClrTypeName(attribType.Name, attribType.FullName |> Some, attribType.AssemblyQualifiedName |> Some)
             yield 
                 {
-                    ClrAttribution.AttributeName =  attribName
+                    ClrAttribution.AttributeName =  attribType.TypeName
+                    Target = target
                     AppliedValues = attribType.GetProperties() 
                                   |> Array.filter(fun p -> p.CanRead)
                                   |> Array.mapi( fun i p -> ValueIndexKey(p.Name, i),  p |> getValue attribute  ) 
@@ -57,35 +65,36 @@ module ClrMetadataProvider =
                 }            
         ]
 
-    let private createInputParameterDescription pos (p : ParameterInfo) = {
-        ClrParameterDescription.Name = p.Name |> ClrParameterName
-        Position = pos
-        ReflectedElement = p |> Some
-        Attributes = p.GetCustomAttributes() |> createAttributions
-        CanOmit = (p.IsOptional || p.IsDefined(typeof<OptionalArgumentAttribute>))
-        ParameterType = p.ParameterType.TypeName
-        DeclaringMethod = ClrMemberName(p.Member.Name)
-        IsReturn = false
-    }
+    let private createInputParameterDescription pos (p : ParameterInfo) =
+        
+        {
+            ClrParameterDescription.Name = p.ParameterName
+            Position = pos
+            ReflectedElement = p |> Some
+            Attributes = p.GetCustomAttributes() |> createAttributions p.ElementName
+            CanOmit = (p.IsOptional || p.IsDefined(typeof<OptionalArgumentAttribute>))
+            ParameterType = p.ParameterType.TypeName
+            DeclaringMethod = ClrMemberName(p.Member.Name)
+            IsReturn = false
+        }
 
-    let private createReturnParameterDescription (m : MethodInfo) = {
-        ClrParameterDescription.Name = ClrParameterName(String.Empty)
-        Position = -1
-        ReflectedElement = None
-        Attributes = m |> MethodInfo.getReturnAttributes |> createAttributions
-        CanOmit = false
-        ParameterType = m.ReturnType.TypeName
-        DeclaringMethod = ClrMemberName(m.Name)
-        IsReturn = true
-    }
-
-    let private createInputParameterDescriptions (parameters : ParameterInfo[]) =
-        parameters |> Array.mapi(fun pos p -> p |> createInputParameterDescription pos) |>List.ofArray
 
     let private createParameterDescriptions (m : MethodInfo) = 
-        [ yield! m.GetParameters() |> createInputParameterDescriptions
-          if m.ReturnType <> typeof<Void> then
-            yield m |> createReturnParameterDescription                            
+        [ yield! m.GetParameters() 
+                    |> Array.mapi(fun pos p -> p |> createInputParameterDescription pos) 
+                    |>List.ofArray
+          
+          if m.ReturnType <> typeof<Void> then            
+              yield {
+                    ClrParameterDescription.Name = ClrParameterName(String.Empty)
+                    Position = -1
+                    ReflectedElement = None
+                    Attributes = m |> MethodInfo.getReturnAttributes |> createAttributions m.ElementName
+                    CanOmit = false
+                    ParameterType = m.ReturnType.TypeName
+                    DeclaringMethod = ClrMemberName(m.Name)
+                    IsReturn = true
+                  }
         ]
 
     
@@ -96,9 +105,9 @@ module ClrMetadataProvider =
         Access = m.Access
         IsStatic = m.IsStatic
         Parameters = m |> createParameterDescriptions
-        Attributes = m.GetCustomAttributes() |> createAttributions
+        Attributes = m.GetCustomAttributes() |> createAttributions m.ElementName
         ReturnType = if m.ReturnType = typeof<System.Void> then None else m.ReturnType.TypeName |> Some
-        ReturnAttributes = m |> MethodInfo.getReturnAttributes |> createAttributions
+        ReturnAttributes = m |> MethodInfo.getReturnAttributes |> createAttributions m.ElementName
         DeclaringType = m.DeclaringType.TypeName
     }
 
@@ -115,41 +124,49 @@ module ClrMetadataProvider =
             WriteAccess = if p.CanWrite then p.SetMethod.Access |> Some else None
             ReflectedElement = p |> Some
             IsStatic = if p.CanRead then p.GetMethod.IsStatic else p.SetMethod.IsStatic
-            Attributes = p.GetCustomAttributes() |> createAttributions
-            GetMethodAttributes = if p.CanRead then p.GetMethod.GetCustomAttributes() |> createAttributions else []
-            SetMethodAttributes = if p.CanWrite then p.SetMethod.GetCustomAttributes() |> createAttributions else []
+            Attributes = p.GetCustomAttributes() |> createAttributions p.ElementName
+            GetMethodAttributes = if p.CanRead then 
+                                        p.GetMethod.GetCustomAttributes() |> createAttributions p.GetMethod.ElementName 
+                                  else []
+            SetMethodAttributes = if p.CanWrite then
+                                        p.SetMethod.GetCustomAttributes() |> createAttributions p.SetMethod.ElementName else []
         }
+    
 
     let private createFieldDescription pos (f : FieldInfo) =
+        let attributes = f.GetCustomAttributes() |> createAttributions f.ElementName
+        let isLiteral = attributes |> ClrAttribution.tryFind typeof<LiteralAttribute> |> Option.isSome
         {
-            ClrStorageFieldDescription.Name = f.Name |> ClrMemberName
+            ClrFieldDescription.Name = f.Name |> ClrMemberName
             Position = pos
             ReflectedElement = f |> Some
             Access = f.Access
             IsStatic = f.IsStatic
-            Attributes = f.GetCustomAttributes() |> createAttributions
+            Attributes = attributes
             FieldType = f.FieldType.TypeName
             DeclaringType = f.DeclaringType.TypeName
+            IsLiteral = isLiteral
+            LiteralValue = if isLiteral then f.GetValue(null) |> fun x -> x.ToString() |> Some else None
         }
 
     let private createConstructorDescription pos (c : ConstructorInfo) =
         {
-            ClrConstructorDescription.Name = c.Name |> ClrMemberName
+            ClrConstructorDescription.Name = c.MemberName
             Position = pos
             ReflectedElement = c |> Some
             Access = c.Access
             IsStatic = c.IsStatic
-            Parameters = c.GetParameters() |>  createInputParameterDescriptions
-            Attributes = c.GetCustomAttributes() |> createAttributions
+            Parameters = c.GetParameters() |>  Array.mapi(fun pos p -> p |> createInputParameterDescription pos) |>List.ofArray
+            Attributes = c.GetCustomAttributes() |> createAttributions c.ElementName
             DeclaringType = c.DeclaringType.TypeName
         }
 
     let private createEventDescription pos (e : EventInfo) =
         {
-            ClrEventDescription.Name = e.Name |> ClrMemberName
+            ClrEventDescription.Name = e.MemberName
             Position = pos
             ReflectedElement = e |> Some                
-            Attributes = e.GetCustomAttributes() |> createAttributions
+            Attributes = e.GetCustomAttributes() |> createAttributions e.ElementName
             DeclaringType = e.DeclaringType.TypeName
         }
 
@@ -172,9 +189,8 @@ module ClrMetadataProvider =
     let private createTypeDescription pos (t : Type) =
         let isCollection = t |> Type.isCollectionType
         let collKind = if isCollection then t |> Type.getCollectionKind |> Some else None
-        let typeName = t.TypeName
         {
-            ClrTypeDescription.Name = typeName
+            ClrTypeDescription.Name = t.TypeName
             Position = pos
             DeclaringType = if t.DeclaringType <> null then 
                                 t.DeclaringType.TypeName |> Some 
@@ -182,18 +198,22 @@ module ClrMetadataProvider =
                                 None
             DeclaredTypes = t.GetNestedTypes() |> Array.map(fun n -> n.TypeName) |> List.ofArray
             Members = t |> Type.getDeclaredMembers |> List.mapi(fun pos m -> m |> createMemberDescription pos)
-            Kind = t |> Type.getTypeKind
+            Kind = t |> Type.getKind
             ReflectedElement = t |> Some
             CollectionKind = collKind
             IsOptionType = t |> Option.isOptionType
             Access = t.Access
             IsStatic = t.IsAbstract && t.IsSealed
-            Attributes = t.GetCustomAttributes() |> createAttributions
+            Attributes = t.GetCustomAttributes() |> createAttributions t.ElementName
             ItemValueType = t.ItemValueType.TypeName
         }                                    
 
+    let private acquireTypeDescription pos (t : Type) =
+        typeIndex.GetOrAdd(t.TypeName, fun n -> createTypeDescription pos t)
 
-    let describeAssembly (a : Assembly) =                               
+    
+        
+    let private describeAssembly (a : Assembly) =                               
         assemblyDescriptions.GetOrAdd(typeof<int>.Assembly, fun corlib ->
             {
                 Name = ClrAssemblyName(corlib.SimpleName, corlib.FullName |> Some)
@@ -203,7 +223,7 @@ module ClrMetadataProvider =
                             typeof<Int64>; typeof<UInt16>; typeof<UInt32>; typeof<UInt64>
                             typeof<DateTime>;typeof<String>; 
                             typeof<Decimal>; typeof<Double>; typeof<Single>;
-                        ] |> List.mapi(fun pos t -> createTypeDescription pos t) 
+                        ] |> List.mapi(fun pos t -> acquireTypeDescription pos t) 
                 ReflectedElement = corlib |> Some
                 Attributes = []
             }        
@@ -215,17 +235,17 @@ module ClrMetadataProvider =
                 Position = 0
                 Types = a.GetTypes() |> Array.mapi(fun pos t -> createTypeDescription pos t) |> List.ofArray
                 ReflectedElement = a |> Some
-                Attributes = a.GetCustomAttributes() |> createAttributions
+                Attributes = a.GetCustomAttributes() |> createAttributions a.ElementName
             })    
 
-    let describeType (t : Type) =
+    let private describeType (t : Type) =
         let a = t.Assembly |> describeAssembly        
         a.Types |> List.find(fun x -> x.ReflectedElement = Some(t))    
 
-    let describeTypeProperties (t : Type) =
+    let private describeTypeProperties (t : Type) =
          t |> describeType |> (fun x -> x.Members |> List.filter(fun m -> m.Kind = ClrMemberKind.Property))
 
-    let describeProperty (p : PropertyInfo) =
+    let private describeProperty (p : PropertyInfo) =
         let members = [for t in p.DeclaringType.Assembly |> describeAssembly |> (fun x -> x.Types) do 
                         yield! t.Members
                     ]
@@ -235,7 +255,7 @@ module ClrMetadataProvider =
             | PropertyDescription(d) -> d.ReflectedElement = (Some(p))
             | _ -> false)
   
-    let describeMember(subject : MemberInfo) =
+    let private describeMember(subject : MemberInfo) =
         let members = [for t in subject.DeclaringType.Assembly |> describeAssembly |> (fun x -> x.Types) do 
                         yield! t.Members
                     ]
@@ -265,11 +285,31 @@ module ClrMetadataProvider =
     let findTypes(q : ClrTypeQuery) =
         match q with
         | FindTypeByName(name) ->     
-            match getTypeDescriptions() |> List.tryFind(fun x -> x.Name = name) with
-            | Some(x) -> [x]
-            | None ->  
-                [Type.GetType(name.Text) |> createTypeDescription -1]
+            match name |> typeIndex.TryGetValue with
+            | (true,descrption) -> [descrption]                
+            | (false,_)->  
+                //TODO: whatever type this is needs to be discovered when the provider is created
+                [Type.GetType(name.Text) |> acquireTypeDescription -1]
 
+    let private findTypeProperties(q : ClrTypeQuery) =
+        [for t in (q |> findTypes) do yield! t.Properties]
+    
+    let findProperties(q : ClrPropertyQuery) =
+        match q with
+        | FindPropertyByName(name, typeQuery) ->
+            
+            typeQuery |> findTypeProperties |> List.find(fun p -> p.Name = name) |> List.singleton
+        | FindPropertiesByType(typeQuery) ->
+            typeQuery |> findTypeProperties
+            
+    
+    let private findAssemblies(q : ClrAssemblyQuery) =
+        match q with
+        | FindAssemblyByName(name) ->
+            match getAssemblyDescriptions() |> List.tryFind(fun x -> x.Name = name) with
+            | Some(x) -> [x]
+            | None -> []
+    
     let findType(q : ClrTypeQuery) =
         let types = q |> findTypes
         if types |> Seq.isEmpty then
@@ -285,21 +325,65 @@ module ClrMetadataProvider =
         name |> FindTypeByName |> findType |> fun x -> x.ReflectedElement.Value
 
     type private ClrMetadataStore(config : ClrMetadataProviderConfig) =
-        interface IClrMetadataProvider with
-            member this.DescribeTypes(q) =
-                q |> findTypes
-        
-    let get(config) =
-        ClrMetadataStore(config) :> IClrMetadataProvider
-        
+        do
+            config.Assemblies  |> List.map AppDomain.CurrentDomain.AcquireAssembly |> List.map(fun x -> x |> describeAssembly) |> ignore
 
+        interface IClrMetadataProvider with
+            member this.DescribeTypes q = q |> findTypes
+            member this.DescribeAssemblies q = q |> findAssemblies
+            member this.DescribeProperties q = q |> findProperties
+        
+    let internal get(config) =
+        ClrMetadataStore(config) :> IClrMetadataProvider
+    
+    let getCurrent() =
+        CompositionRoot.resolve<IClrMetadataProvider>()
+    
+[<AutoOpen>]
+module internal ClrMetadataProviderInstance =
+    let ClrMetadata() = ClrMetadataProvider.getCurrent()        
+
+[<AutoOpen>]
 module ClrMetadataProviderExtensions =
     type IClrMetadataProvider 
     with
+        /// <summary>
+        /// Describes exactly one type identified by the query; raises error if not found
+        /// </summary>
+        /// <param name="q">Identifies the type</param>
         member this.DescribeType q = 
             q |> this.DescribeTypes |> Seq.exactlyOne
-        member this.DescribeNamedType name = 
+        
+        /// <summary>
+        /// Decribes exactly one type given its name
+        /// </summary>
+        /// <param name="name">The name of the type</param>
+        member this.DescribeType name = 
             name |> FindTypeByName |> this.DescribeType 
+
+        /// <summary>
+        /// Describes the identified property
+        /// </summary>
+        /// <param name="q">Identifies the property</param>
+        member this.DescribeProperty q =
+            q |> this.DescribeProperties |> Seq.exactlyOne
+
+        /// <summary>
+        /// Describes exactly one asseembly identified by the query; raises error if not found
+        /// </summary>
+        /// <param name="q">Identifies the assembly</param>
+        member this.DesribeAssembly q =
+            q |> this.DescribeAssemblies |> Seq.exactlyOne
+        
+        /// <summary>
+        /// Describes exactly one asseembly identified by name; raises error if not found
+        /// </summary>
+        /// <param name="q">Identifies the assembly</param>
+        member this.DescribeAssembly name =
+            name |> FindAssemblyByName |> this.DesribeAssembly
+        
+
+
                       
 
 module ClrElementDescription = 
@@ -338,9 +422,6 @@ module ClrElementDescription =
         
         element |> walk handler
 
-    let private tryFindAttribute (element : ClrElementDescription) (attribType  : Type)= 
-        element.Attributes 
-              |> List.tryFind(fun x -> x.AttributeInstance |> Option.get |> fun instance -> instance |> attribType.IsInstanceOfType)
        
     /// <summary>
     /// Retrieves an attribute from the element if it exists and returns None if it does not
@@ -348,7 +429,7 @@ module ClrElementDescription =
     /// <param name="element">The element to examine</param>
     /// <param name="attribType">The type of attribute to match</param>
     let tryGetAttribute (element : ClrElementDescription) attribType =
-        attribType |> tryFindAttribute element
+        element.Attributes |> ClrAttribution.tryFind attribType
     
     /// <summary>
     /// Retrieves an attribute from the element if it exists and raises an exception otherwise
@@ -379,7 +460,7 @@ module ClrElementDescription =
     /// </summary>
     /// <param name="subject">The type to examine</param>
     let tryGetAttributeT<'T when 'T :> Attribute> (element : ClrElementDescription) =
-        match typeof<'T> |> tryFindAttribute element  with
+        match  element.Attributes |> ClrAttribution.tryFind typeof<'T> with
         | Some(x) -> 
             match x.AttributeInstance with
             | Some(x) -> x :?> 'T |> Some
@@ -414,19 +495,25 @@ module ClrDescriptionExtensions =
     /// </summary>
     /// <param name="pos">The ordinal position of the property relative to its declaration context</param>
     /// <param name="p">The property to be referenced</param>
-    let internal propinfo (p : PropertyInfo) = p |> ClrMetadataProvider.describeProperty 
+    let internal propinfo (p : PropertyInfo) = 
+        FindPropertyByName(p.MemberName, p.DeclaringType.TypeName |> FindTypeByName) |> ClrMetadata().DescribeProperty
+        
 
     /// <summary>
     /// Creates a property description map keyed by name
-    /// </summary>
-    //let propinfomap<'T> = props<'T> |> List.mapi propinfo |> List.map(fun p -> p.Name, p) |> Map.ofList
-    let propinfomap<'T> = typeof<'T> |> ClrMetadataProvider.describeTypeProperties |> List.map(fun x -> x.Name, x) |> Map.ofList
+    /// </summary>        
+    let propinfomap<'T> = 
+        typeof<'T>.TypeName |> FindTypeByName |> FindPropertiesByType 
+                            |> ClrMetadata().DescribeProperties 
+                            |> List.map(fun x -> x.Name, x) 
+                            |> Map.ofList
+        
        
 
     /// <summary>
     /// Describes the type identified by a type prameter
     /// </summary>
-    let typeinfo<'T> = typeof<'T> |> ClrMetadataProvider.describeType
+    let typeinfo<'T> = typeof<'T>.TypeName |> ClrMetadata().DescribeType
 
     /// <summary>
     /// Gets the methods defined by a type

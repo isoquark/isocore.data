@@ -6,29 +6,31 @@ open IQ.Core.Data.Sql
 
 
 [<AutoOpen>]
-module Globals =
+module internal Globals =
     //TODO: See how to use autofac in a unit test environment to avoid this sort of foolishness
-    let mutable Root = Unchecked.defaultof<ICompositionRoot>
-    let mutable Configuration = Unchecked.defaultof<IConfigurationManager>
+    let mutable ComposedRoot = Unchecked.defaultof<ICompositionRoot>
+    let mutable  _ClrMetadata = Unchecked.defaultof<IClrMetadataProvider>
+    let ClrMetadata() = _ClrMetadata
 
 [<TestAssemblyInit>]
 type AssemblyInit() =
     inherit TestAssemblyInitializer()
     
     override this.Initialize() =        
-        Root <- CompositionRoot.build(thisAssembly())
-        Root.Seal()
-        Configuration <- Root.Resolve<IConfigurationManager>()
+        ComposedRoot <- CompositionRoot.build(thisAssembly())
+        ComposedRoot |> SqlServices.register
+        ComposedRoot.Seal()
+        _ClrMetadata <- ComposedRoot.Resolve<IClrMetadataProvider>()
 
     override this.Dispose() =
-        Root.Dispose()
+        ComposedRoot.Dispose()
 
 module ConfigSettingNames =
     let SqlTestDb = "csSqlDataStore"
 
 module DataStore =
-    let private cs = lazy(ConfigSettingNames.SqlTestDb |> Configuration.GetValue)
-    let private store = lazy(Root.Resolve<ISqlDataStore>(ConfigSettingNames.SqlTestDb, cs.Value |> ConnectionString.parse))
+    let private cs = lazy(ConfigSettingNames.SqlTestDb |> Configuration().GetValue)
+    let private store = lazy(ComposedRoot.Resolve<ISqlDataStore>(ConfigSettingNames.SqlTestDb, cs.Value |> ConnectionString.parse))
     let contract<'T when 'T : not struct>() = store.Value.GetContract<'T>()
 
 module Benchmark =

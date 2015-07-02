@@ -1,11 +1,9 @@
-﻿namespace IQ.Core.Data.Sql.Test
+﻿namespace IQ.Core.Data.Test
 
 open IQ.Core.Framework
 open IQ.Core.TestFramework
-open IQ.Core.Data.Sql
+open IQ.Core.Data
 
-module ConfigSettingNames =
-    let SqlTestDb = "csSqlDataStore"
 
 [<AutoOpen>]
 module Globals =
@@ -18,7 +16,6 @@ type AssemblyInit() =
     
     override this.Initialize() =        
         Root <- CompositionRoot.build(thisAssembly())
-        Root |> SqlServices.register
         Root.Seal()
 
     override this.Dispose() =

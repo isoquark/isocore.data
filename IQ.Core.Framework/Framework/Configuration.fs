@@ -21,10 +21,11 @@ module ConfigurationVocabulary =
         abstract GetValue:name:string->string
 
 
+
 /// <summary>
 /// Implements basic configuration management capabilities
 /// </summary>
-module Configuration =
+module ConfigurationManager =
     
     type private ConfigFileManager() =
         interface IConfigurationManager with
@@ -35,7 +36,14 @@ module Configuration =
 
 
 
-    let getManager() =
+    let get() =
         ConfigFileManager() :> IConfigurationManager    
 
 
+module internal CoreConfiguration = 
+    [<Literal>]
+    let CoreServicesType = "IQ.Core.Framework.CoreServices"
+    [<Literal>]
+    let CoreRervicesMethod = "register"
+    [<Literal>]
+    let UserAssemblyPrefix = "IQ."

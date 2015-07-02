@@ -35,12 +35,12 @@ module TypeTest =
         typeof<string>.ItemValueType |> Claim.equal typeof<string>
 
     [<Test>]
-    let ``Determined whether type is a collection type``() =
-        [1;2;3].GetType() |> Type.getTypeKind|> Claim.equal ClrTypeKind.Collection                    
-        [|1;2;3|].GetType() |> Type.getTypeKind|> Claim.equal ClrTypeKind.Collection
+    let ``Classified types as collection types``() =
+        [1;2;3].GetType().Kind |> Claim.equal ClrTypeKind.Collection                    
+        [|1;2;3|].GetType().Kind |> Claim.equal ClrTypeKind.Collection
 
     [<Test>]
-    let ``Determined collection kind``() =
+    let ``Classified collection types``() =
          [1;2;3].GetType() |>Type.getCollectionKind |> Claim.equal ClrCollectionKind.FSharpList
          [|1;2;3|].GetType() |>Type.getCollectionKind |> Claim.equal ClrCollectionKind.Array
          Some([|1;2;3|]).GetType()   |> Type.getCollectionKind |> Claim.equal ClrCollectionKind.Array
@@ -70,3 +70,14 @@ module TypeTest =
         actual.[0] |> Claim.equal expect.[0]
         actual.[1] |> Claim.equal expect.[1]
         actual.[2] |> Claim.equal expect.[2]
+
+    type EnumA =
+    | Field1 = 1
+    | Field2 = 2
+    | Field3 = 3
+
+    [<Test>]
+    let ``Discovered enum types``() =
+        let t = typeinfo<EnumA>
+        t.Kind |> Claim.equal ClrTypeKind.Enum        
+

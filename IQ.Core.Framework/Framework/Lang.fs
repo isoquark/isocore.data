@@ -124,9 +124,56 @@ module Lang =
         /// </summary>
         member this.ElementType : Type = t 
 
+    /// <summary>
+    /// Defines augmentations for the <see cref="System.Enum" /> type
+    /// </summary>
     type Enum 
     with
         static member Parse<'T when 'T:>Enum >(value) = Enum.Parse(typeof<'T>, value) :?> 'T
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="System.Reflection.AssemblyName" /> type
+    /// </summary>
+    type AssemblyName
+    with
+        /// <summary>
+        /// Specifies whether the identified assembly is loaded into the current application domain
+        /// </summary>
+        member this.IsAssemblyLoaded = 
+            AppDomain.CurrentDomain.GetAssemblies() 
+                |> Array.map(fun a -> a.GetName()) 
+                |> Array.exists (fun n -> n = this)
+            
+
+    module Assembly =
+        /// <summary>
+        /// Recursively loads assembly references into the current application domain
+        /// </summary>
+        /// <param name="subject">The starting assembly</param>
+        let rec loadReferences (filter : string option) (subject : Assembly) =
+            let references = subject.GetReferencedAssemblies()
+            let filtered = match filter with
+                            | Some(filter) -> 
+                                references |> Array.filter(fun x -> x.Name.StartsWith(filter)) 
+                            | None ->
+                                references
+
+            filtered |> Array.iter(fun name ->
+                if name.IsAssemblyLoaded |>not then
+                    name |> AppDomain.CurrentDomain.Load |> loadReferences filter
+            )
+
+        
+    /// <summary>
+    /// Defines augmentations for the <see cref="System.Reflection.Assembly" /> type
+    /// </summary>
+    type Assembly
+    with
+        /// <summary>
+        /// Recursively loads assembly references into the current application domain
+        /// </summary>
+        /// <param name="subject">The starting assembly</param>
+        member this.LoadReferences (filter : string option) = this |> Assembly.loadReferences filter
 
     /// <summary>
     /// Lookup operator to retrieve the value identified by a key in a map
@@ -145,7 +192,8 @@ module Lang =
         | ExactlyOne
         | OneOrMore
         | BoundedRange of min : uint32 * max : uint32
-            
+
+                
 
 
 
