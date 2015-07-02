@@ -1016,7 +1016,7 @@ module ReflectionExtensions =
     /// <param name="q">The property accessor quotation</param>
     let rec propname q =
        match q with
-       | PropertyGet(_,p,_) -> p.Name |> ClrMemberName |> MemberElementName
+       | PropertyGet(_,p,_) -> p.Name |> ClrMemberName 
        | Lambda(_, expr) -> propname expr
        | _ -> nosupport()
 

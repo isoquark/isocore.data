@@ -69,7 +69,7 @@ module ClrMetadataProviderTest =
         abstract Property01:DateTime
         abstract Property02:DateTime with get,set
 
-    let methodmap = methodinfomap<IInterfaceA>    
+    let methodmap = methinfos<IInterfaceA>    
     [<Test>]
     let ``Described non-tupled method - variation 1``() =
         let mName = "Method01" |> ClrMemberName 
@@ -134,7 +134,7 @@ module ClrMetadataProviderTest =
 
     [<Test>]
     let ``Described class methods with optional parameters``() =
-        let methodmap = methodinfomap<ClassB>
+        let methodmap = methinfos<ClassB>
         let mName = "Method01" |> ClrMemberName 
         let m = methodmap.[mName]
         m.Name |> Claim.equal mName
@@ -145,7 +145,7 @@ module ClrMetadataProviderTest =
 
     [<Test>]
     let ``Described classes``() =
-        let infomap = propinfomap<ClassA>
+        let infomap = propinfos<ClassA>
         let p1Info = propinfo<@ fun (x : ClassA) -> x.Prop1 @> 
         let p1Name = p1Info.Name |> ClrMemberName
         let p1Expect = 
@@ -233,9 +233,9 @@ module ClrMetadataProviderTest =
 
     [<Test>]
     let ``Found types by name``() =
-        let results = typeof<UnionA>.TypeName |> FindTypeByName |> ClrMetadataProvider.findTypes
-        results |> List.isEmpty |> Claim.isFalse
-        Claim.equal typeof<UnionA>.TypeName results.Head.Name
+        typeof<UnionA>.TypeName |> ClrMetadata().DescribeType 
+                                |> fun x -> x.Name 
+                                |> Claim.equal (typeof<UnionA>.TypeName)
 
     module ModuleB =
         [<Description("This is RecordA")>]
@@ -262,9 +262,7 @@ module ClrMetadataProviderTest =
 
     [<Test>]
     let ``Discovered literals defined in a module``() =
-        let m = typeof<Literals.Dummy>.DeclaringType.TypeName 
-              |> FindTypeByName 
-              |> ClrMetadataProvider.findType
+        let m = typeof<Literals.Dummy>.DeclaringType.TypeName |> ClrMetadata().DescribeType
         m.Fields |> Claim.seqCount 2
         m.Fields.[0].IsLiteral |> Claim.isTrue
         m.Fields.[0].LiteralValue |> Option.get |> Claim.equal (Literals.Literal1.ToString())

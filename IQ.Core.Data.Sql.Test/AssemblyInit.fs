@@ -10,17 +10,20 @@ module ConfigSettingNames =
 [<AutoOpen>]
 module Globals =
     //TODO: See how to use autofac in a unit test environment to avoid this sort of foolishness
-    let mutable Root = Unchecked.defaultof<ICompositionRoot>
+    let mutable _Root = Unchecked.defaultof<ICompositionRoot>
+    let mutable Context = Unchecked.defaultof<IAppContext>    
 
 [<TestAssemblyInit>]
 type AssemblyInit() =
     inherit TestAssemblyInitializer()
     
     override this.Initialize() =        
-        Root <- CompositionRoot.build(thisAssembly())
-        Root |> SqlServices.register
-        Root.Seal()
+        _Root <- CompositionRoot.build(thisAssembly())
+        _Root |> SqlServices.register
+        _Root.Seal()
+        Context <- _Root.CreateContext()
 
     override this.Dispose() =
-        Root.Dispose()
+        Context.Dispose()
+        _Root.Dispose()
 

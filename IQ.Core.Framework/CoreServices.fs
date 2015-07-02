@@ -13,6 +13,8 @@ module internal CoreServices =
                           |> Array.map(fun a -> a.AssemblyName) 
                           |> List.ofArray
         {Assemblies = assemblyNames} |>ClrMetadataProvider.get |> registry.RegisterInstance
+        
+        registry.RegisterFactory(fun config -> config |> Transformer.get)
         ()
     
         

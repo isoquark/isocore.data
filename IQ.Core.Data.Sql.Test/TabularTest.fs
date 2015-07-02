@@ -15,9 +15,9 @@ open IQ.Core.Framework
 
 [<TestContainer; DataStoreTrait>]
 module ``Tabular Query and Manipulation`` =
-    let private config = Root.Resolve<IConfigurationManager>()
+    let private config = Context.Resolve<IConfigurationManager>()
     let private cs = ConfigSettingNames.SqlTestDb |> config.GetValue 
-    let store = Root.Resolve<ISqlDataStore>(ConfigSettingNames.SqlTestDb, cs |> ConnectionString.parse)
+    let store = Context.Resolve<ISqlDataStore>(ConfigSettingNames.SqlTestDb, cs |> ConnectionString.parse)
 
     [<Test>]
     let ``Queried [Metadata].[vDataType] - Partial column set A``() =

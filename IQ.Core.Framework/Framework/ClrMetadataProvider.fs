@@ -265,7 +265,7 @@ module ClrMetadataProvider =
             | Some(e) -> (e :?> MemberInfo) = subject
             | None -> false)
 
-    let describeParameter(subject : ParameterInfo) =
+    let private describeParameter(subject : ParameterInfo) =
         let m = subject.Member |> describeMember
         match m with
         | MethodDescription(x) -> x.Parameters
@@ -274,7 +274,7 @@ module ClrMetadataProvider =
         |> List.find(fun p -> p.Name = ClrParameterName(subject.Name))
 
 
-    let describElement(o : obj) =
+    let private describElement(o : obj) =
         match o with
         | :? Type as x -> x |> describeType |> TypeDescription
         | :? MemberInfo as x -> x |> describeMember |> MemberDescription 
@@ -282,7 +282,8 @@ module ClrMetadataProvider =
         | :? ParameterInfo as x -> x |> describeParameter  |> ParameterDescription
         | _ -> nosupport()
     
-    let findTypes(q : ClrTypeQuery) =
+
+    let private findTypes(q : ClrTypeQuery) =
         match q with
         | FindTypeByName(name) ->     
             match name |> typeIndex.TryGetValue with
@@ -310,7 +311,7 @@ module ClrMetadataProvider =
             | Some(x) -> [x]
             | None -> []
     
-    let findType(q : ClrTypeQuery) =
+    let private findType(q : ClrTypeQuery) =
         let types = q |> findTypes
         if types |> Seq.isEmpty then
             ArgumentException(sprintf "Query %O does not identify a known type" q) |> raise
@@ -321,7 +322,7 @@ module ClrMetadataProvider =
     /// Finds the type with the specified name
     /// </summary>
     /// <param name="name"></param>
-    let findNamedType(name : ClrTypeName) =
+    let private findNamedType(name : ClrTypeName) =
         name |> FindTypeByName |> findType |> fun x -> x.ReflectedElement.Value
 
     type private ClrMetadataStore(config : ClrMetadataProviderConfig) =
@@ -489,27 +490,15 @@ module ClrElementDescription =
 [<AutoOpen>]
 module ClrDescriptionExtensions =
 
-           
-    /// <summary>
-    /// Creates a property description
-    /// </summary>
-    /// <param name="pos">The ordinal position of the property relative to its declaration context</param>
-    /// <param name="p">The property to be referenced</param>
-    let internal propinfo (p : PropertyInfo) = 
-        FindPropertyByName(p.MemberName, p.DeclaringType.TypeName |> FindTypeByName) |> ClrMetadata().DescribeProperty
-        
-
     /// <summary>
     /// Creates a property description map keyed by name
     /// </summary>        
-    let propinfomap<'T> = 
+    let propinfos<'T> = 
         typeof<'T>.TypeName |> FindTypeByName |> FindPropertiesByType 
                             |> ClrMetadata().DescribeProperties 
                             |> List.map(fun x -> x.Name, x) 
                             |> Map.ofList
-        
-       
-
+               
     /// <summary>
     /// Describes the type identified by a type prameter
     /// </summary>
@@ -518,5 +507,5 @@ module ClrDescriptionExtensions =
     /// <summary>
     /// Gets the methods defined by a type
     /// </summary>
-    let methodinfomap<'T> = typeinfo<'T>.Methods |> List.map(fun m -> m.Name, m) |> Map.ofList
+    let methinfos<'T> = typeinfo<'T>.Methods |> List.map(fun m -> m.Name, m) |> Map.ofList
 

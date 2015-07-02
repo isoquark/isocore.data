@@ -43,14 +43,11 @@ module TransformerTest =
         Some(3) |> Transformer.convert (typeof<option<int>>) |> Claim.equal (Some(3) :> obj)
         3 |> Transformer.convert (typeof<option<int>>) |> Claim.equal (Some(3) :> obj)
         3 |> Transformer.convert (typeof<int>) |> Claim.equal (3 :> obj)
-
-        //Convert option<int64> to int32
         Some(3L) |> Transformer.convert (typeof<int>) |> Claim.equal (3 :> obj)
         option<int>.None |> Transformer.convert typeof<int> |> Claim.isNull
-
     
-    
-    let private transformer = DataConverterConfig([thisAssembly().AssemblyName],None) |> Transformer.get
+        
+    let private transformer : ITransformer = DataConverterConfig([thisAssembly().AssemblyName],None) |> Context.Resolve
 
     [<Test>]
     let ``Discovered transformations``() =

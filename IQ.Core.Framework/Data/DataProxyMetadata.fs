@@ -61,6 +61,9 @@ module DataProxyMetadata =
                 t.ReflectedElement.Value |> fromClrType
             | _ -> nosupport()
 
+    let private describeType(name : ClrTypeName) =
+        name |> ClrMetadata().DescribeType 
+
     /// <summary>
     /// Infers the name of the schema in which the element lives or represents
     /// </summary>
@@ -69,7 +72,7 @@ module DataProxyMetadata =
         let inferFromDeclaringType() =
                 match description.DeclaringType with
                 | Some(t) ->
-                    let description = t |> FindTypeByName |>  ClrMetadataProvider.findType |> TypeDescription
+                    let description = t |> describeType |> TypeDescription
                    
                     match description |> ClrElementDescription.tryGetAttributeT<SchemaAttribute>  with
                     | Some(a) ->
@@ -200,7 +203,7 @@ module DataProxyMetadata =
                                 | Some(attrib) -> 
                                     attrib.DataType
                                 | None -> 
-                                    description.ReturnType  |> Option.get |> FindTypeByName |>   ClrMetadataProvider.findType |> TypeDescription |>   inferStorageType
+                                    description.ReturnType  |> Option.get |> describeType |> TypeDescription |>   inferStorageType
         
         match description.ReturnAttributes |> List.tryFind(fun x -> x.AttributeName = typeinfo<RoutineParameterAttribute>.Name) with
         |Some(attrib) ->
@@ -272,15 +275,12 @@ module DataProxyMetadata =
             | MemberDescription(m) -> 
                 match m with
                 | MethodDescription(m) ->
-                    
-                    let itemType = m.ReflectedElement.Value.ReturnType.ItemValueType.TypeName 
-                                    |> FindTypeByName
-                                    |> ClrMetadataProvider.findType
+                    let itemType = m.ReflectedElement.Value.ReturnType.ItemValueType.TypeName  |> describeType
                     let itemTypeProxies = itemType |> describeColumnProxies                                        
                     m.InputParameters |> List.mapi (fun i x ->  x |> describeParameterProxy m ), 
                     itemTypeProxies,
                     m,
-                    m.ReturnType |> Option.get |> FindTypeByName |> ClrMetadataProvider.findType
+                    m.ReturnType |> Option.get |> describeType
                 | _ ->
                     NotSupportedException() |> raise
             | _ ->

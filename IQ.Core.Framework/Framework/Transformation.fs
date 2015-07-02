@@ -218,21 +218,9 @@ module Transformer =
     let inline private putTransform key del (idx : TransformationIndex) = 
         idx.[key] <- del
 
-    
-//    type Transformation(src, dst, f) =
-//        member this.SrcType : Type = src
-//        member this.DstType : Type = dst
-//        member this.F : Func<obj,obj>  = f
-//    
-//    let private transformations = ResizeArray<Transformation>()
-//    let inline private putT srcType dstType f =
-//        transformations.Add(Transformation(srcType,dstType,f))
-//    let inline private getT srcType dstType =
-//        transformations.First(fun x -> x.SrcType = srcType && x.DstType = dstType).F
-        
-
-                   
     let private discover(config : TransformerConfig) =
+        use context = CompositionRoot.createContext()
+        let provider = context.Resolve<IClrMetadataProvider>()
         let delegateIndex = createDelegateIndex()
         let category = defaultArg config.Category DefaultTransformerCategory
         let identifiers = ResizeArray<TransformationIdentifier>()
@@ -251,7 +239,7 @@ module Transformer =
                    
                                 let parameter = parameters.Head.ReflectedElement |> Option.get
                                 let srcType = parameter.ParameterType
-                                let dstType = m.ReturnType |> Option.get |> FindTypeByName |> ClrMetadataProvider.findType |> fun x -> x.ReflectedElement.Value
+                                let dstType = m.ReturnType |> Option.get |> provider.DescribeType |> fun x -> x.ReflectedElement.Value
                     
                                 let del = m.ReflectedElement.Value |> createDelegate
                                 let key = createKey srcType dstType
@@ -264,7 +252,7 @@ module Transformer =
             | _ -> ()
         
         
-        config.SearchAssemblies |> List.map(fun x -> x |> ClrMetadata().DescribeAssembly) 
+        config.SearchAssemblies |> List.map(fun x -> x |> provider.DescribeAssembly) 
                                 |> List.iter (fun x -> x |> AssemblyDescription |> ClrElementDescription.walk handler)
 
 
@@ -279,8 +267,6 @@ module Transformer =
         let transform dstType srcValue =
             let srcType = srcValue.GetType()
             (getTransform srcType dstType delegates).Invoke(srcValue)
-
-
             
         interface ITransformer with
             member this.Transform dstType srcValue =               
@@ -300,7 +286,7 @@ module Transformer =
             member this.TransformMany values =
                 [] |> Seq.ofList
            
-    let get(config : TransformerConfig) =        
+    let internal get(config : TransformerConfig) =        
         Realization(config) :> ITransformer
 
 [<AutoOpen>]
