@@ -98,7 +98,8 @@ module OrderedSequenceTest =
             let s1 = c1() |> OrderedSequence.get<int32>
             for i in minValue..maxValue do
                 s1.NextValue() |> ignore
-        f |> Benchmark.run name |> Benchmark.record
+
+        f |> Benchmark.capture
 
     [<Test; BenchmarkTrait>]
     let ``Benchmark - Int32 Direct Sequence Generation - 10^6 Calls``() =
@@ -108,8 +109,6 @@ module OrderedSequenceTest =
             let mutable current = 0
             while (e.MoveNext()) do
                 current <- e.Current
-            
-        //f |> Benchmark.run (Benchmark.deriveName()) |> Benchmark.record
         f |> Benchmark.capture
 
             
