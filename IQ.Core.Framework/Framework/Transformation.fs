@@ -286,7 +286,7 @@ module Transformer =
                 if srcValues |> Seq.isEmpty
                     then Seq.empty
                 else
-                    let srcType = srcValues |> Seq.nth 0 |> fun x -> x.GetType()
+                    let srcType = srcValues |> Seq.item 0 |> fun x -> x.GetType()
                     let t = getTransform srcType dstType delegates
                     srcValues |> Seq.map t.Invoke
             member this.GetTargetTypes srcType  = []

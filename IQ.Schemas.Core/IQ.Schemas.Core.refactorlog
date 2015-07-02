@@ -49,4 +49,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="UQ_DataKind" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="1c20e36d-139d-46ff-8024-051f90026551" ChangeDateTime="07/01/2015 23:16:10">
+    <Property Name="ElementName" Value="[Core].[BenchmarkResult].[Name]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[Core].[BenchmarkResult]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="BenchmarkName" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="17e0b445-7001-469d-8e95-615cdc1bc6de" ChangeDateTime="07/01/2015 23:36:03">
+    <Property Name="ElementName" Value="[Core].[pPutBenchmarkResult]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[Core]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="pBenchmarkResultPut" />
+  </Operation>
 </Operations>

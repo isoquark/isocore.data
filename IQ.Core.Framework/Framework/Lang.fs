@@ -23,6 +23,10 @@ module Lang =
     /// </summary>
     let inline nosupport()  = NotSupportedException() |> raise
 
+    /// <summary>
+    /// Alias for UInt8 type for consistency
+    /// </summary>
+    type UInt8 = Byte
                                             
     /// <summary>
     /// Defines custom Seq module operations

@@ -68,10 +68,92 @@ module DataTypeVocabulary =
         | Hierarchy = 162uy
         | TypedDocument = 180uy
 
+
+    module internal DataTypeShortNames =
+        [<Literal>]
+        let Bit = "bit"
+        [<Literal>]
+        let UInt8 = "uint8"
+        [<Literal>]
+        let UInt16 = "uint16"
+        [<Literal>]
+        let UInt32 = "uint32"
+        [<Literal>]
+        let UInt64 = "uint64"
+        [<Literal>]
+        let Int8 = "int8"
+        [<Literal>]
+        let Int16 = "int16"
+        [<Literal>]
+        let Int32 = "int32"
+        [<Literal>]
+        let Int64 = "int64"
+        [<Literal>]
+        let BinaryFixed = "binf"
+        [<Literal>]
+        let BinaryVariable = "binv"
+        [<Literal>]
+        let BinaryMax = "binm"
+        [<Literal>]
+        let AnsiTextFixed = "atextf"
+        [<Literal>]
+        let AnsiTextVariable = "atextv"
+        [<Literal>]
+        let AnsiTextMax = "atextm"
+        [<Literal>]
+        let UnicodeTextFixed = "utextf"
+        [<Literal>]
+        let UnicodeTextVariable = "utextv"
+        [<Literal>]
+        let UnicodeTextMax = "utextm"
+        [<Literal>]
+        let DateTime32 = "datetime32"
+        [<Literal>]
+        let DateTime64 = "datetime64"
+        [<Literal>]
+        let DateTime = "datetime"
+        [<Literal>]
+        let DateTimeOffset = "dtoffset"
+        [<Literal>]
+        let TimeOfDay = "tod"
+        [<Literal>]
+        let Date = "date"
+        [<Literal>]
+        let Timespan = "timespan"
+        [<Literal>]
+        let Float32 = "float32"
+        [<Literal>]
+        let Float64 = "float64"
+        [<Literal>]
+        let Decimal = "decimal"
+        [<Literal>]
+        let Money = "money"
+        [<Literal>]
+        let Guid = "guid"
+        [<Literal>]
+        let Xml = "xml"
+        [<Literal>]
+        let Variant = "variant"
+        [<Literal>]
+        let CustomTable = "ctable"
+        [<Literal>]
+        let CustomObject = "cobject"
+        [<Literal>]
+        let CustomPrimitive = "cprim"
+        [<Literal>]
+        let Geography = "geography"
+        [<Literal>]
+        let Geometry = "geometry"
+        [<Literal>]
+        let Hierarchy = "hierarchy"
+        [<Literal>]
+        let TypedDocument = "typedoc"
+        
+
     /// <summary>
     /// Defines the literals that specify the semantic names for the DataTypeType cases
     /// </summary>
-    module internal DataTypeNames =
+    module internal DataTypeLongNames =
         [<Literal>]
         let BitDataTypeName = "Bit"
         [<Literal>]
@@ -145,8 +227,9 @@ module DataTypeVocabulary =
         [<Literal>]
         let TypedDocumentDataTypeName = "TypedDocument"
 
+        
 
-    open DataTypeNames
+    open DataTypeLongNames
     /// <summary>
     /// Specifies a DataType class together with the information that is required to
     /// instantiate and store values corresponding to that class
@@ -256,7 +339,7 @@ module DataTypeVocabulary =
         | AnsiTextMaxValue of string
         | UnicodeTextFixedValue of string
         | UnicodeTextVariableValue of string
-        | UnicodeMaxValue of string
+        | UnicodeTextMaxValue of string
         | DateTime32Value of DateTime
         | DateTime64Value of DateTime
         | DateTimeValue of DateTime
@@ -279,9 +362,7 @@ module DataTypeVocabulary =
     type DataPoint = | DataPoint of v : DataValue * t : DataType 
         
         
-    
-    
-open DataTypeNames
+      
 
 module DataValue =
     let inline private cast<'T>(o : obj) = o :?> 'T
@@ -305,7 +386,7 @@ module DataValue =
         | AnsiTextMaxValue(x) -> x |> cast<'T>
         | UnicodeTextFixedValue(x) -> x |> cast<'T>
         | UnicodeTextVariableValue(x) -> x |> cast<'T>
-        | UnicodeMaxValue(x) -> x |> cast<'T>
+        | UnicodeTextMaxValue(x) -> x |> cast<'T>
         | DateTime32Value(x) -> x |> cast<'T>
         | DateTime64Value(x) -> x |> cast<'T>
         | DateTimeValue(x) -> x |> cast<'T>
@@ -325,48 +406,72 @@ module DataValue =
         | CustomPrimitiveValue(x) -> x |> cast<'T>
         | TypedDocumentValue(x) -> x |> cast<'T>
 
+    let inline bit(x) = BitValue(x)
+    let inline uint8(x) = UInt8Value(x)
+    let inline uint16(x) = UInt16Value(x)
+    let inline uint32(x) = UInt32Value(x)
+    let inline uint64(x) = UInt64Value(x)
+    let inline int8(x) = Int8Value(x)
+    let inline int16(x) = Int16Value(x)
+    let inline int32(x) = Int32Value(x)
+    let inline int64(x) = Int64Value(x)
+    let inline binf(x) = BinaryFixedValue(x)
+    let inline binv(x) = BinaryVariableValue(x)
+    let inline binm(x) = BinaryMaxValue(x)
+    let inline atextf(x) = AnsiTextFixedValue(x)
+    let inline atextv(x) = AnsiTextVariableValue(x)
+    let inline atextm(x) = AnsiTextMaxValue(x)
+    let inline utextf(x) = UnicodeTextFixedValue(x)
+    let inline utextv(x) = UnicodeTextVariableValue(x)
+    let inline utextm(x) = UnicodeTextMaxValue(x)
+    
 module DataKind =
-        [<Literal>]
-        let private DefaultDataTypeKindAspectsResource = "Data/Resources/DefaultStorageKindAspects.csv"                
-        type private DefaultDataTypeKindAspects = CsvProvider<DefaultDataTypeKindAspectsResource, Separators="|", PreferOptionals=true>
+    [<Literal>]
+    let private DefaultDataTypeKindAspectsResource = "Data/Resources/DefaultStorageKindAspects.csv"                
+    type private DefaultDataTypeKindAspects = CsvProvider<DefaultDataTypeKindAspectsResource, Separators="|", PreferOptionals=true>
         
-        type private DataTypeKindAspects = | DataTypeKindAspects of length : int option * precision : uint8 option * scale : uint8 option
-        with
-            member this.Length = match this with DataTypeKindAspects(length=x) -> x |> Option.get
-            member this.Precision = match this with DataTypeKindAspects(precision=x) -> x |> Option.get
-            member this.Scale = match this with DataTypeKindAspects(scale=x) -> x |> Option.get
+    type private DataTypeKindAspects = | DataTypeKindAspects of length : int option * precision : uint8 option * scale : uint8 option
+    with
+        member this.Length = match this with DataTypeKindAspects(length=x) -> x |> Option.get
+        member this.Precision = match this with DataTypeKindAspects(precision=x) -> x |> Option.get
+        member this.Scale = match this with DataTypeKindAspects(scale=x) -> x |> Option.get
 
-        let private defaults : IDictionary<DataKind, DataTypeKindAspects> = 
-            [for row in (DefaultDataTypeKindAspectsResource |> DefaultDataTypeKindAspects.Load).Cache().Rows ->
-                (DataKind.Parse row.DataTypeName, DataTypeKindAspects(row.Length, row.Precision |> Convert.ToUInt8Option , row.Scale |> Convert.ToUInt8Option))
-            ] |> dict        
+    let private defaults : IDictionary<DataKind, DataTypeKindAspects> = 
+        [for row in (DefaultDataTypeKindAspectsResource |> DefaultDataTypeKindAspects.Load).Cache().Rows ->
+            (DataKind.Parse row.DataTypeName, DataTypeKindAspects(row.Length, row.Precision |> Convert.ToUInt8Option , row.Scale |> Convert.ToUInt8Option))
+        ] |> dict        
         
-        /// <summary>
-        /// Gets the DataType kind's default length
-        /// </summary>
-        /// <param name="kind">The kind of DataType</param>
-        let getDefaultLength kind =
-            defaults.[kind].Length 
+    /// <summary>
+    /// Gets the DataType kind's default length
+    /// </summary>
+    /// <param name="kind">The kind of DataType</param>
+    let getDefaultLength kind =
+        defaults.[kind].Length 
 
-        /// <summary>
-        /// Gets the DataType kind's default precision
-        /// </summary>
-        /// <param name="kind">The kind of DataType</param>
-        let getDefaultPrecision kind =
-            defaults.[kind].Precision
+    /// <summary>
+    /// Gets the DataType kind's default precision
+    /// </summary>
+    /// <param name="kind">The kind of DataType</param>
+    let getDefaultPrecision kind =
+        defaults.[kind].Precision
 
-        /// <summary>
-        /// Gets the DataType kind's default scale
-        /// </summary>
-        /// <param name="kind">The kind of DataType</param>
-        let getDefaultScale kind =
-            defaults.[kind].Scale
+    /// <summary>
+    /// Gets the DataType kind's default scale
+    /// </summary>
+    /// <param name="kind">The kind of DataType</param>
+    let getDefaultScale kind =
+        defaults.[kind].Scale
+    
+    
 
 
 /// <summary>
 /// Defines operations for working with DataTypeType specifications
 /// </summary>
 module DataType =                
+        
+        open DataTypeLongNames
+
         /// <summary>
         /// Renders the DataTypeType as a semantic string
         /// </summary>

@@ -68,6 +68,8 @@
     <Folder Include="Core" />
     <Folder Include="Core\Tables" />
     <Folder Include="Core\Data" />
+    <Folder Include="Core\Sequences" />
+    <Folder Include="Core\Procedures" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Metadata\Metadata.sql" />
@@ -90,6 +92,8 @@
     <Build Include="Metadata\Views\vProcedureParameter.sql" />
     <Build Include="Metadata\Views\vSequence.sql" />
     <Build Include="Core\Tables\BenchmarkResult.sql" />
+    <Build Include="Core\Sequences\BenchmarkResultSequence.sql" />
+    <Build Include="Core\Procedures\pBenchmarkResultInsert.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">

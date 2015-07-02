@@ -2,6 +2,7 @@
 
 open IQ.Core.TestFramework
 open IQ.Core.Framework
+open IQ.Core.Data
 
 open System
 open System.Reflection
@@ -29,7 +30,10 @@ module TestTransformations =
     [<Transformation>]
     let intToInt (x : int) =
         x
-               
+
+
+    
+    
 
 [<TestContainer>]
 module TransformerTest =
@@ -55,11 +59,11 @@ module TransformerTest =
         
         let c1Info = funcinfo<@fun () -> TestTransformations.stringToDate@>
         let c1Id =  TransformationIdentifier.createDefault<DateTime,string>()
-        c1Id |> Claim.inList transformations
+        c1Id |> Claim.seqIn transformations
 
         let c2Info = funcinfo<@fun () -> TestTransformations.dateToString@>
         let c2Id = TransformationIdentifier.createDefault<string,DateTime>()
-        c2Id |> Claim.inList transformations
+        c2Id |> Claim.seqIn transformations
 
     [<Test>]
     let ``Executed transformations via untyped transformer``() =
@@ -79,61 +83,64 @@ module TransformerTest =
         let transformer = transformer :?> ITypedTransformer
         transformer.Transform(35u) |> Claim.equal 35L
 
+    //The number of iterations to use for benchmarking
+    let itcount = pown 10 6
 
     [<Test; BenchmarkTrait>]
-    let ``Executed delegate invocation benchmarks``() =
+    let ``Benchmark - Called Method Invoke 10^6 Times``() =
         let m = funcinfo<@fun () -> TestTransformations.intToInt@>
-        let count = pown 10 6
 
-
-        let bm1() =
-            for i in 0..count do
+        let f() =
+            for i in 0..itcount do
                 m.Invoke(null, [|i :> obj|]) |> ignore
-            
-        let bm2() =
-            for i in 0..count do
+                                   
+        f |> Benchmark.capture
+
+    [<Test; BenchmarkTrait>]
+    let ``Benchmark - Called Method Directly 10^6 Times``() =
+        let m = funcinfo<@fun () -> TestTransformations.intToInt@>
+                    
+        let f() =
+            for i in 0..itcount do
                 Convert.ChangeType(i, typeof<int>) |> ignore
                        
-        let bm1Result = Benchmark.run "Delegate Invocation 1" bm1
-        let bm2Result = Benchmark.run "Baseline Comparision" bm2
-                       
-        ()
+        f |> Benchmark.capture
 
     type Transformation(src, dst, t) =
         member this.SrcType : Type = src
         member this.DstType : Type = dst
         member this.T : Func<obj,obj>  = t
-
-     
     
 
-
-
     [<Test; BenchmarkTrait>]
-    let ``Executed transformation benchmarks``() =
+    let ``Benchmark - Executed Transformation Int32->Int32 with Transformer 10^6 Times``() =
                 
-        let count = pown 10 6
-        let bm1() =
+        let f() =
             let dstType = typeof<int>
-            for i in 0..count do
+            for i in 0..itcount do
                 i |> transformer.Transform dstType |> ignore
         
-        let bm2() =
+        f |> Benchmark.capture
+
+    [<Test; BenchmarkTrait>]
+    let ``Benchmark - Executed Transformation Int32->Int32 with System Convert 10^6 Times``() =
+                
+        let f() =
             let dstType = typeof<int>
-            for i in 0..count do
+            for i in 0..itcount do
                 Convert.ChangeType(i, typeof<int>) |> ignore
 
-        let bm3() =
+        f |> Benchmark.capture
+        
+    [<Test; BenchmarkTrait>]
+    let ``Benchmark - Executed Transformation Int32->Int32 Directly 10^6 Times``() =
+                
+        let f() =
             let dstType = typeof<int>
-            for i in 0..count do
+            for i in 0..itcount do
                 i |> TestTransformations.intToInt |> ignore
 
-        let bm1Result = Benchmark.run "Transform1" bm1 
-        let bm2Result = Benchmark.run "Transform2" bm2
-        let bm3Result = Benchmark.run "Transform2" bm3
-        ()
-
-        
+        f |> Benchmark.capture
         
 
         

@@ -113,24 +113,31 @@ module Claim =
         (<=) l r |> isTrue
 
     /// <summary>
-    /// Asserts that the supplied sequence has not items
+    /// Asserts that the supplied sequence has no items
     /// </summary>
     /// <param name="seq">The sequence to examine</param>
-    let seqIsEmpty (seq : seq<_>) =
-        seq |> Seq.isEmpty |> isTrue
+    let seqIsEmpty (s : seq<_>) =
+        s |> Seq.isEmpty |> isTrue
+    /// <summary>
+    /// Asserts that the supplied sequence is not empty
+    /// </summary>
+    /// <param name="seq">The sequence to examine</param>
+    let seqNotEmpty (s : seq<_>) =
+        s |> Seq.isEmpty |> isFalse
+
 
     /// <summary>
-    /// Asserts that an item is contained in a list
+    /// Asserts that an item is contained in a sequence
     /// </summary>
     /// <param name="list">The list to search</param>
     /// <param name="item">The item to search for</param>
-    let inList list item =
-       list |> List.exists(fun x -> x = item) |> isTrue
+    let seqIn s item =
+       s |> Seq.exists(fun x -> x = item) |> isTrue
 
     /// <summary>
-    /// Asserts that a list has a specified length
+    /// Asserts that a sequence has a specified length
     /// </summary>
     /// <param name="list">The list to search</param>
     /// <param name="item">The item to search for</param>
-    let listHasLength length (list : list<_>) =
-        list.Length |> equal length
+    let seqCount count (s : seq<_>) =
+        s |> Seq.length|> equal count

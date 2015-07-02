@@ -69,6 +69,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <EmbeddedResource Include="Resources\EmbeddedResource01.txt" />
+    <Compile Include="AssemblyInit.fs" />
     <Compile Include="LangTest.fs" />
     <Compile Include="TxtTest.fs" />
     <Compile Include="ClrUtilitiesTest.fs" />
@@ -77,8 +78,8 @@
     <Compile Include="ConnectionStringTest.fs" />
     <Compile Include="ClrElementTest.fs" />
     <Compile Include="RecordValueTest.fs" />
-    <Compile Include="Synthetics\OrderedSequence.fs" />
     <Compile Include="Data\DataStorageTypeTest.fs" />
+    <Compile Include="Synthetics\OrderedSequence.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
@@ -93,6 +94,11 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />
+    <ProjectReference Include="..\IQ.Core.Data.Sql\IQ.Core.Data.Sql.fsproj">
+      <Name>IQ.Core.Data.Sql</Name>
+      <Project>{29aedcf6-3187-4c89-aa30-d3d60a8e3379}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Framework\IQ.Core.Framework.fsproj">
       <Name>IQ.Core.Framework</Name>
       <Project>{8e2497e0-941b-4ca7-ab78-4ca15291c56a}</Project>

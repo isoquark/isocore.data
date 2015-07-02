@@ -32,6 +32,8 @@ type TestInitAttribute = NUnit.Framework.SetUpAttribute
 
 type TestCleanupAttribute = NUnit.Framework.TearDownAttribute
 
+type ExpectedErrorAttribute = NUnit.Framework.ExpectedExceptionAttribute
+
 /// <summary>
 /// Defines base type for test assembly initializers
 /// </summary>
