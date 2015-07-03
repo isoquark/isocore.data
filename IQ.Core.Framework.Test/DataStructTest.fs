@@ -13,7 +13,7 @@ open IQ.Core.DataStructLib
 [<TestContainer>]
 module DataStructTest =
     let numLookups = pown 10 6
-    let itemcount = Nullable<int>(100)
+    let itemcount = Nullable<int>(pown 8 3)
     
     //all in one function: initialized container with random data and executes lookups
     let ContainerInitAndRun<'T when 'T :> IDataContainer 
@@ -21,7 +21,7 @@ module DataStructTest =
                         and 'T :> IDisposable>() =
         use c = new 'T()
         c.Init(itemcount)
-        c.ExecuteRandomLookup() |> ignore
+        c.ExecuteRandomLookup()
 
     //(STEP 1) initializes container with random data
     let ContainerInit<'T when 'T :> IDataContainer 
@@ -39,14 +39,14 @@ module DataStructTest =
         container.Dispose()
 
     [<Fact; BenchmarkTrait>]
-    let ``Benchmark - Composite Key Container Init 100 Types``() =
+    let ``Benchmark - Composite Key Container Init 8^3 Types``() =
         let f() = 
-            ContainerInitAndRun<CompositeKeyDictionaryContainer>() 
+            ContainerInit<CompositeKeyDictionaryContainer>()  |> ignore
 
         f |> Benchmark.capture
 
     [<Fact; BenchmarkTrait>]
-    let ``Benchmark - CompositeKey Container Init 100 Types 10^6 Lookups``() =
+    let ``Benchmark - CompositeKey Container Init 8^3 Types 10^6 Lookups``() =
         let container = ContainerInit<CompositeKeyDictionaryContainer>()
         let f() = 
             ContainerLookup<CompositeKeyDictionaryContainer> container numLookups
@@ -54,14 +54,14 @@ module DataStructTest =
         f |> Benchmark.capture
 
     [<Fact; BenchmarkTrait>]
-    let ``Benchmark - Double Dictionary Container Init 100 Types``() =
+    let ``Benchmark - Double Dictionary Container Init 8^3 Types``() =
         let f() = 
-            ContainerInitAndRun<DictionaryOfDictionariesContainer>() 
+            ContainerInit<DictionaryOfDictionariesContainer>()  |> ignore
 
         f |> Benchmark.capture
 
     [<Fact; BenchmarkTrait>]
-    let ``Benchmark - Double Dictionary Container Init 100 Types 10^6 Lookups``() =
+    let ``Benchmark - Double Dictionary Container Init 8^3 Types 10^6 Lookups``() =
         let container = ContainerInit<DictionaryOfDictionariesContainer>()
         let f() = 
             ContainerLookup<DictionaryOfDictionariesContainer> container numLookups
@@ -69,14 +69,11 @@ module DataStructTest =
         f |> Benchmark.capture
 
     [<Fact; BenchmarkTrait>]
-    let ``Benchmark - Matrix Container Init 100 Types``() =
-        let f() = 
-            ContainerInitAndRun<MatrixContainer>() 
-
-        f |> Benchmark.capture
+    let ``Benchmark - Matrix Container Init 8^3 Types``() =
+        (fun () -> ContainerInit<MatrixContainer>() |> ignore) |> Benchmark.capture
 
     [<Fact; BenchmarkTrait>]
-    let ``Benchmark - Matrix Container Init 100 Types 10^6 Lookups``() =
+    let ``Benchmark - Matrix Container Init 8^3 Types 10^6 Lookups``() =
         let container = ContainerInit<MatrixContainer>()
         let f() = 
             ContainerLookup<MatrixContainer> container numLookups
