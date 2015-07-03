@@ -12,7 +12,7 @@ open IQ.Core.DataStructLib
 
 [<TestContainer>]
 module DataStructTest =
-    let numLookups = pown 10 3
+    let numLookups = pown 10 6
     let itemcount = Nullable<int>(100)
     
     //all in one function: initialized container with random data and executes lookups
@@ -46,7 +46,7 @@ module DataStructTest =
         f |> Benchmark.capture
 
     [<Fact; BenchmarkTrait>]
-    let ``Benchmark - CompositeKey Container Init 100 Types 10^3 Lookups``() =
+    let ``Benchmark - CompositeKey Container Init 100 Types 10^6 Lookups``() =
         let container = ContainerInit<CompositeKeyDictionaryContainer>()
         let f() = 
             ContainerLookup<CompositeKeyDictionaryContainer> container numLookups
@@ -61,7 +61,7 @@ module DataStructTest =
         f |> Benchmark.capture
 
     [<Fact; BenchmarkTrait>]
-    let ``Benchmark - Double Dictionary Container Init 100 Types 10^3 Lookups``() =
+    let ``Benchmark - Double Dictionary Container Init 100 Types 10^6 Lookups``() =
         let container = ContainerInit<DictionaryOfDictionariesContainer>()
         let f() = 
             ContainerLookup<DictionaryOfDictionariesContainer> container numLookups
@@ -76,7 +76,7 @@ module DataStructTest =
         f |> Benchmark.capture
 
     [<Fact; BenchmarkTrait>]
-    let ``Benchmark - Matrix Container Init 100 Types 10^3 Lookups``() =
+    let ``Benchmark - Matrix Container Init 100 Types 10^6 Lookups``() =
         let container = ContainerInit<MatrixContainer>()
         let f() = 
             ContainerLookup<MatrixContainer> container numLookups

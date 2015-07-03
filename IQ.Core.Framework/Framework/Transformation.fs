@@ -190,6 +190,7 @@ module Transformer =
     /// delegate is of the form T:obj->obj
     /// </summary>
     /// <param name="m">The (static) method that will be executed when the delegate is invoked</param>
+    /// TODO: Make this work for an arbitrary number of arguments and VOID return type
     let private createDelegate(m : MethodInfo) =
         //Define input parameter and 
         let input = Expression.Parameter(typeof<obj>, "input")

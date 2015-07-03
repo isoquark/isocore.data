@@ -95,6 +95,7 @@
     <Compile Include="Data\CsvData.fs" />
     <Compile Include="Synthetics\OrderedSequence.fs" />
     <Compile Include="CoreServices.fs" />
+    <Compile Include="Etl\EtlVocabulary.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Autofac">
