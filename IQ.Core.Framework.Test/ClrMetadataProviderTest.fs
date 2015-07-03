@@ -2,9 +2,6 @@
 open System
 open System.ComponentModel
 
-open IQ.Core.Framework
-open IQ.Core.TestFramework
-
 [<TestContainer>]
 module ClrMetadataProviderTest =
     module private ModuleA =

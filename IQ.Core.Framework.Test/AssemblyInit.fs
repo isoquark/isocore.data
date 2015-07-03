@@ -1,7 +1,5 @@
 ﻿namespace IQ.Core.Framework.Test
 
-open IQ.Core.Framework
-open IQ.Core.TestFramework
 open IQ.Core.Data.Sql
 
 
@@ -43,4 +41,4 @@ module Benchmark =
         store.pBenchmarkResultPut summary.Name summary.MachineName summary.StartTime summary.EndTime summary.Duration |> ignore
 
     let inline capture (f:unit->unit) =
-        f |> Benchmark.run (Benchmark.deriveName()) |> record
+        f |> Benchmark.run (Benchmark.deriveDesignator()) |> record

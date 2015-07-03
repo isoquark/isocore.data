@@ -150,6 +150,7 @@ module OrderedSequence =
             member this.NextValue<'T when 'T : comparison>() =  getNextValue() :> obj :?> 'T
             member this.NextRange<'T when 'T : comparison>(count) = (getNextRange count).Cast<'T>() 
 
+    //type private DateTimeSequence(config : Ordered)
         
 
     let private createSequence (config : OrderedSequenceConfig) =

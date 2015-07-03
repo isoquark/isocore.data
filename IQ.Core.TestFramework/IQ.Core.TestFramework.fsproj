@@ -70,6 +70,7 @@
   </Target>
   <ItemGroup>
     <None Include="packages.config" />
+    <Compile Include="AssemblyInfo.fs" />
     <Compile Include="XUnit.fs" />
     <Compile Include="NUnit.fs" />
     <Compile Include="Benchmark.fs" />

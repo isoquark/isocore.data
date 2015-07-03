@@ -1,12 +1,10 @@
 ﻿namespace IQ.Core.Framework.Test
 
-open IQ.Core.TestFramework
-open IQ.Core.Framework
-open IQ.Core.Data
-
 open System
 open System.Reflection
 open System.Linq.Expressions
+
+open IQ.Core.Data
 
 
 module TestTransformations =

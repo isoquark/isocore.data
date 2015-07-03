@@ -1,8 +1,6 @@
 ﻿namespace IQ.Core.Framework.Test
-open System
 
-open IQ.Core.Framework
-open IQ.Core.TestFramework
+open System
 open System.Collections.Generic
 
 [<TestContainer>]

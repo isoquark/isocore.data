@@ -4,8 +4,6 @@ open System
 open System.IO
 open System.Diagnostics
 
-open IQ.Core.Framework
-
 open NUnit.Framework
 
 

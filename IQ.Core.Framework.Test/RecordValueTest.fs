@@ -2,8 +2,6 @@
 
 open System
 
-open IQ.Core.TestFramework
-open IQ.Core.Framework
 
 [<TestContainer>]
 module RecordValueTest =

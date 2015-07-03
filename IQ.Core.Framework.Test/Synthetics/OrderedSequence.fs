@@ -3,8 +3,6 @@
 open System
 open System.Collections.Generic
 
-open IQ.Core.Framework
-open IQ.Core.TestFramework
 open IQ.Core.Data
 open IQ.Core.Data.Sql
 
@@ -78,8 +76,8 @@ module OrderedSequenceTest =
         
 
     [<Fact; BenchmarkTrait>]
-    let ``Benchmark - Int32 Framework Sequence Generation - 10^6 Calls``() =
-        let name = Benchmark.deriveName()
+    let ``Benchmark - Int32 Framework Sequence Generation: 10^6 Calls``() =
+        let name = Benchmark.deriveDesignator()
            
         let f() =
             let minValue = 0
@@ -102,7 +100,32 @@ module OrderedSequenceTest =
         f |> Benchmark.capture
 
     [<Fact; BenchmarkTrait>]
-    let ``Benchmark - Int32 Direct Sequence Generation - 10^6 Calls``() =
+    let ``Benchmark - Int64 Framework Sequence Generation: 10^6 Calls``() =
+        let name = Benchmark.deriveDesignator()
+           
+        let f() =
+            let minValue = 0L
+            let maxValue = pown 10L 6
+            let c1() : OrderedSequenceConfig =
+                {
+                    Name = name
+                    ItemDataKind = DataKind.Int64
+                    MinValue = int64(minValue)
+                    MaxValue = int64(maxValue)
+                    InitialValue = int64(minValue)
+                    Increment = int64(1L)
+                    Cycle = false
+                }
+        
+            let s1 = c1() |> OrderedSequence.get<int64>
+            for i in minValue..maxValue do
+                s1.NextValue() |> ignore
+
+        f |> Benchmark.capture
+
+
+    [<Fact; BenchmarkTrait>]
+    let ``Benchmark - Int32 Direct Sequence Generation: 10^6 Calls``() =
            
         let f() =
             let e = OrderedSequence.createEnumerator 0 0 1 (pown 10 6) false

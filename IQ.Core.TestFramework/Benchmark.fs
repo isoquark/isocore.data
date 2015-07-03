@@ -5,7 +5,6 @@ open System.IO
 open System.Diagnostics
 open System.Reflection
 
-open IQ.Core.Framework
 open IQ.Core.Data
 
 /// <summary>
@@ -51,6 +50,18 @@ module BenchmarkVocabulary =
         [<Procedure>]
         abstract pBenchmarkResultPut:BenchmarkName : string -> MachineName : string -> StartTime : DateTime -> EndTime : DateTime -> Duration : int -> [<return : RoutineParameter("Id", 5)>] int
  
+
+    type BenchmarkParameter = BenchmarkParameter of name : string * value : string
+    with
+        member this.Name = match this with BenchmarkParameter(name=x) -> x
+        member this.Value = match this with BenchmarkParameter(value=x) -> x
+
+    type BenchmarkDesignator = BenchmarkDesignator of name: string * parameters : BenchmarkParameter list
+    with
+        member this.Name = match this with BenchmarkDesignator(name=x) -> x
+        member this.Parameters = match this with BenchmarkDesignator(parameters=x) -> x
+    
+
 /// <summary>
 /// Implements capabilities related to benchmarking
 /// </summary>
@@ -139,7 +150,7 @@ module Benchmark =
     /// <summary>
     /// Derives the name of the benchmark from the currently executing method
     /// </summary>
-    let inline deriveName() =
+    let inline deriveDesignator() =
         let m = thisMethod()
         if m.Name |> Txt.startsWith BMC |> not then
             raise <| ArgumentException(sprintf "Method name \"%s\" does not align with convention" m.Name) 

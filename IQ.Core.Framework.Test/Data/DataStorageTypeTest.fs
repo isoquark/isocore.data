@@ -3,8 +3,6 @@
 open System
 open System.Diagnostics
 
-open IQ.Core.Framework
-open IQ.Core.TestFramework
 open IQ.Core.Data
 
 
@@ -67,5 +65,3 @@ module ``DataStorageType Test`` =
         DataTypeAttribute(DataKind.UnicodeTextVariable, 150) |> verifyAttribute (UnicodeTextVariableDataType(150))
         DataTypeAttribute(DataKind.Variant) |> verifyAttribute VariantDataType
         DataTypeAttribute(DataKind.Xml) |> verifyAttribute ( XmlDataType(""))
-
-        ()
