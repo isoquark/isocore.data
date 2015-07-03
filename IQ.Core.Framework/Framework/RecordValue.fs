@@ -27,7 +27,7 @@ module RecordValue =
         if t |> Type.isRecordType |> not then
             argerrord "o" o "Not a record value"
         t.TypeName   
-            |> ClrMetadata().DescribeType
+            |> ClrMetadata().FindType
             |> fun x -> x.Properties
             |> List.map(fun field ->                 
                 let p = field.ReflectedElement |> Option.get
@@ -43,7 +43,7 @@ module RecordValue =
         if t |> Type.isRecordType |> not then
             argerrord "o" o "Not a record value"
         t.TypeName   
-            |> ClrMetadata().DescribeType
+            |> ClrMetadata().FindType
             |> fun x -> x.Properties
             |> List.map(fun p -> p.ReflectedElement.Value.GetValue(o))
             |> Array.ofList
@@ -59,7 +59,7 @@ module RecordValue =
 
         let types = 
             t.TypeName   
-                |> ClrMetadata().DescribeType 
+                |> ClrMetadata().FindType 
                 |> fun x -> x.Properties
                 |> List.map(fun p -> p.ReflectedElement.Value.PropertyType) |> Array.ofList
             
@@ -75,7 +75,7 @@ module RecordValue =
         if t |> Type.isRecordType |> not then
             argerrord "o" t "Not a record type"
 
-        let fields =  t.TypeName   |> ClrMetadata().DescribeType |> fun x -> x.Properties
+        let fields =  t.TypeName   |> ClrMetadata().FindType |> fun x -> x.Properties
 
         let types = 
              fields |> List.map(fun p -> p.ReflectedElement.Value.PropertyType) 

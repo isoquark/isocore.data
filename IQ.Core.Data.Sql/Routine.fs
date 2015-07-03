@@ -82,9 +82,9 @@ module internal Routine =
             proxies |> List.tryFind
                 (
                     fun p -> match p.ProxyElement with                                
-                                | MemberDescription(x) -> 
+                                | MemberElement(x) -> 
                                     match x with
-                                    | MethodDescription(x) ->
+                                    | MethodMember(x) ->
                                         x.ReflectedElement.Value = m
                                     | _ -> ArgumentException() |> raise
                                 | _ -> ArgumentException() |> raise) 
@@ -164,7 +164,7 @@ module internal Routine =
                     match typedesc.CollectionKind with
                     | Some(collectionKind) ->
                         let provider = context.Resolve<IClrMetadataProvider>()
-                        let itemType = typedesc.Name |> provider.DescribeType |> fun x -> x.ReflectedElement.Value.ItemValueType
+                        let itemType = typedesc.Name |> provider.FindType |> fun x -> x.ReflectedElement.Value.ItemValueType
                         let items = 
                             [for row in result ->
                                 itemType |> RecordValue.fromValueArray row]

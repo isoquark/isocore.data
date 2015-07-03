@@ -101,7 +101,7 @@ module ClrUtilityVocabulary =
         /// <summary>
         /// Classifies a CLR element as a field
         /// </summary>
-        | StorageField = 3
+        | Field = 3
         /// <summary>
         /// Classifies a CLR element as an event
         /// </summary>

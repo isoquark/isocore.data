@@ -75,8 +75,8 @@ module ClrAssemblyTest =
     
     [<Fact>]
     let ``Traversed CLR element hierarchy``() =
-        let elements = ResizeArray<ClrElementDescription>()
-        let handler (e : ClrElementDescription) =
+        let elements = ResizeArray<ClrElement>()
+        let handler (e : ClrElement) =
             e |> elements.Add
-        typeinfo<RecordA> |> TypeDescription |> ClrElementDescription.walk handler
+        typeinfo<RecordA> |> TypeElement |> ClrElement.walk handler
 

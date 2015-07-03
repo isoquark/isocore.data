@@ -14,19 +14,31 @@ module ClrMetadataProviderVocbulary =
         Assemblies : ClrAssemblyName list
     }
 
+    /// <summary>
+    /// Defines contract realized by CLR metadata provider
+    /// </summary>
     type IClrMetadataProvider =
-        abstract DescribeTypes:ClrTypeQuery->ClrTypeDescription list
-        abstract DescribeAssemblies:ClrAssemblyQuery->ClrAssemblyDescription list
-        abstract DescribeProperties:ClrPropertyQuery->ClrPropertyDescription list
+        /// <summary>
+        /// Find types accessible to the provider
+        /// </summary>
+        abstract FindTypes:ClrTypeQuery->ClrType list
+        /// <summary>
+        /// Find assemblies accessible to the provider
+        /// </summary>
+        abstract FindAssemblies:ClrAssemblyQuery->ClrAssembly list
+        /// <summary>
+        /// Find properties accessible to the provider
+        /// </summary>
+        abstract FindProperties:ClrPropertyQuery->ClrProperty list
 
 /// <summary>
 /// Realizes client API for CLR metadata discovery
 /// </summary>
 module ClrMetadataProvider =    
     
-    let private assemblyDescriptions = ConcurrentDictionary<Assembly, ClrAssemblyDescription>()        
+    let private assemblyDescriptions = ConcurrentDictionary<Assembly, ClrAssembly>()        
     
-    let private typeIndex = ConcurrentDictionary<ClrTypeName, ClrTypeDescription>()
+    let private typeIndex = ConcurrentDictionary<ClrTypeName, ClrType>()
 
 
     let private getAssemblyDescriptions() =
@@ -68,7 +80,7 @@ module ClrMetadataProvider =
     let private createInputParameterDescription pos (p : ParameterInfo) =
         
         {
-            ClrParameterDescription.Name = p.ParameterName
+            ClrMethodParameter.Name = p.ParameterName
             Position = pos
             ReflectedElement = p |> Some
             Attributes = p.GetCustomAttributes() |> createAttributions p.ElementName
@@ -86,7 +98,7 @@ module ClrMetadataProvider =
           
           if m.ReturnType <> typeof<Void> then            
               yield {
-                    ClrParameterDescription.Name = ClrParameterName(String.Empty)
+                    ClrMethodParameter.Name = ClrParameterName(String.Empty)
                     Position = -1
                     ReflectedElement = None
                     Attributes = m |> MethodInfo.getReturnAttributes |> createAttributions m.ElementName
@@ -99,7 +111,7 @@ module ClrMetadataProvider =
 
     
     let private createMethodDescription pos (m : MethodInfo) = {
-        ClrMethodDescription.Name = m.Name |> ClrMemberName
+        ClrMethod.Name = m.Name |> ClrMemberName
         Position = pos
         ReflectedElement = m |> Some
         Access = m.Access
@@ -113,7 +125,7 @@ module ClrMetadataProvider =
 
     let private createPropertyDescription pos (p : PropertyInfo) =
         {
-            ClrPropertyDescription.Name = p.Name |> ClrMemberName 
+            ClrProperty.Name = p.Name |> ClrMemberName 
             Position = pos
             DeclaringType  = p.DeclaringType.TypeName
             ValueType = p.PropertyType.TypeName
@@ -137,7 +149,7 @@ module ClrMetadataProvider =
         let attributes = f.GetCustomAttributes() |> createAttributions f.ElementName
         let isLiteral = attributes |> ClrAttribution.tryFind typeof<LiteralAttribute> |> Option.isSome
         {
-            ClrFieldDescription.Name = f.Name |> ClrMemberName
+            ClrField.Name = f.Name |> ClrMemberName
             Position = pos
             ReflectedElement = f |> Some
             Access = f.Access
@@ -151,7 +163,7 @@ module ClrMetadataProvider =
 
     let private createConstructorDescription pos (c : ConstructorInfo) =
         {
-            ClrConstructorDescription.Name = c.MemberName
+            ClrConstructor.Name = c.MemberName
             Position = pos
             ReflectedElement = c |> Some
             Access = c.Access
@@ -163,7 +175,7 @@ module ClrMetadataProvider =
 
     let private createEventDescription pos (e : EventInfo) =
         {
-            ClrEventDescription.Name = e.MemberName
+            ClrEvent.Name = e.MemberName
             Position = pos
             ReflectedElement = e |> Some                
             Attributes = e.GetCustomAttributes() |> createAttributions e.ElementName
@@ -173,15 +185,15 @@ module ClrMetadataProvider =
     let private createMemberDescription pos (m : MemberInfo) =
         match m with
         | :? MethodInfo as x->
-            x |> createMethodDescription pos |> MethodDescription
+            x |> createMethodDescription pos |> MethodMember
         | :? PropertyInfo as x->
-            x |> createPropertyDescription pos |> PropertyDescription
+            x |> createPropertyDescription pos |> PropertyMember
         | :? FieldInfo as x -> 
-            x |> createFieldDescription pos |> FieldDescription
+            x |> createFieldDescription pos |> FieldMember
         | :? ConstructorInfo as x ->
-            x |> createConstructorDescription pos |> ConstructorDescription
+            x |> createConstructorDescription pos |> ConstructorMember
         | :? EventInfo as x ->
-            x |> createEventDescription pos |> EventDescription
+            x |> createEventDescription pos |> EventMember
         | _ ->
             nosupport()
     
@@ -190,7 +202,7 @@ module ClrMetadataProvider =
         let isCollection = t |> Type.isCollectionType
         let collKind = if isCollection then t |> Type.getCollectionKind |> Some else None
         {
-            ClrTypeDescription.Name = t.TypeName
+            ClrType.Name = t.TypeName
             Position = pos
             DeclaringType = if t.DeclaringType <> null then 
                                 t.DeclaringType.TypeName |> Some 
@@ -252,7 +264,7 @@ module ClrMetadataProvider =
         //Obviously, this is extremely inefficient
         members |> List.find(fun m ->
             match m with
-            | PropertyDescription(d) -> d.ReflectedElement = (Some(p))
+            | PropertyMember(d) -> d.ReflectedElement = (Some(p))
             | _ -> false)
   
     let private describeMember(subject : MemberInfo) =
@@ -268,18 +280,18 @@ module ClrMetadataProvider =
     let private describeParameter(subject : ParameterInfo) =
         let m = subject.Member |> describeMember
         match m with
-        | MethodDescription(x) -> x.Parameters
-        | ConstructorDescription(x) -> x.Parameters
+        | MethodMember(x) -> x.Parameters
+        | ConstructorMember(x) -> x.Parameters
         | _ -> nosupport()
         |> List.find(fun p -> p.Name = ClrParameterName(subject.Name))
 
 
     let private describElement(o : obj) =
         match o with
-        | :? Type as x -> x |> describeType |> TypeDescription
-        | :? MemberInfo as x -> x |> describeMember |> MemberDescription 
-        | :? Assembly as x -> x |> describeAssembly |> AssemblyDescription
-        | :? ParameterInfo as x -> x |> describeParameter  |> ParameterDescription
+        | :? Type as x -> x |> describeType |> TypeElement
+        | :? MemberInfo as x -> x |> describeMember |> MemberElement 
+        | :? Assembly as x -> x |> describeAssembly |> AssemblyElemement
+        | :? ParameterInfo as x -> x |> describeParameter  |> ParameterElement
         | _ -> nosupport()
     
 
@@ -330,9 +342,9 @@ module ClrMetadataProvider =
             config.Assemblies  |> List.map AppDomain.CurrentDomain.AcquireAssembly |> List.map(fun x -> x |> describeAssembly) |> ignore
 
         interface IClrMetadataProvider with
-            member this.DescribeTypes q = q |> findTypes
-            member this.DescribeAssemblies q = q |> findAssemblies
-            member this.DescribeProperties q = q |> findProperties
+            member this.FindTypes q = q |> findTypes
+            member this.FindAssemblies q = q |> findAssemblies
+            member this.FindProperties q = q |> findProperties
         
     let internal get(config) =
         ClrMetadataStore(config) :> IClrMetadataProvider
@@ -341,73 +353,65 @@ module ClrMetadataProvider =
         CompositionRoot.resolve<IClrMetadataProvider>()
     
 [<AutoOpen>]
-module internal ClrMetadataProviderInstance =
-    let ClrMetadata() = ClrMetadataProvider.getCurrent()        
-
-[<AutoOpen>]
 module ClrMetadataProviderExtensions =
     type IClrMetadataProvider 
     with
         /// <summary>
-        /// Describes exactly one type identified by the query; raises error if not found
+        /// Finds type identified by the query and raises error if not found
         /// </summary>
         /// <param name="q">Identifies the type</param>
-        member this.DescribeType q = 
-            q |> this.DescribeTypes |> Seq.exactlyOne
+        member this.FindType q = 
+            q |> this.FindTypes |> Seq.exactlyOne
         
         /// <summary>
-        /// Decribes exactly one type given its name
+        /// Finds type identified by name and raises error if not found
         /// </summary>
         /// <param name="name">The name of the type</param>
-        member this.DescribeType name = 
-            name |> FindTypeByName |> this.DescribeType 
+        member this.FindType name = 
+            name |> FindTypeByName |> this.FindType 
 
         /// <summary>
-        /// Describes the identified property
+        /// Finds property identified by the query and raises error if not found
         /// </summary>
         /// <param name="q">Identifies the property</param>
-        member this.DescribeProperty q =
-            q |> this.DescribeProperties |> Seq.exactlyOne
+        member this.FindProperty q =
+            q |> this.FindProperties |> Seq.exactlyOne
 
         /// <summary>
-        /// Describes exactly one asseembly identified by the query; raises error if not found
+        /// Finds assembly identified by the query and raises error if not found
         /// </summary>
         /// <param name="q">Identifies the assembly</param>
-        member this.DesribeAssembly q =
-            q |> this.DescribeAssemblies |> Seq.exactlyOne
+        member this.FindAssembly q =
+            q |> this.FindAssemblies |> Seq.exactlyOne
         
         /// <summary>
-        /// Describes exactly one asseembly identified by name; raises error if not found
+        /// Finds assembly identified by name and raises error if not found
         /// </summary>
-        /// <param name="q">Identifies the assembly</param>
-        member this.DescribeAssembly name =
-            name |> FindAssemblyByName |> this.DesribeAssembly
-        
-
-
-                      
-
-module ClrElementDescription = 
+        /// <param name="name">Identifies the assembly</param>
+        member this.FindAssembly name =
+            name |> FindAssemblyByName |> this.FindAssembly
+                              
+module ClrElement = 
     let getChildren element =
         match element with
-        | MemberDescription(m) ->
+        | MemberElement(m) ->
             match m with
-            | MethodDescription(x) -> 
-                x.Parameters |> List.map(fun x -> x |> ParameterDescription)
+            | MethodMember(x) -> 
+                x.Parameters |> List.map(fun x -> x |> ParameterElement)
             |_ -> []            
-        | TypeDescription(d) -> 
-            d.Members |> List.map(fun x -> x |> MemberDescription)
-        | AssemblyDescription(z) ->
-            z.Types |> List.map(fun x -> x |> TypeDescription)
-        | ParameterDescription(_) -> []
-        | UnionCaseDescription(_) -> []
+        | TypeElement(d) -> 
+            d.Members |> List.map(fun x -> x |> MemberElement)
+        | AssemblyElemement(z) ->
+            z.Types |> List.map(fun x -> x |> TypeElement)
+        | ParameterElement(_) -> []
+        | UnionCaseElement(_) -> []
 
     /// <summary>
     /// Recursively traverses the element hierarchy graph and invokes the supplied handler as each element is traversed
     /// </summary>
     /// <param name="handler">The handler that will be invoked for each element</param>
     /// <param name="element"></param>
-    let rec walk (handler:ClrElementDescription->unit) element =
+    let rec walk (handler:ClrElement->unit) element =
         element |> handler
         let children = element |> getChildren
         children |> List.iter (fun child -> child |> walk handler)
@@ -417,7 +421,7 @@ module ClrElementDescription =
     /// </summary>
     /// <param name="handler">The handlers that will be invoked for each element</param>
     /// <param name="element"></param>
-    let multiwalk (handlers: (ClrElementDescription->unit) list) element =
+    let multiwalk (handlers: (ClrElement->unit) list) element =
         let handler e =
             handlers |> List.iter(fun handler -> e|> handler)
         
@@ -429,7 +433,7 @@ module ClrElementDescription =
     /// </summary>
     /// <param name="element">The element to examine</param>
     /// <param name="attribType">The type of attribute to match</param>
-    let tryGetAttribute (element : ClrElementDescription) attribType =
+    let tryGetAttribute (element : ClrElement) attribType =
         element.Attributes |> ClrAttribution.tryFind attribType
     
     /// <summary>
@@ -453,14 +457,14 @@ module ClrElementDescription =
     /// </summary>
     /// <param name="element">The element to examine</param>
     /// <param name="attribType">The type of attribute to match</param>
-    let getAttributes (element : ClrElementDescription) attribType =
+    let getAttributes (element : ClrElement) attribType =
         element.Attributes |> List.filter(fun x -> x.AttributeName = attribType)
 
     /// <summary>
     /// Retrieves an attribute applied to a member, if present
     /// </summary>
     /// <param name="subject">The type to examine</param>
-    let tryGetAttributeT<'T when 'T :> Attribute> (element : ClrElementDescription) =
+    let tryGetAttributeT<'T when 'T :> Attribute> (element : ClrElement) =
         match  element.Attributes |> ClrAttribution.tryFind typeof<'T> with
         | Some(x) -> 
             match x.AttributeInstance with
@@ -473,7 +477,7 @@ module ClrElementDescription =
     /// Determines whether an attribute is applied to an element
     /// </summary>
     /// <param name="element">The element to examine</param>
-    let hasAttributeT<'T when 'T :> Attribute>(element : ClrElementDescription) =
+    let hasAttributeT<'T when 'T :> Attribute>(element : ClrElement) =
         element |> tryGetAttributeT<'T> |> Option.isSome
                     
     /// <summary>
@@ -485,24 +489,26 @@ module ClrElementDescription =
         element |> tryGetAttributeT<'T> |> Option.get
 
     
+[<AutoOpen>]
+module internal ClrMetadataProviderInstance =
+    //This sucks, but we really have to do this if we are going to have the convenient operators below
+    let ClrMetadata() = ClrMetadataProvider.getCurrent()        
         
                                            
 [<AutoOpen>]
 module ClrDescriptionExtensions =
-
     /// <summary>
     /// Creates a property description map keyed by name
     /// </summary>        
     let propinfos<'T> = 
         typeof<'T>.TypeName |> FindTypeByName |> FindPropertiesByType 
-                            |> ClrMetadata().DescribeProperties 
+                            |> ClrMetadata().FindProperties 
                             |> List.map(fun x -> x.Name, x) 
-                            |> Map.ofList
-               
+                            |> Map.ofList               
     /// <summary>
     /// Describes the type identified by a type prameter
     /// </summary>
-    let typeinfo<'T> = typeof<'T>.TypeName |> ClrMetadata().DescribeType
+    let typeinfo<'T> = typeof<'T>.TypeName |> ClrMetadata().FindType
 
     /// <summary>
     /// Gets the methods defined by a type

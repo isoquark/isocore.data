@@ -123,13 +123,13 @@ module Transformer =
         let delegateIndex = createDelegateIndex()
         let category = defaultArg config.Category DefaultTransformerCategory
         let identifiers = ResizeArray<TransformationIdentifier>()
-        let handler (e : ClrElementDescription) =
+        let handler (e : ClrElement) =
             match e with
-            | MemberDescription(m) ->
+            | MemberElement(m) ->
                 match m with 
-                | MethodDescription(m) ->
+                | MethodMember(m) ->
                     if m.IsStatic then
-                        match e |> ClrElementDescription.tryGetAttributeT<TransformationAttribute> with
+                        match e |> ClrElement.tryGetAttributeT<TransformationAttribute> with
                         | Some(a) -> 
                             if a.Category = category then                                
                                 let parameters = m.Parameters |>List.filter(fun p -> p.IsReturn = false)
@@ -138,7 +138,7 @@ module Transformer =
                    
                                 let parameter = parameters.Head.ReflectedElement |> Option.get
                                 let srcType = parameter.ParameterType
-                                let dstType = m.ReturnType |> Option.get |> provider.DescribeType |> fun x -> x.ReflectedElement.Value
+                                let dstType = m.ReturnType |> Option.get |> provider.FindType |> fun x -> x.ReflectedElement.Value
                     
                                 let del = m.ReflectedElement.Value |> createDelegate
                                 let key = createKey srcType dstType
@@ -151,8 +151,8 @@ module Transformer =
             | _ -> ()
         
         
-        config.SearchAssemblies |> List.map(fun x -> x |> provider.DescribeAssembly) 
-                                |> List.iter (fun x -> x |> AssemblyDescription |> ClrElementDescription.walk handler)
+        config.SearchAssemblies |> List.map(fun x -> x |> provider.FindAssembly) 
+                                |> List.iter (fun x -> x |> AssemblyElemement |> ClrElement.walk handler)
 
 
         delegateIndex, identifiers |> List.ofSeq

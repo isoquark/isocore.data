@@ -16,7 +16,7 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a column proxy
     /// </summary>
-    type ColumnProxyDescription = ColumnProxyDescription of field : ClrPropertyDescription * dataElement : ColumnDescription
+    type ColumnProxyDescription = ColumnProxyDescription of field : ClrProperty * dataElement : ColumnDescription
     with
         /// <summary>
         /// Specifies the proxy record field
@@ -33,7 +33,7 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a proxy for a tabular result set
     /// </summary>
-    type TableFunctionResultProxyDescription = TabularResultProxyDescription of proxy : ClrTypeDescription  * dataElement : TableFunctionDescription * columns : ColumnProxyDescription list
+    type TableFunctionResultProxyDescription = TabularResultProxyDescription of proxy : ClrType  * dataElement : TableFunctionDescription * columns : ColumnProxyDescription list
     with
         /// <summary>
         /// Specifies the proxy record
@@ -56,7 +56,7 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a table proxy
     /// </summary>
-    type TabularProxyDescription = TablularProxyDescription of proxy : ClrTypeDescription * dataElement : TabularDescription * columns : ColumnProxyDescription list
+    type TabularProxyDescription = TablularProxyDescription of proxy : ClrType * dataElement : TabularDescription * columns : ColumnProxyDescription list
     with
         /// <summary>
         /// Specifies the proxy record
@@ -81,7 +81,7 @@ module DataProxyMetamodel =
     /// Describes a proxy for a routine parameter
     /// </summary>
     [<DebuggerDisplay("{DebuggerDisplay,nq}")>]
-    type ParameterProxyDescription = ParameterProxyDescription of proxy : ClrParameterDescription * proxyParameterPosition : int * dataElement : RoutineParameterDescription 
+    type ParameterProxyDescription = ParameterProxyDescription of proxy : ClrMethodParameter * proxyParameterPosition : int * dataElement : RoutineParameterDescription 
     with   
         /// <summary>
         /// Specifies  the CLR proxy element
@@ -107,7 +107,7 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a proxy for a stored procedure
     /// </summary>
-    type ProcedureCallProxyDescription = ProcedureCallProxyDescription of proxy : ClrMethodDescription * dataElement : ProcedureDescription * parameters : ParameterProxyDescription list
+    type ProcedureCallProxyDescription = ProcedureCallProxyDescription of proxy : ClrMethod * dataElement : ProcedureDescription * parameters : ParameterProxyDescription list
     with
         /// <summary>
         /// Specifies  the CLR proxy element
@@ -130,7 +130,7 @@ module DataProxyMetamodel =
     /// <summary>
     /// Describes a proxy for calling a table-valued function
     /// </summary>
-    type TableFunctionCallProxyDescription = TableFunctionCallProxyDescription of proxy : ClrMethodDescription * dataElement : TableFunctionDescription * parameters : ParameterProxyDescription list
+    type TableFunctionCallProxyDescription = TableFunctionCallProxyDescription of proxy : ClrMethod * dataElement : TableFunctionDescription * parameters : ParameterProxyDescription list
     with
         /// <summary>
         /// Specifies  the CLR proxy element
@@ -193,11 +193,11 @@ module DataObjectProxy =
     let getProxyElement (subject : DataObjectProxy) =
         match subject with
         | TabularProxy(proxy) -> 
-            proxy.ProxyElement |> TypeDescription
+            proxy.ProxyElement |> TypeElement
         | ProcedureProxy(proxy) -> 
-            proxy.ProxyElement |> MethodDescription |> MemberDescription
+            proxy.ProxyElement |> MethodMember |> MemberElement
         | TableFunctionProxy(proxy) ->
-            proxy.CallProxy.ProxyElement |> MethodDescription |> MemberDescription
+            proxy.CallProxy.ProxyElement |> MethodMember |> MemberElement
 
     let getDataElement (subject : DataObjectProxy) =
         match subject with

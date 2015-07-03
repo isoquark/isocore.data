@@ -147,7 +147,7 @@ module ``Proxy Discovery`` =
 
     [<FactAttribute>]
     let ``Inferred schema name from table proxy``() =
-        typeinfo<ModuleB.RecordA> |> TypeDescription |> DataProxyMetadata.inferSchemaName |> Claim.equal "MySchema"
+        typeinfo<ModuleB.RecordA> |> TypeElement |> DataProxyMetadata.inferSchemaName |> Claim.equal "MySchema"
 
 
     [<FactAttribute>]

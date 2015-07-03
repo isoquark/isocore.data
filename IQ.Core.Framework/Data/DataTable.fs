@@ -90,7 +90,7 @@ module DataTable =
     /// </summary>
     /// <param name="t">The proxy type</param>
     /// <param name="dataTable">The data table</param>
-    let toProxyValues (t : ClrTypeDescription) (dataTable : DataTable) =
+    let toProxyValues (t : ClrType) (dataTable : DataTable) =
         match t.CollectionKind with        
         | Some(collectionKind) ->
             let items = 
@@ -108,7 +108,7 @@ module DataTable =
     /// </summary>
     /// <param name="t">The proxy type</param>
     /// <param name="dataTable">The data table</param>
-    let toProxyValuesT<'T> (t : ClrTypeDescription) (dataTable : DataTable) =
+    let toProxyValuesT<'T> (t : ClrType) (dataTable : DataTable) =
         dataTable |> toProxyValues t :?> IEnumerable<'T>
 
  

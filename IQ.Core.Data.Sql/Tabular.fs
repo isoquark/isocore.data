@@ -26,7 +26,7 @@ module internal Tabular =
         command.CommandType <- CommandType.Text
         command |> SqlCommand.executeQuery tabular.Columns
 
-    let executeProxyQuery cs (tdesc : ClrTypeDescription) =
+    let executeProxyQuery cs (tdesc : ClrType) =
         let proxy = tdesc |> DataProxyMetadata.describeTablularProxy
         let data = proxy.DataElement |> executeQuery cs
         let itemType = tdesc.ReflectedElement.Value

@@ -23,7 +23,7 @@ module ClrMetadataProviderTest =
     [<Fact>]
     let ``Described records``() =
         //No optional fields
-        let t1 = typeof<ModuleA.RecordA>.TypeName |> ClrMetadata().DescribeType
+        let t1 = typeof<ModuleA.RecordA>.TypeName |> ClrMetadata().FindType
         t1.Name.SimpleName |> Claim.equal typeof<ModuleA.RecordA>.Name
         t1.Members.Length |> Claim.equal 3
         t1.Members.[0].Name.Text |> Claim.equal "FieldA1"
@@ -31,7 +31,7 @@ module ClrMetadataProviderTest =
         t1.Members.[2].Name.Text |> Claim.equal "FieldA3"
 
         //Optional fields
-        let t2 = typeof<ModuleA.RecordB>.TypeName |> ClrMetadata().DescribeType
+        let t2 = typeof<ModuleA.RecordB>.TypeName |> ClrMetadata().FindType
         let t2Props = t2.Properties
         t2Props.Length |> Claim.equal 3  
         
@@ -114,7 +114,7 @@ module ClrMetadataProviderTest =
 
     [<Fact>]
     let ``Described interfaces``() =
-        let t = typeof<IInterfaceB>.TypeName |> ClrMetadata().DescribeType
+        let t = typeof<IInterfaceB>.TypeName |> ClrMetadata().FindType
         t.Members.Length |> Claim.equal 5
 
     type ClassA() =   
@@ -230,7 +230,7 @@ module ClrMetadataProviderTest =
 
     [<Fact>]
     let ``Found types by name``() =
-        typeof<UnionA>.TypeName |> ClrMetadata().DescribeType 
+        typeof<UnionA>.TypeName |> ClrMetadata().FindType 
                                 |> fun x -> x.Name 
                                 |> Claim.equal (typeof<UnionA>.TypeName)
 
@@ -259,7 +259,7 @@ module ClrMetadataProviderTest =
 
     [<Fact>]
     let ``Discovered literals defined in a module``() =
-        let m = typeof<Literals.Dummy>.DeclaringType.TypeName |> ClrMetadata().DescribeType
+        let m = typeof<Literals.Dummy>.DeclaringType.TypeName |> ClrMetadata().FindType
         m.Fields |> Claim.seqCount 2
         m.Fields.[0].IsLiteral |> Claim.isTrue
         m.Fields.[0].LiteralValue |> Option.get |> Claim.equal (Literals.Literal1.ToString())
