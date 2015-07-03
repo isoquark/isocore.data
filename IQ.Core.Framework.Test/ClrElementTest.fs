@@ -56,7 +56,7 @@ open ClrElementTestTypes
         
 [<TestContainer>]
 module ClrElementNameTests =
-    [<Test>]
+    [<Fact>]
     let ``Retreived CLR type name from type``() =
         let t = typeof<RecordA>
         let actual = typeinfo<RecordA>.Name
@@ -65,18 +65,18 @@ module ClrElementNameTests =
 
 [<TestContainer>]
 module ClrAssemblyTest =
-    [<Test>]
+    [<Fact>]
     let ``Extracted embedded text resource from assembly``() =
         let text = thisAssembly() |> Assembly.findTextResource "EmbeddedResource01.txt"
         text |> Claim.isSome
         text.Value.Trim() |> Claim.equal "This is an embedded text resource"
     
 
-    [<Test>]
+    [<Fact>]
     let ``Discovered type child elements``() =
         typeinfo<ClassA>.Members.Length |> Claim.equal 6
     
-    [<Test>]
+    [<Fact>]
     let ``Traversed CLR element hierarchy``() =
         let elements = ResizeArray<ClrElementDescription>()
         let handler (e : ClrElementDescription) =

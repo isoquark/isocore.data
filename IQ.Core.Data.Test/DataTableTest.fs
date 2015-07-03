@@ -17,7 +17,7 @@ module DataTableTest =
         Field03 : string
     }
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Created DataTable from record metadata - strongly typed``() =
         let dataTable = tabularproxy<DataTableRecord> |> TabularProxy |> DataTable.fromProxyDescription
         Claim.equal 3 dataTable.Columns.Count
@@ -25,7 +25,7 @@ module DataTableTest =
         Claim.equal (typeof<int64>) dataTable.Columns.[0].DataType
 
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Created DataTable from list of record values - weakly typed``() =
         let recordValues = [
             {Field01 = 1000L; Field02 = true; Field03 = "ABC"} :> obj
@@ -39,7 +39,7 @@ module DataTableTest =
         Claim.equal true (dataTable |> DataTable.getValue 0 1)
         Claim.equal "ABC" (dataTable |> DataTable.getValue 0 2)
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Created DataTable from list of record values - strongly typed``() =
         let recordValues = [
             {Field01 = 1000L; Field02 = true; Field03 = "ABC"}
@@ -54,7 +54,7 @@ module DataTableTest =
         Claim.equal "ABC" (dataTable |> DataTable.getValue 0 2)
 
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Created record values from a DataTable - weakly  typed``() =
         let description = typeinfo<DataTableRecord>
         

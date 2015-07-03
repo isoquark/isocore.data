@@ -19,7 +19,7 @@ module ``Tabular Query and Manipulation`` =
     let private cs = ConfigSettingNames.SqlTestDb |> config.GetValue 
     let store = Context.Resolve<ISqlDataStore>(ConfigSettingNames.SqlTestDb, cs |> ConnectionString.parse)
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Queried [Metadata].[vDataType] - Partial column set A``() =
         let items = store.Get<Metadata.vDataTypeA>() 
                  |> List.map(fun item -> item.DataTypeName, item) 
@@ -29,7 +29,7 @@ module ``Tabular Query and Manipulation`` =
         money.Nullable |> Claim.isTrue
         money.SchemaName |> Claim.equal "sys"
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Queried [Metadata].[vDataType] - Partial column set B``() =
         let items = store.Get<Metadata.vDataTypeB>() 
                  |> List.map(fun item -> item.DataTypeName, item) 
@@ -51,7 +51,7 @@ module ``Tabular Query and Manipulation`` =
         
 
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Bulk inserted data into [SqlTest].[Table05]``() =
         let input = [
             {Table05.Col01 = 1; Col02 = 2uy; Col03 = 3s; Col04=5L}
@@ -61,7 +61,7 @@ module ``Tabular Query and Manipulation`` =
         verifyBulkInsert input (fun x -> x.Col01 :> IComparable)
    
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Bulk inserted data into [SqlTest].[Table06]``() =
         let input = [
             {Table06.Col01 = 1; Col02 = Some 2uy; Col03 = Some 3s; Col04=5L}
@@ -71,7 +71,7 @@ module ``Tabular Query and Manipulation`` =
         verifyBulkInsert input (fun x -> x.Col01 :> IComparable)
 
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Bulk inserted data into [SqlTest].[Table07]``() =
         let input = [
             {Table07.Col01 = Some(1); Col02 = "ABC"; Col03 = "DEF"}

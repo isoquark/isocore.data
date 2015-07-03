@@ -26,7 +26,7 @@ module RecordValueTest =
     let private FieldB2Name = propname<@ fun (x : RecordB) -> x.FieldB2 @>
     let private FieldB3Name = propname<@ fun (x : RecordB) -> x.FieldB3 @>
 
-    [<Test>]
+    [<Fact>]
     let ``Created record value from array - No optional fields``() =
         let expect = {        
             FieldA1 = 15
@@ -38,7 +38,7 @@ module RecordValueTest =
                   :?> RecordA
         actual |> Claim.equal expect
 
-    [<Test>]
+    [<Fact>]
     let ``Created value array from record - No optional fields``() =
         let recordValue = {
             FieldA1 = 16
@@ -50,7 +50,7 @@ module RecordValueTest =
         Claim.equal (recordValue.FieldA2 :> obj) valueArray.[1]
         Claim.equal (recordValue.FieldA3 :> obj) valueArray.[2]
     
-    [<Test>]
+    [<Fact>]
     let ``Created record from value map - No optional fields``() =
         let valueMap = 
             [(FieldA1Name.Text, 0, 16 :> obj)
@@ -67,7 +67,7 @@ module RecordValueTest =
         actual |> Claim.equal expect
 
 
-    [<Test>]
+    [<Fact>]
     let ``Created record from value map - Optional fields``() =
         let valueMap1 = 
             [(FieldB1Name.Text, 0, 16 :> obj)
@@ -97,7 +97,7 @@ module RecordValueTest =
         let actual2 =  typeof<RecordB> |> RecordValue.fromValueIndex valueMap2 :?> RecordB
         actual2 |> Claim.equal expect2
 
-    [<Test>]
+    [<Fact>]
     let ``Create value map from record - Optional fields``() =
         let value1 = {
             FieldB1 = 16

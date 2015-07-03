@@ -19,7 +19,7 @@ module ``Routine Execution`` =
     let private cs = ConfigSettingNames.SqlTestDb |> config.GetValue 
     let store = Context.Resolve<ISqlDataStore>(ConfigSettingNames.SqlTestDb, cs |> ConnectionString.parse)
         
-    [<Test>]
+    [<FactAttribute>]
     let ``Executed [SqlTest].[pTable02Insert] procedure - Direct``() =
         let procName = thisMethod() |> ProxyTestCaseMethod.getDbObjectName
         let procProxy = routineproxies<ISqlTestRoutines> |> List.find(fun x -> x.DataElement.Name = procName)
@@ -31,14 +31,14 @@ module ``Routine Execution`` =
         let col01Value = outputvalues.["col01"] :?> int
         Claim.greater col01Value 1
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Executed [SqlTest].[pTable02Insert] procedure - Contract``() =
         let procs = store.GetContract<ISqlTestRoutines>()
         let result = procs.pTable02Insert (DateTime(2015, 5, 16)) (507L)
         Claim.greater result 1
 
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Executed [SqlTest].[pTable03Insert] procedure - Direct``() =
         let procName = thisMethod() |> ProxyTestCaseMethod.getDbObjectName
         let procProxy = routineproxies<ISqlTestRoutines> |> List.find(fun x -> x.DataElement.Name = procName) 
@@ -50,14 +50,14 @@ module ``Routine Execution`` =
         let outputValues = proc |> Routine.executeProcedure cs inputValues
         ()
     
-    [<Test>]
+    [<FactAttribute>]
     let ``Executed [SqlTest].[pTable03Insert] procedure - Contract``() =
         let procs = store.GetContract<ISqlTestRoutines>()
         let result = procs.pTable03Insert 5uy 10s 15 20L
         0 |> Claim.greater result
         ()
     
-    [<Test>]
+    [<FactAttribute>]
     let ``Executed [SqlTest].[fTable04Before] procedure - List result``() =
         let routines = store.GetContract<ISqlTestRoutines>()
         routines.pTable04Truncate()
@@ -83,7 +83,7 @@ module ``Routine Execution`` =
         results.[1].StartDate |> Claim.equal (DateTime(2012,1,3))
         results.[1].EndDate |> Claim.equal (DateTime(2012,1,4))
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Executed [SqlTest].[fTable04Before] procedure - Array result``() =
         let routines = store.GetContract<ISqlTestRoutines>()
         routines.pTable04Truncate()

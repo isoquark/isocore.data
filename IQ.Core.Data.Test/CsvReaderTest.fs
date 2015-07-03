@@ -27,7 +27,7 @@ module ``CsvReader Test`` =
         text |> CsvReader.readText<'T> format
         
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Hydrated proxies from CSV file - no attribute overrides``() =
         let items = resname<CsvTestCase1> |> hydrate<CsvTestCase1> 
 
@@ -52,7 +52,7 @@ module ``CsvReader Test`` =
         }
         patty_actual |> Claim.equal patty_expect
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Desribed CSV file - no attribute overrides``() =
         let resname = resname<CsvTestCase1>
         let path = thisAssembly() |> Assembly.writeTextResource resname (TestContext.getTempDir())
@@ -101,14 +101,14 @@ module ``CsvReader Test`` =
             true
         benchmark |> Benchmark.repeat 10 (thisMethod().Name) |> Benchmark.summarize
         
-    [<Test; BenchmarkTrait>]
+    [<FactAttribute; BenchmarkTrait>]
     let ``Benchmark - CsvReader 2A``() =
         //This will eventually be persisted to a data store
         //that maintains test execution history
         let benchmark = captureBenchmark<CsvTestCase2A> "CsvTestCase2.csv"
         ()
 
-    [<Test; BenchmarkTrait>]
+    [<FactAttribute; BenchmarkTrait>]
     let ``Benchmark - CsvReader 2B``() =
         //This will eventually be persisted to a data store
         //that maintains test execution history
@@ -129,7 +129,7 @@ module ``CsvReader Test`` =
     }                
 
         
-    [<Test>]
+    [<FactAttribute>]
     let ``Hydrated proxies from CSV file - column name attribute override``() =
         let items = resname<CsvTestCase3> |> hydrate<CsvTestCase3> 
 

@@ -11,14 +11,14 @@ open IQ.Core.Data
 [<TestContainer>]
 module ``DataStorageType Test`` =
 
-    [<Test>]
+    [<Fact>]
     let ``Parsed semantic representations of DataStorageType``() =
         "Bit" |> DataType.parse  |> Option.get |> Claim.equal BitDataType
         "UInt8" |> DataType.parse  |> Option.get |> Claim.equal UInt8DataType
         "BinaryVariable(350)" |>  DataType.parse |> Option.get |> Claim.equal (BinaryVariableDataType(350))
         "BinaryFixed(120)" |>  DataType.parse |> Option.get |> Claim.equal (BinaryFixedDataType(120))
 
-    [<Test>]
+    [<Fact>]
     let ``Rendered semantic representations of DataStorageType``() =       
         122 |> AnsiTextFixedDataType |> DataType.toSemanticString |> Claim.equal "AnsiTextFixed(122)"
         122 |> AnsiTextVariableDataType |> DataType.toSemanticString |> Claim.equal "AnsiTextVariable(122)"
@@ -31,7 +31,7 @@ module ``DataStorageType Test`` =
         attribute.DataType |> Claim.equal storageTypeExpect
 
 
-    [<Test>]
+    [<Fact>]
     let ``Determined StorageType values from data attributes``() =
         DataTypeAttribute(DataKind.AnsiTextFixed, 150) |> verifyAttribute (AnsiTextFixedDataType(150))
         DataTypeAttribute(DataKind.AnsiTextMax) |> verifyAttribute (AnsiTextMaxDataType)

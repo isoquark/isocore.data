@@ -22,7 +22,7 @@ module ``Proxy Discovery`` =
             AField3 : int64 option        
         }
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Read table proxy description - no attribution``() =
         let proxy = tabularproxy<RecordA> 
         
@@ -77,7 +77,7 @@ module ``Proxy Discovery`` =
         BField4 : DateTime
     }
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Read DateTimeStorage from table proxy metadata - attribute overrides``() =
         let proxy = tabularproxy<RecordB> 
         proxy.Columns.Length |> Claim.equal 4
@@ -88,7 +88,7 @@ module ``Proxy Discovery`` =
         proxy.[3].DataElement.StorageType |> Claim.equal (DateTimeDataType(DataKind.DateTime.DefaultPrecision))
 
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Read Column names from table proxy metadata - attribute overrides``() =
         let proxy = tabularproxy<RecordB> 
         proxy.Columns.Length |> Claim.equal 4
@@ -98,7 +98,7 @@ module ``Proxy Discovery`` =
         proxy.[2].DataElement.Name |> Claim.equal "BField_3"
         proxy.[3].DataElement.Name |> Claim.equal "BField4"
     
-    [<Test>]
+    [<FactAttribute>]
     let ``Described [SqlTest].[pTable02Insert] procedure from proxy``() =
             
         let procName = thisMethod() |> ProxyTestCaseMethod.getDbObjectName
@@ -145,24 +145,24 @@ module ``Proxy Discovery`` =
             Field03 : int8
         }
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Inferred schema name from table proxy``() =
         typeinfo<ModuleB.RecordA> |> TypeDescription |> DataProxyMetadata.inferSchemaName |> Claim.equal "MySchema"
 
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Inferred schema name from enclosing module``() =
         typeinfo<RecordA> |> TypeProxy.inferSchemaName |> Claim.equal "MySchema"
         typeinfo<ModuleA.RecordA> |> TypeProxy.inferSchemaName |> Claim.equal "ModuleA"
         typeinfo<ModuleB.RecordA> |> TypeProxy.inferSchemaName |> Claim.equal "MySchema"
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Inferred data object names``() =
         typeinfo<RecordA> |> TypeProxy.inferDataObjectName |> Claim.equal (DataObjectName("MySchema", "RecordA"))
         typeinfo<ModuleA.RecordA> |> TypeProxy.inferDataObjectName |> Claim.equal (DataObjectName("ModuleA", "RecordA"))
         typeinfo<ModuleB.RecordA> |> TypeProxy.inferDataObjectName |> Claim.equal (DataObjectName("MySchema", "RecordA"))
 
-    [<Test>]
+    [<FactAttribute>]
     let ``Described [SqlTest].[fTable04Before] table function from proxy``() =
         let dbElementName = thisMethod() |> ProxyTestCaseMethod.getDbObjectName
         dbElementName |> Claim.equal (DataObjectName("SqlTest", "fTable04Before"))

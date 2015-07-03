@@ -21,7 +21,7 @@ module OrderedSequenceTest =
     let inline genRefList min skip max = [min..skip..max]
         
 
-    [<Test>]
+    [<Fact>]
     let ``Generated Cyclical UInt8 sequences``() =        
         
         let createConfig1() : OrderedSequenceConfig =
@@ -58,7 +58,7 @@ module OrderedSequenceTest =
 
         test2()
 
-    [<Test; ExpectedError(typeof<EndOfSequenceException>)>]
+    [<Fact; ExpectedError(typeof<EndOfSequenceException>)>]
     let ``Generate Non-Cyclical UInt8 sequences``() =
         let createConfig() : OrderedSequenceConfig =
             {
@@ -77,7 +77,7 @@ module OrderedSequenceTest =
 
         
 
-    [<Test; BenchmarkTrait>]
+    [<Fact; BenchmarkTrait>]
     let ``Benchmark - Int32 Framework Sequence Generation - 10^6 Calls``() =
         let name = Benchmark.deriveName()
            
@@ -101,7 +101,7 @@ module OrderedSequenceTest =
 
         f |> Benchmark.capture
 
-    [<Test; BenchmarkTrait>]
+    [<Fact; BenchmarkTrait>]
     let ``Benchmark - Int32 Direct Sequence Generation - 10^6 Calls``() =
            
         let f() =

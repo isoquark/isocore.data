@@ -23,7 +23,7 @@ module ClrMetadataProviderTest =
         
     
 
-    [<Test>]
+    [<Fact>]
     let ``Described records``() =
         //No optional fields
         let t1 = typeof<ModuleA.RecordA>.TypeName |> ClrMetadata().DescribeType
@@ -70,7 +70,7 @@ module ClrMetadataProviderTest =
         abstract Property02:DateTime with get,set
 
     let methodmap = methinfos<IInterfaceA>    
-    [<Test>]
+    [<Fact>]
     let ``Described non-tupled method - variation 1``() =
         let mName = "Method01" |> ClrMemberName 
         let m = methodmap.[mName]
@@ -87,7 +87,7 @@ module ClrMetadataProviderTest =
         m.ReturnAttributes.Length |> Claim.equal 1
         m.ReturnAttributes.Head.AttributeName |> Claim.equal typeof<MyAttribute>.TypeName
 
-    [<Test>]
+    [<Fact>]
     let ``Described tupled methods``() =
         let m2Name = "Method02" |> ClrMemberName 
         let m2 = methodmap.[m2Name]
@@ -101,7 +101,7 @@ module ClrMetadataProviderTest =
         m3.Parameters.Length |> Claim.equal 1
         m3.ReturnType |> Claim.isNone
 
-    [<Test>]
+    [<Fact>]
     let ``Described non-tupled method - variation 2``() =
         let mName = "Method04" |> ClrMemberName 
         let m = methodmap.[mName]
@@ -115,7 +115,7 @@ module ClrMetadataProviderTest =
         m.Parameters.[1].ParameterType |> Claim.equal typeof<option<int>>.TypeName
         m.ReturnType |> Option.get |> Claim.equal typeof<DateTime>.TypeName
 
-    [<Test>]
+    [<Fact>]
     let ``Described interfaces``() =
         let t = typeof<IInterfaceB>.TypeName |> ClrMetadata().DescribeType
         t.Members.Length |> Claim.equal 5
@@ -132,7 +132,7 @@ module ClrMetadataProviderTest =
     type private ClassB() =
         member this.Method01(p1 : int, ?p2 : int) = 0L
 
-    [<Test>]
+    [<Fact>]
     let ``Described class methods with optional parameters``() =
         let methodmap = methinfos<ClassB>
         let mName = "Method01" |> ClrMemberName 
@@ -143,7 +143,7 @@ module ClrMetadataProviderTest =
         m.ReturnType|> Option.get |> Claim.equal typeof<int64>.TypeName
 
 
-    [<Test>]
+    [<Fact>]
     let ``Described classes``() =
         let infomap = propinfos<ClassA>
         let p1Info = propinfo<@ fun (x : ClassA) -> x.Prop1 @> 
@@ -224,14 +224,14 @@ module ClrMetadataProviderTest =
 
     type private UnionA = UnionA of field01 : int * field02 : decimal * field03 : DateTime        
     
-    [<Test>]
+    [<Fact>]
     let ``Described union``() =
         let u = typeinfo<UnionA>
         u.ReflectedElement  |> Option.get|> Claim.equal typeof<UnionA>        
         let unioninfo = typeinfo<UnionA>
         unioninfo.Name.SimpleName |> Claim.equal typeof<UnionA>.Name
 
-    [<Test>]
+    [<Fact>]
     let ``Found types by name``() =
         typeof<UnionA>.TypeName |> ClrMetadata().DescribeType 
                                 |> fun x -> x.Name 
@@ -245,7 +245,7 @@ module ClrMetadataProviderTest =
             FieldA3 : DateTime option   
         }
 
-    [<Test>]
+    [<Fact>]
     let ``Discovered attributes on type``() =
         let t = typeinfo<ModuleB.RecordA>
         let desc = t.Attributes 
@@ -260,7 +260,7 @@ module ClrMetadataProviderTest =
         let Literal2 = "Hello"
         let NotEvenAField = 46m
 
-    [<Test>]
+    [<Fact>]
     let ``Discovered literals defined in a module``() =
         let m = typeof<Literals.Dummy>.DeclaringType.TypeName |> ClrMetadata().DescribeType
         m.Fields |> Claim.seqCount 2
