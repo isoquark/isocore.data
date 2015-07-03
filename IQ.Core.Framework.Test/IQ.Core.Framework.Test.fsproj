@@ -81,6 +81,7 @@
     <Compile Include="DataStructTest.fs" />
     <Compile Include="Data\DataStorageTypeTest.fs" />
     <Compile Include="Synthetics\OrderedSequence.fs" />
+    <Compile Include="Etl\EtlVocabularyTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

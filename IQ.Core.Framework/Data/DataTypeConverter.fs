@@ -39,12 +39,12 @@ module internal DataTypeConverter =
         | UnicodeTextVariableDataType(length) -> typeof<string>
         | UnicodeTextMaxDataType -> typeof<string>
             
-        | DateTime32DataType -> typeof<DateTime>
-        | DateTime64DataType -> typeof<DateTime>
-        | DateTimeDataType(precision)-> typeof<DateTime>
-        | DateTimeOffsetDataType -> typeof<DateTimeOffset>
-        | TimeOfDayDataType -> typeof<TimeSpan>
-        | DateDataType -> typeof<DateTime>
+        | DateTime32DataType -> typeof<BclDateTime>
+        | DateTime64DataType -> typeof<BclDateTime>
+        | DateTimeDataType(precision)-> typeof<BclDateTime>
+        | DateTimeOffsetDataType -> typeof<BclDateTimeOffset>
+        | TimeOfDayDataType -> typeof<BclTimeSpan>
+        | DateDataType -> typeof<BclDateTime>
         | TimespanDataType -> typeof<int64>
             
         | Float32DataType -> typeof<float32>
@@ -60,7 +60,7 @@ module internal DataTypeConverter =
         | TypedDocumentDataType(t) -> typeof<obj>
 
     [<TransformationAttribute>]
-    let private timespanToTicks (ts : TimeSpan) =
+    let private timespanToTicks (ts : BclTimeSpan) =
         ts.Ticks
 
     [<TransformationAttribute>]

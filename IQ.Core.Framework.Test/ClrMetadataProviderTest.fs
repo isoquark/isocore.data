@@ -57,14 +57,14 @@ module ClrMetadataProviderTest =
         abstract Method01:p1 : string -> p2 : int -> [<return: MyAttribute>] int64
         abstract Method02:p1 : string * p2: int->unit
         abstract Method03:p1 : (string*int) -> unit
-        abstract Method04:p1 : string -> p2 : int option -> DateTime
+        abstract Method04:p1 : string -> p2 : int option -> BclDateTime
 
     type private IInterfaceB =
         abstract Method01:unit->unit
         abstract Method02:int->unit
         abstract Method03:int->int
-        abstract Property01:DateTime
-        abstract Property02:DateTime with get,set
+        abstract Property01:BclDateTime
+        abstract Property02:BclDateTime with get,set
 
     let methodmap = methinfos<IInterfaceA>    
     [<Fact>]
@@ -110,7 +110,7 @@ module ClrMetadataProviderTest =
         m.Parameters.[1].CanOmit |> Claim.isFalse
         m.Parameters.[1].Name.Text |> Claim.equal "p2"        
         m.Parameters.[1].ParameterType |> Claim.equal typeof<option<int>>.TypeName
-        m.ReturnType |> Option.get |> Claim.equal typeof<DateTime>.TypeName
+        m.ReturnType |> Option.get |> Claim.equal typeof<BclDateTime>.TypeName
 
     [<Fact>]
     let ``Described interfaces``() =
@@ -120,7 +120,7 @@ module ClrMetadataProviderTest =
     type ClassA() =   
         let mutable p2Val = 0
         let p3Val = Some(4L)
-        member this.Prop1  = DateTime.Now
+        member this.Prop1  = BclDateTime.Now
         member this.Prop2
             with get() = p2Val
             and  set(value) = p2Val <-value
@@ -150,7 +150,7 @@ module ClrMetadataProviderTest =
                 Name = p1Name
                 Position = 0
                 DeclaringType = typeof<ClassA>.TypeName
-                ValueType = typeof<DateTime>.TypeName
+                ValueType = typeof<BclDateTime>.TypeName
                 IsOptional = false
                 CanWrite = false
                 WriteAccess = None
@@ -219,7 +219,7 @@ module ClrMetadataProviderTest =
         p3Actual.SetMethodAttributes |> Claim.seqIsEmpty
                                    
 
-    type private UnionA = UnionA of field01 : int * field02 : decimal * field03 : DateTime        
+    type private UnionA = UnionA of field01 : int * field02 : decimal * field03 : BclDateTime        
     
     [<Fact>]
     let ``Described union``() =
@@ -239,7 +239,7 @@ module ClrMetadataProviderTest =
         type RecordA = {
             FieldA1 : decimal
             FieldA2 : int64
-            FieldA3 : DateTime option   
+            FieldA3 : BclDateTime option   
         }
 
     [<Fact>]

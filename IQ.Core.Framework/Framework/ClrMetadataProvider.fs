@@ -221,7 +221,7 @@ module ClrMetadataProvider =
                 Types = [
                             typeof<Byte>; typeof<Int32>; typeof<Int16>
                             typeof<Int64>; typeof<UInt16>; typeof<UInt32>; typeof<UInt64>
-                            typeof<DateTime>;typeof<String>; 
+                            typeof<BclDateTime>;typeof<String>; 
                             typeof<Decimal>; typeof<Double>; typeof<Single>;
                         ] |> List.mapi(fun pos t -> acquireTypeDescription pos t) 
                 ReflectedElement = corlib |> Some

@@ -67,6 +67,7 @@
     <Content Include="app.config" />
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Framework\Lang.fs" />
+    <Compile Include="Framework\Time.fs" />
     <Compile Include="Framework\Configuration.fs" />
     <Compile Include="Framework\CompositionRoot.fs" />
     <Compile Include="Framework\Txt.fs" />

@@ -15,7 +15,7 @@ module ``CsvReader Test`` =
         Id : int
         FirstName : string
         LastName : string
-        Birthday : DateTime
+        Birthday : BclDateTime
         NetWorth : decimal option
     }
 
@@ -36,7 +36,7 @@ module ``CsvReader Test`` =
             Id = 1
             FirstName = "Tom"
             LastName = "Thompson"
-            Birthday = DateTime(1962, 5, 12)
+            Birthday = BclDateTime(1962, 5, 12)
             NetWorth = 380000m |> Some
         }
 
@@ -47,7 +47,7 @@ module ``CsvReader Test`` =
             Id = 3
             FirstName = "Patty"
             LastName = "Pierce"
-            Birthday = DateTime(1970, 11, 19)
+            Birthday = BclDateTime(1970, 11, 19)
             NetWorth = 50000m |> Some
         }
         patty_actual |> Claim.equal patty_expect
@@ -123,7 +123,7 @@ module ``CsvReader Test`` =
         FirstName : string
         LastName : string
         [<Column("BDAY")>]
-        Birthday : DateTime
+        Birthday : BclDateTime
         [<Column("NET_WORTH")>]
         NetWorth : decimal option
     }                
@@ -138,7 +138,7 @@ module ``CsvReader Test`` =
             Id = 1
             FirstName = "Tom"
             LastName = "Thompson"
-            Birthday = DateTime(1962, 5, 12)
+            Birthday = BclDateTime(1962, 5, 12)
             NetWorth = 380000m |> Some
         }
 
@@ -149,7 +149,7 @@ module ``CsvReader Test`` =
             Id = 3
             FirstName = "Patty"
             LastName = "Pierce"
-            Birthday = DateTime(1970, 11, 19)
+            Birthday = BclDateTime(1970, 11, 19)
             NetWorth = 50000m |> Some
         }
         patty_actual |> Claim.equal patty_expect

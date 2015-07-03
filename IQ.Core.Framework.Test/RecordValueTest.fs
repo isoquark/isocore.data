@@ -18,7 +18,7 @@ module RecordValueTest =
     type private RecordB = {
         FieldB1 : int
         FieldB2 : decimal
-        FieldB3 : DateTime option    
+        FieldB3 : BclDateTime option    
     }
     let private FieldB1Name = propname<@ fun (x : RecordB) -> x.FieldB1 @>
     let private FieldB2Name = propname<@ fun (x : RecordB) -> x.FieldB2 @>
@@ -70,13 +70,13 @@ module RecordValueTest =
         let valueMap1 = 
             [(FieldB1Name.Text, 0, 16 :> obj)
              (FieldB2Name.Text, 1, 38.12m :> obj)
-             (FieldB3Name.Text, 2, DateTime(2015, 5, 6) |> Some :> obj)
+             (FieldB3Name.Text, 2, BclDateTime(2015, 5, 6) |> Some :> obj)
             ]|> ValueIndex.create
         
         let expect1 = {
             FieldB1 = 16
             FieldB2 = 38.12m
-            FieldB3 = DateTime(2015, 5, 6) |> Some
+            FieldB3 = BclDateTime(2015, 5, 6) |> Some
         }
         let actual1 =  typeof<RecordB> |> RecordValue.fromValueIndex valueMap1 :?> RecordB
         actual1 |> Claim.equal expect1
@@ -84,7 +84,7 @@ module RecordValueTest =
         let valueMap2 = 
             [(FieldB1Name.Text, 0, 16 :> obj)
              (FieldB2Name.Text, 1, 38.12m :> obj)
-             (FieldB3Name.Text, 2, option<DateTime>.None :> obj)
+             (FieldB3Name.Text, 2, option<BclDateTime>.None :> obj)
             ]|> ValueIndex.create
         
         let expect2 = {
@@ -100,7 +100,7 @@ module RecordValueTest =
         let value1 = {
             FieldB1 = 16
             FieldB2 = 38.12m
-            FieldB3 = Some(DateTime(2015, 5, 6))
+            FieldB3 = Some(BclDateTime(2015, 5, 6))
         }
         let expect1 = 
             [

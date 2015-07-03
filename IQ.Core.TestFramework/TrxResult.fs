@@ -18,8 +18,8 @@ module TrxResult =
             TestName : string
             ComputerName : string
             Duration : TimeSpan
-            StartTime : DateTime
-            EndTime : DateTime
+            StartTime : BclDateTime
+            EndTime : BclDateTime
             Succeeded : bool
         }
 
@@ -33,8 +33,8 @@ module TrxResult =
     type TestRun = {
         TestRunId : string
         ResultFile : string
-        StartTime : DateTime
-        EndTime : DateTime
+        StartTime : BclDateTime
+        EndTime : BclDateTime
         Results : TestResult list
         }
     
@@ -48,8 +48,8 @@ module TrxResult =
             TestId = result.TestId
             ComputerName = result.ComputerName
             Duration = TimeSpan.Parse(result.Duration)
-            StartTime = DateTime.Parse(result.StartTime)
-            EndTime = DateTime.Parse(result.EndTime)
+            StartTime = BclDateTime.Parse(result.StartTime)
+            EndTime = BclDateTime.Parse(result.EndTime)
             Succeeded = result.Outcome = "Passed"
         }
 
@@ -93,8 +93,8 @@ module TrxResult =
                     yield {
                         TestRun.TestRunId = trx.Id
                         ResultFile = trxFile
-                        StartTime = DateTime.Parse(trx.Times.Start)
-                        EndTime = DateTime.Parse(trx.Times.Finish)
+                        StartTime = BclDateTime.Parse(trx.Times.Start)
+                        EndTime = BclDateTime.Parse(trx.Times.Finish)
                         Results = [for result in trx.Results.UnitTestResults do yield result |> getTestResult definitions]
                         }
             }

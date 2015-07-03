@@ -340,12 +340,12 @@ module DataTypeVocabulary =
         | UnicodeTextFixedValue of string
         | UnicodeTextVariableValue of string
         | UnicodeTextMaxValue of string
-        | DateTime32Value of DateTime
-        | DateTime64Value of DateTime
-        | DateTimeValue of DateTime
-        | DateTimeOffsetValue of DateTimeOffset
-        | TimeOfDayValue of DateTime
-        | DateValue of DateTime
+        | DateTime32Value of BclDateTime
+        | DateTime64Value of BclDateTime
+        | DateTimeValue of BclDateTime
+        | DateTimeOffsetValue of BclDateTimeOffset
+        | TimeOfDayValue of BclDateTime
+        | DateValue of BclDateTime
         | TimespanValue of TimeSpan
         | Float32DValue of float32
         | Float64Value of float

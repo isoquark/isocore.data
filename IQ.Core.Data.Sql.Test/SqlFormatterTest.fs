@@ -13,9 +13,9 @@ open IQ.Core.Framework
 module SqlFormatterTest =
     
     [<FactAttribute>]
-    let ``Formatted DateTime value as SQL``() =
+    let ``Formatted BclDateTime value as SQL``() =
         let expect = "'2015-09-03 09:33:56.123'"
-        let actual = DateTime(2015, 9,3, 9,33,56,123) |> SqlFormatter.formatValue
+        let actual = BclDateTime(2015, 9,3, 9,33,56,123) |> SqlFormatter.formatValue
         actual |> Claim.equal expect
 
     [<FactAttribute>]

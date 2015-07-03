@@ -25,7 +25,7 @@ module ``Routine Execution`` =
         let procProxy = routineproxies<ISqlTestRoutines> |> List.find(fun x -> x.DataElement.Name = procName)
         let proc = procProxy.DataElement |> DataObjectDescription.unwrapProcedure
         let inputValues =  
-            [("col01", 0, DBNull.Value :> obj); ("col02", 1, DateTime(2015, 5, 16) :> obj); ("col03", 2, 507L :> obj);]
+            [("col01", 0, DBNull.Value :> obj); ("col02", 1, BclDateTime(2015, 5, 16) :> obj); ("col03", 2, 507L :> obj);]
             |> List.map DataParameterValue
         let outputvalues = proc |> Routine.executeProcedure cs inputValues
         let col01Value = outputvalues.["col01"] :?> int
@@ -34,7 +34,7 @@ module ``Routine Execution`` =
     [<FactAttribute>]
     let ``Executed [SqlTest].[pTable02Insert] procedure - Contract``() =
         let procs = store.GetContract<ISqlTestRoutines>()
-        let result = procs.pTable02Insert (DateTime(2015, 5, 16)) (507L)
+        let result = procs.pTable02Insert (BclDateTime(2015, 5, 16)) (507L)
         Claim.greater result 1
 
 
@@ -62,7 +62,7 @@ module ``Routine Execution`` =
         let routines = store.GetContract<ISqlTestRoutines>()
         routines.pTable04Truncate()
         
-        let d0 = DateTime(2012, 1, 1)
+        let d0 = BclDateTime(2012, 1, 1)
         
         let identities =
             [0..2..20] |> List.map(fun i ->                        
@@ -70,25 +70,25 @@ module ``Routine Execution`` =
         )
 
         let results = 
-            routines.fTable04Before(DateTime(2012,1,9))
+            routines.fTable04Before(BclDateTime(2012,1,9))
             |> List.sortBy(fun x -> x.StartDate)
 
         results.Length |> Claim.equal 5
 
         results.[0].Code |> Claim.equal "ABC"
-        results.[0].StartDate |> Claim.equal (DateTime(2012,1,1))
-        results.[0].EndDate |> Claim.equal (DateTime(2012,1,2))
+        results.[0].StartDate |> Claim.equal (BclDateTime(2012,1,1))
+        results.[0].EndDate |> Claim.equal (BclDateTime(2012,1,2))
 
         results.[1].Code |> Claim.equal "ABC"
-        results.[1].StartDate |> Claim.equal (DateTime(2012,1,3))
-        results.[1].EndDate |> Claim.equal (DateTime(2012,1,4))
+        results.[1].StartDate |> Claim.equal (BclDateTime(2012,1,3))
+        results.[1].EndDate |> Claim.equal (BclDateTime(2012,1,4))
 
     [<FactAttribute>]
     let ``Executed [SqlTest].[fTable04Before] procedure - Array result``() =
         let routines = store.GetContract<ISqlTestRoutines>()
         routines.pTable04Truncate()
         
-        let d0 = DateTime(2012, 1, 1)
+        let d0 = BclDateTime(2012, 1, 1)
         
         let identities =
             [0..2..20] |> List.map(fun i ->                        
@@ -96,18 +96,18 @@ module ``Routine Execution`` =
         )
 
         let results = 
-            routines.fTable04BeforeArray(DateTime(2012,1,9))
+            routines.fTable04BeforeArray(BclDateTime(2012,1,9))
             |> Array.sortBy(fun x -> x.StartDate)
 
         results.Length |> Claim.equal 5
 
         results.[0].Code |> Claim.equal "ABC"
-        results.[0].StartDate |> Claim.equal (DateTime(2012,1,1))
-        results.[0].EndDate |> Claim.equal (DateTime(2012,1,2))
+        results.[0].StartDate |> Claim.equal (BclDateTime(2012,1,1))
+        results.[0].EndDate |> Claim.equal (BclDateTime(2012,1,2))
 
         results.[1].Code |> Claim.equal "ABC"
-        results.[1].StartDate |> Claim.equal (DateTime(2012,1,3))
-        results.[1].EndDate |> Claim.equal (DateTime(2012,1,4))
+        results.[1].StartDate |> Claim.equal (BclDateTime(2012,1,3))
+        results.[1].EndDate |> Claim.equal (BclDateTime(2012,1,4))
 
 
     

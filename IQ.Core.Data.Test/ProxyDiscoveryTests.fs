@@ -69,12 +69,12 @@ module ``Proxy Discovery`` =
     
     type private RecordB = {
         [<DataTypeAttribute(DataKind.DateTime, 5uy); Column("BField_1")>]
-        BField1 : DateTime
+        BField1 : BclDateTime
         [<DataTypeAttribute(DataKind.DateTime, 4uy)>]
-        BField2 : DateTime option
+        BField2 : BclDateTime option
         [<DataTypeAttribute(DataKind.DateTime); Column("BField_3")>]
-        BField3 : DateTime
-        BField4 : DateTime
+        BField3 : BclDateTime
+        BField4 : BclDateTime
     }
 
     [<FactAttribute>]

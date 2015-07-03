@@ -15,8 +15,8 @@ module ProxyTestCases =
     type Table04FunctionResult = {
         Id : int
         Code : string
-        StartDate : DateTime
-        EndDate : DateTime        
+        StartDate : BclDateTime
+        EndDate : BclDateTime        
     }
         
 
@@ -30,7 +30,7 @@ module ProxyTestCases =
         /// <param name="col02">The value of Col02</param>
         /// <param name="col03">The Value of Col03</param>
         [<Procedure>]
-        abstract pTable02Insert:col02 : DateTime -> col03 : int64 -> [<return : RoutineParameter("col01", 0)>] int
+        abstract pTable02Insert:col02 : BclDateTime -> col03 : int64 -> [<return : RoutineParameter("col01", 0)>] int
         
         /// <summary>
         /// Inserts a record into the [SqlTest].[Table03] table and returns the integral
@@ -47,13 +47,13 @@ module ProxyTestCases =
         abstract pTable04Truncate:unit->unit
 
         [<Procedure>]
-        abstract pTable04Insert:code : string->startDate : DateTime -> endDate : DateTime -> int
+        abstract pTable04Insert:code : string->startDate : BclDateTime -> endDate : BclDateTime -> int
 
         [<TableFunction>]
-        abstract fTable04Before: startDate:DateTime-> Table04FunctionResult list
+        abstract fTable04Before: startDate:BclDateTime-> Table04FunctionResult list
 
         [<TableFunction("SqlTest", "fTable04Before")>]
-        abstract fTable04BeforeArray: startDate:DateTime-> Table04FunctionResult[]
+        abstract fTable04BeforeArray: startDate:BclDateTime-> Table04FunctionResult[]
 
 
     [<Description("SQL Test Table01")>]

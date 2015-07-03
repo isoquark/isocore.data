@@ -21,10 +21,10 @@ module BenchmarkVocabulary =
         MachineName : string
         
         /// The time at which benchmark function execution began
-        StartTime : DateTime
+        StartTime : BclDateTime
 
         /// The time at which benchmark function execution ended
-        EndTime : DateTime
+        EndTime : BclDateTime
         
         /// The time required to execute the benchmark function (in ms)
         Duration : int
@@ -48,7 +48,7 @@ module BenchmarkVocabulary =
     [<Schema("Core")>]
      type ICoreTestFrameworkProcedures =
         [<Procedure>]
-        abstract pBenchmarkResultPut:BenchmarkName : string -> MachineName : string -> StartTime : DateTime -> EndTime : DateTime -> Duration : int -> [<return : RoutineParameter("Id", 5)>] int
+        abstract pBenchmarkResultPut:BenchmarkName : string -> MachineName : string -> StartTime : BclDateTime -> EndTime : BclDateTime -> Duration : int -> [<return : RoutineParameter("Id", 5)>] int
  
 
     type BenchmarkParameter = BenchmarkParameter of name : string * value : string
@@ -79,11 +79,11 @@ module Benchmark =
     /// <param name="f">The function that invokes the benchmarked capability</param>
     let run<'TDetail> benchmarkName (f:unit -> 'TDetail) =
         let sw = Stopwatch()
-        let startTime = DateTime.Now
+        let startTime = BclDateTime.Now
         sw.Start()
         let detail = f()
         sw.Stop()
-        let endTime = DateTime.Now
+        let endTime = BclDateTime.Now
 
         BenchmarkResult(
             {
@@ -108,11 +108,11 @@ module Benchmark =
         [for i in 0..iterations-1 do            
             gcwait()            
             let sw = Stopwatch()
-            let startTime = DateTime.Now
+            let startTime = BclDateTime.Now
             sw.Start()            
             let detail = f()
             sw.Stop()
-            let endTime = DateTime.Now
+            let endTime = BclDateTime.Now
 
             yield BenchmarkResult(
                 {

@@ -15,7 +15,7 @@ module internal CoreServices =
         {Assemblies = assemblyNames} |>ClrMetadataProvider.get |> registry.RegisterInstance
         
         registry.RegisterFactory(fun config -> config |> Transformer.get)
-        ()
+        registry.RegisterInstance(SystemClock())
     
         
     

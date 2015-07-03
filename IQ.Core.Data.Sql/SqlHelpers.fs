@@ -24,7 +24,7 @@ module SqlFormatter =
             match value with
             | :? DBNull as x -> "null"
             | :? bool as x -> if x = true then "1" else "0"
-            | :? DateTime as x -> sprintf "'%s'" (x.ToString("yyyy-MM-dd HH:mm:ss.fff"))
+            | :? BclDateTime as x -> sprintf "'%s'" (x.ToString("yyyy-MM-dd HH:mm:ss.fff"))
             | :? char as x -> if x = ''' then @"''" else x.ToString()
             | :? string as x -> String.Format("'{0}'", x.Replace("'", @"''"))
             | :? Guid as x -> sprintf "'%O'" x

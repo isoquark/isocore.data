@@ -10,12 +10,12 @@ open IQ.Core.Data
 module TestTransformations =
     
     [<Transformation>]
-    let dateToString (x : DateTime) =
+    let dateToString (x : BclDateTime) =
         x.ToShortDateString()
 
     [<Transformation>]
     let stringToDate x =
-        x |> DateTime.Parse
+        x |> BclDateTime.Parse
 
     [<Transformation>]
     let uint32Toint64 (x : uint32) =
@@ -47,19 +47,19 @@ module TransformerTest =
         let transformations  = transformer.GetKnownTransformations()
         
         let c1Info = funcinfo<@fun () -> TestTransformations.stringToDate@>
-        let c1Id =  TransformationIdentifier.createDefault<DateTime,string>()
+        let c1Id =  TransformationIdentifier.createDefault<BclDateTime,string>()
         c1Id |> Claim.seqIn transformations
 
         let c2Info = funcinfo<@fun () -> TestTransformations.dateToString@>
-        let c2Id = TransformationIdentifier.createDefault<string,DateTime>()
+        let c2Id = TransformationIdentifier.createDefault<string,BclDateTime>()
         c2Id |> Claim.seqIn transformations
 
     [<Fact>]
     let ``Executed transformations via untyped transformer``() =
-        let val1 = DateTime(2015, 5, 15) :> obj
-        let val2 = DateTime(2015, 5, 15).ToShortDateString() :> obj
+        let val1 = BclDateTime(2015, 5, 15) :> obj
+        let val2 = BclDateTime(2015, 5, 15).ToShortDateString() :> obj
         val1 |> transformer.Transform (typeof<string>) |> Claim.equal val2 
-        val2 |> transformer.Transform (typeof<DateTime>) |> Claim.equal val1
+        val2 |> transformer.Transform (typeof<BclDateTime>) |> Claim.equal val1
 
         let x = [1u..15u] |> List.map( fun x -> x :> obj) 
         let y = [1s..15s] |> List.map( fun x -> x :> obj)
