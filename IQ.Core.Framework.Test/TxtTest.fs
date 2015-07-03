@@ -1,8 +1,8 @@
 ﻿namespace IQ.Core.Framework.Test
 
+open XUnit
 
-[<TestContainer>]
-module TxtTest =
+type TxtTest() =
     
     [<Fact>]
     let ``Found text to the right of a marker``()  =

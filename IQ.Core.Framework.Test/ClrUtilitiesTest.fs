@@ -3,10 +3,10 @@
 open System
 open System.Collections.Generic
 
-[<TestContainer>]
-module TypeTest =
-    
-    module private A = 
+open XUnit
+
+module TypeTestTypes =    
+    module A = 
         type internal B = class end
 
         module internal C = 
@@ -15,6 +15,8 @@ module TypeTest =
             module internal E = 
                 type internal F = class end
 
+open TypeTestTypes
+type TypeTest() =
     [<Fact>]
     let ``Discovered nested types``() =
         let actualA = typeof<A.B>.DeclaringType |> Type.getNestedTypes
@@ -39,43 +41,35 @@ module TypeTest =
 
     [<Fact>]
     let ``Classified collection types``() =
-         [1;2;3].GetType() |>Type.getCollectionKind |> Claim.equal ClrCollectionKind.FSharpList
-         [|1;2;3|].GetType() |>Type.getCollectionKind |> Claim.equal ClrCollectionKind.Array
-         Some([|1;2;3|]).GetType()   |> Type.getCollectionKind |> Claim.equal ClrCollectionKind.Array
+            [1;2;3].GetType() |>Type.getCollectionKind |> Claim.equal ClrCollectionKind.FSharpList
+            [|1;2;3|].GetType() |>Type.getCollectionKind |> Claim.equal ClrCollectionKind.Array
+            Some([|1;2;3|]).GetType()   |> Type.getCollectionKind |> Claim.equal ClrCollectionKind.Array
 
     [<Fact>]
     let ``Created F# list via reflection``() =
         let actual = [1 :> obj;2:> obj; 3:> obj]   
-                   |> Collection.create ClrCollectionKind.FSharpList typeof<int> 
-                   :?> list<int>
+                    |> Collection.create ClrCollectionKind.FSharpList typeof<int> 
+                    :?> list<int>
         let expect = [1; 2; 3;]
         actual |> Claim.equal expect
 
     [<Fact>]
     let ``Created array via reflection``() =
         let actual = [1 :> obj;2:> obj; 3:> obj]   
-                   |> Collection.create ClrCollectionKind.Array typeof<int> 
-                   :?> array<int>
+                    |> Collection.create ClrCollectionKind.Array typeof<int> 
+                    :?> array<int>
         let expect = [|1; 2; 3|]
         actual |> Claim.equal expect
 
     [<Fact>]
     let ``Created generic list via reflection``() =
         let actual = [1 :> obj;2:> obj; 3:> obj]   
-                   |> Collection.create ClrCollectionKind.GenericList typeof<int>
-                   :?> List<int>
+                    |> Collection.create ClrCollectionKind.GenericList typeof<int>
+                    :?> List<int>
         let expect = List<int>([1;2;3])
         actual.[0] |> Claim.equal expect.[0]
         actual.[1] |> Claim.equal expect.[1]
         actual.[2] |> Claim.equal expect.[2]
 
-    type EnumA =
-    | Field1 = 1
-    | Field2 = 2
-    | Field3 = 3
 
-    [<Fact>]
-    let ``Discovered enum types``() =
-        let t = typeinfo<EnumA>
-        t.Kind |> Claim.equal ClrTypeKind.Enum        
 

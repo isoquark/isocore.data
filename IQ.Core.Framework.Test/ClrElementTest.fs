@@ -18,8 +18,7 @@ module ClrElementTestTypes =
 
     let FieldA1Name = propname<@fun (x : RecordA) -> x.FieldA1 @>
     let FieldA2Name = propname<@fun (x : RecordA) -> x.FieldA2 @>
-    
-    
+        
     type ClassA() =
         let mutable f1 : int = 0    
         let mutable f2 : string = String.Empty
@@ -51,8 +50,12 @@ module ClrElementTestTypes =
 
 open ClrElementTestTypes
         
-[<TestContainer>]
-module ClrElementNameTests =
+
+open XUnit
+
+type ClrElementNameTests(ctx,log)  =
+    inherit ProjectTestContainer(ctx,log)
+
     [<Fact>]
     let ``Retreived CLR type name from type``() =
         let t = typeof<RecordA>
@@ -60,8 +63,6 @@ module ClrElementNameTests =
         let expect = ClrTypeName(t.Name , t.FullName |> Some, t.AssemblyQualifiedName |> Some)
         actual |> Claim.equal expect
 
-[<TestContainer>]
-module ClrAssemblyTest =
     [<Fact>]
     let ``Extracted embedded text resource from assembly``() =
         let text = thisAssembly() |> Assembly.findTextResource "EmbeddedResource01.txt"
@@ -79,4 +80,6 @@ module ClrAssemblyTest =
         let handler (e : ClrElement) =
             e |> elements.Add
         typeinfo<RecordA> |> TypeElement |> ClrElement.walk handler
+
+
 

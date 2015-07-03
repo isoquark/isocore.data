@@ -7,8 +7,10 @@ open System.Linq.Expressions
 open IQ.Core.Data
 open IQ.Core.DataStructLib
 
-[<TestContainer>]
-module DataStructTest =
+open XUnit
+
+
+module DataStructures =
     let numLookups = pown 10 6
     let itemcount = Nullable<int>(pown 8 3)
     
@@ -35,45 +37,48 @@ module DataStructTest =
         container.ExecuteRandomLookup(numberOfLookups) |> ignore
         container.Dispose()
 
-    [<Fact; BenchmarkTrait>]
-    let ``Benchmark - Composite Key Container Init 8^3 Types``() =
-        let f() = 
-            ContainerInit<CompositeKeyDictionaryContainer>()  |> ignore
+    type Tests(ctx,log) =
+        inherit ProjectTestContainer(ctx,log)        
 
-        f |> Benchmark.capture
+        [<Fact; BenchmarkTrait>]
+        let ``Benchmark - Composite Key Container Init 8^3 Types``() =
+            let f() = 
+                ContainerInit<CompositeKeyDictionaryContainer>()  |> ignore
 
-    [<Fact; BenchmarkTrait>]
-    let ``Benchmark - CompositeKey Container Init 8^3 Types 10^6 Lookups``() =
-        let container = ContainerInit<CompositeKeyDictionaryContainer>()
-        let f() = 
-            ContainerLookup<CompositeKeyDictionaryContainer> container numLookups
+            f |> Benchmark2.capture ctx
 
-        f |> Benchmark.capture
+        [<Fact; BenchmarkTrait>]
+        let ``Benchmark - CompositeKey Container Init 8^3 Types 10^6 Lookups``() =
+            let container = ContainerInit<CompositeKeyDictionaryContainer>()
+            let f() = 
+                ContainerLookup<CompositeKeyDictionaryContainer> container numLookups
 
-    [<Fact; BenchmarkTrait>]
-    let ``Benchmark - Double Dictionary Container Init 8^3 Types``() =
-        let f() = 
-            ContainerInit<DictionaryOfDictionariesContainer>()  |> ignore
+            f |> Benchmark2.capture ctx
 
-        f |> Benchmark.capture
+        [<Fact; BenchmarkTrait>]
+        let ``Benchmark - Double Dictionary Container Init 8^3 Types``() =
+            let f() = 
+                ContainerInit<DictionaryOfDictionariesContainer>()  |> ignore
 
-    [<Fact; BenchmarkTrait>]
-    let ``Benchmark - Double Dictionary Container Init 8^3 Types 10^6 Lookups``() =
-        let container = ContainerInit<DictionaryOfDictionariesContainer>()
-        let f() = 
-            ContainerLookup<DictionaryOfDictionariesContainer> container numLookups
+            f |> Benchmark2.capture ctx
 
-        f |> Benchmark.capture
+        [<Fact; BenchmarkTrait>]
+        let ``Benchmark - Double Dictionary Container Init 8^3 Types 10^6 Lookups``() =
+            let container = ContainerInit<DictionaryOfDictionariesContainer>()
+            let f() = 
+                ContainerLookup<DictionaryOfDictionariesContainer> container numLookups
 
-    [<Fact; BenchmarkTrait>]
-    let ``Benchmark - Matrix Container Init 8^3 Types``() =
-        (fun () -> ContainerInit<MatrixContainer>() |> ignore) |> Benchmark.capture
+            f |> Benchmark2.capture ctx
 
-    [<Fact; BenchmarkTrait>]
-    let ``Benchmark - Matrix Container Init 8^3 Types 10^6 Lookups``() =
-        let container = ContainerInit<MatrixContainer>()
-        let f() = 
-            ContainerLookup<MatrixContainer> container numLookups
+        [<Fact; BenchmarkTrait>]
+        let ``Benchmark - Matrix Container Init 8^3 Types``() =
+            (fun () -> ContainerInit<MatrixContainer>() |> ignore) |> Benchmark2.capture ctx
 
-        f |> Benchmark.capture
+        [<Fact; BenchmarkTrait>]
+        let ``Benchmark - Matrix Container Init 8^3 Types 10^6 Lookups``() =
+            let container = ContainerInit<MatrixContainer>()
+            let f() = 
+                ContainerLookup<MatrixContainer> container numLookups
+
+            f |> Benchmark2.capture ctx
 

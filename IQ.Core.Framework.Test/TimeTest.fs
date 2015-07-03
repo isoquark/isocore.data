@@ -2,8 +2,11 @@
 
 open System
 
+ open XUnit
 
-module TimeTests =
-    [<XUnit.FactAttribute>]
+type TimeTests(context,log) =    
+    inherit ProjectTestContainer(context,log)
+    [<Fact>]
     let ``Convert between BCL and Framework Date/Time representations``() =
-        ()
+        
+        log.WriteLine("This is output for test 1")

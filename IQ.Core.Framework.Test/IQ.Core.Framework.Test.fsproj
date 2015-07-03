@@ -79,7 +79,6 @@
     <Compile Include="TimeTest.fs" />
     <Compile Include="ClrElementTest.fs" />
     <Compile Include="ClrMetadataProviderTest.fs" />
-    <Compile Include="ConnectionStringTest.fs" />
     <Compile Include="RecordValueTest.fs" />
     <Compile Include="DataStructTest.fs" />
     <Compile Include="Data\DataStorageTypeTest.fs" />

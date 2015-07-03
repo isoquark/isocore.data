@@ -28,9 +28,13 @@ module TestTransformations =
     [<Transformation>]
     let intToInt (x : int) =
         x
+open XUnit
 
-[<TestContainer>]
-module TransformerTest = 
+type TransformerTest(ctx,log) = 
+    inherit ProjectTestContainer(ctx,log)
+    
+    let transformer : ITransformer = TransformerConfig([thisAssembly().AssemblyName],None) |>ctx.AppContext.Resolve
+    
     [<Fact>]
     let ``Converted optional and non-optional values``() =
         Some(3) |> Transformer.convert (typeof<int>) |> Claim.equal (3 :> obj)
@@ -40,8 +44,6 @@ module TransformerTest =
         Some(3L) |> Transformer.convert (typeof<int>) |> Claim.equal (3 :> obj)
         option<int>.None |> Transformer.convert typeof<int> |> Claim.isNull
             
-    let transformer : ITransformer = TransformerConfig([thisAssembly().AssemblyName],None) |> Context.Resolve
-
     [<Fact>]
     let ``Discovered transformations``() =
         let transformations  = transformer.GetKnownTransformations()
@@ -61,9 +63,9 @@ module TransformerTest =
         val1 |> transformer.Transform (typeof<string>) |> Claim.equal val2 
         val2 |> transformer.Transform (typeof<BclDateTime>) |> Claim.equal val1
 
-        let x = [1u..15u] |> List.map( fun x -> x :> obj) 
-        let y = [1s..15s] |> List.map( fun x -> x :> obj)
-        let z = [1l..15l] |> List.map( fun x -> x :> obj)
+        let x = [1u..4u] |> List.map( fun x -> x :> obj) 
+        let y = [1s..4s] |> List.map( fun x -> x :> obj)
+        let z = [1L..4L] |> List.map( fun x -> x :> obj)
         x |> transformer.TransformMany typeof<int64> |> List.ofSeq |> Claim.equal z
         y |> transformer.TransformMany typeof<int64> |> List.ofSeq |> Claim.equal z
 
@@ -83,7 +85,7 @@ module TransformerTest =
             for i in 0..itcount do
                 m.Invoke(null, [|i :> obj|]) |> ignore
                                    
-        f |> Benchmark.capture
+        f |> Benchmark2.capture ctx
 
     [<Fact; BenchmarkTrait>]
     let ``Benchmark - Called Method Directly 10^6 Times``() =
@@ -93,7 +95,7 @@ module TransformerTest =
             for i in 0..itcount do
                 Convert.ChangeType(i, typeof<int>) |> ignore
                        
-        f |> Benchmark.capture
+        f |> Benchmark2.capture ctx
     
     [<Fact; BenchmarkTrait>]
     let ``Benchmark - Executed Transformation Int32->Int32 with Transformer 10^6 Times``() =
@@ -103,7 +105,7 @@ module TransformerTest =
             for i in 0..itcount do
                 i |> transformer.Transform dstType |> ignore
         
-        f |> Benchmark.capture
+        f |> Benchmark2.capture ctx
 
     [<Fact; BenchmarkTrait>]
     let ``Benchmark - Executed Transformation Int32->Int32 with System Convert 10^6 Times``() =
@@ -113,7 +115,7 @@ module TransformerTest =
             for i in 0..itcount do
                 Convert.ChangeType(i, typeof<int>) |> ignore
 
-        f |> Benchmark.capture
+        f |> Benchmark2.capture ctx
         
     [<Fact; BenchmarkTrait>]
     let ``Benchmark - Executed Transformation Int32->Int32 Directly 10^6 Times``() =
@@ -123,7 +125,7 @@ module TransformerTest =
             for i in 0..itcount do
                 i |> TestTransformations.intToInt |> ignore
 
-        f |> Benchmark.capture
+        f |> Benchmark2.capture ctx
         
 
         

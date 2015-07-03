@@ -77,7 +77,6 @@
     <Compile Include="Framework\ClrMetadataProvider.fs" />
     <Compile Include="Framework\Transformer.fs" />
     <Compile Include="Framework\RecordValue.fs" />
-    <Compile Include="Framework\ConnectionString.fs" />
     <Compile Include="Framework\DynamicContract.fs" />
     <Compile Include="Framework\DataStructures.fs" />
     <None Include="Data\Resources\DefaultClrStorageTypeMap.csv">

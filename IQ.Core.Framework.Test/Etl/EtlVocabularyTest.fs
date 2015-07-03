@@ -2,7 +2,7 @@
 
 open System
 
-[<TestContainer>]
+
 module EtlVocabularyTest = ()
         
     
