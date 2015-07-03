@@ -42,3 +42,30 @@ module Benchmark =
 
     let inline capture (f:unit->unit) =
         f |> Benchmark.run (Benchmark.deriveDesignator()) |> record
+
+
+//module LocalTestVocabulary = 
+//    
+//    open XUnit
+//
+//    //This is instantiated/cleaned-up once per collection
+//    type MyTestContext() = 
+//        inherit TestContext()
+//        member this.Text = "Hello"
+//        
+//        interface IDisposable with
+//            member this.Dispose() = ()
+//
+//    [<Literal>]
+//    let TestCollectionName = "My Test Collection"
+//
+//    //This class exists to feed the test infrastructure metadata
+//    [<AbstractClass; TestCollectionMaker(TestCollectionName)>]
+//    type MyTestCollectionMarker() = 
+//        inherit TestCollection<MyTestContext>()
+//
+//    //Every subclass will automatically belong to the collection
+//    [<AbstractClass; TestContainer(TestCollectionName)>]
+//    type MyTestContainer(context, log) =
+//        inherit TestContainer<MyTestContext>(log)
+//        member this.Context : MyTestContext = context

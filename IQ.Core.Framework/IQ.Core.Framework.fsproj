@@ -73,7 +73,7 @@
     <Compile Include="Framework\ClrUtilities.fs" />
     <Compile Include="Framework\TransformerVocabulary.fs" />
     <Compile Include="Framework\Time.fs" />
-    <Compile Include="Framework\ClrElementVocabulary.fs" />
+    <Compile Include="Framework\ClrElement.fs" />
     <Compile Include="Framework\ClrMetadataProvider.fs" />
     <Compile Include="Framework\Transformer.fs" />
     <Compile Include="Framework\RecordValue.fs" />
