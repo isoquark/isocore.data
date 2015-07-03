@@ -73,8 +73,9 @@
     <Compile Include="LangTest.fs" />
     <Compile Include="TxtTest.fs" />
     <Compile Include="ClrUtilitiesTest.fs" />
-    <Compile Include="ClrMetadataProviderTest.fs" />
     <Compile Include="TransformerTest.fs" />
+    <Compile Include="TimeTest.fs" />
+    <Compile Include="ClrMetadataProviderTest.fs" />
     <Compile Include="ConnectionStringTest.fs" />
     <Compile Include="ClrElementTest.fs" />
     <Compile Include="RecordValueTest.fs" />

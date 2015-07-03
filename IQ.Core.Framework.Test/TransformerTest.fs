@@ -40,7 +40,7 @@ module TransformerTest =
         Some(3L) |> Transformer.convert (typeof<int>) |> Claim.equal (3 :> obj)
         option<int>.None |> Transformer.convert typeof<int> |> Claim.isNull
             
-    let transformer : ITransformer = DataConverterConfig([thisAssembly().AssemblyName],None) |> Context.Resolve
+    let transformer : ITransformer = TransformerConfig([thisAssembly().AssemblyName],None) |> Context.Resolve
 
     [<Fact>]
     let ``Discovered transformations``() =
