@@ -3,7 +3,8 @@ open System
 
 open XUnit
 
-type LangTest() =
+type LangTest(ctx,log) =
+    inherit ProjectTestContainer(ctx,log)
     [<Fact>]
     let ``Determined whether values were option values``() =
         Some(3) |> Option.isOptionValue |> Claim.isTrue

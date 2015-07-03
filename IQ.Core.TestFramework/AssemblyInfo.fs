@@ -4,10 +4,16 @@ open System.Reflection
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
 
+module AssemblyLiterals =
+    [<Literal>]
+    let ShortAssemblyName = "IQ.Core.TestFramework"
+    [<Literal>]
+    let DefaultNamespace = "IQ.Core.TestFramework"
+
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[<assembly: AssemblyTitle("IQ.Core.TestFramework")>]
+[<assembly: AssemblyTitle(AssemblyLiterals.ShortAssemblyName)>]
 [<assembly: AssemblyDescription("Core Test Infrastructure")>]
 [<assembly: AssemblyConfiguration("")>]
 [<assembly: AssemblyCompany("IQ")>]
@@ -37,7 +43,7 @@ open System.Runtime.InteropServices
 [<assembly: AssemblyVersion("1.0.0.0")>]
 [<assembly: AssemblyFileVersion("1.0.0.0")>]
 
-[<assembly: AutoOpen("IQ.Core.TestFramework")>]
+[<assembly: AutoOpen(AssemblyLiterals.DefaultNamespace)>]
 
 do
     ()

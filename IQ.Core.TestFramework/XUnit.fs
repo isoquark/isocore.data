@@ -4,10 +4,39 @@ open System
 open System.IO
 open System.Diagnostics
 open System.Collections.Generic
+open System.Linq
 
 open Xunit
 open Xunit.Sdk
 open Xunit.Abstractions
+
+
+//See: https://github.com/xunit/samples.xunit/blob/master/TraitExtensibility/
+
+/// <summary>
+/// This class discovers all of the tests and test classes that have
+/// applied the Category attribute
+/// </summary>
+type CategoryDiscoverer() =
+    interface ITraitDiscoverer with
+        member this.GetTraits(attrib) =
+            seq{
+                let args = attrib.GetConstructorArguments().ToList()
+                yield KeyValuePair("Category", args.[0].ToString())
+                }
+        
+/// <summary>
+/// Apply this attribute to your test method to specify a category.
+/// </summary>
+[<TraitDiscoverer("IQ.Core.TestFramework.CategoryDiscoverer", AssemblyLiterals.ShortAssemblyName)>]
+[<AttributeUsage(AttributeTargets.All, AllowMultiple = true)>]
+type CategoryAttribute(category) =
+    inherit Attribute()
+
+    member this.Category : string = category            
+
+    with interface ITraitAttribute end
+
 
 module XUnit =
     /// <summary>
@@ -19,6 +48,8 @@ module XUnit =
     /// Applied to a test to asign it to a category
     /// </summary>
     type TraitAttribute = Xunit.TraitAttribute
+
+
 
     //See http://xunit.github.io/docs/shared-context.html
     [<AbstractClass>]
@@ -36,23 +67,10 @@ module XUnit =
     [<AbstractClass>]
     type TestContext() = class end
 
-        
-    /// <summary>
-    /// Apply this attribute to your test method to specify a category.
-    /// </summary>
-    [<TraitDiscoverer("CategoryDiscoverer", "TraitExtensibility")>]
-    [<AttributeUsage(AttributeTargets.All, AllowMultiple = true)>]
-    type CategoryAttribute(category) =
-        inherit Attribute()
 
-        member this.Category : string = category            
-
-        with interface ITraitAttribute end
-        
-    
-            
-     
-        
+    module Categories =
+        [<Literal>]
+        let Benchmark = "Benchmark"
 
     /// <summary>
     /// Defines operations that assert the truth of various conditions
@@ -195,3 +213,6 @@ module XUnit =
         /// <param name="item">The item to search for</param>
         let seqCount count (s : seq<_>) =
             s |> Seq.length|> equal count
+
+        
+                                 

@@ -16,7 +16,8 @@ module TypeTestTypes =
                 type internal F = class end
 
 open TypeTestTypes
-type TypeTest() =
+type TypeTest(ctx,log) =
+    inherit ProjectTestContainer(ctx,log)
     [<Fact>]
     let ``Discovered nested types``() =
         let actualA = typeof<A.B>.DeclaringType |> Type.getNestedTypes

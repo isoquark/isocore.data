@@ -61,23 +61,27 @@ module OrderedSequence =
 
             test2()
 
-        [<Fact; ExpectedError(typeof<EndOfSequenceException>)>]
-        let ``Generate Non-Cyclical UInt8 sequences``() =
-            let createConfig() : OrderedSequenceConfig =
-                {
-                    Name = "Non-Cyclical UInt8 Sequence"
-                    ItemDataKind = DataKind.UInt8
-                    MinValue  = uint8(0uy)
-                    MaxValue = uint8(UInt8.MaxValue)
-                    InitialValue = uint8(5uy)
-                    Increment = uint8(1uy)
-                    Cycle = false
-                }         
-            let c = createConfig()
-            let s = c |> OrderedSequence.get<uint8>
-            s.NextRange(300) |> Seq.iter(fun x -> ())
+//        [<Fact; ExpectedError(typeof<EndOfSequenceException>)>]
+//        let ``Generate Non-Cyclical UInt8 sequences``() =
+//            let createConfig() : OrderedSequenceConfig =
+//                {
+//                    Name = "Non-Cyclical UInt8 Sequence"
+//                    ItemDataKind = DataKind.UInt8
+//                    MinValue  = uint8(0uy)
+//                    MaxValue = uint8(UInt8.MaxValue)
+//                    InitialValue = uint8(5uy)
+//                    Increment = uint8(1uy)
+//                    Cycle = false
+//                }         
+//            let c = createConfig()
+//            let s = c |> OrderedSequence.get<uint8>
+//            s.NextRange(300) |> Seq.iter(fun x -> ())
+
+    [<Category(Categories.Benchmark)>]
+    type PerformanceTests(ctx,log) =
+        inherit ProjectTestContainer(ctx,log)
                 
-        [<Fact; BenchmarkTrait>]
+        [<Fact>]
         let ``Benchmark - Int32 Framework Sequence Generation: 10^6 Calls``() =
             let name = Benchmark.deriveDesignator()
            
@@ -99,9 +103,9 @@ module OrderedSequence =
                 for i in minValue..maxValue do
                     s1.NextValue() |> ignore
 
-            f |> Benchmark.capture
+            f |> Benchmark.capture ctx
 
-        [<Fact; BenchmarkTrait>]
+        [<Fact>]
         let ``Benchmark - Int64 Framework Sequence Generation: 10^6 Calls``() =
             let name = Benchmark.deriveDesignator()
            
@@ -123,10 +127,10 @@ module OrderedSequence =
                 for i in minValue..maxValue do
                     s1.NextValue() |> ignore
 
-            f |> Benchmark.capture
+            f |> Benchmark.capture ctx
 
 
-        [<Fact; BenchmarkTrait>]
+        [<Fact>]
         let ``Benchmark - Int32 Direct Sequence Generation: 10^6 Calls``() =
            
             let f() =
@@ -134,7 +138,7 @@ module OrderedSequence =
                 let mutable current = 0
                 while (e.MoveNext()) do
                     current <- e.Current
-            f |> Benchmark.capture
+            f |> Benchmark.capture ctx
 
             
 

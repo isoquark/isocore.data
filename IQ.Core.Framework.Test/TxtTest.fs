@@ -2,7 +2,8 @@
 
 open XUnit
 
-type TxtTest() =
+type TxtTest(ctx,log) =
+    inherit ProjectTestContainer(ctx,log)
     
     [<Fact>]
     let ``Found text to the right of a marker``()  =
