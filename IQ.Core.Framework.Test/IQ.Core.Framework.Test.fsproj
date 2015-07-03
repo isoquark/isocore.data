@@ -78,6 +78,7 @@
     <Compile Include="ConnectionStringTest.fs" />
     <Compile Include="ClrElementTest.fs" />
     <Compile Include="RecordValueTest.fs" />
+    <Compile Include="DataStructTest.fs" />
     <Compile Include="Data\DataStorageTypeTest.fs" />
     <Compile Include="Synthetics\OrderedSequence.fs" />
   </ItemGroup>
@@ -97,6 +98,11 @@
     <ProjectReference Include="..\IQ.Core.Data.Sql\IQ.Core.Data.Sql.fsproj">
       <Name>IQ.Core.Data.Sql</Name>
       <Project>{29aedcf6-3187-4c89-aa30-d3d60a8e3379}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\IQ.Core.DataStructLib\IQ.Core.DataStructLib.csproj">
+      <Name>IQ.Core.DataStructLib</Name>
+      <Project>{4159cc44-092f-4fbc-b84e-226540e54396}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Framework\IQ.Core.Framework.fsproj">
