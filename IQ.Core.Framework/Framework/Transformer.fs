@@ -168,7 +168,12 @@ module Transformer =
         
         let transform dstType srcValue =
             let srcType = srcValue.GetType()
-            (getTransformation srcType dstType delegates).Invoke(srcValue)
+            try
+                let transformation = getTransformation srcType dstType delegates
+                transformation.Invoke(srcValue)
+            with
+                | :? KeyNotFoundException as e ->   
+                    TransformationUndefinedException(srcType, dstType) |> raise
         
         let canTransform srcType dstType =
             let key = dstType |> createKey srcType            

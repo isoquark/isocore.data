@@ -91,7 +91,6 @@ module OrderedSequence =
             Cycle = config.Cycle
         }
 
-
     let inline createEnumerator (initial : ^T) (min : ^T) (inc : ^S) (max : ^T) cycle = 
         let s = seq{ 
                let mutable cur =  initial
@@ -101,8 +100,7 @@ module OrderedSequence =
                     if cur = max then
                         yield cur
                         if cycle then
-                            cur <- min
-                
+                            cur <- min                
            }
         s.GetEnumerator()
 

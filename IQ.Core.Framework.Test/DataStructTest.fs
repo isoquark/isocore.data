@@ -36,7 +36,7 @@ module DataStructures =
         container.Dispose()
 
     [<Category(Categories.Benchmark)>]
-    type PerformanceTests(ctx,log) =
+    type Benchmarks(ctx,log) =
         inherit ProjectTestContainer(ctx,log)        
 
         [<Fact>]

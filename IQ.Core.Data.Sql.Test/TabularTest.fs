@@ -29,7 +29,7 @@ module Tabular =
 
 
         [<FactAttribute>]
-        let ``Queried [Metadata].[vDataType] - Partial column set A``() =
+        let ``Queried vDataType metadata - Partial column set A``() =
             let items = store.Get<Metadata.vDataTypeA>() 
                      |> List.map(fun item -> item.DataTypeName, item) 
                      |> Map.ofList
@@ -39,7 +39,7 @@ module Tabular =
             money.SchemaName |> Claim.equal "sys"
 
         [<FactAttribute>]
-        let ``Queried [Metadata].[vDataType] - Partial column set B``() =
+        let ``Queried vDataType metadata - Partial column set B``() =
             let items = store.Get<Metadata.vDataTypeB>() 
                      |> List.map(fun item -> item.DataTypeName, item) 
                      |> Map.ofList
@@ -52,7 +52,7 @@ module Tabular =
             money.IsUserDefined |> Claim.isFalse      
         
         [<FactAttribute>]
-        let ``Bulk inserted data into [SqlTest].[Table05]``() =
+        let ``Bulk inserted data into Table05``() =
             let input = [
                 {Table05.Col01 = 1; Col02 = 2uy; Col03 = 3s; Col04=5L}
                 {Table05.Col01 = 2; Col02 = 6uy; Col03 = 7s; Col04=8L}
@@ -62,7 +62,7 @@ module Tabular =
    
 
         [<FactAttribute>]
-        let ``Bulk inserted data into [SqlTest].[Table06]``() =
+        let ``Bulk inserted data into Table06``() =
             let input = [
                 {Table06.Col01 = 1; Col02 = Some 2uy; Col03 = Some 3s; Col04=5L}
                 {Table06.Col01 = 2; Col02 = Some 6uy; Col03 = Some 7s; Col04=8L}
@@ -72,7 +72,7 @@ module Tabular =
 
 
         [<FactAttribute>]
-        let ``Bulk inserted data into [SqlTest].[Table07]``() =
+        let ``Bulk inserted data into Table07``() =
             let input = [
                 {Table07.Col01 = Some(1); Col02 = "ABC"; Col03 = "DEF"}
                 {Table07.Col01 = Some(2); Col02 = "GHI"; Col03 = "JKL"}

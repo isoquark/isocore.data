@@ -17,7 +17,7 @@ module OrderedSequence =
                      
     let inline genRefList min skip max = [min..skip..max]
         
-    type Test(ctx,log) =
+    type LogicTests(ctx,log) =
         inherit ProjectTestContainer(ctx,log)
             
         [<Fact>]
@@ -57,24 +57,26 @@ module OrderedSequence =
 
             test2()
 
-//        [<Fact; ExpectedError(typeof<EndOfSequenceException>)>]
-//        let ``Generate Non-Cyclical UInt8 sequences``() =
-//            let createConfig() : OrderedSequenceConfig =
-//                {
-//                    Name = "Non-Cyclical UInt8 Sequence"
-//                    ItemDataKind = DataKind.UInt8
-//                    MinValue  = uint8(0uy)
-//                    MaxValue = uint8(UInt8.MaxValue)
-//                    InitialValue = uint8(5uy)
-//                    Increment = uint8(1uy)
-//                    Cycle = false
-//                }         
-//            let c = createConfig()
-//            let s = c |> OrderedSequence.get<uint8>
-//            s.NextRange(300) |> Seq.iter(fun x -> ())
+        [<Fact>]
+        let ``Failed when enumerating past the end of a non-cyclical sequence``() =
+            let createConfig() : OrderedSequenceConfig =
+                {
+                    Name = "Non-Cyclical UInt8 Sequence"
+                    ItemDataKind = DataKind.UInt8
+                    MinValue  = uint8(0uy)
+                    MaxValue = uint8(UInt8.MaxValue)
+                    InitialValue = uint8(5uy)
+                    Increment = uint8(1uy)
+                    Cycle = false
+                }         
+            let f() =
+                let c = createConfig()
+                let s = c |> OrderedSequence.get<uint8>
+                s.NextRange(300) |> Seq.iter(fun x -> ())
+            f |> Claim.failWith<EndOfSequenceException>
 
     [<Category(Categories.Benchmark)>]
-    type PerformanceTests(ctx,log) =
+    type Benchmarks(ctx,log) =
         inherit ProjectTestContainer(ctx,log)
                 
         [<Fact>]

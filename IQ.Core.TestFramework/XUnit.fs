@@ -141,7 +141,7 @@ module TestVocabulary =
         /// <summary>
         /// Asserts unconditional failure
         /// </summary>
-        let assertFail() =
+        let assertFalse() =
             Assert.True false
     
         /// <summary>

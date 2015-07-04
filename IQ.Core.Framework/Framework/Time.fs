@@ -111,12 +111,24 @@ module DefaultTimeProvider =
         }
    
 
+/// <summary>
+/// Defines time-related transformations
+/// </summary>
+/// <remarks>
+/// There is a little code duplication here but this is to support grouping 
+/// transformations from source to target without having to worry about 
+/// ordering
+/// </remarks
 module TimeConversions =
     type private Marker() = class end
     /// <summary>
     /// Specifies the <see cref="System.Type"/> of the module
     /// </summary>
     let ModuleType = typeof<Marker>.DeclaringType
+
+
+    // Date projections
+    // ------------------------------------------------------------------------
 
     /// <summary>
     /// Converts a <see cref="Date"> to a <see cref="DateTime"/>
@@ -126,33 +138,49 @@ module TimeConversions =
     let dateToDateTime(src : Date) = DateTime(src.Year, src.Month, src.Day, 0,0,0, src.Calendar)
     
     /// <summary>
-    /// Converts a <see cref="DateTime"> to a <see cref="BclDateTime"/>
+    /// Converts a <see cref="Date"/> to a <see cref="BclDateTime"/>
+    /// </summary>
+    /// <param name="src">The source value</param>
+    [<Transformation>]
+    let dateToBclDateTime(src : Date) = src |> dateToDateTime |> fun x -> x.ToDateTimeUnspecified()
+
+    // DateTime projections
+    // ------------------------------------------------------------------------
+
+    /// <summary>
+    /// <see cref="DateTime"> => <see cref="BclDateTime"/>
     /// </summary>
     /// <param name="src">The source value</param>
     [<Transformation>]
     let dateTimeToBclDateTime(src : DateTime) = src.ToDateTimeUnspecified()        
 
     /// <summary>
-    /// Converts a <see cref="Date"/> to a <see cref="BclDateTime"/>
-    /// </summary>
-    /// <param name="src">The source value</param>
-    [<Transformation>]
-    let dateToBclDateTime(src : Date) = src |> dateToDateTime |> dateTimeToBclDateTime
-
-    /// <summary>
-    /// Converts a <see cref="DateTime"> to a <see cref="Date"/>
+    /// <see cref="DateTime"> => <see cref="Date"/>
     /// </summary>
     /// <param name="src">The source value</param>
     [<Transformation>]
     let dateTimeToDate(src : DateTime) = Date(src.Year, src.Month, src.Day, src.Calendar)
 
+    // BclDateTime projections
+    // ------------------------------------------------------------------------
+
     /// <summary>
     /// Converts a <see cref="BclDateTime"> to a <see cref="DateTime"/>
     /// </summary>
-    /// <param name="src"></param>
+    /// <param name="src">The source value</param>
     [<Transformation>]
     let bclDateTimeToDateTime(src : BclDateTime) = src |> DateTime.FromDateTime
-        
+
+    /// <summary>
+    /// Converts a <see cref="BclDateTime"> to a <see cref="Date"/>
+    /// </summary>
+    /// <param name="src">The source value</param>
+    [<Transformation>]
+    let bclDateTimeToDate(src : BclDateTime) = Date(src.Year, src.Month, src.Day)        
+    
+    // BclTimeSpan projections
+    // ------------------------------------------------------------------------
+
     /// <summary>
     /// Converts a <see cref="BclTimeSpan"> to a <see cref="Duration"/>
     /// </summary>
@@ -167,6 +195,7 @@ module TimeConversions =
     [<Transformation>]
     let durationToBclTimeSpan(src : BclTimeSpan) = src |> Duration.FromTimeSpan
 
+    
     /// <summary>
     /// Converts a <see cref="UnixTickCount"> to a <see cref="Duration"/>
     /// </summary>

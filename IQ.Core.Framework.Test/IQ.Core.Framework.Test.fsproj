@@ -74,9 +74,6 @@
     <EmbeddedResource Include="Resources\CsvTestCase3.csv" />
     <EmbeddedResource Include="Resources\EmbeddedResource01.txt" />
     <None Include="xunit.bat" />
-    <None Include="nunit.bat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <Compile Include="TestConfiguration.fs" />
     <Compile Include="LangTest.fs" />
     <Compile Include="TxtTest.fs" />
@@ -87,7 +84,7 @@
     <Compile Include="ClrMetadataProviderTest.fs" />
     <Compile Include="RecordValueTest.fs" />
     <Compile Include="DataStructTest.fs" />
-    <Compile Include="Synthetics\OrderedSequence.fs" />
+    <Compile Include="Synthetics\OrderedSequenceTests.fs" />
     <Compile Include="Etl\EtlVocabularyTest.fs" />
     <Compile Include="Data\DataStorageTypeTest.fs" />
     <Compile Include="Data\ProxyTestCases.fs" />

@@ -35,7 +35,7 @@ module Transformer =
         let q = thisAssembly().AssemblyName |> FindAssemblyByName |> FindAssemblyElement |> List.singleton
         TransformerConfig(q, None)
 
-    type LogicalTests(ctx,log) = 
+    type LogicTests(ctx,log) = 
         inherit ProjectTestContainer(ctx,log)
     
 
@@ -84,7 +84,7 @@ module Transformer =
     let itcount = pown 10 6
 
     [<Category(Categories.Benchmark)>]
-    type PerformanceTests(ctx,log) =
+    type Benchmarks(ctx,log) =
         inherit ProjectTestContainer(ctx,log)
     
         let transformer : ITransformer = getTransformerConfig() |>ctx.AppContext.Resolve

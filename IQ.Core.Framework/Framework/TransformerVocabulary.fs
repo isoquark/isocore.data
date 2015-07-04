@@ -133,6 +133,13 @@ module TransformerVocabulary =
         /// </summary>
         member this.Category = match this with TransformerConfig(category=x) -> x
 
+    type TransformationUndefinedException(srcType, dstType) =
+        inherit Exception()
+        member this.SrcTpye : Type = srcType
+        member this.DstType : Type = dstType
+        override this.ToString() =
+            sprintf "A transformation from %s to %s does not exist" srcType.FullName dstType.FullName
+        override this.Message = this.ToString()
 
 
 
