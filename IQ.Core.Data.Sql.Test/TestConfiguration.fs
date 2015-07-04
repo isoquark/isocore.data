@@ -45,7 +45,7 @@ module TestConfiguration =
                     
     //This is instantiated/cleaned-up once per collection
     type ProjectTestContext() = 
-        inherit XUnit.TestContext()
+        inherit TestContext()
         
         let root = compose()
         let appContext = root.CreateContext()
@@ -66,14 +66,14 @@ module TestConfiguration =
     let TestCollectionName = "Core Sql Tests"
 
     //This class exists to feed the test infrastructure metadata
-    [<AbstractClass; XUnit.TestCollectionMaker(TestCollectionName)>]
+    [<AbstractClass; TestCollectionMaker(TestCollectionName)>]
     type ProjectCollectionMarker() = 
-        inherit XUnit.TestCollection<ProjectTestContext>()
+        inherit TestCollection<ProjectTestContext>()
 
-    [<AbstractClass; XUnit.TestContainer(TestCollectionName)>]
+    [<AbstractClass; TestContainer(TestCollectionName)>]
     type ProjectTestContainer(context,log) =
         member this.Context : ProjectTestContext = context
-        member this.Log : XUnit.ITestLog = log
+        member this.Log : ITestLog = log
 
 module Benchmark =
     let record (ctx :ProjectTestContext) (result : BenchmarkResult<_>)  =

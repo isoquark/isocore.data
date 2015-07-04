@@ -13,7 +13,6 @@ open IQ.Core.Data.Test.ProxyTestCases
 
 open IQ.Core.Framework.Test
 
-open XUnit
 
 module DataProxyMetadata =
 

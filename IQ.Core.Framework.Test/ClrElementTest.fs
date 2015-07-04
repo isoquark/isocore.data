@@ -51,8 +51,6 @@ module ClrElementTestTypes =
 open ClrElementTestTypes
         
 
-open XUnit
-
 type ClrElementNameTests(ctx,log)  =
     inherit ProjectTestContainer(ctx,log)
 

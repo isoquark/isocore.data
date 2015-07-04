@@ -1,8 +1,8 @@
 ﻿namespace IQ.Core.Framework.Test
+
 open System
 open System.ComponentModel
 
-open XUnit
 
 
 module ClrMetadataProvider =

@@ -12,8 +12,6 @@ open IQ.Core.Data.Test.ProxyTestCases
 open IQ.Core.Data.Sql
 open IQ.Core.Framework
 
-open XUnit
-
 module Tabular =
     
     let private verifyBulkInsert<'T>(input : 'T list) (sortBy: 'T->IComparable) (store : ISqlDataStore)=

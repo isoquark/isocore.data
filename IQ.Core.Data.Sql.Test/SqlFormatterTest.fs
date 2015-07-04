@@ -8,7 +8,6 @@ open IQ.Core.Data
 open IQ.Core.Data.Sql
 open IQ.Core.Framework
 
-open XUnit
 
 module SqlFormatter =
     [<Table("MySchema")>]

@@ -8,7 +8,7 @@ open IQ.Core.Framework
 open IQ.Core.TestFramework
 open IQ.Core.Data
 
-open XUnit
+
 open IQ.Core.Framework.Test
 
 module CsvReader =

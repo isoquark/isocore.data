@@ -48,7 +48,8 @@ module TestContext =
         dir
 
 
-module XUnit =
+[<AutoOpen>]
+module TestVocabulary =
     /// <summary>
     /// Identifies a test method
     /// </summary>
@@ -108,9 +109,6 @@ module XUnit =
         /// <param name="actual">The actual value</param>
         let equal (expected : 'T) (actual : 'T) =
             Assert.Equal<'T>(expected,actual)
-
-        //let listsEqual (expected : 'T list) (actual : 'T list)
-
 
         /// <summary>
         /// Asserts that a supplied optional value has a value

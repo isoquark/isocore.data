@@ -6,7 +6,6 @@ open System.Diagnostics
 open IQ.Core.Data
 open IQ.Core.Framework.Test
 
-open XUnit
 
 module DataType =
     let private verifyAttribute storageTypeExpect (attribute : DataTypeAttribute) =

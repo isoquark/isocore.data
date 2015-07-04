@@ -28,7 +28,6 @@ module TestTransformations =
     [<Transformation>]
     let intToInt (x : int) =
         x
-open XUnit
 
 module Transformer =
     

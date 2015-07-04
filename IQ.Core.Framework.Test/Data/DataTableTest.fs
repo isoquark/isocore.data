@@ -8,7 +8,6 @@ open System.Data
 open IQ.Core.Framework
 open IQ.Core.Data
 
-open XUnit
 
 open IQ.Core.Framework.Test
 

@@ -7,8 +7,6 @@ open System.Linq.Expressions
 open IQ.Core.Data
 open IQ.Core.DataStructLib
 
-open XUnit
-
 
 module DataStructures =
     let numLookups = pown 10 6

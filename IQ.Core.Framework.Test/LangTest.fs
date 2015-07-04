@@ -1,8 +1,6 @@
 ﻿namespace IQ.Core.Framework.Test
 open System
 
-open XUnit
-
 type LangTest(ctx,log) =
     inherit ProjectTestContainer(ctx,log)
     [<Fact>]

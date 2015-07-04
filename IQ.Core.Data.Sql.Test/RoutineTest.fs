@@ -12,8 +12,6 @@ open IQ.Core.Data.Test.ProxyTestCases
 open IQ.Core.Data.Sql
 open IQ.Core.Framework
 
-open XUnit
-
 module Routine =
     
     type Tests(ctx, log) = 

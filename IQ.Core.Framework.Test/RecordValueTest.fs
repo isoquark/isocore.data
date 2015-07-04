@@ -2,7 +2,6 @@
 
 open System
 
-open XUnit
 
 module RecordValue =
 
