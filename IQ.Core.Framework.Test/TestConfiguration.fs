@@ -1,6 +1,7 @@
 ﻿namespace IQ.Core.Framework.Test
 
 open System
+open System.Reflection
 
 open IQ.Core.Data.Sql
 
@@ -11,16 +12,45 @@ module ConfigSettingNames =
 [<AutoOpen>]
 module TestConfiguration =
     
-    let private compose() =
+    let private build() =
         let root = CompositionRoot.build(thisAssembly())
         root |> SqlServices.register
         root.Seal()
         root
+
+
+    let private compose() =        
+        let root = CompositionRoot.compose(fun registry ->        
+        
+            //Register configuration manager
+            //registry.RegisterFactory(fun config -> config |> ConfigurationManager.get)
+            registry.RegisterInstance({ConfigurationManagerConfig.Name="AppConfig"} |> ConfigurationManager.get)
+        
+            //Load all referenced user assemblies assemblies so we can engage 
+            //in profitable reflection exercises
+            thisAssembly() |> Assembly.loadReferences (Some(CoreConfiguration.UserAssemblyPrefix))            
+            let assemblyNames = AppDomain.CurrentDomain.GetUserAssemblyNames()
+            
+            //Register CLR metadata provider
+            {Assemblies = assemblyNames} |>ClrMetadataProvider.get |> registry.RegisterInstance
+        
+            //Register transformer
+            registry.RegisterFactory(fun config -> config |> Transformer.get)
+            
+            //Register time provider
+            registry.RegisterInstance<ITimeProvider>(DefaultTimeProvider.get())
+
+            registry |> SqlServices.register
+
+        )
+        root
+
                     
     //This is instantiated/cleaned-up once per collection
     type ProjectTestContext() = 
         inherit XUnit.TestContext()
         
+        //let root = build()
         let root = compose()
         let appContext = root.CreateContext()
         let configManager = appContext.Resolve<IConfigurationManager>()

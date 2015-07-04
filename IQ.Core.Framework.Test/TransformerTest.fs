@@ -32,10 +32,15 @@ open XUnit
 
 module Transformer =
     
+    let getTransformerConfig() =
+        let q = thisAssembly().AssemblyName |> FindAssemblyByName |> FindAssemblyElement |> List.singleton
+        TransformerConfig(q, None)
+
     type LogicalTests(ctx,log) = 
         inherit ProjectTestContainer(ctx,log)
     
-        let transformer : ITransformer = TransformerConfig([thisAssembly().AssemblyName],None) |>ctx.AppContext.Resolve
+
+        let transformer : ITransformer = getTransformerConfig() |>ctx.AppContext.Resolve
     
         [<Fact>]
         let ``Converted optional and non-optional values``() =
@@ -83,7 +88,7 @@ module Transformer =
     type PerformanceTests(ctx,log) =
         inherit ProjectTestContainer(ctx,log)
     
-        let transformer : ITransformer = TransformerConfig([thisAssembly().AssemblyName],None) |>ctx.AppContext.Resolve
+        let transformer : ITransformer = getTransformerConfig() |>ctx.AppContext.Resolve
 
         [<Fact>]
         let ``Benchmark - Called Method Invoke 10^6 Times``() =

@@ -51,7 +51,7 @@ module CompositionRoot =
     
     let mutable private root = Unchecked.defaultof<ICompositionRoot>
     let mutable private container = ref(Unchecked.defaultof<IContainer>)
-    let private _ConfigurationManager = lazy(ConfigurationManager.get()) 
+    let private _ConfigurationManager = lazy(ConfigurationManager.get({Name = ""})) 
     let internal ConfigurationManager() = _ConfigurationManager.Value
 
     let private registerFactory<'TConfig,'I when 'I : not struct> (f:ServiceFactory<'TConfig,'I>) (builder : ContainerBuilder) =
@@ -96,8 +96,6 @@ module CompositionRoot =
             assroot |> Assembly.loadReferences (Some(CoreConfiguration.UserAssemblyPrefix))
             builder |> registerCore asscore
             builder            
-
-
         
         let builder = build()
 
@@ -111,10 +109,30 @@ module CompositionRoot =
             member this.Dispose() = container.Value.Dispose()
             member this.CreateContext() = new AppContext(c()) :> IAppContext
 
+    type private CompositionRoot2() = 
+        let builder = ContainerBuilder()
+        
+        interface ICompositionRoot with
+            member this.RegisterInstance instance = builder |> registerInstance instance
+            member this.RegisterInterfaces<'T>() = builder |> registerInterfaces<'T>
+            member this.RegisterFactory<'TConfig,'I when 'I : not struct> f = builder |> registerFactory<'TConfig,'I> f
+            member this.Seal() = container := builder.Build()
+            member this.Dispose() = container.Value.Dispose()
+            member this.CreateContext() = new AppContext(container.Value) :> IAppContext
+        
+
     let build(assroot : Assembly) =
         root <- new CompositionRoot(assroot) :> ICompositionRoot
         root
 
+    let compose(register:ICompositionRegistry -> unit) =               
+        let _root = (new CompositionRoot2()) :> ICompositionRoot
+        _root |> register
+        _root.Seal()
+        root <- _root
+        _root
+                        
+                
     let internal resolve<'T when 'T : not struct>() =
         container.Value.Resolve<'T>()
 

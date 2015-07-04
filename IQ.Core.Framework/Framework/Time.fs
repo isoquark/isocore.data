@@ -14,27 +14,41 @@ module TimeVocabulary =
     type CalendarSystem = NodaTime.CalendarSystem
     type DateTimeZone = NodaTime.DateTimeZone
     type Duration = NodaTime.Duration
-    type IClock = NodaTime.IClock
+    
+    type ITimeProvider = 
+        inherit NodaTime.IClock
+    
     type IDateTimeZoneProvider = NodaTime.IDateTimeZoneProvider
     type Instant = NodaTime.Instant
     type TimeInterval = NodaTime.Interval
-    type IsoDayOfWeek = NodaTime.IsoDayOfWeek
-    type Date = NodaTime.LocalDate
-    type DateTime = NodaTime.LocalDateTime
-    type TimeOfDay = NodaTime.LocalTime
-    type TimeConstants = NodaTime.NodaConstants
-    type OffsetTime = NodaTime.Offset
-    type OffsetDateTime = NodaTime.OffsetDateTime
-    type Period = NodaTime.Period
-    type PeriodBuilder = NodaTime.PeriodBuilder
-    type PeriodUnits = NodaTime.PeriodUnits
-    type SkippedTimeException = NodaTime.SkippedTimeException
-    type ZonedDateTime = NodaTime.ZonedDateTime
-    let internal SystemClock() = NodaTime.SystemClock.Instance :> IClock
+    type IsoDayOfWeek = NodaTime.IsoDayOfWeek    
 
-    type BclDateTime = System.DateTime
-    type BclDateTimeOffset = System.DateTimeOffset
-    type BclTimeSpan = System.TimeSpan
+    type Date = NodaTime.LocalDate
+    
+    /// <summary>
+    /// The concept of Date and Time as represented in the Time Vocabulary
+    /// </summary>
+    type DateTime = NodaTime.LocalDateTime
+    
+    type TimeOfDay = NodaTime.LocalTime
+    
+    type TimeConstants = NodaTime.NodaConstants
+    
+    type TimeOffset = NodaTime.Offset
+    
+    type DateTimeOffset = NodaTime.OffsetDateTime
+    
+    type Period = NodaTime.Period
+    
+    type PeriodBuilder = NodaTime.PeriodBuilder
+    
+    type PeriodUnits = NodaTime.PeriodUnits
+    
+    type SkippedTimeException = NodaTime.SkippedTimeException
+    
+    type ZonedDateTime = NodaTime.ZonedDateTime
+    
+   
 
     /// <summary>
     /// Represents a BCL tick which is based at 1 AD
@@ -56,9 +70,54 @@ module TimeVocabulary =
             new (value) = { Value = value}
         end        
 
+//Here I'm trying really, really hard to hide the System.DateTime stuff!
+namespace System
+    /// <summary>
+    /// The <see cref="System.DateTime"/> type defined in the .Net System namespace
+    /// </summary>
+    type BclDateTime = System.DateTime
 
+    /// <summary>
+    /// The <see cref="IQ.Core.Framework.TimeVocabulary.DateTime"/> defined by the Core Framework Time vocabulary
+    /// </summary>
+    type DateTime = IQ.Core.Framework.TimeVocabulary.DateTime
+    
+    /// <summary>
+    /// The <see cref="System.DateTimeOffset"/> type defined in the .Net System namespace
+    /// </summary>
+    type BclDateTimeOffset = System.DateTimeOffset
+
+    /// <summary>
+    /// The <see cref="IQ.Core.Framework.TimeVocabulary.DateTime"/> defined by the Core Framework Time vocabulary
+    /// </summary>
+    type DateTimeOffset = IQ.Core.Framework.TimeVocabulary.DateTimeOffset    
+
+    /// <summary>
+    /// The <see cref="System.TimeSpan"/> type defined in the .Net System namespace
+    /// </summary>
+    type BclTimeSpan = System.TimeSpan
+    
+
+namespace IQ.Core.Framework
+
+open System
+
+
+module DefaultTimeProvider =
+    let private clock = NodaTime.SystemClock.Instance
+    let get() = 
+        { new ITimeProvider with
+            member this.Now = clock.Now
+        }
+   
 
 module TimeConversions =
+    type private Marker() = class end
+    /// <summary>
+    /// Specifies the <see cref="System.Type"/> of the module
+    /// </summary>
+    let ModuleType = typeof<Marker>.DeclaringType
+
     /// <summary>
     /// Converts a <see cref="Date"> to a <see cref="DateTime"/>
     /// </summary>
@@ -74,7 +133,7 @@ module TimeConversions =
     let dateTimeToBclDateTime(src : DateTime) = src.ToDateTimeUnspecified()        
 
     /// <summary>
-    /// Converts a <see cref="Date"> to a <see cref="BclDateTime"/>
+    /// Converts a <see cref="Date"/> to a <see cref="BclDateTime"/>
     /// </summary>
     /// <param name="src">The source value</param>
     [<Transformation>]
@@ -92,7 +151,7 @@ module TimeConversions =
     /// </summary>
     /// <param name="src"></param>
     [<Transformation>]
-    let bclDateTimeToDateTime(src : BclDateTime) = DateTime.FromDateTime
+    let bclDateTimeToDateTime(src : BclDateTime) = src |> DateTime.FromDateTime
         
     /// <summary>
     /// Converts a <see cref="BclTimeSpan"> to a <see cref="Duration"/>

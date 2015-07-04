@@ -1064,14 +1064,7 @@ module ReflectionExtensions =
         member this.Kind = this |> Type.getKind
 
 
-    /// <summary>
-    /// Defines augmentations for the <see cref="System.AppDomain"/> type
-    /// </summary>
-    type AppDomain
-    with
-        member this.AcquireAssembly (name : ClrAssemblyName) =
-            this |> AppDomain.acquireAssembly name
-    
+                
 
     /// <summary>
     /// Defines augmentations for the <see cref="System.Assembly"/> type
@@ -1090,6 +1083,28 @@ module ReflectionExtensions =
         /// Gets the short/simple name of the assembly
         /// </summary>
         member this.SimpleName = this.GetName().Name
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="System.AppDomain"/> type
+    /// </summary>
+    type AppDomain
+    with
+        member this.AcquireAssembly (name : ClrAssemblyName) =
+            this |> AppDomain.acquireAssembly name
+
+        /// <summary>
+        /// Gets the user assemblies that are currently loaded in the domain
+        /// </summary>
+        member this.GetUserAssemblies() =
+            AppDomain.CurrentDomain.GetAssemblies() 
+            |> Array.filter(fun a -> a.SimpleName.StartsWith(CoreConfiguration.UserAssemblyPrefix))
+
+        /// <summary>
+        /// Gets the names of the assemblies that are currently loaded in the domain
+        /// </summary>
+        member this.GetUserAssemblyNames() =
+             this.GetUserAssemblies() |> Array.map(fun a -> a.AssemblyName) |> List.ofArray
+
 
     /// <summary>
     /// Defines augmentations for the <see cref="System.Reflection.PropertyInfo"/> type

@@ -50,6 +50,16 @@ module Lang =
         /// </summary>
         let pmap = Array.Parallel.map
 
+    /// <summary>
+    /// Defines custom List module operations
+    /// </summary>
+    module List =
+        //Isn't this beautiful? Imagine how horrid these chain operations would look in C#!
+        let chain2 f1 f2 l =
+            l |> List.map f1 |> List.map f2
+
+        let chain3 f1 f2 f3 l =
+            l |> chain2 f1 f2 |> f3
 
     /// <summary>
     /// Raises a debugging assertion if a supplied predicate fails and emits a diagnostic message

@@ -69,8 +69,9 @@
     <Compile Include="Framework\Lang.fs" />
     <Compile Include="Framework\Txt.fs" />
     <Compile Include="Framework\Configuration.fs" />
-    <Compile Include="Framework\CompositionRoot.fs" />
     <Compile Include="Framework\ClrUtilities.fs" />
+    <Compile Include="Framework\CompositionRoot.fs" />
+    <Compile Include="Framework\ClrElementVocabulary.fs" />
     <Compile Include="Framework\TransformerVocabulary.fs" />
     <Compile Include="Framework\Time.fs" />
     <Compile Include="Framework\ClrElement.fs" />
@@ -95,8 +96,8 @@
     <Compile Include="Data\DataTable.fs" />
     <Compile Include="Data\CsvData.fs" />
     <Compile Include="Synthetics\OrderedSequence.fs" />
-    <Compile Include="CoreServices.fs" />
     <Compile Include="Etl\EtlVocabulary.fs" />
+    <Compile Include="CoreServices.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Autofac">

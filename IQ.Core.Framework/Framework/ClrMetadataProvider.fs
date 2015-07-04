@@ -30,6 +30,10 @@ module ClrMetadataProviderVocbulary =
         /// Find properties accessible to the provider
         /// </summary>
         abstract FindProperties:ClrPropertyQuery->ClrProperty list
+        /// <summary>
+        /// Find elements accessible to the provider
+        /// </summary>        
+        abstract FindElements:ClrElementQuery->ClrElement list
 
 /// <summary>
 /// Realizes client API for CLR metadata discovery
@@ -290,7 +294,7 @@ module ClrMetadataProvider =
         match o with
         | :? Type as x -> x |> describeType |> TypeElement
         | :? MemberInfo as x -> x |> describeMember |> MemberElement 
-        | :? Assembly as x -> x |> describeAssembly |> AssemblyElemement
+        | :? Assembly as x -> x |> describeAssembly |> AssemblyElement
         | :? ParameterInfo as x -> x |> describeParameter  |> ParameterElement
         | _ -> nosupport()
     
@@ -314,8 +318,7 @@ module ClrMetadataProvider =
             typeQuery |> findTypeProperties |> List.find(fun p -> p.Name = name) |> List.singleton
         | FindPropertiesByType(typeQuery) ->
             typeQuery |> findTypeProperties
-            
-    
+                
     let private findAssemblies(q : ClrAssemblyQuery) =
         match q with
         | FindAssemblyByName(name) ->
@@ -329,6 +332,12 @@ module ClrMetadataProvider =
             ArgumentException(sprintf "Query %O does not identify a known type" q) |> raise
         else
             types |> Seq.exactlyOne
+
+    let private findElements(q : ClrElementQuery) =
+        match q with
+        | FindAssemblyElement(q) -> q |> findAssemblies |> List.map AssemblyElement
+        | FindPropertyElement(q) -> q |> findProperties |> List.chain2  PropertyMember  MemberElement
+        | FindTypeElement(q) -> q |> findTypes |> List.map TypeElement
 
     /// <summary>
     /// Finds the type with the specified name
@@ -345,8 +354,9 @@ module ClrMetadataProvider =
             member this.FindTypes q = q |> findTypes
             member this.FindAssemblies q = q |> findAssemblies
             member this.FindProperties q = q |> findProperties
+            member this.FindElements q = q |> findElements
         
-    let internal get(config) =
+    let get(config) =
         ClrMetadataStore(config) :> IClrMetadataProvider
     
     let getCurrent() =
@@ -390,7 +400,9 @@ module ClrMetadataProviderExtensions =
         /// <param name="name">Identifies the assembly</param>
         member this.FindAssembly name =
             name |> FindAssemblyByName |> this.FindAssembly
-                              
+
+        member this.FindElement q =
+            q |> this.FindElement |> Seq.exactlyOne                              
 
     
 [<AutoOpen>]

@@ -64,6 +64,8 @@ module ``Routine Execution`` =
         
         let d0 = BclDateTime(2012, 1, 1)
         
+        
+
         let identities =
             [0..2..20] |> List.map(fun i ->                        
             routines.pTable04Insert "ABC" (d0.AddDays(float(i))) (d0.AddDays( float(i) + 1.0))      

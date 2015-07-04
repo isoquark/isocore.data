@@ -65,31 +65,75 @@ module TransformerVocabulary =
         /// <summary>
         /// Gets the conversions supported by the converter
         /// </summary>
-        abstract GetKnownTransformations: unit->TransformationIdentifier list
-
-
-     type ITypedTransformer =
-        abstract Transform<'TSrc, 'TDst> : src :'TSrc ->'TDst
-        abstract TransformMany<'TSrc,'TDst> : src : 'TSrc seq -> 'TDst seq
+        abstract GetKnownTransformations: unit->TransformationIdentifier list        
+        
+        /// <summary>
+        /// Determines whether the transformer can project an instace of the source type onto the destination type
+        /// </summary>
+        /// <param name="srcType">The source Type</param>
+        /// <param name="dstType">The destination type</param>
+        abstract CanTransform : srcType : Type -> dstType : Type -> bool
+        
+        /// <summary>
+        /// Converts to a generic version of itself
+        /// </summary>
+        abstract AsTyped:unit -> ITypedTransformer
+     and
+     ITypedTransformer =
+        /// <summary>
+        /// Converts a supplied value to the destination type
+        /// </summary>
+        /// <param name="srcValue">The value to convert</param>
+        abstract Transform<'TSrc, 'TDst> : srcValue :'TSrc ->'TDst
+        
+        /// <summary>
+        /// Converts a sequence of supplied values to the destination type
+        /// </summary>
+        /// <param name="dstType">The destination type</param>
+        /// <param name="srcValue">The values to convert</param>
+        abstract TransformMany<'TSrc,'TDst> : srcValues : 'TSrc seq -> 'TDst seq
+        
+        /// <summary>
+        /// Gets types into which a source type may be transformed
+        /// </summary>
+        /// <param name="srcType">The source type</param>
         abstract GetTargetTypes<'TSrc> : category : string -> Type list
-        abstract GetDefaultTargetType<'TSrc> : unit -> Type
+        
+        /// <summary>
+        /// Gets the conversions supported by the converter
+        /// </summary>
+        abstract GetKnownTransformations: unit->TransformationIdentifier list        
+
+        /// <summary>
+        /// Determines whether the transformer can project an instace of the source type onto the destination type
+        /// </summary>
+        /// <param name="srcType">The source Type</param>
+        /// <param name="dstType">The destination type</param>
+        abstract CanTransform<'TSrc,'TDst> :unit -> bool
+        
+        /// <summary>
+        /// Converts to a non-generic version of itself
+        /// </summary>
+        abstract AsUntyped:unit->ITransformer
 
 
     /// <summary>
-    /// Encapsulates data converer configuration parameters
+    /// Encapsulates Transformer configuration parameters
     /// </summary>
-    type TransformerConfig = TransformerConfig of searchAssemblies : ClrAssemblyName list * category : string option
+    type TransformerConfig = TransformerConfig of searchElements : ClrElementQuery list * category : string option
     with
         
         /// <summary>
         /// The assemblies that will be searched for converters
         /// </summary>
-        member this.SearchAssemblies = match this with TransformerConfig(searchAssemblies=x) -> x
+        member this.SearchElements = match this with TransformerConfig(searchElements=x) -> x
         
         /// <summary>
         /// The name of the conversion category if specified; otherwise the default category is assumed
         /// </summary>
         member this.Category = match this with TransformerConfig(category=x) -> x
+
+
 
 
  module TransformationIdentifier =

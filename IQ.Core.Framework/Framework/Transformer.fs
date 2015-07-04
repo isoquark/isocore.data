@@ -106,16 +106,22 @@ module Transformer =
     type private Key = uint64
     type private TransformationIndex = Dictionary<Key, TransformationDelegate>
     let private createDelegateIndex() = TransformationIndex()    
+
     let inline private createKey (srcType : Type) (dstType : Type)=
         let x = srcType.GetHashCode() |> uint64
         let y = dstType.GetHashCode() |> uint64
         let key = (x <<< 32) ||| y
         key
-    let inline private getTransform  srcType dstType (idx : TransformationIndex) = 
-        let key = createKey srcType dstType
-        idx.[key]
-    let inline private putTransform key del (idx : TransformationIndex) = 
+    
+    let inline private getTransformation  srcType dstType (idx : TransformationIndex) =  
+        idx.[createKey srcType dstType]
+    
+    let inline private putTransformation key del (idx : TransformationIndex) = 
         idx.[key] <- del
+    
+    let inline private hasTransformation key (idx : TransformationIndex) = 
+        idx.ContainsKey(key)
+
 
     let private discover(config : TransformerConfig) =
         use context = CompositionRoot.createContext()
@@ -134,7 +140,7 @@ module Transformer =
                             if a.Category = category then                                
                                 let parameters = m.Parameters |>List.filter(fun p -> p.IsReturn = false)
                                 if parameters.Length <> 1 || m.ReflectedElement.Value.ReturnType = typeof<Void> then
-                                    failwith (sprintf "Method %O incorrectly identified as a conversion function" m)
+                                    failwith (sprintf "Method %s incorrectly identified as a conversion function" m.Name.Text)
                    
                                 let parameter = parameters.Head.ReflectedElement |> Option.get
                                 let srcType = parameter.ParameterType
@@ -142,7 +148,7 @@ module Transformer =
                     
                                 let del = m.ReflectedElement.Value |> createDelegate
                                 let key = createKey srcType dstType
-                                putTransform key del delegateIndex
+                                putTransformation key del delegateIndex
                     
                                 TransformationIdentifier(a.Category, srcType.TypeName, dstType.TypeName) |> identifiers.Add
                         | None ->
@@ -150,13 +156,10 @@ module Transformer =
                 | _ -> ()
             | _ -> ()
         
-        
-        config.SearchAssemblies |> List.map(fun x -> x |> provider.FindAssembly) 
-                                |> List.iter (fun x -> x |> AssemblyElemement |> ClrElement.walk handler)
-
-
+        [for q in config.SearchElements do 
+            yield! q |> provider.FindElements] |> List.iter (fun x -> x |> ClrElement.walk handler)
+            
         delegateIndex, identifiers |> List.ofSeq
-
                    
     type private Realization(config : TransformerConfig) =
         let delegates, identifiers = config |> discover
@@ -165,30 +168,49 @@ module Transformer =
         
         let transform dstType srcValue =
             let srcType = srcValue.GetType()
-            (getTransform srcType dstType delegates).Invoke(srcValue)
+            (getTransformation srcType dstType delegates).Invoke(srcValue)
+        
+        let canTransform srcType dstType =
+            let key = dstType |> createKey srcType            
+            delegates |> hasTransformation key 
             
         interface ITransformer with
             member this.Transform dstType srcValue =               
                 transform dstType srcValue
+            
             member this.TransformMany dstType srcValues =
                 if srcValues |> Seq.isEmpty
                     then Seq.empty
                 else
                     let srcType = srcValues |> Seq.item 0 |> fun x -> x.GetType()
-                    let t = getTransform srcType dstType delegates
+                    let t = getTransformation srcType dstType delegates
                     srcValues |> Seq.map t.Invoke
+            
             member this.GetTargetTypes srcType  = []
+            
             member this.GetKnownTransformations() = identifiers
+            
+            member this.CanTransform srcType dstType =
+                dstType |> canTransform srcType 
+
+            member this.AsTyped() = this :> ITypedTransformer
         interface ITypedTransformer with
             member this.Transform value = 
                 value |> transform typeof<'TDst> :?> 'TDst
+            
             member this.TransformMany values =
                 [] |> Seq.ofList
+            
             member this.GetTargetTypes<'TSrc> category = nosupport()
-            member this.GetDefaultTargetType<'TSrc>()  = nosupport()
-
+            
+            member this.GetKnownTransformations() = identifiers
+            
+            member this.CanTransform<'TSrc,'TDst>() = 
+                typeof<'TDst> |> canTransform typeof<'TSrc>
+            
+            member this.AsUntyped() = this :> ITransformer
            
-    let internal get(config : TransformerConfig) =        
+    let get(config : TransformerConfig) =        
         Realization(config) :> ITransformer
 
 [<AutoOpen>]

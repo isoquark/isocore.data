@@ -2,11 +2,23 @@
 
 open System
 
- open XUnit
+open XUnit
 
-type TimeTests(context,log) =    
-    inherit ProjectTestContainer(context,log)
+type TimeTests(ctx,log) =    
+    inherit ProjectTestContainer(ctx,log)
+    
+    let getTransformer() =
+        let q = TimeConversions.ModuleType.TypeName |> FindTypeByName |> FindTypeElement |> List.singleton
+        let t : ITransformer = TransformerConfig(q, None) |> ctx.AppContext.Resolve 
+        t.AsTyped()
+
+    let transformer = getTransformer()
+
+    
+
     [<Fact>]
-    let ``Convert between BCL and Framework Date/Time representations``() =
+    let ``Discovered Time Transformations``() =        
+        transformer.CanTransform<DateTime,BclDateTime>() |> Claim.isTrue
+        transformer.CanTransform<BclDateTime,DateTime>() |> Claim.isTrue
         
-        log.WriteLine("This is output for test 1")
+        
