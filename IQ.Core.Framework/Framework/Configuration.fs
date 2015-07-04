@@ -80,3 +80,9 @@ module ConnectionString =
     /// <param name="cs">The connection string to format</param>
     let format (cs : ConnectionString) =
         cs.Components |> Txt.delemit ";"
+
+[<AutoOpen>]
+module ConnectionStringExtensions =
+    type ConnectionString
+    with
+        member this.Text = this |> ConnectionString.format    

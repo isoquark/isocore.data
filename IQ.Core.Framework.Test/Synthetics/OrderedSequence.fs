@@ -11,12 +11,9 @@ open IQ.Core.Synthetics
 open DataValue
 
 
-type SyntheticsAttribute() =
-    inherit TraitAttribute("Synthetics")
 
 open XUnit
 
-//[<TestContainer; Synthetics>]
 module OrderedSequence =
                      
     let inline genRefList min skip max = [min..skip..max]

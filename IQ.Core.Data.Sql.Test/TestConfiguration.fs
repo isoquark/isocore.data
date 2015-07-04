@@ -1,9 +1,12 @@
-﻿namespace IQ.Core.Framework.Test
+﻿namespace IQ.Core.Data.Sql.Test
 
 open System
 open System.Reflection
 
+open IQ.Core.Framework
+open IQ.Core.TestFramework
 open IQ.Core.Data.Sql
+
 
 
 module ConfigSettingNames =
@@ -60,7 +63,7 @@ module TestConfiguration =
                 root.Dispose()
 
     [<Literal>]
-    let TestCollectionName = "Core Framework Tests"
+    let TestCollectionName = "Core Sql Tests"
 
     //This class exists to feed the test infrastructure metadata
     [<AbstractClass; XUnit.TestCollectionMaker(TestCollectionName)>]
@@ -80,6 +83,3 @@ module Benchmark =
 
     let inline capture ctx (f:unit->unit) =
         f |> Benchmark.run (Benchmark.deriveDesignator()) |> record ctx
-
-
-            

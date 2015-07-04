@@ -197,7 +197,7 @@ module DataProxyMetadata =
             "(Some Schema,Some Object)" |> DataObjectName.parse |> Claim.equal (DataObjectName("Some Schema", "Some Object"))
             "(,X)" |> DataObjectName.parse |> Claim.equal (DataObjectName("", "X"))
 
-        [<Fact; FailureVerification>]
+        [<Fact>]
         let ``Correctly failed when attempting to parse semenantic representations of DataObjectName``() =
             (fun () -> "(Some Object)" |> DataObjectName.parse |> ignore ) |> Claim.failWith<ArgumentException>
             (fun () -> "SomeObject," |> DataObjectName.parse |> ignore ) |> Claim.failWith<ArgumentException>

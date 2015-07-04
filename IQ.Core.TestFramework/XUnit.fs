@@ -37,6 +37,16 @@ type CategoryAttribute(category) =
 
     with interface ITraitAttribute end
 
+module TestContext =
+    [<Literal>]
+    let private BaseDirectory = @"C:\Temp\IQ\Tests\"
+
+    let inline getTempDir() =
+        let dir = Path.Combine(BaseDirectory, thisAssembly().SimpleName)
+        if dir |> Directory.Exists |> not then
+            dir |> Directory.CreateDirectory |> ignore
+        dir
+
 
 module XUnit =
     /// <summary>

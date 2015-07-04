@@ -5,7 +5,6 @@ open System.IO
 open System.Diagnostics
 
 
-open NUnit.Framework
 open FSharp.Data
 
 module TrxResult =
