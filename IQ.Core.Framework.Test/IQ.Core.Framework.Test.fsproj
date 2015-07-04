@@ -82,13 +82,24 @@
     <Compile Include="RecordValueTest.fs" />
     <Compile Include="DataStructTest.fs" />
     <Compile Include="Data\DataStorageTypeTest.fs" />
+    <Compile Include="Data\ProxyTestCases.fs" />
+    <Compile Include="Data\ProxyDiscoveryTests.fs" />
+    <Compile Include="Data\DataTableTest.fs" />
     <Compile Include="Synthetics\OrderedSequence.fs" />
     <Compile Include="Etl\EtlVocabularyTest.fs" />
     <None Include="nunit.bat">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <EmbeddedResource Include="Data\Resources\CsvTestCase1.csv" />
+    <EmbeddedResource Include="Data\Resources\CsvTestCase2.csv" />
+    <EmbeddedResource Include="Data\Resources\CsvTestCase3.csv" />
+    <Compile Include="Data\CsvReaderTest.fs" />
   </ItemGroup>
   <ItemGroup>
+    <Reference Include="FSharp.Text.RegexProvider">
+      <HintPath>..\packages\FSharp.Text.RegexProvider.0.0.7\lib\net40\FSharp.Text.RegexProvider.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
