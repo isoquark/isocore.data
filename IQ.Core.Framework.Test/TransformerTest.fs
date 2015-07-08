@@ -97,7 +97,7 @@ module Transformer =
                 for i in 0..itcount do
                     m.Invoke(null, [|i :> obj|]) |> ignore
                                    
-            f |> Benchmark.capture ctx.SqlDataStore
+            f |> Benchmark.capture ctx
 
         [<Fact>]
         let ``Benchmark - Called Method Directly 10^6 Times``() =
@@ -107,7 +107,7 @@ module Transformer =
                 for i in 0..itcount do
                     Convert.ChangeType(i, typeof<int>) |> ignore
                        
-            f |> Benchmark.capture ctx.SqlDataStore
+            f |> Benchmark.capture ctx
     
         [<Fact>]
         let ``Benchmark - Executed Transformation Int32->Int32 with Transformer 10^6 Times``() =
@@ -117,7 +117,7 @@ module Transformer =
                 for i in 0..itcount do
                     i |> transformer.Transform dstType |> ignore
         
-            f |> Benchmark.capture ctx.SqlDataStore
+            f |> Benchmark.capture ctx
 
         [<Fact>]
         let ``Benchmark - Executed Transformation Int32->Int32 with System Convert 10^6 Times``() =
@@ -127,7 +127,7 @@ module Transformer =
                 for i in 0..itcount do
                     Convert.ChangeType(i, typeof<int>) |> ignore
 
-            f |> Benchmark.capture ctx.SqlDataStore
+            f |> Benchmark.capture ctx
         
         [<Fact>]
         let ``Benchmark - Executed Transformation Int32->Int32 Directly 10^6 Times``() =
@@ -137,7 +137,7 @@ module Transformer =
                 for i in 0..itcount do
                     i |> TestTransformations.intToInt |> ignore
 
-            f |> Benchmark.capture ctx.SqlDataStore
+            f |> Benchmark.capture ctx
         
 
         

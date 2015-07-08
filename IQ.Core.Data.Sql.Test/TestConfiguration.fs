@@ -9,38 +9,16 @@ open IQ.Core.Data
 open IQ.Core.Data.Sql
 
 
-
-module ConfigSettingNames =
-    let SqlTestDb = "csSqlDataStore"
-
 [<AutoOpen>]
 module TestConfiguration =
-    
-    let private compose() =        
-        let root = CompositionRoot.compose(fun registry ->                        
-            registry |> CoreRegistration.register (thisAssembly())
-            registry.RegisterFactory(fun config -> config |> SqlDataStore.access)
-        )
-        root
-                    
+                        
     //This is instantiated/cleaned-up once per collection
     type ProjectTestContext() = 
-        inherit TestContext()
+        inherit TestContext(thisAssembly(), ProjectTestContext.RegisterDependencies) 
+                                                
+        static member private RegisterDependencies(registry : ICompositionRegistry) =
+            registry.RegisterFactory(fun config -> config |> SqlDataStore.access)
         
-        let root = compose()
-        let appContext = root.CreateContext()
-        let configManager = appContext.Resolve<IConfigurationManager>()
-        let cs = ConfigSettingNames.SqlTestDb |> configManager.GetValue |> ConnectionString.parse        
-        let store : ISqlDataStore = cs |> appContext.Resolve
-                
-        member this.ConfigurationManager = configManager
-        member this.SqlDataStore = store
-        member this.AppContext = appContext
-        
-        interface IDisposable with
-            member this.Dispose() =
-                appContext.Dispose()
-                root.Dispose()
 
     [<Literal>]
     let TestCollectionName = "Core Sql Tests"

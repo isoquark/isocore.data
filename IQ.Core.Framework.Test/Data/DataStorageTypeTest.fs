@@ -63,3 +63,11 @@ module DataType =
             DataTypeAttribute(DataKind.UnicodeTextVariable, 150) |> verifyAttribute (UnicodeTextVariableDataType(150))
             DataTypeAttribute(DataKind.Variant) |> verifyAttribute VariantDataType
             DataTypeAttribute(DataKind.Xml) |> verifyAttribute ( XmlDataType(""))
+
+        [<Fact>]
+        let ``Formatted connection string``() =
+            ["A"; "B"; "C"] |> ConnectionString |> ConnectionString.format |> Claim.equal "A;B;C"
+
+        [<Fact>]
+        let ``Parsed connection string``() =
+            "A;B;C" |> ConnectionString.parse |> Claim.equal (ConnectionString["A"; "B"; "C"])

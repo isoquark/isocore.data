@@ -25,13 +25,6 @@ type LangTest(ctx,log) =
     let ``Determined collection value type``() =
         [1;2;3].GetType() |> Type.getCollectionValueType |> Claim.equal (Some(typeof<int>))
 
-    [<Fact>]
-    let ``Formatted connection string``() =
-        ["A"; "B"; "C"] |> ConnectionString |> ConnectionString.format |> Claim.equal "A;B;C"
-
-    [<Fact>]
-    let ``Parsed connection string``() =
-        "A;B;C" |> ConnectionString.parse |> Claim.equal (ConnectionString["A"; "B"; "C"])
 
 
        

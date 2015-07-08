@@ -6,34 +6,57 @@ open System.Linq.Expressions
 open System.Reflection
 open System.Collections
 
-open IQ.Core.Contracts
 open IQ.Core.Framework
 
-module Calculator =                  
+module CalcOps = 
     type Ops<'T>() =
         static member Init() = ()
         static member val Add : BinaryFunc<'T> = ExpressionBuilder.binaryLambda Expression.Add |> ExpressionBuilder.compile 
         static member val AddChecked : BinaryFunc<'T> = ExpressionBuilder.binaryLambda Expression.AddChecked |> ExpressionBuilder.compile    
+        
         static member val Subtract : BinaryFunc<'T> = ExpressionBuilder.binaryLambda Expression.Subtract |> ExpressionBuilder.compile 
         static member val SubtractChecked : BinaryFunc<'T> = ExpressionBuilder.binaryLambda Expression.SubtractChecked |> ExpressionBuilder.compile 
-        static member val Multiply  : BinaryFunc<'T> = ExpressionBuilder.binaryLambda Expression.Multiply |> ExpressionBuilder.compile 
+        
+        static member val Multiply  : BinaryFunc<'T> = ExpressionBuilder.binaryLambda Expression.Multiply |> ExpressionBuilder.compile         
         static member val MultiplyChecked : BinaryFunc<'T> = ExpressionBuilder.binaryLambda Expression.MultiplyChecked |> ExpressionBuilder.compile 
+        
         static member val Divide : BinaryFunc<'T> = ExpressionBuilder.binaryLambda Expression.Divide |> ExpressionBuilder.compile 
         static member val Modulo : BinaryFunc<'T> = ExpressionBuilder.binaryLambda Expression.Modulo |> ExpressionBuilder.compile 
+        
         static member val Increment : UnaryFunc<'T> = ExpressionBuilder.unaryLambda Expression.Increment |> ExpressionBuilder.compile 
         static member val Decrement : UnaryFunc<'T> = ExpressionBuilder.unaryLambda Expression.Decrement |> ExpressionBuilder.compile 
+        
+        static member val Equal : BinaryPredicate<'T> = ExpressionBuilder.binaryLambda Expression.Equal |> ExpressionBuilder.compile 
         static member val LessThan : BinaryPredicate<'T> = ExpressionBuilder.binaryLambda Expression.LessThan |> ExpressionBuilder.compile 
         static member val LessThanOrEqual : BinaryPredicate<'T> = ExpressionBuilder.binaryLambda Expression.LessThanOrEqual |> ExpressionBuilder.compile 
         static member val GreaterThan : BinaryPredicate<'T> = ExpressionBuilder.binaryLambda Expression.GreaterThan |> ExpressionBuilder.compile 
         static member val GreaterThanOrEqual : BinaryPredicate<'T> = ExpressionBuilder.binaryLambda Expression.GreaterThanOrEqual |> ExpressionBuilder.compile 
-        static member val Equal : BinaryPredicate<'T> = ExpressionBuilder.binaryLambda Expression.Equal |> ExpressionBuilder.compile 
+        
         static member val Zero : 'T = Unchecked.defaultof<'T>
         static member val MaxValue : 'T = typeof<'T>.GetField("MaxValue", BindingFlags.Public ||| BindingFlags.Static).GetValue(null) :?> 'T    
         static member val MinValue : 'T = typeof<'T>.GetField("MinValue", BindingFlags.Public ||| BindingFlags.Static).GetValue(null) :?> 'T    
-     
-     //The purpose of this is to provide some determinism about when we take
-     //the hit for compiling the delegates
 
+
+    let inline add x y =  Ops.Add.Invoke(x,y)
+    let inline addChecked x y = Ops.Add.Invoke(x,y)
+
+    let inline subtract x y = Ops.Subtract.Invoke(x,y)
+    let inline subtractChecked x y = Ops.SubtractChecked.Invoke(x,y)
+    
+    let inline multiply x y = Ops.Multiply.Invoke(x,y)
+    let inline multiplyChecked x y = Ops.MultiplyChecked.Invoke(x,y)
+
+    let inline divide x y  = Ops.Divide.Invoke(x,y)
+    let inline zero() = Ops.Zero    
+   
+    let inline increment x = Ops.Increment.Invoke(x)
+    let inline decrement x = Ops.Decrement.Invoke(x)
+
+
+open CalcOps
+
+module Calculator =                  
+     
     let init() =
         try
             Ops<uint8>.Init()
@@ -49,14 +72,11 @@ module Calculator =
             Ops<decimal>.Init()
         with 
             e ->
-                reraise()
-    
+                reraise()    
         
-    let sequence start count = 
+    let sequence start minval maxval count = 
         let eq = Ops.Equal
         let increment = Ops.Increment
-        let maxval = Ops.MaxValue
-        let minval = Ops.MinValue
         seq{
                 let mutable curval = start
                 let mutable curcount = 1
@@ -68,15 +88,8 @@ module Calculator =
                         curval <- curval|> increment.Invoke
                     curcount <- curcount + 1
            }    
-    
+        
 
-    
-    let inline add x y =  Ops.Add.Invoke(x,y)
-    let inline multiply x y = Ops.Multiply.Invoke(x,y)
-    let inline divide x y  = Ops.Divide.Invoke(x,y)
-    let inline zero() = Ops.Zero
-    
-   
     let inline private castAdd (x : ^T) (y : obj) =
         x + (y :?> ^T)
                
@@ -95,8 +108,7 @@ module Calculator =
             else
                 NotSupportedException(sprintf "I don't know how to add items of type %s" typeof<'T>.Name) |> raise
         result :?> 'T
-        
-             
+                     
     let inline private castMultiply (a : obj) (b : obj) =
         (a :?> ^T) * (b :?> ^T)
 
@@ -166,30 +178,47 @@ module Calculator =
             member this.GreaterThan (x,y) = gt.Invoke(x,y)
             member this.LessThanOrEqual(x,y) = lteq.Invoke(x,y)
             member this.GreaterThanOrEqual(x,y) = gteq.Invoke(x,y)
-            member this.Sequence (start, count) = sequence start count
+            member this.Sequence (start, minval, maxval, count) = sequence start minval maxval count
         } :> obj
 
     let private calculators = 
         [
-            typeof<int64>, create<int64>()
-            typeof<int32>, create<int32>()
+            typeof<int8>, create<int8>()
             typeof<int16>, create<int16>()
-            typeof<uint64>, create<uint64>()
-            typeof<uint32>, create<uint32>()
+            typeof<int32>, create<int32>()
+            typeof<int64>, create<int64>()
+            
+            typeof<uint8>, create<uint8>()
             typeof<uint16>, create<uint16>()
+            typeof<uint32>, create<uint32>()
+            typeof<uint64>, create<uint64>()
+            
             typeof<float32>, create<float32>()
             typeof<float>, create<float>()
             typeof<decimal>, create<decimal>()
 
         ] |> dict    
-            
+    
+    
     let get<'T>() =
         calculators.[typeof<'T>] :?> ICalculator<'T>
+
+    let get1() =
+        {new ICalculator with
+            member this.Add (x,y) =  add x y
+            member this.Subtract(x,y) = subtract x y
+            member this.Multiply(x,y) = multiply x y
+            member this.Divide(x,y) = divide x y
+            member this.Zero() = zero()
+        }                   
+        
+    
 
 
 type Number<'T>(value : 'T) =
     struct
         member this.Value = value
         static member val Ops : ICalculator<'T> = Calculator.get()          
-        static member inline (+) (x : Number<_>, y: Number<_>) = Number<_>.Ops.Add x.Value  y.Value |> Number<_>           
+        static member inline (+) (x : Number<_>, y: Number<_>) = Number<_>.Ops.Add(x.Value, y.Value) |> Number<_>           
+        static member inline (-) (x : Number<_>, y: Number<_>) = Number<_>.Ops.Subtract(x.Value, y.Value) |> Number<_>           
     end

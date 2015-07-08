@@ -7,44 +7,11 @@ open System.Collections.Generic
 open Autofac
 open Autofac.Builder
 
-[<AutoOpen>]
-module CompositionRootVocabulary =
     
-    type ServiceFactory<'TConfig,'I> = 'TConfig->'I
-    
-    type ICompositionRegistry =
-        /// <summary>
-        /// Registers an instance value
-        /// </summary>
-        abstract RegisterInstance<'I> : 'I->unit when 'I : not struct
-        
-        /// <summary>
-        /// Registers the interfaces implemented by the provided type
-        /// </summary>
-        abstract RegisterInterfaces<'T> : unit->unit
-
-        /// <summary>
-        /// Registers a service factory method
-        /// </summary>
-        abstract RegisterFactory<'TConfig, 'I> :ServiceFactory<'TConfig,'I> -> unit when 'I : not struct
-
-    type IAppContext =
-        inherit IDisposable
-        abstract Resolve<'T> :unit->'T
-        //Resolves the service by finding a type constructor with a parameter name 'key' and passing 
-        //the value to it when instantiating it
-        abstract Resolve<'T> : key :string * value : obj->'T
-        abstract Resolve<'C,'I> : config : 'C -> 'I
-
-    type ICompositionRoot =        
-        inherit IDisposable
-        inherit ICompositionRegistry
-        abstract Seal:unit->unit
-        abstract CreateContext:unit -> IAppContext
         
 
-    type RootNotInitializedException() =
-        inherit Exception()
+type RootNotInitializedException() =
+    inherit Exception()
 
 
 module CompositionRoot =

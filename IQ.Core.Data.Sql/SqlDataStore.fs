@@ -82,6 +82,8 @@ module SqlDataStore =
             
             member this.GetContract() =
                 Routine.getContract<'TContract> cs
+
+            member this.ConnectionString = cs
                 
                                              
     /// <summary>

@@ -48,6 +48,16 @@ with
 /// </summary>
 type SqlStoreCommand =
 | TruncateTable of tableName : DataObjectName
+
+/// <summary>
+/// Responsible for identifying a Data Store, Network Address or other resource
+/// </summary>
+type ConnectionString = ConnectionString of string list
+with
+    /// <summary>
+    /// The components of the connection string
+    /// </summary>
+    member this.Components = match this with ConnectionString(components) -> components
     
         
 /// <summary>
@@ -82,3 +92,5 @@ type ISqlDataStore =
     abstract BulkInsert:'T seq ->unit
 
     abstract ExecuteCommand:command : SqlStoreCommand -> unit
+
+    abstract ConnectionString:string

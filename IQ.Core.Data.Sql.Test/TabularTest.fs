@@ -21,11 +21,10 @@ module Tabular =
         let output = store.Get<'T>() |> List.sortBy sortBy
         output |> Claim.equal input
 
-    type Tests(ctx, log) = 
+    type Tests(ctx, log) as this= 
         inherit ProjectTestContainer(ctx,log)
         
-        let cs = ConfigSettingNames.SqlTestDb |> ctx.ConfigurationManager.GetValue |> ConnectionString.parse  
-        let store : ISqlDataStore = cs |> ctx.AppContext.Resolve                  
+        let store = this.Context.SqlDataStore
 
 
         [<FactAttribute>]

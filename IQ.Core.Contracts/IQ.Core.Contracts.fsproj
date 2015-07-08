@@ -50,6 +50,8 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="ICalculator.fs" />
     <Compile Include="IDataStore.fs" />
+    <Compile Include="IConfigurationManager.fs" />
+    <Compile Include="ICompositionRoot.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

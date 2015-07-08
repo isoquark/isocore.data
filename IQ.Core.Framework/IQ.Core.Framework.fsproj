@@ -87,6 +87,7 @@
     <None Include="Data\Resources\DefaultStorageKindAspects.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Compile Include="Data\ConnectionString.fs" />
     <Compile Include="Data\DataObjectName.fs" />
     <Compile Include="Data\DataType.fs" />
     <Compile Include="Data\DataAttributes.fs" />

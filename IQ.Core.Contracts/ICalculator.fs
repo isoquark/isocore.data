@@ -1,7 +1,10 @@
-﻿namespace IQ.Core.Contracts
+﻿namespace IQ.Core.Math
 
 type ICalculator =
-    abstract Add:'T->'T->'T
+    abstract Add:'T*'T->'T
+    abstract Subtract:'T*'T->'T
+    abstract Multiply:'T*'T->'T
+    abstract Divide:'T*'T->'T
     abstract Zero:unit->'T
 
 type ICalculator<'T> =
@@ -17,7 +20,7 @@ type ICalculator<'T> =
     abstract Modulo: 'T*'T->'T
     abstract Increment: 'T->'T
     abstract Decrement: 'T->'T
-    abstract Sequence: start : 'T * count : int -> 'T seq
+    abstract Sequence: start : 'T * minval : 'T * maxval : 'T *count : int -> 'T seq
     abstract Equal: 'T*'T->bool
     abstract LessThan: 'T*'T->bool
     abstract LessThanOrEqual: 'T*'T->bool

@@ -161,8 +161,9 @@ module Benchmark =
         let summary = result.Summary
         store.pBenchmarkResultPut summary.Name summary.MachineName summary.StartTime summary.EndTime summary.Duration |> ignore
 
-    let inline capture ctx (f:unit->unit) =
-        f |> run (deriveDesignator()) |> record ctx
+    let inline capture (ctx : ITestContext) (f:unit->unit) =
+        f |> run (deriveDesignator()) |> record ctx.ExecutionLog
 
-
+//module BenchmarkExtensions =
+    
 

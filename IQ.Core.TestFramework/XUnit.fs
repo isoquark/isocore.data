@@ -5,11 +5,14 @@ open System.IO
 open System.Diagnostics
 open System.Collections.Generic
 open System.Linq
+open System.Reflection
 
 open Xunit
 open Xunit.Sdk
 open Xunit.Abstractions
 
+open IQ.Core.Data
+open IQ.Core.Framework
 
 //See: https://github.com/xunit/samples.xunit/blob/master/TraitExtensibility/
 
@@ -47,6 +50,10 @@ module TestContext =
             dir |> Directory.CreateDirectory |> ignore
         dir
 
+module ConfigSettingNames =
+    [<Literal>]
+    let LogConnectionString = "csSqlDataStore"
+
 
 [<AutoOpen>]
 module TestVocabulary =
@@ -75,8 +82,50 @@ module TestVocabulary =
     
     type ITestLog = Xunit.Abstractions.ITestOutputHelper
 
+    type ITestContext =
+        abstract ConfigurationManager : IConfigurationManager
+        abstract AppContext : IAppContext
+        abstract ExecutionLog : ISqlDataStore
+
     [<AbstractClass>]
-    type TestContext() = class end
+    type TestContext(assemblyRoot : Assembly, register:ICompositionRegistry->unit) = 
+        let compose() =        
+            let root = CompositionRoot.compose(fun registry ->                        
+                registry |> CoreRegistration.register assemblyRoot
+                registry |> register
+            )
+            root
+
+        let root = compose()
+        let context = root.CreateContext()
+        let configManager = context.Resolve<IConfigurationManager>()
+        
+        let getSqlDataStore(): ISqlDataStore =
+            ConfigSettingNames.LogConnectionString 
+                |> configManager.GetValue 
+                |> ConnectionString.parse 
+                |> context.Resolve
+
+        let store = getSqlDataStore()
+        
+        new (assemblyRoot:Assembly) =
+            new TestContext(assemblyRoot, fun _ -> ())
+                 
+        member this.ConfigurationManager = configManager
+        member this.AppContext = context
+        member this.SqlDataStore = store
+                                                   
+            
+        interface IDisposable with
+            member this.Dispose() =
+                context.Dispose()
+                root.Dispose()
+        
+        interface ITestContext with
+            member this.ConfigurationManager = configManager
+            member this.AppContext = context
+            member this.ExecutionLog = store
+            
 
 
     module Categories =
