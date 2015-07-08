@@ -49,7 +49,8 @@ module CalculatorTests =
         else
             NotSupportedException(sprintf "I don't know how to run the baseline for the type %s" typeof<'T>.Name) |> raise
    
-    let count = pown 10 6
+    [<Literal>]
+    let count = 1000000
 
     let genItems<'T> minval maxval (count: int) =
         let calc = Calculator.get<'T>()
@@ -95,7 +96,7 @@ module CalculatorTests =
             (4.0m, 5.0m)  |> Calculator.get().Add |> Claim.equal 9.0m
             
          
-    [<Category(Categories.Benchmark)>]
+    [<Benchmark(count)>]
     type Benchmarks(ctx,log) =
         inherit ProjectTestContainer(ctx,log)
         
@@ -104,7 +105,7 @@ module CalculatorTests =
             Calculator.init()
 
         [<Fact>]
-        let ``Benchmark - Int8 - Add - Baseline - 10^6``() =
+        let ``Benchmark - Int8 - Add - Baseline``() =
             let f() =
                 for (x,y) in NumberLists.Int8List do
                     x + y |> ignore
@@ -112,7 +113,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Int8 - Add - Generic Calculator - 10^6``() =
+        let ``Benchmark - Int8 - Add - Generic Calculator``() =
             let c = Calculator.get<int8>()
             let f() =
                 for (x,y) in NumberLists.Int8List do
@@ -121,7 +122,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Int8 - Add - Generic Method - 10^6``() =
+        let ``Benchmark - Int8 - Add - Generic Method``() =
             let c = Calculator.get1()
             let f() =
                 for (x,y) in NumberLists.Int8List do
@@ -130,7 +131,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Int8 - Add - Generic Function - 10^6``() =
+        let ``Benchmark - Int8 - Add - Generic Function``() =
             let f() =
                 for (x,y) in NumberLists.Int8List do
                     add x y |> ignore
@@ -139,7 +140,7 @@ module CalculatorTests =
 
 
         [<Fact>]
-        let ``Benchmark - Int16 - Add - Baseline - 10^6``() =
+        let ``Benchmark - Int16 - Add - Baseline``() =
             let f() =
                 for (x,y) in NumberLists.Int16List do
                     x + y |> ignore
@@ -147,7 +148,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Int16 - Add - Generic Calculator - 10^6``() =
+        let ``Benchmark - Int16 - Add - Generic Calculator``() =
             let c = Calculator.get<int16>()
             let f() =
                 for (x,y) in NumberLists.Int16List do
@@ -156,7 +157,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Int16 - Add - Generic Method - 10^6``() =
+        let ``Benchmark - Int16 - Add - Generic Method``() =
             let c = Calculator.get1()
             let f() =
                 for (x,y) in NumberLists.Int16List do
@@ -165,7 +166,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Int16 - Add - Generic Function - 10^6``() =
+        let ``Benchmark - Int16 - Add - Generic Function``() =
             let f() =
                 for (x,y) in NumberLists.Int16List do
                     add x y |> ignore
@@ -174,7 +175,7 @@ module CalculatorTests =
 
 
         [<Fact>]
-        let ``Benchmark - Int32 - Add - Baseline - 10^6``() =
+        let ``Benchmark - Int32 - Add - Baseline``() =
             let f() =
                 for (x,y) in NumberLists.Int32List do
                     x + y |> ignore
@@ -183,7 +184,7 @@ module CalculatorTests =
         
         
         [<Fact>]
-        let ``Benchmark - Int32 - Add - Generic Calculator - 10^6``() =
+        let ``Benchmark - Int32 - Add - Generic Calculator``() =
             let c = Calculator.get<int32>()
             let f() =
                 for (x,y) in NumberLists.Int32List do
@@ -192,7 +193,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Int32 - Add - Generic Method - 10^6``() =
+        let ``Benchmark - Int32 - Add - Generic Method``() =
             let c = Calculator.get1()
             let f() =
                 for (x,y) in NumberLists.Int32List do
@@ -201,7 +202,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Int32 - Add - Generic Function - 10^6``() =
+        let ``Benchmark - Int32 - Add - Generic Function``() =
             let f() =
                 for (x,y) in NumberLists.Int32List do
                     add x y |> ignore
@@ -210,7 +211,7 @@ module CalculatorTests =
 
             
         [<Fact>]
-        let ``Benchmark - Int64 - Add - Baseline - 10^6``() =
+        let ``Benchmark - Int64 - Add - Baseline``() =
             let f() =
                 for (x,y) in NumberLists.Int64List do
                     x + y |> ignore
@@ -218,7 +219,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Int64 - Add - Generic Calculator - 10^6``() =
+        let ``Benchmark - Int64 - Add - Generic Calculator``() =
             let c = Calculator.get<int64>()
             let f() =
                 for (x,y) in NumberLists.Int64List do
@@ -227,7 +228,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Int64 - Add - Generic Method - 10^6``() =
+        let ``Benchmark - Int64 - Add - Generic Method``() =
             let c = Calculator.get1()
             let f() =
                 for (x,y) in NumberLists.Int64List do
@@ -236,7 +237,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Int64 - Add - Generic Function - 10^6``() =
+        let ``Benchmark - Int64 - Add - Generic Function``() =
             let f() =
                 for (x,y) in NumberLists.Int64List do
                     add x y |> ignore
@@ -244,7 +245,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - UInt16 - Add - Baseline - 10^6``() =
+        let ``Benchmark - UInt16 - Add - Baseline``() =
             let f() =
                 for (x,y) in NumberLists.UInt16List do
                     x + y |> ignore
@@ -252,7 +253,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - UInt16 - Add - Generic Calculator - 10^6``() =
+        let ``Benchmark - UInt16 - Add - Generic Calculator``() =
             let c = Calculator.get<uint16>()
             let f() =
                 for (x,y) in NumberLists.UInt16List do
@@ -261,7 +262,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - UInt16 - Add - Generic Method - 10^6``() =
+        let ``Benchmark - UInt16 - Add - Generic Method``() =
             let c = Calculator.get()
             let f() =
                 for (x,y) in NumberLists.UInt16List do
@@ -270,7 +271,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - UInt16 - Add - Generic Function - 10^6``() =
+        let ``Benchmark - UInt16 - Add - Generic Function``() =
             let f() =
                 for (x,y) in NumberLists.UInt16List do
                     add x y |> ignore
@@ -279,7 +280,7 @@ module CalculatorTests =
 
 
         [<Fact>]
-        let ``Benchmark - UInt32 - Add - Baseline - 10^6``() =
+        let ``Benchmark - UInt32 - Add - Baseline``() =
             let f() =
                 for (x,y) in NumberLists.UInt32List do
                     x + y |> ignore
@@ -288,7 +289,7 @@ module CalculatorTests =
 
 
         [<Fact>]
-        let ``Benchmark - UInt32 - Add - Generic Calculator - 10^6``() =
+        let ``Benchmark - UInt32 - Add - Generic Calculator``() =
             let c = Calculator.get<uint32>()
             let f() =
                 for (x,y) in NumberLists.UInt32List do
@@ -297,7 +298,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - UInt32 - Add - Generic Method - 10^6``() =
+        let ``Benchmark - UInt32 - Add - Generic Method``() =
             let c = Calculator.get()
             let f() =
                 for (x,y) in NumberLists.UInt32List do
@@ -306,7 +307,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - UInt32 - Add - Generic Function - 10^6``() =
+        let ``Benchmark - UInt32 - Add - Generic Function``() =
             let f() =
                 for (x,y) in NumberLists.UInt32List do
                     add x y |> ignore
@@ -314,7 +315,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - UInt64 - Add - Baseline - 10^6``() =
+        let ``Benchmark - UInt64 - Add - Baseline``() =
             let f() =
                 for (x,y) in NumberLists.UInt64List do
                     x + y |> ignore
@@ -322,7 +323,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - UInt64 - Add - Generic Calculator - 10^6``() =
+        let ``Benchmark - UInt64 - Add - Generic Calculator``() =
             let c = Calculator.get<uint64>()
             let f() =
                 for (x,y) in NumberLists.UInt64List do
@@ -331,7 +332,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - UInt64 - Add - Generic Method - 10^6``() =
+        let ``Benchmark - UInt64 - Add - Generic Method``() =
             let c = Calculator.get1()
             let f() =
                 for (x,y) in NumberLists.UInt64List do
@@ -340,7 +341,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - UInt64 - Add - Generic Function - 10^6``() =
+        let ``Benchmark - UInt64 - Add - Generic Function``() =
             let f() =
                 for (x,y) in NumberLists.UInt64List do
                     add x y |> ignore
@@ -349,7 +350,7 @@ module CalculatorTests =
 
 
         [<Fact>]
-        let ``Benchmark - Float32 - Add - Baseline - 10^6``() =
+        let ``Benchmark - Float32 - Add - Baseline``() =
             let f() =
                 for (x,y) in NumberLists.Float32List do
                     x + y |> ignore
@@ -357,7 +358,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Float32 - Add - Generic Calculator - 10^6``() =
+        let ``Benchmark - Float32 - Add - Generic Calculator``() =
             let c = Calculator.get<float32>()
             let f() =
                 for (x,y) in NumberLists.Float32List do
@@ -366,7 +367,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Float32 - Add - Generic Method - 10^6``() =
+        let ``Benchmark - Float32 - Add - Generic Method``() =
             let c = Calculator.get1()
             let f() =
                 for (x,y) in NumberLists.Float32List do
@@ -375,7 +376,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Float32 - Add - Generic Function - 10^6``() =
+        let ``Benchmark - Float32 - Add - Generic Function``() =
             let f() =
                 for (x,y) in NumberLists.Float32List do
                     add x y |> ignore
@@ -384,7 +385,7 @@ module CalculatorTests =
 
 
         [<Fact>]
-        let ``Benchmark - Float64 - Add - Baseline - 10^6``() =
+        let ``Benchmark - Float64 - Add - Baseline``() =
             let f() =
                 for (x,y) in NumberLists.Float64List do
                     x + y |> ignore
@@ -392,7 +393,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Float64 - Add - Generic Calculator - 10^6``() =
+        let ``Benchmark - Float64 - Add - Generic Calculator``() =
             let c = Calculator.get<float>()
             let f() =
                 for (x,y) in NumberLists.Float64List do
@@ -401,7 +402,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Float64 - Add - Generic Method - 10^6``() =
+        let ``Benchmark - Float64 - Add - Generic Method``() =
             let c = Calculator.get()
             let f() =
                 for (x,y) in NumberLists.Float64List do
@@ -410,7 +411,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Float64 - Add - Generic Function - 10^6``() =
+        let ``Benchmark - Float64 - Add - Generic Function``() =
             let f() =
                 for (x,y) in NumberLists.Float64List do
                     add x y |> ignore
@@ -419,7 +420,7 @@ module CalculatorTests =
 
 
         [<Fact>]
-        let ``Benchmark - Decimal - Add - Baseline - 10^6``() =
+        let ``Benchmark - Decimal - Add - Baseline``() =
             let f() =
                 for (x,y) in NumberLists.DecimalList do
                     x + y |> ignore
@@ -427,7 +428,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Decimal - Add - Generic Calculator - 10^6``() =
+        let ``Benchmark - Decimal - Add - Generic Calculator``() =
             let c = Calculator.get<decimal>()
             let f() =
                 for (x,y) in NumberLists.DecimalList do
@@ -436,7 +437,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Decimal - Add - Generic Method - 10^6``() =
+        let ``Benchmark - Decimal - Add - Generic Method``() =
             let c = Calculator.get()
             let f() =
                 for (x,y) in NumberLists.DecimalList do
@@ -445,7 +446,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Decimal - Add - Generic Function - 10^6``() =
+        let ``Benchmark - Decimal - Add - Generic Function``() =
             let f() =
                 for (x,y) in NumberLists.DecimalList do
                     add x y |> ignore
@@ -453,7 +454,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Number<int> - Add - 10^6``() =
+        let ``Benchmark - Number<int> - Add``() =
             let xList = NumberLists.Int32List |> List.map (fun (x,y) -> x |> Number)
             let yList = NumberLists.Int32List |> List.map (fun (x,y) -> y |> Number)
             let numbers = yList |> List.zip xList
@@ -463,7 +464,7 @@ module CalculatorTests =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Number<int> - Subtract - 10^6``() =
+        let ``Benchmark - Number<int> - Subtract``() =
             let xList = NumberLists.Int32List |> List.map (fun (x,y) -> x |> Number)
             let yList = NumberLists.Int32List |> List.map (fun (x,y) -> y |> Number)
             let numbers = yList |> List.zip xList

@@ -40,6 +40,35 @@ type CategoryAttribute(category) =
 
     with interface ITraitAttribute end
 
+
+/// <summary>
+/// This class discovers all of the tests and test classes to which the BenchmarkTrait
+/// attribute has been applied
+/// </summary>
+type BenchmarkDiscoverer() =
+    interface ITraitDiscoverer with
+        member this.GetTraits(attrib) =
+            seq{
+                let args = attrib.GetConstructorArguments().ToList()
+                //yield KeyValuePair("Benchmarks", args.[0].ToString())                
+                yield KeyValuePair("Category", "Benchmarks")
+                }
+        
+/// <summary>
+/// Apply this attribute to your test method to specify a category.
+/// </summary>
+[<TraitDiscoverer("IQ.Core.TestFramework.BenchmarkDiscoverer", AssemblyLiterals.ShortAssemblyName)>]
+[<AttributeUsage(AttributeTargets.All, AllowMultiple = true)>]
+type BenchmarkAttribute(opcount) =
+    inherit Attribute()
+
+    new () =
+        BenchmarkAttribute(0)
+    
+    member this.OperationCount : int = opcount
+
+    with interface ITraitAttribute end
+
 module TestContext =
     [<Literal>]
     let private BaseDirectory = @"C:\Temp\IQ\Tests\"

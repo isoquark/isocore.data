@@ -80,61 +80,61 @@ module Transformer =
             let transformer = transformer :?> ITypedTransformer
             transformer.Transform(35u) |> Claim.equal 35L
 
-    //The number of iterations to use for benchmarking
-    let itcount = pown 10 6
+    [<Literal>]
+    let opcount = 1000000
 
-    [<Category(Categories.Benchmark)>]
+    [<Benchmark(opcount)>]
     type Benchmarks(ctx,log) =
         inherit ProjectTestContainer(ctx,log)
     
         let transformer : ITransformer = getTransformerConfig() |>ctx.AppContext.Resolve
 
         [<Fact>]
-        let ``Benchmark - Called Method Invoke 10^6 Times``() =
+        let ``Benchmark - Called Method Invoke``() =
             let m = funcinfo<@fun () -> TestTransformations.intToInt@>
 
             let f() =
-                for i in 0..itcount do
+                for i in 0..opcount do
                     m.Invoke(null, [|i :> obj|]) |> ignore
                                    
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Called Method Directly 10^6 Times``() =
+        let ``Benchmark - Called Method Directly``() =
             let m = funcinfo<@fun () -> TestTransformations.intToInt@>
                     
             let f() =
-                for i in 0..itcount do
+                for i in 0..opcount do
                     Convert.ChangeType(i, typeof<int>) |> ignore
                        
             f |> Benchmark.capture ctx
     
         [<Fact>]
-        let ``Benchmark - Executed Transformation Int32->Int32 with Transformer 10^6 Times``() =
+        let ``Benchmark - Executed Transformation Int32->Int32 with Transformer``() =
                 
             let f() =
                 let dstType = typeof<int>
-                for i in 0..itcount do
+                for i in 0..opcount do
                     i |> transformer.Transform dstType |> ignore
         
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Executed Transformation Int32->Int32 with System Convert 10^6 Times``() =
+        let ``Benchmark - Executed Transformation Int32->Int32 with System Convert``() =
                 
             let f() =
                 let dstType = typeof<int>
-                for i in 0..itcount do
+                for i in 0..opcount do
                     Convert.ChangeType(i, typeof<int>) |> ignore
 
             f |> Benchmark.capture ctx
         
         [<Fact>]
-        let ``Benchmark - Executed Transformation Int32->Int32 Directly 10^6 Times``() =
+        let ``Benchmark - Executed Transformation Int32->Int32 Directly``() =
                 
             let f() =
                 let dstType = typeof<int>
-                for i in 0..itcount do
+                for i in 0..opcount do
                     i |> TestTransformations.intToInt |> ignore
 
             f |> Benchmark.capture ctx

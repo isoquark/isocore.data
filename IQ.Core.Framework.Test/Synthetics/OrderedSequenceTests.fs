@@ -11,7 +11,7 @@ open IQ.Core.Synthetics
 open DataValue
 
 
-
+module FsOps = FSharp.Core.Operators
 
 module OrderedSequence =
                      
@@ -75,17 +75,21 @@ module OrderedSequence =
                 s.NextRange(300) |> Seq.iter(fun x -> ())
             f |> Claim.failWith<EndOfSequenceException>
 
-    [<Category(Categories.Benchmark)>]
+    
+    [<Literal>]
+    let opcount = 1000000
+
+    [<Benchmark(opcount)>]    
     type Benchmarks(ctx,log)  =
         inherit ProjectTestContainer(ctx,log)
                 
         [<Fact>]
-        let ``Benchmark - Int32 Framework Sequence Generation: 10^6 Calls``() =
-            let name = Benchmark.deriveDesignator()
+        let ``Benchmark - Int32 Framework Sequence Generation``() =
+            let name = Benchmark.getBenchmarkName()
            
             let f() =
                 let minValue = 0
-                let maxValue = pown 10 6
+                let maxValue = opcount
                 let c1() : OrderedSequenceConfig =
                     {
                         Name = name
@@ -104,12 +108,12 @@ module OrderedSequence =
             f |> Benchmark.capture ctx
 
         [<Fact>]
-        let ``Benchmark - Int64 Framework Sequence Generation: 10^6 Calls``() =
-            let name = Benchmark.deriveDesignator()
+        let ``Benchmark - Int64 Framework Sequence Generation``() =
+            let name = Benchmark.getBenchmarkName()
            
             let f() =
                 let minValue = 0L
-                let maxValue = pown 10L 6
+                let maxValue = opcount |> FsOps.int64
                 let c1() : OrderedSequenceConfig =
                     {
                         Name = name
@@ -129,10 +133,10 @@ module OrderedSequence =
 
 
         [<Fact>]
-        let ``Benchmark - Int32 Direct Sequence Generation: 10^6 Calls``() =
+        let ``Benchmark - Int32 Direct Sequence Generation``() =
            
             let f() =
-                let e = OrderedSequence.createEnumerator 0 0 1 (pown 10 6) false
+                let e = OrderedSequence.createEnumerator 0 0 1 opcount  false
                 let mutable current = 0
                 while (e.MoveNext()) do
                     current <- e.Current

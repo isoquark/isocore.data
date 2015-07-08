@@ -62,15 +62,6 @@ module CsvReader =
         let format = CsvReader.getDefaultFormat()
         text |> CsvReader.readText<'T> format
         
-    let private captureBenchmark<'T> resname =
-        let path = thisAssembly() |> Assembly.writeTextResource resname (TestContext.getTempDir())
-        let format = CsvReader.getDefaultFormat()
-        let  description = path |> CsvReader.describeFile format
-        let benchmark() =
-            let items = path |> CsvReader.readFile<'T> format
-            true
-        benchmark |> Benchmark.repeat 3 (thisMethod().Name) |> Benchmark.summarize
-    
     type Tests(ctx,log) =
         inherit ProjectTestContainer(ctx,log)
         
@@ -116,21 +107,24 @@ module CsvReader =
             }
             actual |> Claim.equal expect
                
-        [<Fact>]
-        [<Category(Categories.Benchmark)>]
+        [<Fact; Benchmark>]
         let ``Benchmark - CsvReader 2A``() =
-            //This will eventually be persisted to a data store
-            //that maintains test execution history
-            let benchmark = captureBenchmark<CsvTestCase2A> "CsvTestCase2.csv"
-            ()
+            let path = thisAssembly() |> Assembly.writeTextResource "CsvTestCase2.csv" (TestContext.getTempDir())
+            let format = CsvReader.getDefaultFormat()
+            let  description = path |> CsvReader.describeFile format
+            let f() =
+                path |> CsvReader.readFile<CsvTestCase2A> format |> ignore            
+            f |> Benchmark.capture ctx
 
-        [<Fact>]
-        [<Category(Categories.Benchmark)>]
+
+        [<Fact; Benchmark>]
         let ``Benchmark - CsvReader 2B``() =
-            //This will eventually be persisted to a data store
-            //that maintains test execution history
-            let benchmark = captureBenchmark<CsvTestCase2B> "CsvTestCase2.csv"
-            ()
+            let path = thisAssembly() |> Assembly.writeTextResource "CsvTestCase2.csv" (TestContext.getTempDir())
+            let format = CsvReader.getDefaultFormat()
+            let  description = path |> CsvReader.describeFile format
+            let f() =
+                path |> CsvReader.readFile<CsvTestCase2B> format |> ignore            
+            f |> Benchmark.capture ctx
          
         
         [<Fact>]

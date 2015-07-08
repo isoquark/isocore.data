@@ -6,6 +6,7 @@ open System.Diagnostics
 open System.Reflection
 
 open IQ.Core.Data
+open IQ.Core.Framework
 
 /// <summary>
 /// Defines the Benchmark domain vocabulary
@@ -17,6 +18,12 @@ module BenchmarkVocabulary =
         /// The name of the benchmark
         Name : string
         
+        /// The full name of the type that defines the benchmark
+        DeclaringType : string
+
+        /// The number of operations/iterations executed during the benchmark
+        OperationCount : int
+
         /// The name of the machine on which the benchmark was executed
         MachineName : string
         
@@ -48,7 +55,7 @@ module BenchmarkVocabulary =
     [<Schema("Core")>]
      type ICoreTestFrameworkProcedures =
         [<Procedure>]
-        abstract pBenchmarkResultPut:BenchmarkName : string -> MachineName : string -> StartTime : BclDateTime -> EndTime : BclDateTime -> Duration : int -> [<return : RoutineParameter("Id", 5)>] int
+        abstract pBenchmarkResultPut:BenchmarkName : string -> DeclaringType : string -> OpCount : int -> MachineName : string -> StartTime : BclDateTime -> EndTime : BclDateTime -> Duration : int -> [<return : RoutineParameter("Id", 5)>] int
  
 
     type BenchmarkParameter = BenchmarkParameter of name : string * value : string
@@ -61,23 +68,48 @@ module BenchmarkVocabulary =
         member this.Name = match this with BenchmarkDesignator(name=x) -> x
         member this.Parameters = match this with BenchmarkDesignator(parameters=x) -> x
     
-
 /// <summary>
-/// Implements capabilities related to benchmarking
+/// Benchmarking implementation details; note that this cannot actually be internal
+/// because the functions herein are used in inline methods
 /// </summary>
-module Benchmark =    
+module BenchmarkInternals =
+    [<Literal>]
+    let private BMC = "Benchmark - "
+    
     let private gcwait() =
         GC.Collect()
         GC.WaitForPendingFinalizers()
         GC.Collect()
+    
+    /// <summary>
+    /// Derives the name of the benchmark from the currently executing method
+    /// </summary>
+    let getBenchmarkName(testMethod : MethodInfo) =
+        if testMethod.Name |> Txt.startsWith BMC |> not then
+            raise <| ArgumentException(sprintf "Method name \"%s\" does not align with convention" testMethod.Name) 
+        testMethod.Name |> Txt.rightOfFirst BMC
+    
+    let getAttribute(testMethod : MethodInfo) =
+       if Attribute.IsDefined(testMethod, typeof<BenchmarkAttribute>) then
+            testMethod.GetCustomAttribute<BenchmarkAttribute>()
+        else
+            let declaringTypes = 
+                let mutable t = testMethod.DeclaringType
+                [while(t <> null) do
+                    yield t
+                    t <- t.DeclaringType]
+            declaringTypes |> List.find(fun t -> Attribute.IsDefined(t, typeof<BenchmarkAttribute>))
+                           |> fun t -> t.GetCustomAttribute<BenchmarkAttribute>()
 
     /// <summary>
     /// Benchmarks a capability by capturing execution statistics when invoking a function
     /// that exercises the capability
     /// </summary>
     /// <param name="benchmarkName">The name of the benchmark</param>
+    /// <param name="testMethod">The test method that configures benchmark parameters and executes it</param>
     /// <param name="f">The function that invokes the benchmarked capability</param>
-    let run<'TDetail> benchmarkName (f:unit -> 'TDetail) =
+    let run<'TDetail> (testMethod : MethodInfo) (f:unit -> 'TDetail) =
+        //gcwait()
         let sw = Stopwatch()
         let startTime = BclDateTime.Now
         sw.Start()
@@ -87,82 +119,34 @@ module Benchmark =
 
         BenchmarkResult(
             {
-                Name = benchmarkName
-                MachineName = Environment.MachineName
+                Name = testMethod |> getBenchmarkName
+                DeclaringType = testMethod.DeclaringType.FullName
+                MachineName = Environment.MachineName                
+                OperationCount = getAttribute(testMethod).OperationCount
                 StartTime = startTime
                 EndTime = endTime
                 Duration = sw.Elapsed.TotalMilliseconds |> int
             }, detail)
-        
 
-    
-    /// <summary>
-    /// Benchmarks a capability by capturing execution statistics when repeatedly invoking a 
-    /// function that exercises the capability
-    /// </summary>
-    /// <param name="benchmarkName">The name of the benchmark</param>
-    /// <param name="f">The function that invokes the benchmarked capability</param>
-    /// <param name="iterations">The number of times to execute the benchmark function</param>
-    let repeat<'TDetail> (iterations : int) benchmarkName  (f:unit->'TDetail) =
-        
-        [for i in 0..iterations-1 do            
-            gcwait()            
-            let sw = Stopwatch()
-            let startTime = BclDateTime.Now
-            sw.Start()            
-            let detail = f()
-            sw.Stop()
-            let endTime = BclDateTime.Now
-
-            yield BenchmarkResult(
-                {
-                    Name = benchmarkName
-                    MachineName = Environment.MachineName
-                    StartTime = startTime
-                    EndTime = endTime
-                    Duration = sw.Elapsed.TotalMilliseconds |> int
-                }, detail)
-        ]
-
-    /// <summary>
-    /// Summarizes a collection of benchmark results
-    /// </summary>
-    /// <param name="results">The results to summarize</param>
-    let summarize (results : BenchmarkResult<_> seq) =
-        let results = results  |> Seq.sortBy(fun x -> x.Summary.StartTime) |> List.ofSeq
-        let startTime = results.Head.Summary.StartTime
-        let benchmarkName = results.Head.Summary.Name
-        let machineName = results.Head.Summary.MachineName
-        let results = results |> List.sortBy(fun x -> x.Summary.EndTime) |> List.rev
-        let endTime = results.Head.Summary.EndTime
-        let duration = results |> List.sumBy(fun x -> x.Summary.Duration)
-        {
-            Name = benchmarkName
-            MachineName = machineName
-            StartTime = startTime
-            EndTime = endTime
-            Duration = duration
-        }
-        
-    [<Literal>]
-    let private BMC = "Benchmark - "
-    
-    /// <summary>
-    /// Derives the name of the benchmark from the currently executing method
-    /// </summary>
-    let inline deriveDesignator() =
-        let m = thisMethod()
-        if m.Name |> Txt.startsWith BMC |> not then
-            raise <| ArgumentException(sprintf "Method name \"%s\" does not align with convention" m.Name) 
-        m.Name |> Txt.rightOfFirst BMC
-               
     let record (store : ISqlDataStore) (result : BenchmarkResult<_>)  =
         let store = store.GetContract<ICoreTestFrameworkProcedures>()           
         let summary = result.Summary
-        store.pBenchmarkResultPut summary.Name summary.MachineName summary.StartTime summary.EndTime summary.Duration |> ignore
+        store.pBenchmarkResultPut summary.Name summary.DeclaringType summary.OperationCount summary.MachineName summary.StartTime summary.EndTime summary.Duration |> ignore
+
+                    
+                        
+            
+
+/// <summary>
+/// Implements capabilities related to benchmarking
+/// </summary>
+module Benchmark =                                         
 
     let inline capture (ctx : ITestContext) (f:unit->unit) =
-        f |> run (deriveDesignator()) |> record ctx.ExecutionLog
+        f |> BenchmarkInternals.run (thisMethod()) |> BenchmarkInternals.record ctx.ExecutionLog
+    
+    let inline getBenchmarkName() =
+        thisMethod() |> BenchmarkInternals.getBenchmarkName
 
 //module BenchmarkExtensions =
     
