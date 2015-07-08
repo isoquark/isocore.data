@@ -189,8 +189,6 @@ module DataAttributes =
             | DataKind.Money -> MoneyDataType
             | DataKind.Guid -> GuidDataType
             | DataKind.AnsiTextMax -> AnsiTextMaxDataType
-            | DataKind.DateTime32 -> DateTime32DataType
-            | DataKind.DateTime64 -> DateTime64DataType
             | DataKind.DateTimeOffset -> DateTimeOffsetDataType
             | DataKind.TimeOfDay -> TimeOfDayDataType
             | DataKind.Variant -> VariantDataType

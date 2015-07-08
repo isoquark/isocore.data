@@ -43,8 +43,6 @@ module DataType =
             DataTypeAttribute(DataKind.CustomTable, "X", "Y") |> verifyAttribute (CustomTableDataType(DataObjectName("X","Y")))
             DataTypeAttribute(DataKind.Date) |> verifyAttribute DateDataType
             DataTypeAttribute(DataKind.DateTime, 3uy) |> verifyAttribute (DateTimeDataType(3uy))
-            DataTypeAttribute(DataKind.DateTime32) |> verifyAttribute (DateTime32DataType)
-            DataTypeAttribute(DataKind.DateTime64) |> verifyAttribute (DateTime64DataType)
             DataTypeAttribute(DataKind.DateTimeOffset) |> verifyAttribute (DateTimeOffsetDataType)
             DataTypeAttribute(DataKind.Decimal,12uy,4uy) |> verifyAttribute (DecimalDataType(12uy,4uy))
             DataTypeAttribute(DataKind.Float32) |> verifyAttribute (Float32DataType)

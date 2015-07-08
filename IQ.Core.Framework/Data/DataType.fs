@@ -10,6 +10,7 @@ open System.Collections.Generic
 
 open FSharp.Data
 
+open IQ.Core.Contracts
 open IQ.Core.Framework
 
 /// <summary>
@@ -46,8 +47,6 @@ module DataTypeVocabulary =
         | UnicodeTextFixed = 53uy //nchar
         | UnicodeTextVariable = 54uy //nvarchar
         | UnicodeTextMax = 55uy
-        | DateTime32 = 60uy //corresponds to smalldatetime
-        | DateTime64 = 61uy //corresponds to datetime
         | DateTime = 62uy //corresponds to datetime2
         | DateTimeOffset = 63uy
         | TimeOfDay = 64uy //corresponds to time
@@ -106,8 +105,6 @@ module DataTypeVocabulary =
         let UnicodeTextVariable = "utextv"
         [<Literal>]
         let UnicodeTextMax = "utextm"
-        [<Literal>]
-        let DateTime32 = "datetime32"
         [<Literal>]
         let DateTime64 = "datetime64"
         [<Literal>]
@@ -191,10 +188,6 @@ module DataTypeVocabulary =
         [<Literal>]
         let UnicodeTextMaxDataTypeName = "UnicodeTextMax"
         [<Literal>]
-        let DateTime32DataTypeName = "DateTime32"
-        [<Literal>]
-        let DateTime64DataTypeName = "DateTime64"
-        [<Literal>]
         let DateTimeDataTypeName = "DateTime"
         [<Literal>]
         let DateTimeOffsetDataTypeName = "DateTimeOffset"
@@ -254,8 +247,6 @@ module DataTypeVocabulary =
         | UnicodeTextFixedDataType of len : int
         | UnicodeTextVariableDataType of maxlen : int
         | UnicodeTextMaxDataType
-        | DateTime32DataType
-        | DateTime64DataType
         | DateTimeDataType of precision : uint8
         | DateTimeOffsetDataType
         | TimeOfDayDataType
@@ -296,8 +287,6 @@ module DataTypeVocabulary =
             | UnicodeTextFixedDataType(length) -> length |> sprintf "%s(%i)" UnicodeTextFixedDataTypeName
             | UnicodeTextVariableDataType(length) -> length |> sprintf "%s(%i)" UnicodeTextVariableDataTypeName
             | UnicodeTextMaxDataType -> UnicodeTextMaxDataTypeName            
-            | DateTime32DataType -> DateTime32DataTypeName
-            | DateTime64DataType -> DateTime64DataTypeName
             | DateTimeDataType(precision)-> precision |> sprintf "%s(%i)" DateTimeDataTypeName
             | DateTimeOffsetDataType -> DateTimeOffsetDataTypeName
             | TimeOfDayDataType -> TimeOfDayDataTypeName
@@ -340,8 +329,6 @@ module DataTypeVocabulary =
         | UnicodeTextFixedValue of string
         | UnicodeTextVariableValue of string
         | UnicodeTextMaxValue of string
-        | DateTime32Value of BclDateTime
-        | DateTime64Value of BclDateTime
         | DateTimeValue of BclDateTime
         | DateTimeOffsetValue of BclDateTimeOffset
         | TimeOfDayValue of BclDateTime
@@ -387,8 +374,6 @@ module DataValue =
         | UnicodeTextFixedValue(x) -> x |> cast<'T>
         | UnicodeTextVariableValue(x) -> x |> cast<'T>
         | UnicodeTextMaxValue(x) -> x |> cast<'T>
-        | DateTime32Value(x) -> x |> cast<'T>
-        | DateTime64Value(x) -> x |> cast<'T>
         | DateTimeValue(x) -> x |> cast<'T>
         | DateTimeOffsetValue(x) -> x |> cast<'T>
         | TimeOfDayValue(x) -> x |> cast<'T>
@@ -507,8 +492,6 @@ module DataType =
             | UnicodeTextVariableDataType(length) -> DataKind.UnicodeTextVariable
             | UnicodeTextMaxDataType -> DataKind.UnicodeTextMax
             
-            | DateTime32DataType -> DataKind.DateTime32
-            | DateTime64DataType -> DataKind.DateTime64
             | DateTimeDataType(precision)-> DataKind.DateTime
             | DateTimeOffsetDataType -> DataKind.DateTimeOffset
             | TimeOfDayDataType -> DataKind.TimeOfDay
@@ -526,49 +509,6 @@ module DataType =
             | CustomPrimitiveDataType(_) -> DataKind.CustomPrimitive
             | TypedDocumentDataType(_) -> DataKind.TypedDocument
 
-        let toSqlDbType (t : DataType) =
-            match t with
-            | BitDataType -> SqlDbType.Bit
-            | UInt8DataType -> SqlDbType.TinyInt
-            | UInt16DataType -> SqlDbType.Int
-            | UInt32DataType -> SqlDbType.BigInt
-            | UInt64DataType -> SqlDbType.VarBinary 
-            | Int8DataType -> SqlDbType.SmallInt
-            | Int16DataType -> SqlDbType.SmallInt
-            | Int32DataType -> SqlDbType.Int
-            | Int64DataType -> SqlDbType.BigInt
-                        
-            | BinaryFixedDataType(_) -> SqlDbType.Binary
-            | BinaryVariableDataType(_) -> SqlDbType.VarBinary
-            | BinaryMaxDataType -> SqlDbType.VarBinary
-            
-            | AnsiTextFixedDataType(length) -> SqlDbType.Char
-            | AnsiTextVariableDataType(length) -> SqlDbType.VarChar
-            | AnsiTextMaxDataType -> SqlDbType.VarChar
-            
-            | UnicodeTextFixedDataType(length) -> SqlDbType.NChar
-            | UnicodeTextVariableDataType(length) -> SqlDbType.NVarChar
-            | UnicodeTextMaxDataType -> SqlDbType.NVarChar
-            
-            | DateTime32DataType -> SqlDbType.SmallDateTime
-            | DateTime64DataType -> SqlDbType.DateTime
-            | DateTimeDataType(precision)-> SqlDbType.DateTime2
-            | DateTimeOffsetDataType -> SqlDbType.DateTimeOffset
-            | TimeOfDayDataType -> SqlDbType.Time
-            | DateDataType -> SqlDbType.Date
-            | TimespanDataType -> SqlDbType.BigInt
-
-            | Float32DataType -> SqlDbType.Real
-            | Float64DataType -> SqlDbType.Float
-            | DecimalDataType(precision,scale) -> SqlDbType.Decimal
-            | MoneyDataType -> SqlDbType.Money
-            | GuidDataType -> SqlDbType.UniqueIdentifier
-            | XmlDataType(schema) -> SqlDbType.Xml
-            | VariantDataType -> SqlDbType.Variant
-            | CustomTableDataType(name) -> SqlDbType.Structured
-            | CustomObjectDataType(name,t) -> SqlDbType.VarBinary 
-            | CustomPrimitiveDataType(name) -> SqlDbType.Udt
-            | TypedDocumentDataType(_) -> SqlDbType.NVarChar
                                     
                     
         /// <summary>
@@ -648,8 +588,6 @@ module DataType =
                 | BinaryMaxDataTypeName -> BinaryMaxDataType |> Some
                 | AnsiTextMaxDataTypeName -> AnsiTextMaxDataType |> Some
                 | UnicodeTextMaxDataTypeName -> UnicodeTextMaxDataType |> Some
-                | DateTime32DataTypeName -> DateTime32DataType |> Some
-                | DateTime64DataTypeName -> DateTime64DataType |> Some
                 | DateTimeOffsetDataTypeName -> DateTimeOffsetDataType |> Some
                 | DateDataTypeName -> DateDataType |> Some
                 | TimeOfDayDataTypeName -> TimeOfDayDataType |> Some

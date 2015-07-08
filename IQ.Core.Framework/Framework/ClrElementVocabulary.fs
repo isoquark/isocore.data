@@ -379,9 +379,9 @@ module ClrElementVocabulary =
     /// <summary>
     /// Represents an Enum
     /// </summary>
-    type ClrEnum = ClrEnumDescription of t : ClrType
+    type ClrEnum = ClrEnum of t : ClrType
     with 
-        member private this.Type = match this with ClrEnumDescription(t = x) -> x
+        member this.Type = match this with ClrEnum(t = x) -> x
         /// The name of the type
         member this.Name  = this.Type.Name
         /// The position of the type

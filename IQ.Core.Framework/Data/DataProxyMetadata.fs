@@ -9,6 +9,7 @@ open FSharp.Data
 
 open IQ.Core.Framework
 
+
 type DescriptionAttribute = System.ComponentModel.DescriptionAttribute
 
 /// <summary>

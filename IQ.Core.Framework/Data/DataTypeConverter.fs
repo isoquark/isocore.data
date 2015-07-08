@@ -39,8 +39,6 @@ module internal DataTypeConverter =
         | UnicodeTextVariableDataType(length) -> typeof<string>
         | UnicodeTextMaxDataType -> typeof<string>
             
-        | DateTime32DataType -> typeof<BclDateTime>
-        | DateTime64DataType -> typeof<BclDateTime>
         | DateTimeDataType(precision)-> typeof<BclDateTime>
         | DateTimeOffsetDataType -> typeof<BclDateTimeOffset>
         | TimeOfDayDataType -> typeof<BclTimeSpan>

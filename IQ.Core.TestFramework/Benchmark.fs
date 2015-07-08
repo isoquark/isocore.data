@@ -156,5 +156,13 @@ module Benchmark =
             raise <| ArgumentException(sprintf "Method name \"%s\" does not align with convention" m.Name) 
         m.Name |> Txt.rightOfFirst BMC
                
+    let record (store : ISqlDataStore) (result : BenchmarkResult<_>)  =
+        let store = store.GetContract<ICoreTestFrameworkProcedures>()           
+        let summary = result.Summary
+        store.pBenchmarkResultPut summary.Name summary.MachineName summary.StartTime summary.EndTime summary.Duration |> ignore
+
+    let inline capture ctx (f:unit->unit) =
+        f |> run (deriveDesignator()) |> record ctx
+
 
 

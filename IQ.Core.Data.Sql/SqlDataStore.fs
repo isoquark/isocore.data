@@ -5,6 +5,7 @@ open System.Data
 open System.Text
 open System.Data.SqlClient
 
+open IQ.Core.Contracts
 open IQ.Core.Framework
 open IQ.Core.Data
 
@@ -30,51 +31,6 @@ with
                 sb.Append(';') |> ignore
         sb.ToString()
                                         
-/// <summary>
-/// Defines the domain vocabulary for reasoning about SQL Server data stores
-/// </summary>
-[<AutoOpen>]
-module SqlDataStoreVocabulary =
-    
-    type SqlQueryParameter = SqlQueryParameter of name : string * value : obj    
-
-    type SqlQuery =
-        | TabularQuery of tabularName : string * columnNames : string list
-        | TableFunctionQuery of  functionName : string * parameters : SqlQueryParameter list
-        | ProcedureQuery of procedureName : string * parameters : SqlQueryParameter list
-
-
-    type SqlStoreCommand =
-    | TruncateTable of tableName : DataObjectName
-    
-        
-    /// <summary>
-    /// Defines the contract for a SQL Server Data Store
-    /// </summary>
-    type ISqlDataStore =
-        /// <summary>
-        /// Retrieves an identified collection of data entities from the store
-        /// </summary>
-        abstract Get:SqlQuery -> 'T list
-
-        abstract Get:unit -> 'T list
-
-        /// <summary>
-        /// Persists a collection of data entities to the store, inserting or updating as appropriate
-        /// </summary>
-        abstract Put:'T seq -> unit
-
-        /// <summary>
-        /// Deletes and identified collection of data entities from the store
-        /// </summary>
-        abstract Del:SqlQuery -> unit
-
-        abstract GetContract: unit -> 'TContract when 'TContract : not struct
-
-        abstract BulkInsert:'T seq ->unit
-
-        abstract ExecuteCommand:command : SqlStoreCommand -> unit
-       
         
         
 module internal SqlStoreCommand =

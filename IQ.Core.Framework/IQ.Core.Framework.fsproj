@@ -70,6 +70,7 @@
     <Compile Include="Framework\Txt.fs" />
     <Compile Include="Framework\Configuration.fs" />
     <Compile Include="Framework\ClrUtilities.fs" />
+    <Compile Include="Framework\ExpressionBuilder.fs" />
     <Compile Include="Framework\CompositionRoot.fs" />
     <Compile Include="Framework\ClrElementVocabulary.fs" />
     <Compile Include="Framework\TransformerVocabulary.fs" />
@@ -97,7 +98,7 @@
     <Compile Include="Data\CsvData.fs" />
     <Compile Include="Synthetics\OrderedSequence.fs" />
     <Compile Include="Etl\EtlVocabulary.fs" />
-    <Compile Include="CoreServices.fs" />
+    <Compile Include="CoreRegistration.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Autofac">
@@ -139,6 +140,13 @@
     <Reference Include="System.Numerics" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IQ.Core.Contracts\IQ.Core.Contracts.fsproj">
+      <Name>IQ.Core.Contracts</Name>
+      <Project>{8690d158-dd5f-4b78-b542-a4cd5757c20c}</Project>
+      <Private>True</Private>
+    </ProjectReference>
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

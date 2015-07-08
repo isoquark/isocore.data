@@ -26,7 +26,7 @@ module TimeVocabulary =
     type Date = NodaTime.LocalDate
     
     /// <summary>
-    /// The concept of Date and Time as represented in the Time Vocabulary
+    /// Represents a Date/Time
     /// </summary>
     type DateTime = NodaTime.LocalDateTime
     
@@ -70,7 +70,7 @@ module TimeVocabulary =
             new (value) = { Value = value}
         end        
 
-//Here I'm trying really, really hard to hide the System.DateTime stuff!
+//Hide/obscure the System.Date time to prevent erroneous references
 namespace System
     /// <summary>
     /// The <see cref="System.DateTime"/> type defined in the .Net System namespace
@@ -97,20 +97,10 @@ namespace System
     /// </summary>
     type BclTimeSpan = System.TimeSpan
     
-
 namespace IQ.Core.Framework
 
 open System
-
-
-module DefaultTimeProvider =
-    let private clock = NodaTime.SystemClock.Instance
-    let get() = 
-        { new ITimeProvider with
-            member this.Now = clock.Now
-        }
    
-
 /// <summary>
 /// Defines time-related transformations
 /// </summary>
@@ -125,7 +115,6 @@ module TimeConversions =
     /// Specifies the <see cref="System.Type"/> of the module
     /// </summary>
     let ModuleType = typeof<Marker>.DeclaringType
-
 
     // Date projections
     // ------------------------------------------------------------------------
@@ -224,4 +213,10 @@ module TimeConversions =
     [<Transformation>]
     let timeOfDayToBclDateTime(src : TimeOfDay) = src |> timeOfDayToDateTime |> dateTimeToBclDateTime
 
+module DefaultTimeProvider =
+    let private clock = NodaTime.SystemClock.Instance
+    let get() = 
+        { new ITimeProvider with
+            member this.Now = clock.Now
+        }
    

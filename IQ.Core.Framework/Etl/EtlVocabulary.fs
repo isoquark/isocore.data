@@ -19,7 +19,9 @@ module EtlVocabulary =
     
     type Filter<'T,'C> = Filter of ('T seq->'T seq->'C)
 
-    type Join<'S0,'S1,'T,'C> = Join of ('S0 seq ->'S1 seq ->'T seq->'C)
+    type Combine<'S0,'S1,'T,'C> = Combine of ('S0 seq ->'S1 seq ->'T seq->'C)
     
-    //type Split<'T, 'C> = Split of 'T s
+    type CrossJoin<'S0, 'S1, 'C> = CrossJoin of ('S0 seq -> 'S1 seq -> ('S0*'S1) seq -> 'C)
+
+    
 

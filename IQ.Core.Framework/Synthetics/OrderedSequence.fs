@@ -169,10 +169,6 @@ module OrderedSequence =
             Int32Sequence(config |> toGenericConfig1<int32>) :> ISequence       
         | DataKind.Int64 ->
             Int64Sequence(config |> toGenericConfig1<int64>) :> ISequence       
-        | DataKind.DateTime32 ->
-            nosupport()
-        | DataKind.DateTime64 ->
-            nosupport()
         | DataKind.DateTime ->
             nosupport()
         | DataKind.TimeOfDay ->

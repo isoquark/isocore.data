@@ -101,7 +101,7 @@ module OrderedSequence =
                 for i in minValue..maxValue do
                     s1.NextValue() |> ignore
 
-            f |> Benchmark.capture ctx
+            f |> Benchmark.capture ctx.SqlDataStore
 
         [<Fact>]
         let ``Benchmark - Int64 Framework Sequence Generation: 10^6 Calls``() =
@@ -125,7 +125,7 @@ module OrderedSequence =
                 for i in minValue..maxValue do
                     s1.NextValue() |> ignore
 
-            f |> Benchmark.capture ctx
+            f |> Benchmark.capture ctx.SqlDataStore
 
 
         [<Fact>]
@@ -136,7 +136,7 @@ module OrderedSequence =
                 let mutable current = 0
                 while (e.MoveNext()) do
                     current <- e.Current
-            f |> Benchmark.capture ctx
+            f |> Benchmark.capture ctx.SqlDataStore
 
             
 

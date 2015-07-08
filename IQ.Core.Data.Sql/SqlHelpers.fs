@@ -9,9 +9,54 @@ open System.Text
 open System.Data.SqlClient
 open System.Diagnostics
 
-
+open IQ.Core.Contracts
 open IQ.Core.Framework
 open IQ.Core.Data
+
+
+module DataType = 
+    let toSqlDbType (t : DataType) =
+        match t with
+        | BitDataType -> SqlDbType.Bit
+        | UInt8DataType -> SqlDbType.TinyInt
+        | UInt16DataType -> SqlDbType.Int
+        | UInt32DataType -> SqlDbType.BigInt
+        | UInt64DataType -> SqlDbType.VarBinary 
+        | Int8DataType -> SqlDbType.SmallInt
+        | Int16DataType -> SqlDbType.SmallInt
+        | Int32DataType -> SqlDbType.Int
+        | Int64DataType -> SqlDbType.BigInt
+                        
+        | BinaryFixedDataType(_) -> SqlDbType.Binary
+        | BinaryVariableDataType(_) -> SqlDbType.VarBinary
+        | BinaryMaxDataType -> SqlDbType.VarBinary
+            
+        | AnsiTextFixedDataType(length) -> SqlDbType.Char
+        | AnsiTextVariableDataType(length) -> SqlDbType.VarChar
+        | AnsiTextMaxDataType -> SqlDbType.VarChar
+            
+        | UnicodeTextFixedDataType(length) -> SqlDbType.NChar
+        | UnicodeTextVariableDataType(length) -> SqlDbType.NVarChar
+        | UnicodeTextMaxDataType -> SqlDbType.NVarChar
+            
+        | DateTimeDataType(precision)-> SqlDbType.DateTime2
+        | DateTimeOffsetDataType -> SqlDbType.DateTimeOffset
+        | TimeOfDayDataType -> SqlDbType.Time
+        | DateDataType -> SqlDbType.Date
+        | TimespanDataType -> SqlDbType.BigInt
+
+        | Float32DataType -> SqlDbType.Real
+        | Float64DataType -> SqlDbType.Float
+        | DecimalDataType(precision,scale) -> SqlDbType.Decimal
+        | MoneyDataType -> SqlDbType.Money
+        | GuidDataType -> SqlDbType.UniqueIdentifier
+        | XmlDataType(schema) -> SqlDbType.Xml
+        | VariantDataType -> SqlDbType.Variant
+        | CustomTableDataType(name) -> SqlDbType.Structured
+        | CustomObjectDataType(name,t) -> SqlDbType.VarBinary 
+        | CustomPrimitiveDataType(name) -> SqlDbType.Udt
+        | TypedDocumentDataType(_) -> SqlDbType.NVarChar
+
 
 module SqlFormatter =
     

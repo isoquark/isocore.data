@@ -31,6 +31,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{0F6D
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQ.Core.DataStructLib", "IQ.Core.DataStructLib\IQ.Core.DataStructLib.csproj", "{4159CC44-092F-4FBC-B84E-226540E54396}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Contracts", "IQ.Core.Contracts\IQ.Core.Contracts.fsproj", "{8690D158-DD5F-4B78-B542-A4CD5757C20C}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Math", "IQ.Core.Math\IQ.Core.Math.fsproj", "{D01A6D75-53F1-4814-BE92-5F69113AD1B9}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Math.Test", "IQ.Core.Math.Test\IQ.Core.Math.Test.fsproj", "{5F254826-9D3F-478A-9741-4649088D3F72}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,12 +75,24 @@ Global
 		{4159CC44-092F-4FBC-B84E-226540E54396}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4159CC44-092F-4FBC-B84E-226540E54396}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4159CC44-092F-4FBC-B84E-226540E54396}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8690D158-DD5F-4B78-B542-A4CD5757C20C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8690D158-DD5F-4B78-B542-A4CD5757C20C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8690D158-DD5F-4B78-B542-A4CD5757C20C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8690D158-DD5F-4B78-B542-A4CD5757C20C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F254826-9D3F-478A-9741-4649088D3F72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F254826-9D3F-478A-9741-4649088D3F72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F254826-9D3F-478A-9741-4649088D3F72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F254826-9D3F-478A-9741-4649088D3F72}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 9
+		SccNumberOfProjects = 12
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://isoquark.visualstudio.com/defaultcollection
 		SccLocalPath0 = .
@@ -102,5 +120,14 @@ Global
 		SccProjectUniqueName8 = IQ.Core.DataStructLib\\IQ.Core.DataStructLib.csproj
 		SccProjectName8 = IQ.Core.DataStructLib
 		SccLocalPath8 = IQ.Core.DataStructLib
+		SccProjectUniqueName9 = IQ.Core.Contracts\\IQ.Core.Contracts.fsproj
+		SccProjectName9 = IQ.Core.Contracts
+		SccLocalPath9 = IQ.Core.Contracts
+		SccProjectUniqueName10 = IQ.Core.Math\\IQ.Core.Math.fsproj
+		SccProjectName10 = IQ.Core.Math
+		SccLocalPath10 = IQ.Core.Math
+		SccProjectUniqueName11 = IQ.Core.Math.Test\\IQ.Core.Math.Test.fsproj
+		SccProjectName11 = IQ.Core.Math.Test
+		SccLocalPath11 = IQ.Core.Math.Test
 	EndGlobalSection
 EndGlobal

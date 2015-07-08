@@ -44,7 +44,7 @@ module DataStructures =
             let f() = 
                 ContainerInit<CompositeKeyDictionaryContainer>()  |> ignore
 
-            f |> Benchmark.capture ctx
+            f |> Benchmark.capture ctx.SqlDataStore
 
         [<Fact>]
         let ``Benchmark - CompositeKey Container Init 8^3 Types 10^6 Lookups``() =
@@ -52,14 +52,14 @@ module DataStructures =
             let f() = 
                 ContainerLookup<CompositeKeyDictionaryContainer> container numLookups
 
-            f |> Benchmark.capture ctx
+            f |> Benchmark.capture ctx.SqlDataStore
 
         [<Fact>]
         let ``Benchmark - Double Dictionary Container Init 8^3 Types``() =
             let f() = 
                 ContainerInit<DictionaryOfDictionariesContainer>()  |> ignore
 
-            f |> Benchmark.capture ctx
+            f |> Benchmark.capture ctx.SqlDataStore
 
         [<Fact>]
         let ``Benchmark - Double Dictionary Container Init 8^3 Types 10^6 Lookups``() =
@@ -67,11 +67,11 @@ module DataStructures =
             let f() = 
                 ContainerLookup<DictionaryOfDictionariesContainer> container numLookups
 
-            f |> Benchmark.capture ctx
+            f |> Benchmark.capture ctx.SqlDataStore
 
         [<Fact>]
         let ``Benchmark - Matrix Container Init 8^3 Types``() =
-            (fun () -> ContainerInit<MatrixContainer>() |> ignore) |> Benchmark.capture ctx
+            (fun () -> ContainerInit<MatrixContainer>() |> ignore) |> Benchmark.capture ctx.SqlDataStore
 
         [<Fact>]
         let ``Benchmark - Matrix Container Init 8^3 Types 10^6 Lookups``() =
@@ -79,5 +79,5 @@ module DataStructures =
             let f() = 
                 ContainerLookup<MatrixContainer> container numLookups
 
-            f |> Benchmark.capture ctx
+            f |> Benchmark.capture ctx.SqlDataStore
 
