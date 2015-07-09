@@ -35,13 +35,13 @@ module DataType =
         | AnsiTextVariableDataType(length) -> SqlDbType.VarChar
         | AnsiTextMaxDataType -> SqlDbType.VarChar
             
-        | UnicodeTextFixedDataType(length) -> SqlDbType.NChar
-        | UnicodeTextVariableDataType(length) -> SqlDbType.NVarChar
+        | UnicodeTextFixedDataType(_) -> SqlDbType.NChar
+        | UnicodeTextVariableDataType(_) -> SqlDbType.NVarChar
         | UnicodeTextMaxDataType -> SqlDbType.NVarChar
             
-        | DateTimeDataType(precision)-> SqlDbType.DateTime2
+        | DateTimeDataType(_)-> SqlDbType.DateTime2
         | DateTimeOffsetDataType -> SqlDbType.DateTimeOffset
-        | TimeOfDayDataType -> SqlDbType.Time
+        | TimeOfDayDataType(_) -> SqlDbType.Time
         | DateDataType -> SqlDbType.Date
         | TimespanDataType -> SqlDbType.BigInt
 
@@ -50,10 +50,11 @@ module DataType =
         | DecimalDataType(precision,scale) -> SqlDbType.Decimal
         | MoneyDataType -> SqlDbType.Money
         | GuidDataType -> SqlDbType.UniqueIdentifier
-        | XmlDataType(schema) -> SqlDbType.Xml
+        | XmlDataType(_) -> SqlDbType.Xml
+        | JsonDataType -> SqlDbType.NVarChar
         | VariantDataType -> SqlDbType.Variant
-        | CustomTableDataType(name) -> SqlDbType.Structured
-        | CustomObjectDataType(name,t) -> SqlDbType.VarBinary 
+        | CustomTableDataType(_) -> SqlDbType.Structured
+        | CustomObjectDataType(_,_) -> SqlDbType.VarBinary 
         | CustomPrimitiveDataType(name) -> SqlDbType.Udt
         | TypedDocumentDataType(_) -> SqlDbType.NVarChar
 

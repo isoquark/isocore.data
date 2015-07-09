@@ -53,7 +53,7 @@ module DataType =
             DataTypeAttribute(DataKind.Int32) |> verifyAttribute (Int32DataType)
             DataTypeAttribute(DataKind.Int64) |> verifyAttribute (Int64DataType)        
             DataTypeAttribute(DataKind.Money) |> verifyAttribute MoneyDataType
-            DataTypeAttribute(DataKind.TimeOfDay) |> verifyAttribute TimeOfDayDataType
+            DataTypeAttribute(DataKind.TimeOfDay,7uy) |> verifyAttribute (TimeOfDayDataType(7uy))
             DataTypeAttribute(DataKind.UInt8) |> verifyAttribute (UInt8DataType)
             DataTypeAttribute(DataKind.UInt16) |> verifyAttribute (UInt16DataType)
             DataTypeAttribute(DataKind.UInt32) |> verifyAttribute (UInt32DataType)
@@ -61,7 +61,7 @@ module DataType =
             DataTypeAttribute(DataKind.UnicodeTextFixed, 150) |> verifyAttribute (UnicodeTextFixedDataType(150))
             DataTypeAttribute(DataKind.UnicodeTextMax) |> verifyAttribute (UnicodeTextMaxDataType)
             DataTypeAttribute(DataKind.UnicodeTextVariable, 150) |> verifyAttribute (UnicodeTextVariableDataType(150))
-            DataTypeAttribute(DataKind.Variant) |> verifyAttribute VariantDataType
+            DataTypeAttribute(DataKind.Flexible) |> verifyAttribute VariantDataType
             DataTypeAttribute(DataKind.Xml) |> verifyAttribute ( XmlDataType(""))
 
         [<Fact>]

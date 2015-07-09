@@ -6,5 +6,6 @@ AnsiTextVariable|250||
 UnicodeTextFixed|250||
 UnicodeTextVariable|250||
 DateTime||7|
+TimeOfDay||7|
 Decimal||19|4
 Money|||

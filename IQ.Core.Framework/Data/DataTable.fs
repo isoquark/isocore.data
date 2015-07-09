@@ -39,7 +39,7 @@ module DataTable =
     /// <param name="d">The tabular description</param>
     let fromTabularDescription(d : TabularDescription) =
         let table = new DataTable(d.Name.ToSemanticString())
-        d.Columns |> List.iter(fun c -> table.Columns.Add(c.Name, c.StorageType |> DataTypeConverter.toClrTransportType) |> ignore)
+        d.Columns |> List.iter(fun c -> table.Columns.Add(c.Name, c.StorageType |> DataTypeConverter.toBclTransportType) |> ignore)
         table
 
     /// <summary>
@@ -74,7 +74,7 @@ module DataTable =
         for value in values do
             let valueidx = value |>RecordValue.toValueIndex
             [|for column in columns do 
-                yield valueidx.[column.ProxyElement.Name.Text] |> DataTypeConverter.toClrTransportValue column.DataElement.StorageType
+                yield valueidx.[column.ProxyElement.Name.Text] |> DataTypeConverter.toBclTransportValue column.DataElement.StorageType
             |] |> table.Rows.Add |> ignore
         table                
 

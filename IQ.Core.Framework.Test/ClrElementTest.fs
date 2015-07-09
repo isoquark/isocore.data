@@ -3,6 +3,7 @@
 open System
 open System.Reflection
 
+open IQ.Core.Framework
 
 //// <summary>
 /// Defines the types that are used to verify the correct function of the ClrElement module

@@ -15,8 +15,9 @@ module internal DataTypeConverter =
         else
              o
     
-    let toClrTransportType storageType =
-        match storageType with
+    //This actually belongs in IQ.Core.Data.Sql
+    let toBclTransportType dataType =
+        match dataType with
         | BitDataType -> typeof<bool>
         | UInt8DataType -> typeof<uint8>
         | UInt16DataType -> typeof<int32>
@@ -41,7 +42,7 @@ module internal DataTypeConverter =
             
         | DateTimeDataType(precision)-> typeof<BclDateTime>
         | DateTimeOffsetDataType -> typeof<BclDateTimeOffset>
-        | TimeOfDayDataType -> typeof<BclTimeSpan>
+        | TimeOfDayDataType(_) -> typeof<BclTimeSpan>
         | DateDataType -> typeof<BclDateTime>
         | TimespanDataType -> typeof<int64>
             
@@ -51,6 +52,7 @@ module internal DataTypeConverter =
         | MoneyDataType -> typeof<decimal>
         | GuidDataType -> typeof<Guid>
         | XmlDataType(schema) -> typeof<string>
+        | JsonDataType -> typeof<string>
         | VariantDataType -> typeof<obj>
         | CustomTableDataType(name) -> typeof<obj>
         | CustomObjectDataType(name,t) -> typeof<obj>
@@ -65,16 +67,16 @@ module internal DataTypeConverter =
     let private ticksToTimespan (ticks : int64) =
         TimeSpan.FromTicks
 
-    let toClrTransportValue dataType  (value : obj) =
+    let toBclTransportValue dataType  (value : obj) =
         let value = value |> stripOption
         if value = null then
             DBNull.Value :> obj
         else
-            let clrType = dataType |> toClrTransportType
+            let clrType = dataType |> toBclTransportType
             value |> Transformer.convert clrType
     
 
-    let fromClrTransportValue dstType (value : obj) =
+    let fromBclTransportValue dstType (value : obj) =
         value |> Transformer.convert dstType
 
 

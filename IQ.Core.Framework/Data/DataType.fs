@@ -29,6 +29,8 @@ module DataTypeVocabulary =
     /// </remarks>
     type DataKind =
         | Unspecified = 0uy
+        
+        //Integer types
         | Bit = 10uy //bit
         | UInt8 = 20uy //tinyint
         | UInt16 = 21uy //no direct map, use int
@@ -38,34 +40,59 @@ module DataTypeVocabulary =
         | Int16 = 31uy //smallint
         | Int32 = 32uy //int
         | Int64 = 33uy //bigint
+        
+        //Binary types
         | BinaryFixed = 40uy //binary 
         | BinaryVariable = 41uy //varbinary
         | BinaryMax = 42uy
+        
+        //ANSI text types
         | AnsiTextFixed = 50uy //char
         | AnsiTextVariable = 51uy //varchar
         | AnsiTextMax = 52uy
+        
+        ///Unicode text types
         | UnicodeTextFixed = 53uy //nchar
         | UnicodeTextVariable = 54uy //nvarchar
         | UnicodeTextMax = 55uy
+        
+        ///Time-related types
         | DateTime = 62uy //corresponds to datetime2
         | DateTimeOffset = 63uy
         | TimeOfDay = 64uy //corresponds to time
-        | Date = 65uy //corresponds to date
-        | Timespan = 66uy //no direct map, use bigint to store number of ticks
+        | Date = 65uy //corresponds to date        
+        | Duration = 66uy //no direct map, use bigint to store number of ticks
+        
+        ///Approximate real types
         | Float32 = 70uy //corresponds to real
         | Float64 = 71uy //corresponds to float
+        
+        ///Exact real types
         | Decimal = 80uy
         | Money = 81uy
+        
         | Guid = 90uy //corresponds to uniqueidentifier
         | Xml = 100uy
-        | Variant = 110uy //corresponds to sql_variant
-        | CustomTable = 150uy //a non-intrinsic table data type
-        | CustomObject = 151uy //a non-intrinsic CLR type
-        | CustomPrimitive = 152uy //a non-intrinsic primitive based on an intrinsic primitive
-        | Geography = 160uy
-        | Geometry = 161uy
-        | Hierarchy = 162uy
-        | TypedDocument = 180uy
+        | Json = 101uy
+        | Flexible = 110uy //corresponds to sql_variant
+                      
+        ///Intrinsic SQL CLR types
+        | Geography = 150uy
+        | Geometry = 151uy
+        | Hierarchy = 152uy
+        
+        /// A structured document of some sort; specification of an instance
+        /// requires a DOM in code that represents the type (may be a simple record
+        /// or something as involved as the HTML DOM) and a reader/writer type identifier
+        /// than can be used to serialize/reconstitute document instances from ther
+        /// storage format
+        | TypedDocument = 160uy //a varchar(MAX) in sql; maybe a JSON serialized type in code
+
+        //Custom Types
+        | CustomTable = 170uy //a non-intrinsic table data type in sql; probably data DataTable or similar in CLR
+        | CustomObject = 171uy //a non-intrinsic CLR type
+        | CustomPrimitive = 172uy //a non-intrinsic primitive based on an intrinsic primitive; a custom type in code, e.g. a specialized struct, DU
+
 
 
     module internal DataTypeShortNames =
@@ -106,8 +133,6 @@ module DataTypeVocabulary =
         [<Literal>]
         let UnicodeTextMax = "utextm"
         [<Literal>]
-        let DateTime64 = "datetime64"
-        [<Literal>]
         let DateTime = "datetime"
         [<Literal>]
         let DateTimeOffset = "dtoffset"
@@ -116,7 +141,7 @@ module DataTypeVocabulary =
         [<Literal>]
         let Date = "date"
         [<Literal>]
-        let Timespan = "timespan"
+        let Duration = "duration"
         [<Literal>]
         let Float32 = "float32"
         [<Literal>]
@@ -130,21 +155,26 @@ module DataTypeVocabulary =
         [<Literal>]
         let Xml = "xml"
         [<Literal>]
-        let Variant = "variant"
+        let Json = "json"
         [<Literal>]
-        let CustomTable = "ctable"
-        [<Literal>]
-        let CustomObject = "cobject"
-        [<Literal>]
-        let CustomPrimitive = "cprim"
+        let Flexible = "flexible"
+
         [<Literal>]
         let Geography = "geography"
         [<Literal>]
         let Geometry = "geometry"
         [<Literal>]
         let Hierarchy = "hierarchy"
+
         [<Literal>]
-        let TypedDocument = "typedoc"
+        let TypedDocument = "tdoc"
+
+        [<Literal>]
+        let CustomTable = "ctable"
+        [<Literal>]
+        let CustomObject = "cobject"
+        [<Literal>]
+        let CustomPrimitive = "cprimitive"
         
 
     /// <summary>
@@ -210,6 +240,8 @@ module DataTypeVocabulary =
         [<Literal>]
         let XmlDataTypeName = "Xml"
         [<Literal>]
+        let JsonDataTypeName = "Json"
+        [<Literal>]
         let VariantDataTypeName = "Variant"
         [<Literal>]
         let CustomTableDataTypeName = "CustomTable"
@@ -249,7 +281,7 @@ module DataTypeVocabulary =
         | UnicodeTextMaxDataType
         | DateTimeDataType of precision : uint8
         | DateTimeOffsetDataType
-        | TimeOfDayDataType
+        | TimeOfDayDataType of precision : uint8
         | TimespanDataType 
         | DateDataType
         | Float32DataType
@@ -258,6 +290,7 @@ module DataTypeVocabulary =
         | MoneyDataType
         | GuidDataType
         | XmlDataType of schema : string
+        | JsonDataType
         | VariantDataType
         | CustomTableDataType of name : DataObjectName
         | CustomObjectDataType of name : DataObjectName * clrType : Type
@@ -289,7 +322,7 @@ module DataTypeVocabulary =
             | UnicodeTextMaxDataType -> UnicodeTextMaxDataTypeName            
             | DateTimeDataType(precision)-> precision |> sprintf "%s(%i)" DateTimeDataTypeName
             | DateTimeOffsetDataType -> DateTimeOffsetDataTypeName
-            | TimeOfDayDataType -> TimeOfDayDataTypeName
+            | TimeOfDayDataType(precision) -> precision |> sprintf "%s(%i)" TimeOfDayDataTypeName
             | DateDataType -> DateDataTypeName
             | TimespanDataType -> TimespanDataTypeName            
             | Float32DataType -> Float32DataTypeName
@@ -298,6 +331,7 @@ module DataTypeVocabulary =
             | MoneyDataType -> MoneyDataTypeName
             | GuidDataType -> GuidDataTypeName
             | XmlDataType(schema) -> schema |> sprintf "%s(%s)" XmlDataTypeName
+            | JsonDataType -> JsonDataTypeName
             | VariantDataType -> VariantDataTypeName
             | CustomTableDataType(name) -> name |> sprintf "%s%O" CustomTableDataTypeName
             | CustomObjectDataType(name,t) -> sprintf "%s%O:%s" CustomObjectDataTypeName name t.AssemblyQualifiedName
@@ -310,105 +344,10 @@ module DataTypeVocabulary =
         override this.ToString() =
             this.ToSemanticString()
 
-    type DataValue =
-        | BitValue of bool
-        | UInt8Value of uint8
-        | UInt16Value of uint16
-        | UInt32Value of uint32
-        | UInt64Value of uint64
-        | Int8Value of int8
-        | Int16Value of int16
-        | Int32Value of int32
-        | Int64Value of int64
-        | BinaryFixedValue of uint8[] 
-        | BinaryVariableValue of uint8[]
-        | BinaryMaxValue of uint8
-        | AnsiTextFixedValue of string
-        | AnsiTextVariableValue of string
-        | AnsiTextMaxValue of string
-        | UnicodeTextFixedValue of string
-        | UnicodeTextVariableValue of string
-        | UnicodeTextMaxValue of string
-        | DateTimeValue of BclDateTime
-        | DateTimeOffsetValue of BclDateTimeOffset
-        | TimeOfDayValue of BclDateTime
-        | DateValue of BclDateTime
-        | TimespanValue of TimeSpan
-        | Float32DValue of float32
-        | Float64Value of float
-        | DecimalValue of decimal
-        | MoneyValue of decimal
-        | GuidValue of Guid
-        | XmlValue of string
-        | VariantValue of obj
-        | CustomTableValue of obj
-        | CustomObjectValue of obj
-        | CustomPrimitiveValue of obj
-        | TypedDocumentValue of string
-
-    type DataPoint = | DataPoint of v : DataValue * t : DataType 
         
         
       
 
-module DataValue =
-    let inline private cast<'T>(o : obj) = o :?> 'T
-    
-    let unwrap<'T>(v : DataValue) =
-        match v with
-        | BitValue(x) -> x |> cast<'T>
-        | UInt8Value(x) -> x |> cast<'T> 
-        | UInt16Value(x) -> x |> cast<'T>
-        | UInt32Value(x) -> x |> cast<'T>
-        | UInt64Value(x) -> x |> cast<'T>
-        | Int8Value(x) -> x |> cast<'T>
-        | Int16Value(x) -> x |> cast<'T>
-        | Int32Value(x) -> x |> cast<'T>
-        | Int64Value(x) -> x |> cast<'T>
-        | BinaryFixedValue(x) -> x |> cast<'T>
-        | BinaryVariableValue(x) -> x |> cast<'T>
-        | BinaryMaxValue(x) -> x |> cast<'T>
-        | AnsiTextFixedValue(x) -> x |> cast<'T>
-        | AnsiTextVariableValue(x) -> x |> cast<'T>
-        | AnsiTextMaxValue(x) -> x |> cast<'T>
-        | UnicodeTextFixedValue(x) -> x |> cast<'T>
-        | UnicodeTextVariableValue(x) -> x |> cast<'T>
-        | UnicodeTextMaxValue(x) -> x |> cast<'T>
-        | DateTimeValue(x) -> x |> cast<'T>
-        | DateTimeOffsetValue(x) -> x |> cast<'T>
-        | TimeOfDayValue(x) -> x |> cast<'T>
-        | DateValue(x) -> x |> cast<'T>
-        | TimespanValue(x) -> x |> cast<'T>
-        | Float32DValue(x) -> x |> cast<'T>
-        | Float64Value(x) -> x |> cast<'T>
-        | DecimalValue(x) -> x |> cast<'T>
-        | MoneyValue(x) -> x |> cast<'T>
-        | GuidValue(x) -> x |> cast<'T>
-        | XmlValue(x) -> x |> cast<'T>
-        | VariantValue(x) -> x |> cast<'T>
-        | CustomTableValue(x) -> x |> cast<'T>
-        | CustomObjectValue(x) -> x |> cast<'T>
-        | CustomPrimitiveValue(x) -> x |> cast<'T>
-        | TypedDocumentValue(x) -> x |> cast<'T>
-
-    let inline bit(x) = BitValue(x)
-    let inline uint8(x) = UInt8Value(x)
-    let inline uint16(x) = UInt16Value(x)
-    let inline uint32(x) = UInt32Value(x)
-    let inline uint64(x) = UInt64Value(x)
-    let inline int8(x) = Int8Value(x)
-    let inline int16(x) = Int16Value(x)
-    let inline int32(x) = Int32Value(x)
-    let inline int64(x) = Int64Value(x)
-    let inline binf(x) = BinaryFixedValue(x)
-    let inline binv(x) = BinaryVariableValue(x)
-    let inline binm(x) = BinaryMaxValue(x)
-    let inline atextf(x) = AnsiTextFixedValue(x)
-    let inline atextv(x) = AnsiTextVariableValue(x)
-    let inline atextm(x) = AnsiTextMaxValue(x)
-    let inline utextf(x) = UnicodeTextFixedValue(x)
-    let inline utextv(x) = UnicodeTextVariableValue(x)
-    let inline utextm(x) = UnicodeTextMaxValue(x)
     
 module DataKind =
     [<Literal>]
@@ -421,10 +360,12 @@ module DataKind =
         member this.Precision = match this with DataTypeKindAspects(precision=x) -> x |> Option.get
         member this.Scale = match this with DataTypeKindAspects(scale=x) -> x |> Option.get
 
-    let private defaults : IDictionary<DataKind, DataTypeKindAspects> = 
+    let private loadDefaults() =
         [for row in (DefaultDataTypeKindAspectsResource |> DefaultDataTypeKindAspects.Load).Cache().Rows ->
             (DataKind.Parse row.DataTypeName, DataTypeKindAspects(row.Length, row.Precision |> Convert.ToUInt8Option , row.Scale |> Convert.ToUInt8Option))
         ] |> dict        
+
+    let private defaults = loadDefaults() 
         
     /// <summary>
     /// Gets the DataType kind's default length
@@ -488,22 +429,23 @@ module DataType =
             | AnsiTextVariableDataType(length) -> DataKind.AnsiTextVariable
             | AnsiTextMaxDataType -> DataKind.AnsiTextMax
             
-            | UnicodeTextFixedDataType(length) -> DataKind.UnicodeTextFixed
-            | UnicodeTextVariableDataType(length) -> DataKind.UnicodeTextVariable
+            | UnicodeTextFixedDataType(_) -> DataKind.UnicodeTextFixed
+            | UnicodeTextVariableDataType(_) -> DataKind.UnicodeTextVariable
             | UnicodeTextMaxDataType -> DataKind.UnicodeTextMax
             
             | DateTimeDataType(precision)-> DataKind.DateTime
             | DateTimeOffsetDataType -> DataKind.DateTimeOffset
-            | TimeOfDayDataType -> DataKind.TimeOfDay
+            | TimeOfDayDataType(_) -> DataKind.TimeOfDay
             | DateDataType -> DataKind.Date
-            | TimespanDataType -> DataKind.Timespan            
+            | TimespanDataType -> DataKind.Duration            
             | Float32DataType -> DataKind.Float32
             | Float64DataType -> DataKind.Float64
             | DecimalDataType(precision,scale) -> DataKind.Decimal
             | MoneyDataType -> DataKind.Money
             | GuidDataType -> DataKind.Guid
             | XmlDataType(_) -> DataKind.Xml
-            | VariantDataType -> DataKind.Variant
+            | JsonDataType -> DataKind.Json
+            | VariantDataType -> DataKind.Flexible
             | CustomTableDataType(_) -> DataKind.CustomTable
             | CustomObjectDataType(_) -> DataKind.CustomObject
             | CustomPrimitiveDataType(_) -> DataKind.CustomPrimitive
@@ -571,6 +513,8 @@ module DataType =
                         | UnicodeTextFixedDataTypeName -> UnicodeTextFixedDataType(n) |> Some                
                         | UnicodeTextVariableDataTypeName -> UnicodeTextVariableDataType(n) |> Some  
                         | DateTimeDataTypeName -> DateTimeDataType(uint8(n)) |> Some
+                        | TimeOfDayDataTypeName -> TimeOfDayDataType(uint8(n)) |> Some
+
                         | _ -> None
                 | None -> pattern2()
 
@@ -590,7 +534,6 @@ module DataType =
                 | UnicodeTextMaxDataTypeName -> UnicodeTextMaxDataType |> Some
                 | DateTimeOffsetDataTypeName -> DateTimeOffsetDataType |> Some
                 | DateDataTypeName -> DateDataType |> Some
-                | TimeOfDayDataTypeName -> TimeOfDayDataType |> Some
                 | Float32DataTypeName -> Float32DataType |> Some
                 | Float64DataTypeName-> Float64DataType |> Some
                 | MoneyDataTypeName -> MoneyDataType |> Some
@@ -611,6 +554,3 @@ module DataTypeExtensions =
         member this.DefaultPrecision = this |> DataKind.getDefaultPrecision
         member this.DefaultScale = this |> DataKind.getDefaultScale        
 
-    type DataValue
-    with
-        member this.Unwrap<'T>() = this |> DataValue.unwrap<'T>

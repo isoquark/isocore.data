@@ -190,8 +190,9 @@ module DataAttributes =
             | DataKind.Guid -> GuidDataType
             | DataKind.AnsiTextMax -> AnsiTextMaxDataType
             | DataKind.DateTimeOffset -> DateTimeOffsetDataType
-            | DataKind.TimeOfDay -> TimeOfDayDataType
-            | DataKind.Variant -> VariantDataType
+            | DataKind.TimeOfDay -> 
+                TimeOfDayDataType(defaultArg attrib.Precision DataKind.TimeOfDay.DefaultPrecision)
+            | DataKind.Flexible -> VariantDataType
             | DataKind.UnicodeTextMax -> UnicodeTextMaxDataType
             | DataKind.BinaryFixed -> 
                 BinaryFixedDataType( defaultArg attrib.Length DataKind.BinaryFixed.DefaultLength)

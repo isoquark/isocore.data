@@ -14,26 +14,7 @@ module ClrMetadataProviderVocbulary =
         Assemblies : ClrAssemblyName list
     }
 
-    /// <summary>
-    /// Defines contract realized by CLR metadata provider
-    /// </summary>
-    type IClrMetadataProvider =
-        /// <summary>
-        /// Find types accessible to the provider
-        /// </summary>
-        abstract FindTypes:ClrTypeQuery->ClrType list
-        /// <summary>
-        /// Find assemblies accessible to the provider
-        /// </summary>
-        abstract FindAssemblies:ClrAssemblyQuery->ClrAssembly list
-        /// <summary>
-        /// Find properties accessible to the provider
-        /// </summary>
-        abstract FindProperties:ClrPropertyQuery->ClrProperty list
-        /// <summary>
-        /// Find elements accessible to the provider
-        /// </summary>        
-        abstract FindElements:ClrElementQuery->ClrElement list
+    type ClrAttributionIndex = ClrAttributionIndex of attribToAttribution : Map<ClrTypeName, ClrAttribution>
 
 /// <summary>
 /// Realizes client API for CLR metadata discovery
@@ -307,6 +288,9 @@ module ClrMetadataProvider =
             | (false,_)->  
                 //TODO: whatever type this is needs to be discovered when the provider is created
                 [Type.GetType(name.Text) |> acquireTypeDescription -1]
+        | FindTypesByKind(kind) ->
+            typeIndex.Values |> Seq.filter(fun t -> t.Kind = kind) |> List.ofSeq
+            
 
     let private findTypeProperties(q : ClrTypeQuery) =
         [for t in (q |> findTypes) do yield! t.Properties]
@@ -403,6 +387,14 @@ module ClrMetadataProviderExtensions =
 
         member this.FindElement q =
             q |> this.FindElement |> Seq.exactlyOne                              
+
+        /// <summary>
+        /// Finds all modules available to the provider
+        /// </summary>
+        /// <param name="name">Identifies the assembly</param>
+        member this.FindModules() =
+            ClrTypeKind.Module |> FindTypesByKind |> this.FindTypes |> List.map ClrModule
+            
 
     
 [<AutoOpen>]

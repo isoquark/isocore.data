@@ -5,6 +5,7 @@ open System.Reflection
 open System.Linq.Expressions
 
 open IQ.Core.Data
+open IQ.Core.Framework
 
 
 module TestTransformations =

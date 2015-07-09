@@ -37,7 +37,7 @@ module OrderedSequence =
         
             let config1 = createConfig1()
             let test1() =        
-                let s = config1 |> OrderedSequence.get0<uint8>        
+                let s = config1 |> OrderedSequenceProvider.get0<uint8>        
                 let actual = s.NextRange(5) |> List.ofSeq
                 let expect = genRefList 5uy 1uy 9uy
                 actual |> Claim.seqCount expect.Length
@@ -50,7 +50,7 @@ module OrderedSequence =
         
             let config2 = createConfig2()
             let test2() =
-                let s = config2 |> OrderedSequence.get0<uint8>        
+                let s = config2 |> OrderedSequenceProvider.get0<uint8>        
                 let actual = s.NextRange(28) |> List.ofSeq
                 let expect =  (genRefList 0uy 1uy 11uy) |> List.append (genRefList 0uy 1uy 15uy)
                 actual |> Claim.seqCount expect.Length
@@ -72,7 +72,7 @@ module OrderedSequence =
                 }         
             let f() =
                 let c = createConfig()
-                let s = c |> OrderedSequence.get0<uint8>
+                let s = c |> OrderedSequenceProvider.get0<uint8>
                 s.NextRange(300) |> Seq.iter(fun x -> ())
             f |> Claim.failWith<EndOfSequenceException>
 
@@ -82,19 +82,23 @@ module OrderedSequence =
 
 
     let inline enumBaseline (initial : ^T) (min : ^T) (inc : ^S) (max : ^T) cycle =
-        let e = NumericEnumerator.createInline initial min inc max cycle
+        let e = ArithmeticEnumerator.createInline initial min inc max cycle
         seq {while (e.MoveNext()) do
                 yield  e.Current 
             } |> Seq.iter(fun x -> ())
 
-//    let enumProvider (config : OrderedSequenceConfig<_>) =
-//        let s = config |> OrderedSequence.get1
-//        let count = CalcOps.subtract config.MaxValue config.MinValue 
-//        for i in config.MinValue..config.MaxValue do
-//            s1.NextValue() |> ignore
-
-
-    let createConfig name dataKind initialValue  minValue increment maxValue cycle : OrderedSequenceConfig<_>=
+    let createConfig0 name dataKind (initialValue : 'T) (minValue : 'T) (increment : 'S) (maxValue :'T) cycle : OrderedSequenceConfig =
+            {
+                Name = "Cyclical UInt8 Sequence"
+                ItemDataKind = dataKind
+                MinValue  = uint8(5uy)
+                MaxValue = uint8(UInt8.MaxValue)
+                InitialValue = uint8(5uy)
+                Increment = uint8(1uy)
+                Cycle = cycle
+            }         
+    
+    let createConfig1 name dataKind initialValue  minValue increment maxValue cycle : OrderedSequenceConfig<_>=
             {
                 Name = name
                 ItemDataKind = dataKind
@@ -120,9 +124,9 @@ module OrderedSequence =
             let name = Benchmark.getBenchmarkName()           
             let minValue = 0
             let maxValue = opcount
-            let config = createConfig name DataKind.Int32 minValue minValue 1 maxValue false
+            let config = createConfig1 name DataKind.Int32 minValue minValue 1 maxValue false
             let f() =        
-                let s1 = config |> OrderedSequence.get1
+                let s1 = config |> OrderedSequenceProvider.get1
                 for i in minValue..maxValue do
                     s1.NextValue() |> ignore
 
@@ -139,9 +143,9 @@ module OrderedSequence =
             let name = Benchmark.getBenchmarkName()           
             let minValue = 0u
             let maxValue = opcount |> FsOps.uint32
-            let config = createConfig name DataKind.UInt32 minValue minValue 1u maxValue false
+            let config = createConfig1 name DataKind.UInt32 minValue minValue 1u maxValue false
             let f() =        
-                let s1 = config |> OrderedSequence.get1
+                let s1 = config |> OrderedSequenceProvider.get1
                 for i in minValue..maxValue do
                     s1.NextValue() |> ignore
 
@@ -159,9 +163,9 @@ module OrderedSequence =
             let name = Benchmark.getBenchmarkName()            
             let minValue = 0L
             let maxValue = opcount |> FsOps.int64
-            let config = createConfig name DataKind.Int64 minValue minValue 1L maxValue false
+            let config = createConfig1 name DataKind.Int64 minValue minValue 1L maxValue false
             let f() =        
-                let s1 = config |> OrderedSequence.get1
+                let s1 = config |> OrderedSequenceProvider.get1
                 for i in minValue..maxValue do
                     s1.NextValue() |> ignore
             f |> Benchmark.capture ctx
@@ -169,7 +173,7 @@ module OrderedSequence =
         [<Fact>]
         let ``Benchmark - Int64 Sequence Generation - Inline``() =  
             let maxval = 1000000L
-            let enumerator = NumericEnumerator.createInline 0L 0L 1L maxval false
+            let enumerator = ArithmeticEnumerator.createInline 0L 0L 1L maxval false
             
             let mutable current = 0L
             let f() =
@@ -182,7 +186,7 @@ module OrderedSequence =
         [<Fact>]
         let ``Benchmark - Int64 Sequence Generation - Generic``() =  
             let maxval = 1000000L
-            let enumerator = NumericEnumerator.createGeneric 0L 0L 1L maxval false
+            let enumerator = ArithmeticEnumerator.createGeneric 0L 0L 1L maxval false
             
             let mutable current = 0L
             let f() =

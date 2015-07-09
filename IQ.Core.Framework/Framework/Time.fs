@@ -13,7 +13,7 @@ module TimeVocabulary =
     type AmbiguousTimeException = NodaTime.AmbiguousTimeException
     type CalendarSystem = NodaTime.CalendarSystem
     type DateTimeZone = NodaTime.DateTimeZone
-    type Duration = NodaTime.Duration
+    
     
     type ITimeProvider = 
         inherit NodaTime.IClock
@@ -30,20 +30,46 @@ module TimeVocabulary =
     /// </summary>
     type DateTime = NodaTime.LocalDateTime
     
+    /// <summary>
+    /// Represents a time-zone/calendar-independent time of day
+    /// </summary>
+    /// <remarks>
+    /// This is essentially equivalent to the Sql Server Time data type
+    /// </remarks>
     type TimeOfDay = NodaTime.LocalTime
     
+    /// <summary>
+    /// Defines time conversion constants
+    /// </summary>
     type TimeConstants = NodaTime.NodaConstants
     
+    /// <summary>
+    /// Represents nn offset from UTC in milliseconds
+    /// </summary>
     type TimeOffset = NodaTime.Offset
     
     type DateTimeOffset = NodaTime.OffsetDateTime
     
+    /// <summary>
+    /// Represents a calendar-independent length of time
+    /// </summary>
+    type Duration = NodaTime.Duration
+
+    /// <summary>
+    /// Represents a calendar-dependent length of time
+    /// </summary>
     type Period = NodaTime.Period
-    
-    type PeriodBuilder = NodaTime.PeriodBuilder
-    
+
+    /// <summary>
+    /// Enumerates the units in which a <see cref="Period"/> can be expressed
+    /// </summary>
     type PeriodUnits = NodaTime.PeriodUnits
     
+    /// <summary>
+    /// Utility for creating <see cref="Period"/> instances
+    /// </summary>
+    type PeriodBuilder = NodaTime.PeriodBuilder
+        
     type SkippedTimeException = NodaTime.SkippedTimeException
     
     type ZonedDateTime = NodaTime.ZonedDateTime

@@ -60,6 +60,225 @@ module ClrElementKind =
         | ClrElementKind.Property | ClrElementKind.Field -> true
         | _ -> false
 
+
+//TODO: This logic needs to be mooved to a non-extension module
+[<AutoOpen>]
+module ClrTypeExtensions =
+    type ClrType 
+    with
+        /// <summary>
+        /// Gets the properties declared by the type
+        /// </summary>
+        member this.Properties = 
+            [for x in this.Members do
+                match x with
+                | PropertyMember(x) -> yield x
+                |_ ->()
+            ]
+
+        /// <summary>
+        /// Gets the methods declared by the type
+        /// </summary>
+        member this.Methods =
+            [for x in this.Members do
+                match x with
+                | MethodMember(x) -> yield x
+                |_ ->()
+            ]
+
+        /// <summary>
+        /// Gets the fields declared by the type
+        /// </summary>
+        member this.Fields =
+            [for x in this.Members do
+                match x with
+                | FieldMember(x) -> yield x
+                |_ ->()
+            ]
+
+        /// <summary>
+        /// Gets the fields declared by the type
+        /// </summary>
+        member this.Events =
+            [for x in this.Members do
+                match x with
+                | EventMember(x) -> yield x
+                |_ ->()
+            ]
+
+
+//TODO: This logic needs to be mooved to a non-extension module
+[<AutoOpen>]
+module ClrMemberExtensions =
+    type ClrMember
+    with
+        member this.Name =
+            match this with
+            | PropertyMember(x) -> x.Name
+            | FieldMember(x) -> x.Name
+            | MethodMember(x) -> x.Name
+            | EventMember(x) -> x.Name
+            | ConstructorMember(x) -> x.Name
+
+        member this.Kind =
+            match this with
+            | PropertyMember(_) -> ClrMemberKind.Property
+            | FieldMember(_) -> ClrMemberKind.StorageField
+            | MethodMember(_) -> ClrMemberKind.Method
+            | EventMember(_) -> ClrMemberKind.Event
+            | ConstructorMember(_) -> ClrMemberKind.Constructor
+
+        member this.Position =
+            match this with
+            | PropertyMember(x) -> x.Position
+            | FieldMember(x) -> x.Position
+            | MethodMember(x) -> x.Position
+            | EventMember(x) -> x.Position
+            | ConstructorMember(x) -> x.Position
+
+        member this.IsStatic =
+            match this with
+            | PropertyMember(x) -> x.IsStatic
+            | FieldMember(x) -> x.IsStatic
+            | MethodMember(x) -> x.IsStatic
+            | EventMember(x) -> false
+            | ConstructorMember(x) -> x.IsStatic
+
+        member this.Access = 
+            match this with
+            | PropertyMember(x) -> None
+            | FieldMember(x) -> x.Access |> Some
+            | MethodMember(x) -> x.Access |> Some
+            | EventMember(x) -> None
+            | ConstructorMember(x) -> x.Access |> Some
+
+        member this.ReflectedElement =
+            match this with
+            | PropertyMember(x) -> match x.ReflectedElement with |Some(x) -> x :> obj |> Some | None -> None
+            | FieldMember(x) -> match x.ReflectedElement with |Some(x) -> x :> obj |> Some | None -> None
+            | MethodMember(x) -> match x.ReflectedElement with |Some(x) -> x :> obj |> Some | None -> None
+            | EventMember(x) -> match x.ReflectedElement with |Some(x) -> x :> obj |> Some | None -> None
+            | ConstructorMember(x) -> match x.ReflectedElement with |Some(x) -> x :> obj |> Some | None -> None
+        
+        /// <summary>
+        /// Gets the type that declares the memeber
+        /// </summary>
+        member this.DeclaringType =
+            match this with
+            | PropertyMember(x) -> x.DeclaringType
+            | FieldMember(x) -> x.DeclaringType
+            | MethodMember(x) -> x.DeclaringType
+            | EventMember(x) -> x.DeclaringType
+            | ConstructorMember(x) -> x.DeclaringType
+
+        /// <summary>
+        /// Gets the top-level attributions
+        /// </summary>
+        /// <remarks>
+        /// Top-level, in this context, means attributes applied directly to the CLR element and not it's constituent pieces
+        /// such as property getters/settters, method parameters, etc.
+        /// </remarks>
+        member this.Attributes =
+            match this with
+            | PropertyMember(x) -> x.Attributes
+            | FieldMember(x) -> x.Attributes
+            | MethodMember(x) -> x.Attributes
+            | EventMember(x) -> x.Attributes
+            | ConstructorMember(x) -> x.Attributes
+
+
+//TODO: This logic needs to be mooved to a non-extension module
+[<AutoOpen>]
+module ClrMethodExtensions =
+    type ClrMethod
+    with
+        member this.TryGetAttribute<'T when 'T :> Attribute>() =
+            let attribName = ClrTypeName(typeof<'T>.Name, typeof<'T>.FullName |> Some, typeof<'T>.AssemblyQualifiedName |> Some) 
+            this.Attributes |> List.tryFind(fun x -> x.AttributeName = attribName)
+        
+        member this.HasAttribute<'T when 'T:> Attribute>() = 
+            this.TryGetAttribute<'T>() |> Option.isSome
+
+        /// <summary>
+        /// Gets all non-return parameters
+        /// </summary>
+        member this.InputParameters = this.Parameters |> List.filter(fun x -> x.IsReturn |> not)
+
+    
+
+//TODO: This logic needs to be mooved to a non-extension module
+[<AutoOpen>]
+module ClrElementExtensions =
+    type ClrElement
+    with
+        /// <summary>
+        /// Gets the top-level attributes applied to the element
+        /// </summary>
+        member this.Attributes =
+            match this with
+            | MemberElement(x) -> x.Attributes
+            | TypeElement(x) -> x.Attributes
+            | AssemblyElement(x) -> x.Attributes
+            | ParameterElement(x) -> x.Attributes
+            | UnionCaseElement(x) -> x.Attributes
+
+        /// <summary>
+        /// Gets the name of the element
+        /// </summary>
+        member this.Name =
+            match this with
+            | MemberElement(x) -> x.Name |> MemberElementName
+            | TypeElement(x) -> x.Name |> TypeElementName
+            | AssemblyElement(x) -> x.Name |> AssemblyElementName
+            | ParameterElement(x) -> x.Name |> ParameterElementName
+            | UnionCaseElement(x) -> x.Name |> MemberElementName
+
+        member this.DeclaringType =
+            match this with
+            | MemberElement(x) -> x.DeclaringType |> Some
+            | TypeElement(x) -> x.DeclaringType
+            | AssemblyElement(x) -> None
+            | ParameterElement(x) -> None
+            | UnionCaseElement(x) -> x.DeclaringType |> Some
+            
+        member this.Position =
+            match this with
+            | MemberElement(x) -> x.Position
+            | TypeElement(x) -> x.Position
+            | AssemblyElement(x) -> x.Position
+            | ParameterElement(x) -> x.Position
+            | UnionCaseElement(x) -> x.Position
+        
+        member this.ReflectedElement =
+            match this with
+            | MemberElement(x) -> x.ReflectedElement
+            | TypeElement(x) -> match x.ReflectedElement with |Some(y) -> y:> obj|>Some |None -> None
+            | AssemblyElement(x) -> match x.ReflectedElement with |Some(y) -> y:> obj|>Some |None -> None
+            | ParameterElement(x) -> match x.ReflectedElement with |Some(y) -> y:> obj|>Some |None -> None
+            | UnionCaseElement(x) -> match x.ReflectedElement with |Some(y) -> y:> obj|>Some |None -> None
+
+        member this.Kind = 
+            match this with
+            | MemberElement(x) -> 
+                match x.Kind with
+                | ClrMemberKind.Constructor -> ClrElementKind.Constructor
+                | ClrMemberKind.Event -> ClrElementKind.Event
+                | ClrMemberKind.Method -> ClrElementKind.Method
+                | ClrMemberKind.Property -> ClrElementKind.Property
+                | ClrMemberKind.StorageField -> ClrElementKind.Field
+                | _ -> nosupport()
+            | TypeElement(x) -> ClrElementKind.Type
+            | AssemblyElement(x) -> ClrElementKind.Assembly
+            | ParameterElement(x) -> ClrElementKind.Parameter
+            | UnionCaseElement(x) -> ClrElementKind.UnionCase
+
+        member this.TryGetAttribute<'T when 'T :> Attribute>() =
+            let attribName = ClrTypeName(typeof<'T>.Name, typeof<'T>.FullName |> Some, typeof<'T>.AssemblyQualifiedName |> Some) 
+            this.Attributes |> List.tryFind(fun x -> x.AttributeName = attribName)
+        
+        member this.HasAttribute<'T when 'T:> Attribute>() = 
+            this.TryGetAttribute<'T>() |> Option.isSome
+
                 
 module ClrElement = 
     let getChildren element =

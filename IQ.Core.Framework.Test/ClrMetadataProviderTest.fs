@@ -3,6 +3,7 @@
 open System
 open System.ComponentModel
 
+open IQ.Core.Framework
 
 
 module ClrMetadataProvider =
@@ -182,7 +183,7 @@ module ClrMetadataProvider =
                     CanWrite = false
                     WriteAccess = None
                     CanRead = true
-                    ReadAccess = PublicAccess |> Some
+                    ReadAccess = ClrAccessKind.Public |> Some
                     ReflectedElement = p1Info |> Some
                     IsStatic = false
                     Attributes = []
@@ -200,9 +201,9 @@ module ClrMetadataProvider =
                 ValueType = typeof<int>.TypeName
                 IsOptional = false
                 CanWrite = true
-                WriteAccess = PublicAccess |> Some
+                WriteAccess = ClrAccessKind.Public |> Some
                 CanRead = true
-                ReadAccess = PublicAccess |> Some
+                ReadAccess = ClrAccessKind.Public |> Some
                 ReflectedElement = p2Info |> Some
                 IsStatic = false
                 Attributes = []
@@ -222,7 +223,7 @@ module ClrMetadataProvider =
                     CanWrite = false
                     WriteAccess = None
                     CanRead = true
-                    ReadAccess = PublicAccess |> Some
+                    ReadAccess = ClrAccessKind.Public |> Some
                     ReflectedElement = p3Info |> Some
                     IsStatic = false
                     Attributes = []
@@ -238,7 +239,7 @@ module ClrMetadataProvider =
             p3Actual.CanWrite |> Claim.isFalse
             p3Actual.CanRead |> Claim.isTrue
             p3Actual.WriteAccess |> Claim.equal None
-            p3Actual.ReadAccess |> Claim.equal (Some(PublicAccess))
+            p3Actual.ReadAccess |> Claim.equal (Some(ClrAccessKind.Public))
             p3Actual.ReflectedElement |> Claim.equal (p3Info |> Some)
             p3Actual.IsStatic |> Claim.isFalse
             p3Actual.Attributes |> Claim.seqIsEmpty

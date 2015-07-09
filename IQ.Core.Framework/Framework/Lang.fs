@@ -203,47 +203,38 @@ module Lang =
         | OneOrMore
         | BoundedRange of min : uint32 * max : uint32
 
-    [<AutoOpen>]
-    module ValueIndexVocabulary = 
 
+    /// <summary>
+    /// Defines augmentations for the <see cref="ValueIndex" /> type
+    /// </summary>
+    type ValueIndex
+    with
         /// <summary>
-        /// Responsible for identifying a value in a ValueMap
+        /// Gets the underlying map
         /// </summary>
-        type ValueIndexKey = ValueIndexKey of name : string  * position : int
-        with
-            member this.Name = match this with |ValueIndexKey(name=x) -> x
-            member this.Position = match this with |ValueIndexKey(position=x) -> x
-
-        /// <summary>
-        /// Represents a collection of name-indexed or position-indexed values
-        /// </summary>
-        type ValueIndex = ValueIndex of (ValueIndexKey*obj) list
-        with
-            /// <summary>
-            /// Gets the underlying map
-            /// </summary>
-            member internal this.IndexedValues = match this with ValueIndex(m) -> m
+        member internal this.IndexedValues = match this with ValueIndex(m) -> m
         
-            /// <summary>
-            /// Gets a value from the map that is identified by its name
-            /// </summary>
-            /// <param name="name">The name of the value</param>
-            member this.Item name = 
-                this.IndexedValues |> List.find(fun (x,y) -> x.Name = name) |> snd
+        /// <summary>
+        /// Gets a value from the map that is identified by its name
+        /// </summary>
+        /// <param name="name">The name of the value</param>
+        member this.Item name = 
+            this.IndexedValues |> List.find(fun (x,y) -> x.Name = name) |> snd
 
-            /// <summary>
-            /// Gets a value from the map that is identified by its position
-            /// </summary>
-            /// <param name="pos">The position of the value</param>
-            member this.Item pos =
-                this.IndexedValues |> List.find(fun (x,y) -> x.Position = pos) |> snd
+        /// <summary>
+        /// Gets a value from the map that is identified by its position
+        /// </summary>
+        /// <param name="pos">The position of the value</param>
+        member this.Item pos =
+            this.IndexedValues |> List.find(fun (x,y) -> x.Position = pos) |> snd
 
-            /// <summary>
-            /// Gets a value from the map that is identified by its key
-            /// </summary>
-            /// <param name="pos">The position of the value</param>
-            member this.Item key =
-                this.IndexedValues |> List.find(fun (x,y) -> x = key) |> snd
+        /// <summary>
+        /// Gets a value from the map that is identified by its key
+        /// </summary>
+        /// <param name="pos">The position of the value</param>
+        member this.Item key =
+            this.IndexedValues |> List.find(fun (x,y) -> x = key) |> snd
+
 
 
     module ValueIndex =

@@ -72,7 +72,6 @@
     <Compile Include="Framework\ClrUtilities.fs" />
     <Compile Include="Framework\ExpressionBuilder.fs" />
     <Compile Include="Framework\CompositionRoot.fs" />
-    <Compile Include="Framework\ClrElementVocabulary.fs" />
     <Compile Include="Framework\TransformerVocabulary.fs" />
     <Compile Include="Framework\Time.fs" />
     <Compile Include="Framework\ClrElement.fs" />
@@ -90,6 +89,7 @@
     <Compile Include="Data\ConnectionString.fs" />
     <Compile Include="Data\DataObjectName.fs" />
     <Compile Include="Data\DataType.fs" />
+    <Compile Include="Data\DataValue.fs" />
     <Compile Include="Data\DataAttributes.fs" />
     <Compile Include="Data\DataMetamodel.fs" />
     <Compile Include="Data\DataProxyMetamodel.fs" />
