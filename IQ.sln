@@ -41,6 +41,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Synthetics", "IQ.Co
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Synthetics.Test", "IQ.Core.Synthetics.Test\IQ.Core.Synthetics.Test.fsproj", "{35778FD1-5FC5-4815-809E-E654DAE6ECF2}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.MetaCode", "IQ.Core.MetaCode\IQ.Core.MetaCode.fsproj", "{1B4F1280-E097-4A56-8181-FB9668E2C618}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -99,12 +101,16 @@ Global
 		{35778FD1-5FC5-4815-809E-E654DAE6ECF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35778FD1-5FC5-4815-809E-E654DAE6ECF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35778FD1-5FC5-4815-809E-E654DAE6ECF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B4F1280-E097-4A56-8181-FB9668E2C618}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B4F1280-E097-4A56-8181-FB9668E2C618}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B4F1280-E097-4A56-8181-FB9668E2C618}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B4F1280-E097-4A56-8181-FB9668E2C618}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 14
+		SccNumberOfProjects = 15
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://isoquark.visualstudio.com/defaultcollection
 		SccLocalPath0 = .
@@ -147,5 +153,8 @@ Global
 		SccProjectUniqueName13 = IQ.Core.Synthetics.Test\\IQ.Core.Synthetics.Test.fsproj
 		SccProjectName13 = IQ.Core.Synthetics.Test
 		SccLocalPath13 = IQ.Core.Synthetics.Test
+		SccProjectUniqueName14 = IQ.Core.MetaCode\\IQ.Core.MetaCode.fsproj
+		SccProjectName14 = IQ.Core.MetaCode
+		SccLocalPath14 = IQ.Core.MetaCode
 	EndGlobalSection
 EndGlobal
