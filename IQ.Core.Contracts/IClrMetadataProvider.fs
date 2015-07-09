@@ -68,10 +68,6 @@ type ClrTypeKind =
     /// </summary>
     | Module = 7
     /// <summary>
-    /// Classifies a type as a nulluable value type, e.g., Nullable<int>
-    /// </summary>
-    | NullableValue = 8
-    /// <summary>
     /// Classifies a type as an enum
     /// </summary>
     | Enum = 9
@@ -399,11 +395,8 @@ type ClrMember =
 | EventMember of ClrEvent
 | ConstructorMember of ClrConstructor
                                                         
-/// <summary>
-/// Represents a type
-/// </summary>
-[<DebuggerDisplay("{Name}")>]
-type ClrType = {
+
+type ClrTypeInfo = {
     /// The name of the type
     Name : ClrTypeName
     /// The position of the type
@@ -416,8 +409,6 @@ type ClrType = {
     DeclaredTypes : ClrTypeName list
     /// The kind of type, if recognized
     Kind : ClrTypeKind
-    /// The kind of collection represented by the type, if applicable
-    CollectionKind : ClrCollectionKind option
     //Specifies whether the type is of the form option<_>
     IsOptionType : bool
     //The type members
@@ -432,37 +423,94 @@ type ClrType = {
     /// the Name whenever dealing with options, collections and other
     /// parametrized types
     ItemValueType : ClrTypeName
+
 }
 
 /// <summary>
-/// Represents an Enum
+/// Represents a CLR class
 /// </summary>
-type ClrEnum = ClrEnum of t : ClrType
-with 
-    member this.Type = match this with ClrEnum(t = x) -> x
-    /// The name of the type
-    member this.Name  = this.Type.Name
-    /// The position of the type
-    member this.Position = this.Type.Position
-    /// The reflected type, if applicable        
-    member this.ReflectedElement = this.ReflectedElement
-    /// The name of the type that declares the type, if any
-    member this.DeclaringType = this.DeclaringType
-    
+type ClrClass = ClrClass of info : ClrTypeInfo
+
+/// <summary>
+/// Represents a CLR Enum
+/// </summary>
+type ClrEnum = ClrEnum of numericType : ClrTypeName * info : ClrTypeInfo
+
 /// <summary>
 /// Represents an F# module
 /// </summary>
-type ClrModule = ClrModule of t : ClrType
-with        
-    member this.Type = match this with ClrModule(t = x) -> x
-    /// The name of the type
-    member this.Name  = this.Type.Name
-    /// The position of the type
-    member this.Position = this.Type.Position
-    /// The reflected type, if applicable        
-    member this.ReflectedElement = this.ReflectedElement
-    /// The name of the type that declares the type, if any
-    member this.DeclaringType = this.DeclaringType
+type ClrModule = ClrModule of info : ClrTypeInfo
+
+/// <summary>
+/// Represents a collection type
+/// </summary>
+type ClrCollection =  ClrCollection of kind : ClrCollectionKind * info : ClrTypeInfo
+
+/// <summary>
+/// Represents a struct
+/// </summary>
+type ClrStruct = ClrStruct of isNullable : bool * info : ClrTypeInfo
+
+/// <summary>
+/// Represents an F# union
+/// </summary>
+type ClrUnion = ClrUnion of cases : ClrUnionCase list * info : ClrTypeInfo
+
+/// <summary>
+/// Represents an F# record
+/// </summary>
+type ClrRecord = ClrRecord of info : ClrTypeInfo
+
+/// <summary>
+/// Represents an interface
+/// </summary>
+type ClrInterface = ClrInterface of info : ClrTypeInfo
+
+type ClrType =
+    | ClassType of ClrClass
+    | EnumType of ClrEnum
+    | ModuleType of ClrModule
+    | CollectionType of ClrCollection
+    | StructType of ClrStruct
+    | UnionType of ClrUnion
+    | RecordType of ClrRecord
+    | InterfaceType of ClrInterface
+
+
+/// <summary>
+/// Represents a type
+/// </summary>
+//type ClrType = {
+//    /// The name of the type
+//    Name : ClrTypeName
+//    /// The position of the type
+//    Position : int
+//    /// The reflected type, if applicable        
+//    ReflectedElement : Type option
+//    /// The name of the type that declares the type, if any
+//    DeclaringType : ClrTypeName option
+//    /// The nested types declared by the type
+//    DeclaredTypes : ClrTypeName list
+//    /// The kind of type, if recognized
+//    Kind : ClrTypeKind
+//    /// The kind of collection represented by the type, if applicable
+//    CollectionKind : ClrCollectionKind option
+//    //Specifies whether the type is of the form option<_>
+//    IsOptionType : bool
+//    //The type members
+//    Members : ClrMember list
+//    //The access specifier applied to the type
+//    Access : ClrAccessKind
+//    /// Specifies whether the type is static
+//    IsStatic : bool
+//    /// The attributes applied to the type
+//    Attributes : ClrAttribution list
+//    /// Specifies the type of the encapsulated value; will be different from
+//    /// the Name whenever dealing with options, collections and other
+//    /// parametrized types
+//    ItemValueType : ClrTypeName
+//}
+    
        
 /// <summary>
 /// Represents an assembly

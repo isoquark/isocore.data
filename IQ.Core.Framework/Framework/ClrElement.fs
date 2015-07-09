@@ -60,12 +60,136 @@ module ClrElementKind =
         | ClrElementKind.Property | ClrElementKind.Field -> true
         | _ -> false
 
+    
 
-//TODO: This logic needs to be mooved to a non-extension module
 [<AutoOpen>]
 module ClrTypeExtensions =
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrClass"/> type
+    /// </summary>
+    type ClrClass
+    with
+        /// <summary>
+        /// Gets the related type information
+        /// </summary>
+        member this.Info = match this with ClrClass(info=x) -> x
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrEnum"/> type
+    /// </summary>
+    type ClrEnum
+    with
+        /// <summary>
+        /// Gets the related type information
+        /// </summary>
+        member this.Info = match this with ClrEnum(info=x) -> x
+        /// <summary>
+        /// Gets the enum's underlying integral type
+        /// </summary>
+        member this.NumericType = match this with ClrEnum(numericType=x) -> x
+        
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrModule"/> type
+    /// </summary>
+    type ClrModule
+    with
+        /// <summary>
+        /// Gets the related type information
+        /// </summary>
+        member this.Info = match this with ClrModule(info=x) -> x
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrStruct"/> type
+    /// </summary>
+    type ClrStruct
+    with
+        /// <summary>
+        /// Gets the related type information
+        /// </summary>
+        member this.Info = match this with ClrStruct(info=x) -> x
+        /// <summary>
+        /// Specifies whether the struct isf of type Nullable<_>
+        /// </summary>
+        member this.IsNullable = match this with ClrStruct(isNullable=x) -> x
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrUnion"/> type
+    /// </summary>
+    type ClrUnion
+    with
+        /// <summary>
+        /// Gets the related type information
+        /// </summary>
+        member this.Info = match this with ClrUnion(info=x) -> x
+        /// <summary>
+        /// Gets the cases defined for the union
+        /// </summary>
+        member this.Cases = match this with ClrUnion(cases=x) -> x
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrRecord"/> type
+    /// </summary>
+    type ClrRecord
+    with
+        /// <summary>
+        /// Gets the related type information
+        /// </summary>
+        member this.Info = match this with ClrRecord(info=x) -> x
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrInterface"/> type
+    /// </summary>
+    type ClrInterface
+    with
+        /// <summary>
+        /// Gets the related type information
+        /// </summary>
+        member this.Info = match this with ClrInterface(info=x) -> x
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrCollection"/> type
+    /// </summary>
+    type ClrCollection
+    with
+        /// <summary>
+        /// Gets the related type information
+        /// </summary>
+        member this.Info = match this with ClrCollection(info=x) -> x
+        member this.Kind = match this with ClrCollection(kind=x) -> x
+
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrType"/> type
+    /// </summary>
     type ClrType 
     with
+        /// <summary>
+        /// Gets the related type information
+        /// </summary>
+        member this.Info = 
+            match this with
+            | ClassType x -> x.Info
+            | EnumType x -> x.Info
+            | ModuleType x -> x.Info
+            | CollectionType x -> x.Info
+            | StructType x -> x.Info
+            | UnionType x -> x.Info
+            | RecordType x -> x.Info
+            | InterfaceType x -> x.Info
+
+        member this.Name = this.Info.Name
+        member this.Position = this.Info.Position
+        member this.ReflectedElement = this.Info.ReflectedElement
+        member this.DeclaringType = this.Info.DeclaringType
+        member this.DeclaredTypes = this.Info.DeclaredTypes
+        member this.Kind = this.Info.Kind
+        member this.IsOptionType = this.Info.IsOptionType
+        member this.Members = this.Info.Members
+        member this.Access = this.Info.Access
+        member this.IsStatic = this.Info.IsStatic
+        member this.Attributes = this.Info.Attributes
+        member this.ItemValueType = this.Info.ItemValueType
+
         /// <summary>
         /// Gets the properties declared by the type
         /// </summary>

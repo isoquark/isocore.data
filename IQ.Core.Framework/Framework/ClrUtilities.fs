@@ -475,8 +475,6 @@ module Type =
             ClrTypeKind.Module
         else if t |> isUnionType then
             ClrTypeKind.Union 
-        else if t |> isNullableType then
-            ClrTypeKind.NullableValue
         else if t.IsInterface then
             ClrTypeKind.Interface
         else if t.IsClass then
@@ -824,7 +822,7 @@ module ReflectionExtensions =
         member this.ElementName =  this.TypeName |> TypeElementName
 
         /// <summary>
-        /// Specifies whether the type is of the form option<_>
+        /// Specifies whether the type is an F# option type
         /// </summary>
         member this.IsOptionType = this |> Option.isOptionType
 

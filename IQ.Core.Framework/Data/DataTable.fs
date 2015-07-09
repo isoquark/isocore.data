@@ -92,17 +92,29 @@ module DataTable =
     /// <param name="t">The proxy type</param>
     /// <param name="dataTable">The data table</param>
     let toProxyValues (t : ClrType) (dataTable : DataTable) =
-        match t.CollectionKind with        
-        | Some(collectionKind) ->
+        match t with
+        | CollectionType(x) ->
             let items = 
                 [for row in dataTable.Rows ->
                     t.ReflectedElement.Value |> RecordValue.fromValueArray row.ItemArray]
             let itemType = t.ReflectedElement.Value 
-            items |> Collection.create collectionKind itemType :?> IEnumerable
+            items |> Collection.create x.Kind itemType :?> IEnumerable
         | _ ->
             [for row in dataTable.Rows ->
                 
                 t.ReflectedElement.Value |> RecordValue.fromValueArray row.ItemArray] :> IEnumerable
+
+//        match t.CollectionKind with        
+//        | Some(collectionKind) ->
+//            let items = 
+//                [for row in dataTable.Rows ->
+//                    t.ReflectedElement.Value |> RecordValue.fromValueArray row.ItemArray]
+//            let itemType = t.ReflectedElement.Value 
+//            items |> Collection.create collectionKind itemType :?> IEnumerable
+//        | _ ->
+//            [for row in dataTable.Rows ->
+//                
+//                t.ReflectedElement.Value |> RecordValue.fromValueArray row.ItemArray] :> IEnumerable
 
     /// <summary>
     /// Creates a collection of proxies from rows in a data table

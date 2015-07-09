@@ -183,27 +183,83 @@ module ClrMetadataProvider =
             nosupport()
     
 
-    let private createTypeDescription pos (t : Type) =
-        let isCollection = t |> Type.isCollectionType
-        let collKind = if isCollection then t |> Type.getCollectionKind |> Some else None
-        {
-            ClrType.Name = t.TypeName
-            Position = pos
-            DeclaringType = if t.DeclaringType <> null then 
-                                t.DeclaringType.TypeName |> Some 
-                            else 
-                                None
-            DeclaredTypes = t.GetNestedTypes() |> Array.map(fun n -> n.TypeName) |> List.ofArray
-            Members = t |> Type.getDeclaredMembers |> List.mapi(fun pos m -> m |> createMemberDescription pos)
-            Kind = t |> Type.getKind
-            ReflectedElement = t |> Some
-            CollectionKind = collKind
-            IsOptionType = t |> Option.isOptionType
-            Access = t.Access
-            IsStatic = t.IsAbstract && t.IsSealed
-            Attributes = t.GetCustomAttributes() |> createAttributions t.ElementName
-            ItemValueType = t.ItemValueType.TypeName
-        }                                    
+//    let private createTypeDescription pos (t : Type) =
+//        let isCollection = t |> Type.isCollectionType
+//        let collKind = if isCollection then t |> Type.getCollectionKind |> Some else None
+//        {
+//            ClrType.Name = t.TypeName
+//            Position = pos
+//            DeclaringType = if t.DeclaringType <> null then 
+//                                t.DeclaringType.TypeName |> Some 
+//                            else 
+//                                None
+//            DeclaredTypes = t.GetNestedTypes() |> Array.map(fun n -> n.TypeName) |> List.ofArray
+//            Members = t |> Type.getDeclaredMembers |> List.mapi(fun pos m -> m |> createMemberDescription pos)
+//            Kind = t |> Type.getKind
+//            ReflectedElement = t |> Some
+//            CollectionKind = collKind
+//            IsOptionType = t |> Option.isOptionType
+//            Access = t.Access
+//            IsStatic = t.IsAbstract && t.IsSealed
+//            Attributes = t.GetCustomAttributes() |> createAttributions t.ElementName
+//            ItemValueType = t.ItemValueType.TypeName
+//        }                                    
+
+    let private createTypeDescription pos (t : Type) = 
+        let info = 
+            {
+                ClrTypeInfo.Name = t.TypeName
+                Position = pos
+                DeclaringType = if t.DeclaringType <> null then 
+                                    t.DeclaringType.TypeName |> Some 
+                                else 
+                                    None
+                DeclaredTypes = t.GetNestedTypes() |> Array.map(fun n -> n.TypeName) |> List.ofArray
+                Members = t |> Type.getDeclaredMembers |> List.mapi(fun pos m -> m |> createMemberDescription pos)
+                Kind = t.Kind
+                ReflectedElement = t |> Some
+                IsOptionType = t.IsOptionType
+                Access = t.Access
+                IsStatic = t.IsAbstract && t.IsSealed
+                Attributes = t.GetCustomAttributes() |> createAttributions t.ElementName
+                ItemValueType = t.ItemValueType.TypeName
+            }
+        match t.Kind with
+            /// <summary>
+            /// Classifies a type as an F# discriminated union
+            /// </summary>
+            | ClrTypeKind.Union -> ClrUnion([], info) |> UnionType
+            /// <summary>
+            /// Classifies a type as a record
+            /// </summary>
+            | ClrTypeKind.Record -> ClrRecord(info) |> RecordType
+            /// <summary>
+            /// Classifies a type as an interface
+            /// </summary>
+            | ClrTypeKind.Interface -> ClrInterface(info) |> InterfaceType
+            /// <summary>
+            /// Classifies a type as a class
+            /// </summary>
+            | ClrTypeKind.Class -> ClrClass(info) |> ClassType
+            /// <summary>
+            /// Classifies a type as a collection of some sort
+            /// </summary>
+            | ClrTypeKind.Collection -> ClrCollection(t |> Type.getCollectionKind, info) |> CollectionType
+            /// <summary>
+            /// Classifies a type as a struct (a CLR value type)
+            /// </summary>
+            | ClrTypeKind.Struct -> ClrStruct(t |> Type.isNullableType, info) |> StructType
+            /// <summary>
+            /// Classifies a type as an F# module
+            /// </summary>
+            | ClrTypeKind.Module -> ClrModule(info) |> ModuleType
+            /// <summary>
+            /// Classifies a type as an enum
+            /// </summary>
+            | ClrTypeKind.Enum -> ClrEnum(t.GetEnumUnderlyingType().TypeName, info) |> EnumType
+            | _ -> nosupport()
+
+
 
     let private acquireTypeDescription pos (t : Type) =
         typeIndex.GetOrAdd(t.TypeName, fun n -> createTypeDescription pos t)
@@ -393,7 +449,7 @@ module ClrMetadataProviderExtensions =
         /// </summary>
         /// <param name="name">Identifies the assembly</param>
         member this.FindModules() =
-            ClrTypeKind.Module |> FindTypesByKind |> this.FindTypes |> List.map ClrModule
+            ClrTypeKind.Module |> FindTypesByKind |> this.FindTypes 
             
 
     

@@ -161,14 +161,14 @@ module internal Routine =
                 else
                     let result = proxy.DataElement|> executeTableFunction mii.ConnectionString routineArgs
                     let typedesc = proxy.ResultProxy.ProxyElement
-                    match typedesc.CollectionKind with
-                    | Some(collectionKind) ->
+                    match typedesc with
+                    | CollectionType(x) ->
                         let provider = context.Resolve<IClrMetadataProvider>()
                         let itemType = typedesc.Name |> provider.FindType |> fun x -> x.ReflectedElement.Value.ItemValueType
                         let items = 
                             [for row in result ->
                                 itemType |> RecordValue.fromValueArray row]
-                        items |> Collection.create collectionKind itemType |> Some                    
+                        items |> Collection.create x.Kind itemType |> Some                    
                     | _ -> NotSupportedException() |> raise                                            
             | _ -> nosupport()
             
