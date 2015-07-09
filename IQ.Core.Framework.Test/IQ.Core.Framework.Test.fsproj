@@ -85,7 +85,6 @@
     <Compile Include="ClrMetadataProviderTest.fs" />
     <Compile Include="RecordValueTest.fs" />
     <Compile Include="DataStructTest.fs" />
-    <Compile Include="Synthetics\OrderedSequenceTests.fs" />
     <Compile Include="Etl\EtlVocabularyTest.fs" />
     <Compile Include="Data\DataStorageTypeTest.fs" />
     <Compile Include="Data\ProxyTestCases.fs" />

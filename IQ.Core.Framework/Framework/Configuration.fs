@@ -3,6 +3,15 @@
 open System
 open System.Configuration
 
+[<AutoOpen>]
+module ConfigurationVocabulary = 
+    /// <summary>
+    /// Yes, the configuration manager has a config (!)
+    /// </summary>
+    type ConfigurationManagerConfig = {
+        /// The name of the configuration manager
+        Name : string
+    }
 
 /// <summary>
 /// Implements basic configuration management capabilities

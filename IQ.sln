@@ -37,6 +37,10 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Math", "IQ.Core.Mat
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Math.Test", "IQ.Core.Math.Test\IQ.Core.Math.Test.fsproj", "{5F254826-9D3F-478A-9741-4649088D3F72}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Synthetics", "IQ.Core.Synthetics\IQ.Core.Synthetics.fsproj", "{206D0DDC-B382-41FA-AE8E-CE82724648C9}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Synthetics.Test", "IQ.Core.Synthetics.Test\IQ.Core.Synthetics.Test.fsproj", "{35778FD1-5FC5-4815-809E-E654DAE6ECF2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -87,12 +91,20 @@ Global
 		{5F254826-9D3F-478A-9741-4649088D3F72}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F254826-9D3F-478A-9741-4649088D3F72}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F254826-9D3F-478A-9741-4649088D3F72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{206D0DDC-B382-41FA-AE8E-CE82724648C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{206D0DDC-B382-41FA-AE8E-CE82724648C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{206D0DDC-B382-41FA-AE8E-CE82724648C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{206D0DDC-B382-41FA-AE8E-CE82724648C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35778FD1-5FC5-4815-809E-E654DAE6ECF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35778FD1-5FC5-4815-809E-E654DAE6ECF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35778FD1-5FC5-4815-809E-E654DAE6ECF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35778FD1-5FC5-4815-809E-E654DAE6ECF2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 12
+		SccNumberOfProjects = 14
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://isoquark.visualstudio.com/defaultcollection
 		SccLocalPath0 = .
@@ -129,5 +141,11 @@ Global
 		SccProjectUniqueName11 = IQ.Core.Math.Test\\IQ.Core.Math.Test.fsproj
 		SccProjectName11 = IQ.Core.Math.Test
 		SccLocalPath11 = IQ.Core.Math.Test
+		SccProjectUniqueName12 = IQ.Core.Synthetics\\IQ.Core.Synthetics.fsproj
+		SccProjectName12 = IQ.Core.Synthetics
+		SccLocalPath12 = IQ.Core.Synthetics
+		SccProjectUniqueName13 = IQ.Core.Synthetics.Test\\IQ.Core.Synthetics.Test.fsproj
+		SccProjectName13 = IQ.Core.Synthetics.Test
+		SccLocalPath13 = IQ.Core.Synthetics.Test
 	EndGlobalSection
 EndGlobal

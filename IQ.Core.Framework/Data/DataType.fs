@@ -20,7 +20,7 @@ open IQ.Core.Framework
 module DataTypeVocabulary =
 
     /// <summary>
-    /// Specifies the available DataType classes
+    /// Specifies the available DataType classifications
     /// </summary>
     /// <remarks>
     /// Note that the DataType class is not sufficient to characterize the DataType type and

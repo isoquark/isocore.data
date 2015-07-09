@@ -97,7 +97,6 @@
     <Compile Include="Data\DataTypeConverter.fs" />
     <Compile Include="Data\DataTable.fs" />
     <Compile Include="Data\CsvData.fs" />
-    <Compile Include="Synthetics\OrderedSequence.fs" />
     <Compile Include="Etl\EtlVocabulary.fs" />
     <Compile Include="CoreRegistration.fs" />
   </ItemGroup>

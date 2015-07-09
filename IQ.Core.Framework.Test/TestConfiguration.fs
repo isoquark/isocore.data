@@ -13,10 +13,9 @@ module TestConfiguration =
                             
     //This is instantiated/cleaned-up once per collection
     type ProjectTestContext()= 
-        inherit TestContext(thisAssembly(), ProjectTestContext.RegisterDependencies) 
+        inherit TestContext(thisAssembly(), 
+            fun registry -> registry.RegisterFactory(fun config -> config |> SqlDataStore.access)) 
                                                 
-        static member private RegisterDependencies(registry : ICompositionRegistry) =
-            registry.RegisterFactory(fun config -> config |> SqlDataStore.access)
 
     [<Literal>]
     let TestCollectionName = "Core Framework Tests"
@@ -30,6 +29,5 @@ module TestConfiguration =
     type ProjectTestContainer(context,log) =
         member this.Context : ProjectTestContext = context
         member this.Log : ITestLog = log
-        //member inline this.Benchmark f = f |> Benchmark.capture context
 
             

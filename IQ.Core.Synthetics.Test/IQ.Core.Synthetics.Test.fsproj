@@ -6,14 +6,14 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>5f254826-9d3f-478a-9741-4649088d3f72</ProjectGuid>
+    <ProjectGuid>35778fd1-5fc5-4815-809e-e654dae6ecf2</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>IQ.Core.Math.Test</RootNamespace>
-    <AssemblyName>IQ.Core.Math.Test</AssemblyName>
+    <RootNamespace>IQ.Core.Synthetics.Test</RootNamespace>
+    <AssemblyName>IQ.Core.Synthetics.Test</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Name>IQ.Core.Math.Test</Name>
+    <Name>IQ.Core.Synthetics.Test</Name>
     <SccProjectName>SAK</SccProjectName>
     <SccProvider>SAK</SccProvider>
     <SccAuxPath>SAK</SccAuxPath>
@@ -29,7 +29,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Debug\IQ.Core.Math.Test.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\IQ.Core.Synthetics.Test.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -38,7 +38,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Release\IQ.Core.Math.Test.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\IQ.Core.Synthetics.Test.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
@@ -57,16 +57,21 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
-    <Content Include="App.config" />
     <Content Include="packages.config" />
+    <Content Include="app.config" />
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="TestConfiguration.fs" />
-    <Compile Include="CalculatorTest.fs" />
+    <Compile Include="OrderedSequenceTests.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IQ.Core.Data.Sql\IQ.Core.Data.Sql.fsproj">
-      <Name>IQ.Core.Data.Sql</Name>
-      <Project>{29aedcf6-3187-4c89-aa30-d3d60a8e3379}</Project>
+    <ProjectReference Include="..\IQ.Core.Math\IQ.Core.Math.fsproj">
+      <Name>IQ.Core.Math</Name>
+      <Project>{d01a6d75-53f1-4814-be92-5f69113ad1b9}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\IQ.Core.Synthetics\IQ.Core.Synthetics.fsproj">
+      <Name>IQ.Core.Synthetics</Name>
+      <Project>{206d0ddc-b382-41fa-ae8e-ce82724648c9}</Project>
       <Private>True</Private>
     </ProjectReference>
     <Reference Include="mscorlib" />
@@ -76,9 +81,18 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
+    <Reference Include="xunit.abstractions">
+      <HintPath>..\packages\xunit.abstractions.2.0.0\lib\net35\xunit.abstractions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <ProjectReference Include="..\IQ.Core.Contracts\IQ.Core.Contracts.fsproj">
       <Name>IQ.Core.Contracts</Name>
       <Project>{8690d158-dd5f-4b78-b542-a4cd5757c20c}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\IQ.Core.Data.Sql\IQ.Core.Data.Sql.fsproj">
+      <Name>IQ.Core.Data.Sql</Name>
+      <Project>{29aedcf6-3187-4c89-aa30-d3d60a8e3379}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Framework\IQ.Core.Framework.fsproj">
@@ -86,20 +100,11 @@
       <Project>{8e2497e0-941b-4ca7-ab78-4ca15291c56a}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\IQ.Core.Math\IQ.Core.Math.fsproj">
-      <Name>IQ.Core.Math</Name>
-      <Project>{d01a6d75-53f1-4814-be92-5f69113ad1b9}</Project>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\IQ.Core.TestFramework\IQ.Core.TestFramework.fsproj">
       <Name>IQ.Core.TestFramework</Name>
       <Project>{f9d5cbbf-94dc-43be-bffe-7987d14040b8}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <Reference Include="xunit.abstractions">
-      <HintPath>..\packages\xunit.abstractions.2.0.0\lib\net35\xunit.abstractions.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="xunit.assert">
       <HintPath>..\packages\xunit.assert.2.0.0\lib\portable-net45+win+wpa81+wp80+monotouch+monoandroid+Xamarin.iOS\xunit.assert.dll</HintPath>
       <Private>True</Private>

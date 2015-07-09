@@ -19,12 +19,5 @@ type IConfigurationManager =
     /// <param name="name">The name of the value</param>
     abstract GetValue:name:string->string
 
-/// <summary>
-/// Yes, the configuration manager has a config (!)
-/// </summary>
-type ConfigurationManagerConfig = {
-    /// The name of the configuration manager
-    Name : string
-}
 
 

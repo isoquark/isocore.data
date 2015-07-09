@@ -1,4 +1,4 @@
-﻿namespace IQ.Core.Math.Test
+﻿namespace IQ.Core.Synthetics.Test
 
 open System
 open System.Reflection
@@ -20,7 +20,7 @@ module TestConfiguration =
             fun registry -> registry.RegisterFactory(fun config -> config |> SqlDataStore.access)) 
 
     [<Literal>]
-    let TestCollectionName = "Core Math Tests"
+    let TestCollectionName = "Core Synthetics Tests"
 
     //This class exists to feed the test infrastructure metadata
     [<AbstractClass; TestCollectionMaker(TestCollectionName)>]

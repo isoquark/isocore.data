@@ -50,7 +50,7 @@ module CalculatorTests =
             NotSupportedException(sprintf "I don't know how to run the baseline for the type %s" typeof<'T>.Name) |> raise
    
     [<Literal>]
-    let count = 1000000
+    let opcount = 1000000
 
     let genItems<'T> minval maxval (count: int) =
         let calc = Calculator.get<'T>()
@@ -62,20 +62,20 @@ module CalculatorTests =
 
 
     let runBaseline<'T>(opname) op minval maxval =
-        count   |> genItems<'T> minval maxval
+        opcount   |> genItems<'T> minval maxval
                 |> runCalc op    
 
     module private NumberLists =
-        let Int8List = count |> genItems<int8> SByte.MinValue SByte.MaxValue
-        let Int16List = count |> genItems<int16> 0s 10000s
-        let Int32List = count |> genItems<int32> 0 10000 
-        let Int64List = count |> genItems<int64> 0L 500000L
-        let UInt16List = count |> genItems<uint16> 0us 10000us
-        let UInt32List = count |> genItems<uint32> 0u 1000000u
-        let UInt64List = count |> genItems<uint64> 0UL 500000UL
-        let Float32List = count |> genItems<float32> Single.MinValue Single.MaxValue
-        let Float64List =  count |> genItems<float> 0.0 1000000.0
-        let DecimalList = count |> genItems<decimal> 0m 100000000m
+        let Int8List = opcount |> genItems<int8> SByte.MinValue SByte.MaxValue
+        let Int16List = opcount |> genItems<int16> 0s 10000s
+        let Int32List = opcount |> genItems<int32> 0 10000 
+        let Int64List = opcount |> genItems<int64> 0L 500000L
+        let UInt16List = opcount |> genItems<uint16> 0us 10000us
+        let UInt32List = opcount |> genItems<uint32> 0u 1000000u
+        let UInt64List = opcount |> genItems<uint64> 0UL 500000UL
+        let Float32List = opcount |> genItems<float32> Single.MinValue Single.MaxValue
+        let Float64List =  opcount |> genItems<float> 0.0 1000000.0
+        let DecimalList = opcount |> genItems<decimal> 0m 100000000m
         let init() = ()
 
     type LogicTests(ctx,log) =
@@ -96,7 +96,7 @@ module CalculatorTests =
             (4.0m, 5.0m)  |> Calculator.get().Add |> Claim.equal 9.0m
             
          
-    [<Benchmark(count)>]
+    [<Benchmark(opcount)>]
     type Benchmarks(ctx,log) =
         inherit ProjectTestContainer(ctx,log)
         
@@ -104,6 +104,8 @@ module CalculatorTests =
             NumberLists.init()
             Calculator.init()
 
+        //Int8
+        //---------------------------------------------------------------------
         [<Fact>]
         let ``Benchmark - Int8 - Add - Baseline``() =
             let f() =
@@ -138,7 +140,8 @@ module CalculatorTests =
                 
             f |> Benchmark.capture ctx
 
-
+        //Int16
+        //---------------------------------------------------------------------
         [<Fact>]
         let ``Benchmark - Int16 - Add - Baseline``() =
             let f() =
@@ -173,7 +176,8 @@ module CalculatorTests =
                 
             f |> Benchmark.capture ctx
 
-
+        //Int32
+        //---------------------------------------------------------------------
         [<Fact>]
         let ``Benchmark - Int32 - Add - Baseline``() =
             let f() =
@@ -209,7 +213,24 @@ module CalculatorTests =
                 
             f |> Benchmark.capture ctx
 
+        [<Fact>]
+        let ``Benchmark - Int32 - Calculator Sequence - Baseline``() =
+            let f() =
+                seq{for i in 0..opcount do yield i} |> List.ofSeq |> ignore
+                                
+            f |> Benchmark.capture ctx
+
+        [<Fact>]
+        let ``Benchmark - Int32 - Calculator Sequence - Generic``() =
+            let f() =
+                let c = Calculator.get<int>()
+                (0, 0, Int32.MaxValue, opcount) |> c.Sequence |> List.ofSeq |> ignore
+                
+            f |> Benchmark.capture ctx
+
             
+        //Int64
+        //---------------------------------------------------------------------
         [<Fact>]
         let ``Benchmark - Int64 - Add - Baseline``() =
             let f() =
@@ -244,6 +265,28 @@ module CalculatorTests =
                 
             f |> Benchmark.capture ctx
 
+        [<Fact>]
+        let ``Benchmark - Int64 - Increment - Baseline``() =
+            let mutable x = 0L
+            let f() =
+                for i in 1..opcount do
+                    x <- x + 1L
+            f |> Benchmark.capture ctx
+            Claim.equal (int64(opcount)) x
+        
+        [<Fact>]
+        let ``Benchmark - Int64 - Increment - Generic Calculator``() =
+            let mutable x = 0L
+            let c = Calculator.get()
+            let f() =
+                for i in 1..opcount do
+                    x <- x |> c.Increment
+            f |> Benchmark.capture ctx
+            Claim.equal (int64(opcount)) x
+
+        
+        //UInt16
+        //---------------------------------------------------------------------        
         [<Fact>]
         let ``Benchmark - UInt16 - Add - Baseline``() =
             let f() =
