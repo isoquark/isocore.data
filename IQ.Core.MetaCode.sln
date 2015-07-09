@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.22823.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.MetaCode", "IQ.Core.MetaCode\IQ.Core.MetaCode.fsproj", "{1B4F1280-E097-4A56-8181-FB9668E2C618}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Contracts", "IQ.Core.Contracts\IQ.Core.Contracts.fsproj", "{8690D158-DD5F-4B78-B542-A4CD5757C20C}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Framework", "IQ.Core.Framework\IQ.Core.Framework.fsproj", "{8E2497E0-941B-4CA7-AB78-4CA15291C56A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1B4F1280-E097-4A56-8181-FB9668E2C618}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B4F1280-E097-4A56-8181-FB9668E2C618}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B4F1280-E097-4A56-8181-FB9668E2C618}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B4F1280-E097-4A56-8181-FB9668E2C618}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8690D158-DD5F-4B78-B542-A4CD5757C20C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8690D158-DD5F-4B78-B542-A4CD5757C20C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8690D158-DD5F-4B78-B542-A4CD5757C20C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8690D158-DD5F-4B78-B542-A4CD5757C20C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 4
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://isoquark.visualstudio.com/defaultcollection
+		SccProjectUniqueName0 = IQ.Core.MetaCode\\IQ.Core.MetaCode.fsproj
+		SccProjectName0 = IQ.Core.MetaCode
+		SccLocalPath0 = IQ.Core.MetaCode
+		SccProjectUniqueName1 = IQ.Core.Contracts\\IQ.Core.Contracts.fsproj
+		SccProjectName1 = IQ.Core.Contracts
+		SccLocalPath1 = IQ.Core.Contracts
+		SccProjectUniqueName2 = IQ.Core.Framework\\IQ.Core.Framework.fsproj
+		SccProjectName2 = IQ.Core.Framework
+		SccLocalPath2 = IQ.Core.Framework
+		SccLocalPath3 = .
+	EndGlobalSection
+EndGlobal
