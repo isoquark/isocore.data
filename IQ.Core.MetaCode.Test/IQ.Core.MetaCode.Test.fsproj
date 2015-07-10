@@ -61,6 +61,8 @@
     <Compile Include="TestConfiguration.fs" />
     <Content Include="packages.config" />
     <Content Include="app.config" />
+    <Compile Include="Prototypes.fs" />
+    <Compile Include="ClrEnumGeneratorTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

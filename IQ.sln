@@ -43,6 +43,10 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Synthetics.Test", "
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.MetaCode", "IQ.Core.MetaCode\IQ.Core.MetaCode.fsproj", "{1B4F1280-E097-4A56-8181-FB9668E2C618}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.MetaCode.Test", "IQ.Core.MetaCode.Test\IQ.Core.MetaCode.Test.fsproj", "{20EB4271-A3E0-4B13-8162-7A87A9D90964}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.MetaCode.Shell", "IQ.Core.MetaCode.Shell\IQ.Core.MetaCode.Shell.fsproj", "{DDC35261-4953-4F0D-99D9-8C5A1BB24636}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,12 +109,20 @@ Global
 		{1B4F1280-E097-4A56-8181-FB9668E2C618}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B4F1280-E097-4A56-8181-FB9668E2C618}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B4F1280-E097-4A56-8181-FB9668E2C618}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20EB4271-A3E0-4B13-8162-7A87A9D90964}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20EB4271-A3E0-4B13-8162-7A87A9D90964}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20EB4271-A3E0-4B13-8162-7A87A9D90964}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20EB4271-A3E0-4B13-8162-7A87A9D90964}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDC35261-4953-4F0D-99D9-8C5A1BB24636}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDC35261-4953-4F0D-99D9-8C5A1BB24636}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDC35261-4953-4F0D-99D9-8C5A1BB24636}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDC35261-4953-4F0D-99D9-8C5A1BB24636}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 15
+		SccNumberOfProjects = 17
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://isoquark.visualstudio.com/defaultcollection
 		SccLocalPath0 = .
@@ -156,5 +168,11 @@ Global
 		SccProjectUniqueName14 = IQ.Core.MetaCode\\IQ.Core.MetaCode.fsproj
 		SccProjectName14 = IQ.Core.MetaCode
 		SccLocalPath14 = IQ.Core.MetaCode
+		SccProjectUniqueName15 = IQ.Core.MetaCode.Test\\IQ.Core.MetaCode.Test.fsproj
+		SccProjectName15 = IQ.Core.MetaCode.Test
+		SccLocalPath15 = IQ.Core.MetaCode.Test
+		SccProjectUniqueName16 = IQ.Core.MetaCode.Shell\\IQ.Core.MetaCode.Shell.fsproj
+		SccProjectName16 = IQ.Core.MetaCode.Shell
+		SccLocalPath16 = IQ.Core.MetaCode.Shell
 	EndGlobalSection
 EndGlobal

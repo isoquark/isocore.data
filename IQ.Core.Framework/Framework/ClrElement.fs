@@ -60,7 +60,38 @@ module ClrElementKind =
         | ClrElementKind.Property | ClrElementKind.Field -> true
         | _ -> false
 
-    
+
+module ClrProperty =
+    let filter (members : ClrMember list) =
+            [for x in members do
+                match x with
+                | PropertyMember(x) -> yield x
+                |_ ->()
+            ]
+
+module ClrMethod =
+    let filter (members : ClrMember list) =
+        [for x in members do
+            match x with
+            | MethodMember(x) -> yield x
+            |_ ->()
+        ]
+       
+module ClrField =
+    let filter (members : ClrMember list) =
+            [for x in members do
+                match x with
+                | FieldMember(x) -> yield x
+                |_ ->()
+            ]
+
+module ClrEvent =
+    let filter (members : ClrMember list) =
+            [for x in members do
+                match x with
+                | EventMember(x) -> yield x
+                |_ ->()
+            ]
 
 [<AutoOpen>]
 module ClrTypeExtensions =
@@ -75,6 +106,16 @@ module ClrTypeExtensions =
         /// </summary>
         member this.Info = match this with ClrClass(info=x) -> x
 
+        /// <summary>
+        /// Gets the name of the element
+        /// </summary>
+        member this.Name = this.Info.Name
+
+        /// <summary>
+        /// Gets the access modifier specified for the element
+        /// </summary>
+        member this.Access = this.Info.Access
+
     /// <summary>
     /// Defines augmentations for the <see cref="ClrEnum"/> type
     /// </summary>
@@ -84,10 +125,28 @@ module ClrTypeExtensions =
         /// Gets the related type information
         /// </summary>
         member this.Info = match this with ClrEnum(info=x) -> x
+        
+        /// <summary>
+        /// Gets the name of the element
+        /// </summary>
+        member this.Name = this.Info.Name
+
+        /// <summary>
+        /// Gets the access modifier specified for the element
+        /// </summary>
+        member this.Access = this.Info.Access
+
         /// <summary>
         /// Gets the enum's underlying integral type
         /// </summary>
         member this.NumericType = match this with ClrEnum(numericType=x) -> x
+        
+        /// <summary>
+        /// Gets the literals defined by the enumeration
+        /// </summary>
+        member this.Literals = this.Info.Members |> ClrField.filter
+
+
         
     /// <summary>
     /// Defines augmentations for the <see cref="ClrModule"/> type
@@ -99,6 +158,17 @@ module ClrTypeExtensions =
         /// </summary>
         member this.Info = match this with ClrModule(info=x) -> x
 
+        /// <summary>
+        /// Gets the name of the element
+        /// </summary>
+        member this.Name = this.Info.Name
+
+        /// <summary>
+        /// Gets the access modifier specified for the element
+        /// </summary>
+        member this.Access = this.Info.Access
+
+
     /// <summary>
     /// Defines augmentations for the <see cref="ClrStruct"/> type
     /// </summary>
@@ -108,6 +178,17 @@ module ClrTypeExtensions =
         /// Gets the related type information
         /// </summary>
         member this.Info = match this with ClrStruct(info=x) -> x
+
+        /// <summary>
+        /// Gets the name of the element
+        /// </summary>
+        member this.Name = this.Info.Name
+
+        /// <summary>
+        /// Gets the access modifier specified for the element
+        /// </summary>
+        member this.Access = this.Info.Access
+
         /// <summary>
         /// Specifies whether the struct isf of type Nullable<_>
         /// </summary>
@@ -122,6 +203,17 @@ module ClrTypeExtensions =
         /// Gets the related type information
         /// </summary>
         member this.Info = match this with ClrUnion(info=x) -> x
+        
+        /// <summary>
+        /// Gets the name of the element
+        /// </summary>
+        member this.Name = this.Info.Name
+
+        /// <summary>
+        /// Gets the access modifier specified for the element
+        /// </summary>
+        member this.Access = this.Info.Access
+        
         /// <summary>
         /// Gets the cases defined for the union
         /// </summary>
@@ -137,6 +229,17 @@ module ClrTypeExtensions =
         /// </summary>
         member this.Info = match this with ClrRecord(info=x) -> x
 
+        /// <summary>
+        /// Gets the name of the element
+        /// </summary>
+        member this.Name = this.Info.Name
+
+        /// <summary>
+        /// Gets the access modifier specified for the element
+        /// </summary>
+        member this.Access = this.Info.Access
+
+
     /// <summary>
     /// Defines augmentations for the <see cref="ClrInterface"/> type
     /// </summary>
@@ -147,6 +250,18 @@ module ClrTypeExtensions =
         /// </summary>
         member this.Info = match this with ClrInterface(info=x) -> x
 
+        /// <summary>
+        /// Gets the name of the element
+        /// </summary>
+        member this.Name = this.Info.Name
+
+        /// <summary>
+        /// Gets the access modifier specified for the element
+        /// </summary>
+        member this.Access = this.Info.Access
+
+
+
     /// <summary>
     /// Defines augmentations for the <see cref="ClrCollection"/> type
     /// </summary>
@@ -156,8 +271,23 @@ module ClrTypeExtensions =
         /// Gets the related type information
         /// </summary>
         member this.Info = match this with ClrCollection(info=x) -> x
-        member this.Kind = match this with ClrCollection(kind=x) -> x
 
+        /// <summary>
+        /// Gets the name of the element
+        /// </summary>
+        member this.Name = this.Info.Name
+
+        /// <summary>
+        /// Gets the access modifier specified for the element
+        /// </summary>
+        member this.Access = this.Info.Access
+    
+        /// <summary>
+        /// Ges the collection kind
+        /// </summary>
+        member this.Kind = match this with ClrCollection(kind=x) -> x
+       
+    
     /// <summary>
     /// Defines augmentations for the <see cref="ClrType"/> type
     /// </summary>
@@ -193,45 +323,24 @@ module ClrTypeExtensions =
         /// <summary>
         /// Gets the properties declared by the type
         /// </summary>
-        member this.Properties = 
-            [for x in this.Members do
-                match x with
-                | PropertyMember(x) -> yield x
-                |_ ->()
-            ]
+        member this.Properties = this.Members |> ClrProperty.filter
 
         /// <summary>
         /// Gets the methods declared by the type
         /// </summary>
-        member this.Methods =
-            [for x in this.Members do
-                match x with
-                | MethodMember(x) -> yield x
-                |_ ->()
-            ]
+        member this.Methods = this.Members |> ClrMethod.filter
 
         /// <summary>
         /// Gets the fields declared by the type
         /// </summary>
-        member this.Fields =
-            [for x in this.Members do
-                match x with
-                | FieldMember(x) -> yield x
-                |_ ->()
-            ]
+        member this.Fields = this.Members |> ClrField.filter
 
         /// <summary>
         /// Gets the fields declared by the type
         /// </summary>
-        member this.Events =
-            [for x in this.Members do
-                match x with
-                | EventMember(x) -> yield x
-                |_ ->()
-            ]
+        member this.Events = this.Members |> ClrEvent.filter
 
 
-//TODO: This logic needs to be mooved to a non-extension module
 [<AutoOpen>]
 module ClrMemberExtensions =
     type ClrMember

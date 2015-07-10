@@ -162,34 +162,31 @@ type ClrAccessKind =
 /// <summary>
 /// Represents a type name
 /// </summary>
-[<DebuggerDisplay("{Text, nq}")>]
 type ClrTypeName = ClrTypeName of simpleName : string * fullName : string option * assemblyQualifiedName : string option
+with
+    override this.ToString() = match this with ClrTypeName(simpleName=x) -> x
                     
 
 /// <summary>
 /// Represents an assembly name
 /// </summary>
 type ClrAssemblyName = ClrAssemblyName of simpleName : string * fullName : string option
+with
+    override this.ToString() = match this with ClrAssemblyName(simpleName=x) -> x
 
 /// <summary>
 /// Represents the name of a member
 /// </summary>    
 type ClrMemberName = ClrMemberName of string
 with
-    member this.Text = 
-        match this with ClrMemberName(x) -> x
-    override this.ToString() = 
-        this.Text
+    override this.ToString() = match this with ClrMemberName(x) -> x
     
 /// <summary>
 /// Represents the name of a parameter
 /// </summary>    
 type ClrParameterName = ClrParameterName of string
 with
-    member this.Text = 
-        match this with ClrParameterName(x) -> x
-    override this.ToString() = 
-        this.Text
+    override this.ToString() = match this with ClrParameterName(x) -> x
 
 /// <summary>
 /// Represents the name of a CLR element
@@ -387,7 +384,6 @@ type ClrUnionCase = {
 /// <summary>
 /// Represents a member
 /// </summary>
-[<DebuggerDisplay("{Name}")>]
 type ClrMember =
 | PropertyMember of ClrProperty
 | FieldMember of ClrField
@@ -476,40 +472,6 @@ type ClrType =
     | RecordType of ClrRecord
     | InterfaceType of ClrInterface
 
-
-/// <summary>
-/// Represents a type
-/// </summary>
-//type ClrType = {
-//    /// The name of the type
-//    Name : ClrTypeName
-//    /// The position of the type
-//    Position : int
-//    /// The reflected type, if applicable        
-//    ReflectedElement : Type option
-//    /// The name of the type that declares the type, if any
-//    DeclaringType : ClrTypeName option
-//    /// The nested types declared by the type
-//    DeclaredTypes : ClrTypeName list
-//    /// The kind of type, if recognized
-//    Kind : ClrTypeKind
-//    /// The kind of collection represented by the type, if applicable
-//    CollectionKind : ClrCollectionKind option
-//    //Specifies whether the type is of the form option<_>
-//    IsOptionType : bool
-//    //The type members
-//    Members : ClrMember list
-//    //The access specifier applied to the type
-//    Access : ClrAccessKind
-//    /// Specifies whether the type is static
-//    IsStatic : bool
-//    /// The attributes applied to the type
-//    Attributes : ClrAttribution list
-//    /// Specifies the type of the encapsulated value; will be different from
-//    /// the Name whenever dealing with options, collections and other
-//    /// parametrized types
-//    ItemValueType : ClrTypeName
-//}
     
        
 /// <summary>

@@ -65,6 +65,19 @@ module ClrNameExtensions =
                                                                         | Some(x) -> x
                                                                         | None ->
                                                                             simpleName    
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrMemberElementName"/> type
+    /// </summary>
+    type ClrMemberName
+    with
+        member this.Text = match this with ClrMemberName(x) -> x
+    
+    /// <summary>
+    /// Defines augmentations for the <see cref="ClrParameterElementName"/> type
+    /// </summary>
+    type ClrParameterName
+    with
+        member this.Text = match this with ClrParameterName(x) -> x
         
 
     /// <summary>
@@ -90,19 +103,6 @@ module ClrNameExtensions =
                 | ParameterElementName(x) -> x.Text
 
             
-    /// <summary>
-    /// Defines augmentations for the <see cref="ClrMemberElementName"/> type
-    /// </summary>
-    type ClrMemberName
-    with
-        member this.Text = match this with ClrMemberName(x) -> x
-    
-    /// <summary>
-    /// Defines augmentations for the <see cref="ClrParameterElementName"/> type
-    /// </summary>
-    type ClrParameterName
-    with
-        member this.Text = match this with ClrParameterName(x) -> x
 
 
 module ReflectedKind =
@@ -522,6 +522,12 @@ module Type =
             ClrAccessKind.Protected
         else
             nosupport()
+    /// <summary>
+    /// Gets the <see cref="System.Type"/> of the identified type
+    /// </summary>
+    /// <param name="name"></param>
+    let get(name : ClrTypeName) =
+        Type.GetType(name.Text, true)
         
 /// <summary>
 /// Defines System.MemberInfo helpers

@@ -132,6 +132,7 @@ module ClrMetadataProvider =
 
     let private createFieldDescription pos (f : FieldInfo) =
         let attributes = f.GetCustomAttributes() |> createAttributions f.ElementName
+        //TODO: Make this work!
         let isLiteral = attributes |> ClrAttribution.tryFind typeof<LiteralAttribute> |> Option.isSome
         {
             ClrField.Name = f.Name |> ClrMemberName
