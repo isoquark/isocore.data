@@ -12,6 +12,10 @@ open IQ.Core.MetaCode.Test.Prototypes
 
 module ClrEnumGenerator =
     
+    module ClrTypeInfo =
+        let stripReflectedElement (i : ClrTypeInfo) =
+            {i with ReflectedElement = None}
+
     type LogicTests(ctx,log) =
         inherit ProjectTestContainer(ctx,log)
         
@@ -25,15 +29,26 @@ module ClrEnumGenerator =
                 }
 
 
-        //[<Fact>]
-        let ``Generated Enum1``() =
-            let expect = typeinfo<Enum1> 
-            let actual = [expect] |> describeAssembly "GeneratedEnum1" 
-                                  |> ClrAssemblyGenerator.generate 
-                                  |> Assembly.LoadFrom
-                                  |> fun x -> x.GetTypes() |> Array.find(fun x -> x.TypeName.FullName = expect.Name.FullName)
+            
 
-            ()
+//        [<Fact>]
+//        let ``Generated Enum1``() =
+//            let expect = typeinfo<Enum1> 
+//            let actual = [expect] |> describeAssembly "GeneratedEnum1" 
+//                                  |> ClrAssemblyGenerator.generate 
+//                                  |> Assembly.LoadFrom
+//                                  |> fun x -> x.GetTypes() 
+//                                  |> Array.find(fun x -> x.TypeName.FullName = expect.Name.FullName)
+//                                  |> ClrType.describe expect.Position                   
+//            
+//            let attribs = typeof<Enum1>.GetCustomAttributes()
+//            
+//            
+//            let info1 = expect.Info |> ClrTypeInfo.stripReflectedElement
+//            let info2 = actual.Info |> ClrTypeInfo.stripReflectedElement
+//            let same = info1 = info2
+//            
+//            ()
         
         [<Fact>]
         let ``Generated Enum - MyEnum``() =
@@ -51,7 +66,7 @@ module ClrEnumGenerator =
                     FieldType = numericType
                     DeclaringType = enumTypeName
                     IsLiteral = true
-                    LiteralValue = Some("10")
+                    LiteralValue = Some(10 :> obj)
                 } |> FieldMember
             
 

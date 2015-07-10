@@ -3,6 +3,8 @@
 open System
 open System.Reflection
 
+open IQ.Core.Data
+
     
 module CoreRegistration =
     /// <summary>
@@ -12,7 +14,8 @@ module CoreRegistration =
     let register (rootAssembly : Assembly) (registry : ICompositionRegistry)  =
         
         registry.RegisterInstance({ConfigurationManagerConfig.Name="AppConfig"} |> ConfigurationManager.get)
-        
+        //registry.RegisterInstance(DataProxyMetadataProvider.get())
+
         //Load all referenced user assemblies assemblies so we can engage 
         //in profitable reflection exercises
         rootAssembly |> Assembly.loadReferences (Some(CoreConfiguration.UserAssemblyPrefix))            

@@ -85,7 +85,7 @@ module DataProxyMetadata =
                     | None ->
                         t.SimpleName
                 | None ->
-                    NotSupportedException() |> raise                    
+                    nosupport()                    
         
         match description |> ClrElement.tryGetAttributeT<SchemaAttribute> with        
         | Some(a) ->
@@ -251,9 +251,9 @@ module DataProxyMetadata =
                     Parameters = parameters |> List.map(fun p -> p.DataElement)
                 }            
                 ProcedureCallProxyDescription(m, procedure, parameters) |> ProcedureProxy
-            | _ -> NotSupportedException() |> raise
+            | _ -> nosupport()
 
-        | _ -> NotSupportedException() |> raise
+        | _ -> nosupport()
                                                                                                         
     /// <summary>
     /// Infers a Table Proxy Description
@@ -283,9 +283,9 @@ module DataProxyMetadata =
                     m,
                     m.ReturnType |> Option.get |> describeType
                 | _ ->
-                    NotSupportedException() |> raise
+                    nosupport()
             | _ ->
-                NotSupportedException() |> raise
+                nosupport()
         let tableFunction = {
             TableFunctionDescription.Name = objectName   
             Parameters = parameterProxies|> List.map(fun p -> p.DataElement)
@@ -304,9 +304,9 @@ module DataProxyMetadata =
                         description |> describeProcedureProxy
                     else if description |> ClrElement.hasAttributeT<TableFunctionAttribute> then
                         description |> describeTableFunctionProxy
-                    else NotSupportedException() |> raise                        
-                | _ -> NotSupportedException() |> raise
-        | _ -> NotSupportedException() |> raise
+                    else nosupport()                        
+                | _ -> nosupport()
+        | _ -> nosupport()
 
     let describeRoutineProxies(description : ClrElement ) =
         match description with
@@ -319,7 +319,53 @@ module DataProxyMetadata =
             ]
                 
         | _ ->
-             NotSupportedException() |> raise           
+             nosupport()           
+
+type IDataProxyMetadataProvider =
+    abstract DescribeProxies:DataElementKind->ClrElement->DataObjectProxy list
+
+
+module DataProxyMetadataProvider =        
+    let private describeProxies (dek : DataElementKind) (clrElement : ClrElement) =
+        match dek with
+        | DataElementKind.Procedure ->
+            match clrElement with
+            | MemberElement(x) ->
+                clrElement |> DataProxyMetadata.describeProcedureProxy |> List.singleton
+            
+            | TypeElement(x) ->
+                [for m in x.Methods do
+                    if m.HasAttribute<ProcedureAttribute>() then
+                        yield m |> MethodMember |> MemberElement |> DataProxyMetadata.describeProcedureProxy
+                ]
+            | _ -> nosupport()
+                
+        | DataElementKind.TableFunction ->
+            match clrElement with
+            | MemberElement(x) ->
+                clrElement |> DataProxyMetadata.describeTableFunctionProxy |> List.singleton
+            | TypeElement(x) ->
+                [for m in x.Methods do
+                    if m.HasAttribute<TableFunctionAttribute>() then
+                        yield m |> MethodMember |> MemberElement |> DataProxyMetadata.describeTableFunctionProxy
+                ]
+                
+            | _ ->
+                 nosupport()           
+        | DataElementKind.Table | DataElementKind.View ->
+            match clrElement with
+            | TypeElement(x) ->
+                x |> DataProxyMetadata.describeTablularProxy |> TabularProxy |> List.singleton
+            | _ ->
+                 nosupport()           
+            
+        | _ -> nosupport()
+    
+    let get() =
+        { new IDataProxyMetadataProvider with
+            member this.DescribeProxies dek clrElement =
+                describeProxies dek clrElement        
+        }
                                    
 module TypeProxy =
     let inferDataObjectName (typedesc : ClrType) =

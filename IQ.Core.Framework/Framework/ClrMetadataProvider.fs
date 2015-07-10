@@ -21,251 +21,13 @@ module ClrMetadataProviderVocbulary =
 /// </summary>
 module ClrMetadataProvider =    
     
-    let private assemblyDescriptions = ConcurrentDictionary<Assembly, ClrAssembly>()        
-    
+    let private assemblyDescriptions = ConcurrentDictionary<Assembly, ClrAssembly>()            
     let private typeIndex = ConcurrentDictionary<ClrTypeName, ClrType>()
-
-
-    let private getAssemblyDescriptions() =
-        assemblyDescriptions.Values |> List.ofSeq
-   
-    /// <summary>
-    /// Creates an attribution for supplied target and attributes
-    /// </summary>
-    /// <param name="target">Identifies the element to which the attributes apply</param>
-    /// <param name="attributes">The applied attributes</param>
-    let private createAttributions (target : ClrElementName) (attributes : Attribute seq) =
-        
-        let getValue (attrib : Attribute) (p : PropertyInfo) =
-            try
-                attrib |> p.GetValue
-            with
-                | :? TargetInvocationException as e ->
-                    match e.InnerException with
-                    | :? NotSupportedException  ->
-                        null
-                    | _ -> reraise()
-                | _ -> reraise()
-        
-        [for attribute in attributes do
-            let attribType = attribute.GetType()
-            yield 
-                {
-                    ClrAttribution.AttributeName =  attribType.TypeName
-                    Target = target
-                    AppliedValues = attribType.GetProperties() 
-                                  |> Array.filter(fun p -> p.CanRead)
-                                  |> Array.mapi( fun i p -> ValueIndexKey(p.Name, i),  p |> getValue attribute  ) 
-                                  |>List.ofArray 
-                                  |> ValueIndex
-                    AttributeInstance = attribute |> Some
-                }            
-        ]
-
-    let private createInputParameterDescription pos (p : ParameterInfo) =
-        
-        {
-            ClrMethodParameter.Name = p.ParameterName
-            Position = pos
-            ReflectedElement = p |> Some
-            Attributes = p.GetCustomAttributes() |> createAttributions p.ElementName
-            CanOmit = (p.IsOptional || p.IsDefined(typeof<OptionalArgumentAttribute>))
-            ParameterType = p.ParameterType.TypeName
-            DeclaringMethod = ClrMemberName(p.Member.Name)
-            IsReturn = false
-        }
-
-
-    let private createParameterDescriptions (m : MethodInfo) = 
-        [ yield! m.GetParameters() 
-                    |> Array.mapi(fun pos p -> p |> createInputParameterDescription pos) 
-                    |>List.ofArray
-          
-          if m.ReturnType <> typeof<Void> then            
-              yield {
-                    ClrMethodParameter.Name = ClrParameterName(String.Empty)
-                    Position = -1
-                    ReflectedElement = None
-                    Attributes = m |> MethodInfo.getReturnAttributes |> createAttributions m.ElementName
-                    CanOmit = false
-                    ParameterType = m.ReturnType.TypeName
-                    DeclaringMethod = ClrMemberName(m.Name)
-                    IsReturn = true
-                  }
-        ]
-
     
-    let private createMethodDescription pos (m : MethodInfo) = {
-        ClrMethod.Name = m.Name |> ClrMemberName
-        Position = pos
-        ReflectedElement = m |> Some
-        Access = m.Access
-        IsStatic = m.IsStatic
-        Parameters = m |> createParameterDescriptions
-        Attributes = m.GetCustomAttributes() |> createAttributions m.ElementName
-        ReturnType = if m.ReturnType = typeof<System.Void> then None else m.ReturnType.TypeName |> Some
-        ReturnAttributes = m |> MethodInfo.getReturnAttributes |> createAttributions m.ElementName
-        DeclaringType = m.DeclaringType.TypeName
-    }
-
-    let private createPropertyDescription pos (p : PropertyInfo) =
-        {
-            ClrProperty.Name = p.Name |> ClrMemberName 
-            Position = pos
-            DeclaringType  = p.DeclaringType.TypeName
-            ValueType = p.PropertyType.TypeName
-            IsOptional = p.PropertyType |> Option.isOptionType
-            CanRead = p.CanRead
-            ReadAccess = if p.CanRead then p.GetMethod.Access |> Some else None
-            CanWrite = p.CanWrite
-            WriteAccess = if p.CanWrite then p.SetMethod.Access |> Some else None
-            ReflectedElement = p |> Some
-            IsStatic = if p.CanRead then p.GetMethod.IsStatic else p.SetMethod.IsStatic
-            Attributes = p.GetCustomAttributes() |> createAttributions p.ElementName
-            GetMethodAttributes = if p.CanRead then 
-                                        p.GetMethod.GetCustomAttributes() |> createAttributions p.GetMethod.ElementName 
-                                  else []
-            SetMethodAttributes = if p.CanWrite then
-                                        p.SetMethod.GetCustomAttributes() |> createAttributions p.SetMethod.ElementName else []
-        }
-    
-
-    let private createFieldDescription pos (f : FieldInfo) =
-        let attributes = f.GetCustomAttributes() |> createAttributions f.ElementName
-        //TODO: Make this work!
-        let isLiteral = attributes |> ClrAttribution.tryFind typeof<LiteralAttribute> |> Option.isSome
-        {
-            ClrField.Name = f.Name |> ClrMemberName
-            Position = pos
-            ReflectedElement = f |> Some
-            Access = f.Access
-            IsStatic = f.IsStatic
-            Attributes = attributes
-            FieldType = f.FieldType.TypeName
-            DeclaringType = f.DeclaringType.TypeName
-            IsLiteral = isLiteral
-            LiteralValue = if isLiteral then f.GetValue(null) |> fun x -> x.ToString() |> Some else None
-        }
-
-    let private createConstructorDescription pos (c : ConstructorInfo) =
-        {
-            ClrConstructor.Name = c.MemberName
-            Position = pos
-            ReflectedElement = c |> Some
-            Access = c.Access
-            IsStatic = c.IsStatic
-            Parameters = c.GetParameters() |>  Array.mapi(fun pos p -> p |> createInputParameterDescription pos) |>List.ofArray
-            Attributes = c.GetCustomAttributes() |> createAttributions c.ElementName
-            DeclaringType = c.DeclaringType.TypeName
-        }
-
-    let private createEventDescription pos (e : EventInfo) =
-        {
-            ClrEvent.Name = e.MemberName
-            Position = pos
-            ReflectedElement = e |> Some                
-            Attributes = e.GetCustomAttributes() |> createAttributions e.ElementName
-            DeclaringType = e.DeclaringType.TypeName
-        }
-
-    let private createMemberDescription pos (m : MemberInfo) =
-        match m with
-        | :? MethodInfo as x->
-            x |> createMethodDescription pos |> MethodMember
-        | :? PropertyInfo as x->
-            x |> createPropertyDescription pos |> PropertyMember
-        | :? FieldInfo as x -> 
-            x |> createFieldDescription pos |> FieldMember
-        | :? ConstructorInfo as x ->
-            x |> createConstructorDescription pos |> ConstructorMember
-        | :? EventInfo as x ->
-            x |> createEventDescription pos |> EventMember
-        | _ ->
-            nosupport()
-    
-
-//    let private createTypeDescription pos (t : Type) =
-//        let isCollection = t |> Type.isCollectionType
-//        let collKind = if isCollection then t |> Type.getCollectionKind |> Some else None
-//        {
-//            ClrType.Name = t.TypeName
-//            Position = pos
-//            DeclaringType = if t.DeclaringType <> null then 
-//                                t.DeclaringType.TypeName |> Some 
-//                            else 
-//                                None
-//            DeclaredTypes = t.GetNestedTypes() |> Array.map(fun n -> n.TypeName) |> List.ofArray
-//            Members = t |> Type.getDeclaredMembers |> List.mapi(fun pos m -> m |> createMemberDescription pos)
-//            Kind = t |> Type.getKind
-//            ReflectedElement = t |> Some
-//            CollectionKind = collKind
-//            IsOptionType = t |> Option.isOptionType
-//            Access = t.Access
-//            IsStatic = t.IsAbstract && t.IsSealed
-//            Attributes = t.GetCustomAttributes() |> createAttributions t.ElementName
-//            ItemValueType = t.ItemValueType.TypeName
-//        }                                    
-
-    let private createTypeDescription pos (t : Type) = 
-        let info = 
-            {
-                ClrTypeInfo.Name = t.TypeName
-                Position = pos
-                DeclaringType = if t.DeclaringType <> null then 
-                                    t.DeclaringType.TypeName |> Some 
-                                else 
-                                    None
-                DeclaredTypes = t.GetNestedTypes() |> Array.map(fun n -> n.TypeName) |> List.ofArray
-                Members = t |> Type.getDeclaredMembers |> List.mapi(fun pos m -> m |> createMemberDescription pos)
-                Kind = t.Kind
-                ReflectedElement = t |> Some
-                IsOptionType = t.IsOptionType
-                Access = t.Access
-                IsStatic = t.IsAbstract && t.IsSealed
-                Attributes = t.GetCustomAttributes() |> createAttributions t.ElementName
-                ItemValueType = t.ItemValueType.TypeName
-            }
-        match t.Kind with
-            /// <summary>
-            /// Classifies a type as an F# discriminated union
-            /// </summary>
-            | ClrTypeKind.Union -> ClrUnion([], info) |> UnionType
-            /// <summary>
-            /// Classifies a type as a record
-            /// </summary>
-            | ClrTypeKind.Record -> ClrRecord(info) |> RecordType
-            /// <summary>
-            /// Classifies a type as an interface
-            /// </summary>
-            | ClrTypeKind.Interface -> ClrInterface(info) |> InterfaceType
-            /// <summary>
-            /// Classifies a type as a class
-            /// </summary>
-            | ClrTypeKind.Class -> ClrClass(info) |> ClassType
-            /// <summary>
-            /// Classifies a type as a collection of some sort
-            /// </summary>
-            | ClrTypeKind.Collection -> ClrCollection(t |> Type.getCollectionKind, info) |> CollectionType
-            /// <summary>
-            /// Classifies a type as a struct (a CLR value type)
-            /// </summary>
-            | ClrTypeKind.Struct -> ClrStruct(t |> Type.isNullableType, info) |> StructType
-            /// <summary>
-            /// Classifies a type as an F# module
-            /// </summary>
-            | ClrTypeKind.Module -> ClrModule(info) |> ModuleType
-            /// <summary>
-            /// Classifies a type as an enum
-            /// </summary>
-            | ClrTypeKind.Enum -> ClrEnum(t.GetEnumUnderlyingType().TypeName, info) |> EnumType
-            | _ -> nosupport()
-
-
+    let private getAssemblyDescriptions() = assemblyDescriptions.Values |> List.ofSeq
 
     let private acquireTypeDescription pos (t : Type) =
-        typeIndex.GetOrAdd(t.TypeName, fun n -> createTypeDescription pos t)
-
-    
+        typeIndex.GetOrAdd(t.TypeName, fun n -> ClrType.describe pos t)
         
     let private describeAssembly (a : Assembly) =                               
         assemblyDescriptions.GetOrAdd(typeof<int>.Assembly, fun corlib ->
@@ -287,9 +49,9 @@ module ClrMetadataProvider =
             {
                 Name = ClrAssemblyName(a.SimpleName, a.FullName |> Some)
                 Position = 0
-                Types = a.GetTypes() |> Array.mapi(fun pos t -> createTypeDescription pos t) |> List.ofArray
+                Types = a.GetTypes() |> Array.mapi(fun pos t -> ClrType.describe pos t) |> List.ofArray
                 ReflectedElement = a |> Some
-                Attributes = a.GetCustomAttributes() |> createAttributions a.ElementName
+                Attributes = a.GetCustomAttributes() |> ClrAttribution.create a.ElementName
             })    
 
     let private describeType (t : Type) =
@@ -352,7 +114,7 @@ module ClrMetadataProvider =
     let private findTypeProperties(q : ClrTypeQuery) =
         [for t in (q |> findTypes) do yield! t.Properties]
     
-    let findProperties(q : ClrPropertyQuery) =
+    let private findProperties(q : ClrPropertyQuery) =
         match q with
         | FindPropertyByName(name, typeQuery) ->
             

@@ -44,6 +44,26 @@ with
 
 
 /// <summary>
+/// Classifies supported data object/element types
+/// </summary>
+type DataElementKind =
+    | Table = 1uy
+    | View = 2uy
+    | Procedure = 3uy
+    | TableFunction = 4uy
+    | ScalarFunction = 6uy
+    | Sequence = 5uy
+    | Column = 1uy
+    /// Identifies a top-level namescope within a data store. This has
+    /// an obvious interpretation in the context of relational data stores.
+    /// Otherwise, interpretation is dependent on the type of store
+    | Schema = 1uy
+    /// Identifies a custom primitive. In SQL server, for example, this
+    /// is eqivalent to an object created via CREATE TYPE and based on
+    /// an intrinsic type
+    | CustomPrimitive = 1uy
+
+/// <summary>
 /// Represents a store command
 /// </summary>
 type SqlStoreCommand =

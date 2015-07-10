@@ -4,14 +4,13 @@ open System
 open System.Reflection
 open System.Diagnostics
 open System.Collections.Generic
+open System.Linq
+open System.Runtime
+open System.Runtime.CompilerServices
 
 open Microsoft.FSharp.Reflection
 open Microsoft.FSharp.Quotations.Patterns
 
-
-module ClrAttribution =
-    let tryFind (attribType  : Type) (attributions : ClrAttribution seq)= 
-        attributions |> Seq.tryFind(fun x -> x.AttributeInstance |> Option.get |> fun instance -> instance |> attribType.IsInstanceOfType)
 
 module ClrElementKind =
 
@@ -61,7 +60,7 @@ module ClrElementKind =
         | _ -> false
 
 
-module ClrProperty =
+module internal ClrProperty =
     let filter (members : ClrMember list) =
             [for x in members do
                 match x with
@@ -69,15 +68,92 @@ module ClrProperty =
                 |_ ->()
             ]
 
-module ClrMethod =
+    let describe pos (p : PropertyInfo) =
+        {
+            ClrProperty.Name = p.Name |> ClrMemberName 
+            Position = pos
+            DeclaringType  = p.DeclaringType.TypeName
+            ValueType = p.PropertyType.TypeName
+            IsOptional = p.PropertyType |> Option.isOptionType
+            CanRead = p.CanRead
+            ReadAccess = if p.CanRead then p.GetMethod.Access |> Some else None
+            CanWrite = p.CanWrite
+            WriteAccess = if p.CanWrite then p.SetMethod.Access |> Some else None
+            ReflectedElement = p |> Some
+            IsStatic = if p.CanRead then p.GetMethod.IsStatic else p.SetMethod.IsStatic
+            Attributes = p.UserAttributions
+            GetMethodAttributes = p.GetUserAttributions
+            SetMethodAttributes = p.SetUserAttributions
+        }
+
+
+module internal ClrMethod =
     let filter (members : ClrMember list) =
         [for x in members do
             match x with
             | MethodMember(x) -> yield x
             |_ ->()
         ]
+
+    let private describeParameter pos (p : ParameterInfo) =
+        
+        {
+            ClrMethodParameter.Name = p.ParameterName
+            Position = pos
+            ReflectedElement = p |> Some
+            Attributes = p.UserAttributions
+            CanOmit = (p.IsOptional || p.IsDefined(typeof<OptionalArgumentAttribute>))
+            ParameterType = p.ParameterType.TypeName
+            DeclaringMethod = ClrMemberName(p.Member.Name)
+            IsReturn = false
+        }
+
+
+    let private createParameterDescriptions (m : MethodInfo) = 
+        [ yield! m.GetParameters() 
+                    |> Array.mapi(fun pos p -> p |> describeParameter pos) 
+                    |>List.ofArray
+          
+          if m.ReturnType <> typeof<Void> then            
+              yield {
+                    ClrMethodParameter.Name = ClrParameterName(String.Empty)
+                    Position = -1
+                    ReflectedElement = None
+                    Attributes = m.UserReturnAttributions
+                    CanOmit = false
+                    ParameterType = m.ReturnType.TypeName
+                    DeclaringMethod = ClrMemberName(m.Name)
+                    IsReturn = true
+                  }
+        ]
+
+    let describeConstructor pos (c : ConstructorInfo) =
+        {
+            ClrConstructor.Name = c.MemberName
+            Position = pos
+            ReflectedElement = c |> Some
+            Access = c.Access
+            IsStatic = c.IsStatic
+            Parameters = c.GetParameters() |>  Array.mapi(fun pos p -> p |> describeParameter pos) |>List.ofArray
+            Attributes = c.UserAttributions
+            DeclaringType = c.DeclaringType.TypeName
+        }
+    
+    let describe pos (m : MethodInfo) = {
+        ClrMethod.Name = m.Name |> ClrMemberName
+        Position = pos
+        ReflectedElement = m |> Some
+        Access = m.Access
+        IsStatic = m.IsStatic
+        Parameters = m |> createParameterDescriptions
+        Attributes = m.UserAttributions
+        ReturnType = if m.ReturnType = typeof<System.Void> then None else m.ReturnType.TypeName |> Some
+        ReturnAttributes = m.UserReturnAttributions
+        DeclaringType = m.DeclaringType.TypeName
+    }
+
        
-module ClrField =
+module internal ClrField =
     let filter (members : ClrMember list) =
             [for x in members do
                 match x with
@@ -85,13 +161,112 @@ module ClrField =
                 |_ ->()
             ]
 
-module ClrEvent =
+    let describe pos (f : FieldInfo) =
+        let isLiteral = f.Facets.IsLiteral
+        {
+            ClrField.Name = f.Name |> ClrMemberName
+            Position = pos
+            ReflectedElement = f |> Some
+            Access = f.Access
+            IsStatic = f.IsStatic
+            Attributes = f.UserAttributions
+            FieldType = f.FieldType.TypeName
+            DeclaringType = f.DeclaringType.TypeName
+            IsLiteral = isLiteral
+            LiteralValue = if isLiteral then f.GetValue(null) |> Some else None
+        }
+
+
+module internal ClrEvent =
     let filter (members : ClrMember list) =
             [for x in members do
                 match x with
                 | EventMember(x) -> yield x
                 |_ ->()
             ]
+
+    let describe pos (e : EventInfo) =
+        {
+            ClrEvent.Name = e.MemberName
+            Position = pos
+            ReflectedElement = e |> Some                
+            Attributes = e.UserAttributions
+            DeclaringType = e.DeclaringType.TypeName
+        }
+
+
+module internal ClrMember =
+    let describe pos (m : MemberInfo) =
+        match m with
+        | :? MethodInfo as x->
+            x |> ClrMethod.describe pos |> MethodMember
+        | :? PropertyInfo as x->
+            x |> ClrProperty.describe pos |> PropertyMember
+        | :? FieldInfo as x -> 
+            x |> ClrField.describe pos |> FieldMember
+        | :? ConstructorInfo as x ->
+            x |> ClrMethod.describeConstructor pos |> ConstructorMember
+        | :? EventInfo as x ->
+            x |> ClrEvent.describe pos |> EventMember
+        | _ ->
+            nosupport()
+
+module internal ClrType =
+    let describe pos (t : Type) = 
+        let info = 
+            {
+                ClrTypeInfo.Name = t.TypeName
+                Position = pos
+                DeclaringType = if t.DeclaringType <> null then 
+                                    t.DeclaringType.TypeName |> Some 
+                                else 
+                                    None
+                DeclaredTypes = t.GetNestedTypes() |> Array.map(fun n -> n.TypeName) |> List.ofArray
+                Members = t |> Type.getDeclaredMembers |> List.mapi(fun pos m -> m |> ClrMember.describe pos)
+                Kind = t.Kind
+                ReflectedElement = t |> Some
+                IsOptionType = t.IsOptionType
+                Access = t.Access
+                IsStatic = t.IsAbstract && t.IsSealed
+                Attributes = t.UserAttributions
+                ItemValueType = t.ItemValueType.TypeName
+            }
+        match t.Kind with
+            /// <summary>
+            /// Classifies a type as an F# discriminated union
+            /// </summary>
+            | ClrTypeKind.Union -> ClrUnion([], info) |> UnionType
+            /// <summary>
+            /// Classifies a type as a record
+            /// </summary>
+            | ClrTypeKind.Record -> ClrRecord(info) |> RecordType
+            /// <summary>
+            /// Classifies a type as an interface
+            /// </summary>
+            | ClrTypeKind.Interface -> ClrInterface(info) |> InterfaceType
+            /// <summary>
+            /// Classifies a type as a class
+            /// </summary>
+            | ClrTypeKind.Class -> ClrClass(info) |> ClassType
+            /// <summary>
+            /// Classifies a type as a collection of some sort
+            /// </summary>
+            | ClrTypeKind.Collection -> ClrCollection(t |> Type.getCollectionKind, info) |> CollectionType
+            /// <summary>
+            /// Classifies a type as a struct (a CLR value type)
+            /// </summary>
+            | ClrTypeKind.Struct -> ClrStruct(t |> Type.isNullableType, info) |> StructType
+            /// <summary>
+            /// Classifies a type as an F# module
+            /// </summary>
+            | ClrTypeKind.Module -> ClrModule(info) |> ModuleType
+            /// <summary>
+            /// Classifies a type as an enum
+            /// </summary>
+            | ClrTypeKind.Enum -> ClrEnum(t.GetEnumUnderlyingType().TypeName, info) |> EnumType
+            | _ -> nosupport()
+        
+    
 
 [<AutoOpen>]
 module ClrTypeExtensions =

@@ -55,6 +55,7 @@
     <Compile Include="ICompositionRoot.fs" />
     <Compile Include="ISequenceProvider.fs" />
     <Compile Include="IClrMetadataProvider.fs" />
+    <Compile Include="IDataProxyMetadataProvider.fs" />
   </ItemGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>

@@ -71,7 +71,10 @@
   <ItemGroup>
     <None Include="packages.config" />
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="XUnit.fs" />
+    <Compile Include="Traits.fs" />
+    <Compile Include="TestVocabulary.fs" />
+    <Compile Include="TestContext.fs" />
+    <Compile Include="Claim.fs" />
     <Compile Include="Benchmark.fs" />
     <Content Include="app.config" />
     <None Include="Resources\TrxSample1.trx">

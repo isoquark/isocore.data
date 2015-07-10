@@ -74,6 +74,7 @@
     <Compile Include="Framework\CompositionRoot.fs" />
     <Compile Include="Framework\TransformerVocabulary.fs" />
     <Compile Include="Framework\Time.fs" />
+    <Compile Include="Framework\ClrAttribute.fs" />
     <Compile Include="Framework\ClrElement.fs" />
     <Compile Include="Framework\ClrMetadataProvider.fs" />
     <Compile Include="Framework\Transformer.fs" />

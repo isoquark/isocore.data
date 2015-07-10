@@ -273,9 +273,9 @@ module ClrMetadataProvider =
             let m = typeof<Literals.Dummy>.DeclaringType.TypeName |> provider.FindType
             m.Fields |> Claim.seqCount 2
             m.Fields.[0].IsLiteral |> Claim.isTrue
-            m.Fields.[0].LiteralValue |> Option.get |> Claim.equal (Literals.Literal1.ToString())
+            m.Fields.[0].LiteralValue |> Option.get |> Claim.equal (Literals.Literal1 :> obj)
             m.Fields.[1].IsLiteral |> Claim.isTrue
-            m.Fields.[1].LiteralValue |> Option.get |> Claim.equal (Literals.Literal2.ToString())
+            m.Fields.[1].LiteralValue |> Option.get |> Claim.equal (Literals.Literal2 :> obj)
 
 
         [<Fact>]

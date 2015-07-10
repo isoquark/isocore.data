@@ -16,7 +16,41 @@ module Type =
             module internal E = 
                 type internal F = class end
     
+    type Class1() =
+        //This will never show up in the IL
+        let LetValue1 = 3
+        //This will never show up in the IL
+        [<Literal>]
+        let LetValue2 = 4u
+        //This will show up as a field that gets initialized in the constructor
+        let message1 = "hello"
+
+        [<Literal>]
+        let message2 = "world"
+
+        //auto-implemented property
+        member val public Property1 = 5
+        //auto-implemented property
+        member val private Property2 = 6u
+        //auto-implemented property
+        member val internal Property3 = 6L
+
+        member this.Property4 = message1
+
+        member this.Property5 = message2
+
+        [<DefaultValue>]
+        val mutable public Field1 : int
+
+    type Enum1 =
+        | Field01 = 1
+        | Field02 = 2
+
+    type Enum2 =
+        | Field01 = 1u
+        | Field02 = 2u 
     
+
     type LogicTests(ctx,log) =
         inherit ProjectTestContainer(ctx,log)
         [<Fact>]
@@ -24,6 +58,7 @@ module Type =
             let actualA = typeof<A.B>.DeclaringType |> Type.getNestedTypes
             let expectA = [typeof<A.B>; typeof<A.C.D>.DeclaringType] 
             actualA |> Claim.equal expectA
+            
 
         [<Fact>]
         let ``Loaded type from name``() =
@@ -72,6 +107,23 @@ module Type =
             actual.[0] |> Claim.equal expect.[0]
             actual.[1] |> Claim.equal expect.[1]
             actual.[2] |> Claim.equal expect.[2]
+       
+        
+        [<Fact>]
+        let ``Discovered class field facets``() =
+            let f1 = fieldinfo<@fun (t : Class1) -> t.Field1@>
+            f1.Facets |> Claim.equal FieldFacetSet.Blank
 
+        [<Fact>]
+        let ``Discovered enumeration field facets``() =
+            let fields = fields<Enum1>            
+           
+            let f1 = fields |> List.find(fun f -> f.MemberName = Enum1.Field01.MemberName)
+            let f1FacetsExpect = {FieldFacetSet.Blank with IsStatic = true; IsLiteral = true; HasDefault = true} 
+            let f1FacetsActual = f1.Facets
+            Claim.equal f1FacetsExpect f1FacetsActual
+            
+            
+            
 
 

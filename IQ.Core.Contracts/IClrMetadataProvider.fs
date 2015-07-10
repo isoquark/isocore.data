@@ -11,14 +11,23 @@ open Microsoft.FSharp.Quotations.Patterns
 /// Classifies native CLR metadata elements
 /// </summary>
 type ReflectedKind =
+    /// Identifies an Assembly
     | Assembly = 1
+    /// Identifies a Type
     | Type = 2
+    /// Identifies a Method
     | Method = 3
+    /// Identifies a Property
     | Property = 4
+    /// Identifies a Field
     | Field = 5
+    /// Identifies a Constructor
     | Constructor = 6
+    /// Identifies an Event
     | Event = 7
+    /// Identifies a Method Parameter
     | Parameter = 8
+    /// Identifies a Union Case
     | UnionCase = 9
 
 /// <summary>
@@ -273,8 +282,8 @@ type ClrField = {
     DeclaringType : ClrTypeName   
     /// Specifies whether the field is a literal value
     IsLiteral : bool
-    /// The value of the literal encoded as a string, if applicable
-    LiteralValue : string option        
+    /// The value of the literal
+    LiteralValue : obj option        
 }
 
 /// <summary>

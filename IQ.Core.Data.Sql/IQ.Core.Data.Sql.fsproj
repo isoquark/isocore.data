@@ -64,7 +64,6 @@
     <Compile Include="Routine.fs" />
     <Compile Include="Tabular.fs" />
     <Compile Include="SqlDataStore.fs" />
-    <Compile Include="SqlServices.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

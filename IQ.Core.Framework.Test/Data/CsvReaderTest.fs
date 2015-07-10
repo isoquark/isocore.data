@@ -93,7 +93,7 @@ module CsvReader =
         [<Fact>]
         let ``Desribed CSV file - no attribute overrides``() =
             let resname = resname<CsvTestCase1>
-            let path = thisAssembly() |> Assembly.writeTextResource resname (TestContext.getTempDir())
+            let path = thisAssembly() |> Assembly.writeTextResource resname (TestContext.GetTempDir())
             let format = CsvReader.getDefaultFormat()
             let actual = path |> CsvReader.describeFile format
             let tinfo = typeinfo<CsvTestCase1>
@@ -109,7 +109,7 @@ module CsvReader =
                
         [<Fact; Benchmark>]
         let ``Benchmark - CsvReader 2A``() =
-            let path = thisAssembly() |> Assembly.writeTextResource "CsvTestCase2.csv" (TestContext.getTempDir())
+            let path = thisAssembly() |> Assembly.writeTextResource "CsvTestCase2.csv" (TestContext.GetTempDir())
             let format = CsvReader.getDefaultFormat()
             let  description = path |> CsvReader.describeFile format
             let f() =
@@ -119,7 +119,7 @@ module CsvReader =
 
         [<Fact; Benchmark>]
         let ``Benchmark - CsvReader 2B``() =
-            let path = thisAssembly() |> Assembly.writeTextResource "CsvTestCase2.csv" (TestContext.getTempDir())
+            let path = thisAssembly() |> Assembly.writeTextResource "CsvTestCase2.csv" (TestContext.GetTempDir())
             let format = CsvReader.getDefaultFormat()
             let  description = path |> CsvReader.describeFile format
             let f() =

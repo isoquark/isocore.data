@@ -235,6 +235,8 @@ module Lang =
         member this.Item key =
             this.IndexedValues |> List.find(fun (x,y) -> x = key) |> snd
 
+    module Bits =
+        let inline hasFlag flag value  = value &&& flag = flag
 
 
     module ValueIndex =
