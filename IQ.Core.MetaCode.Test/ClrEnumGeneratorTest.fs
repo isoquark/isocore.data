@@ -2,6 +2,12 @@
 
 open System
 open System.Reflection
+open System.Reflection.Emit
+open System.Collections
+
+open FSharp.Reflection
+
+
 
 open IQ.Core.Framework
 open IQ.Core.TestFramework
@@ -11,14 +17,12 @@ open IQ.Core.MetaCode
 open IQ.Core.MetaCode.Test.Prototypes
 
 module ClrEnumGenerator =
-    
-    module ClrTypeInfo =
-        let stripReflectedElement (i : ClrTypeInfo) =
-            {i with ReflectedElement = None}
+
+        
 
     type LogicTests(ctx,log) =
         inherit ProjectTestContainer(ctx,log)
-        
+                 
         let describeAssembly simpleName types =
                 {
                     Name = ClrAssemblyName(simpleName, None)
@@ -28,77 +32,34 @@ module ClrEnumGenerator =
                     Attributes = []
                 }
 
-
+        let generateAssembly types =
+            let simpleName = "IQ.MetaCode.Test.Prototypes.Enums"
+            let config = {GenerationConfig.OutputDirectory = ctx.OutputDirectory}
+            describeAssembly simpleName types |> ClrAssemblyGenerator.generate config            
+            
+        let verifyEnum (expect : ClrType) (actual : ClrType) =
+            actual.Name.FullName |> Claim.equal expect.Name.FullName
+            actual.Fields.Length |> Claim.equal expect.Fields.Length
+            match (expect,actual) with
+            | (EnumType(input), EnumType(output)) ->
+                output.NumericType |> Claim.equal input.NumericType
+            | _ -> 
+                Claim.assertFalse()                                              
             
 
-//        [<Fact>]
-//        let ``Generated Enum1``() =
-//            let expect = typeinfo<Enum1> 
-//            let actual = [expect] |> describeAssembly "GeneratedEnum1" 
-//                                  |> ClrAssemblyGenerator.generate 
-//                                  |> Assembly.LoadFrom
-//                                  |> fun x -> x.GetTypes() 
-//                                  |> Array.find(fun x -> x.TypeName.FullName = expect.Name.FullName)
-//                                  |> ClrType.describe expect.Position                   
-//            
-//            let attribs = typeof<Enum1>.GetCustomAttributes()
-//            
-//            
-//            let info1 = expect.Info |> ClrTypeInfo.stripReflectedElement
-//            let info2 = actual.Info |> ClrTypeInfo.stripReflectedElement
-//            let same = info1 = info2
-//            
-//            ()
-        
+
         [<Fact>]
-        let ``Generated Enum - MyEnum``() =
-
-            let numericType = typeof<int32>.TypeName
-            let enumTypeName = ClrTypeName("MyEnum", Some("SomeNamespace.MyEnum"), None)
-            let literalA = 
-                {
-                    ClrField.Name = ClrMemberName("LiteralA")
-                    Access = ClrAccessKind.Public
-                    ReflectedElement = None
-                    Position = 0
-                    Attributes = []
-                    IsStatic = true
-                    FieldType = numericType
-                    DeclaringType = enumTypeName
-                    IsLiteral = true
-                    LiteralValue = Some(10 :> obj)
-                } |> FieldMember
+        let ``Generated Enums``() =
+            let inputs = [typeinfo<Enum1>; typeinfo<Enum2>]
+            let assembly = generateAssembly inputs
+            let provider = ClrMetadataProvider.get {Assemblies = [assembly.AssemblyName]}
+            let outputs = inputs |> List.map(fun x -> x, x.Name |> provider.FindType ) 
+            outputs |> List.iter(fun (expect, actual) -> verifyEnum expect actual)
             
-
-            let info = 
-                {
-                    ClrTypeInfo.Name = enumTypeName
-                    Position = 1
-                    ReflectedElement = None
-                    DeclaringType = None
-                    DeclaredTypes = []
-                    Kind = ClrTypeKind.Enum
-                    IsOptionType = false
-                    Members = [literalA]
-                    Access = ClrAccessKind.Public
-                    IsStatic = true
-                    Attributes = []
-                    ItemValueType = enumTypeName
-                }
-                        
-            let assembly = 
-                {
-                    Name = ClrAssemblyName("MetaCodeTest", None)
-                    ReflectedElement = None
-                    Position = 0
-                    Types = [ClrEnum(numericType, info) |> EnumType]
-                    Attributes = []
-                }
-
-            let result = assembly |> ClrAssemblyGenerator.generate |> Assembly.LoadFrom
+           
+        
             
-            result.GetTypes() |> Array.exists(fun x -> x.TypeName.FullName = enumTypeName.FullName) |> Claim.isTrue
-
+                
+    
             
-            ()
 

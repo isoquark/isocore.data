@@ -594,14 +594,6 @@ module Member =
         | :? ConstructorInfo -> ClrMemberKind.Constructor
         | _ -> nosupport()
 
-    /// <summary>
-    /// Retrieves an arbitrary number of attributes of the same type applied to a member
-    /// </summary>
-    /// <param name="subject">The type to examine</param>
-    let getAttributesT<'T when 'T :> Attribute>(subject : MemberInfo) =
-        [for a in Attribute.GetCustomAttributes(subject, typeof<'T>) -> a :?> 'T]
-
-
 
 /// <summary>
 /// Defines <see cref="System.Reflection.MethodBase"/> helpers
@@ -631,31 +623,11 @@ module MethodBase =
     
 
 /// <summary>
-/// Defines <see cref="System.Reflection.MethodInfo"/> helpers
+/// Defines <see cref="System.Reflection.FieldInfo"/> utilities
 /// </summary>
-module MethodInfo =
-    /// <summary>
-    /// Retrieves an attribute applied to a method return, if present
-    /// </summary>
-    /// <param name="subject">The method to examine</param>
-    let getReturnAttribute<'T when 'T :> Attribute>(subject : MethodInfo) =
-        let attribs = subject.ReturnTypeCustomAttributes.GetCustomAttributes(typeof<'T>, true)
-        if attribs.Length <> 0 then
-            attribs.[0] :?> 'T |> Some
-        else
-            None
-
-    /// <summary>
-    /// Retrieves attributes applied to a method reutrn
-    /// </summary>
-    /// <param name="subject">The method to examine</param>
-    let getReturnAttributes (subject : MethodInfo) =
-        subject.ReturnTypeCustomAttributes.GetCustomAttributes(true) |> Array.map(fun x -> x :?> Attribute) |> List.ofArray
-
-
 module FieldInfo =
     /// <summary>
-    /// Gets the methods access specificer
+    /// Gets the methods access specifier
     /// </summary>
     /// <param name="m"></param>
     let getAccess (m : FieldInfo) =
@@ -676,8 +648,6 @@ module FieldInfo =
         else
             nosupport()
 
-
-
     let getFacets (f : FieldInfo) =
         {
             FieldFacetSet.HasDefault = FieldAttributes.HasDefault |> f.Attributes.HasFlag
@@ -688,6 +658,9 @@ module FieldInfo =
         }
 
 
+/// <summary>
+/// Defines <see cref="System.Reflection.ConstructorInfo"/> utilities
+/// </summary>
 module ConstructorInfo = 
     /// <summary>
     /// Gets the methods access specificer

@@ -57,10 +57,10 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
-    <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="TestConfiguration.fs" />
     <Content Include="packages.config" />
     <Content Include="app.config" />
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="TestConfiguration.fs" />
     <Compile Include="Prototypes.fs" />
     <Compile Include="ClrEnumGeneratorTest.fs" />
   </ItemGroup>

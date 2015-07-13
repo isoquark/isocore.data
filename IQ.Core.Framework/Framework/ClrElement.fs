@@ -230,6 +230,7 @@ module internal ClrType =
                 IsStatic = t.IsAbstract && t.IsSealed
                 Attributes = t.UserAttributions
                 ItemValueType = t.ItemValueType.TypeName
+                Namespace = t.Namespace
             }
         match t.Kind with
             /// <summary>

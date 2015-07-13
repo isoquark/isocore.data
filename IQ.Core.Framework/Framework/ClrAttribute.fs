@@ -13,17 +13,19 @@ module internal ClrAttribute =
     let private filter (exclusions : Type seq) (input : Attribute seq) =
         input |> Seq.filter(fun a -> a.GetType() |> exclusions.Contains |> not)
 
+
+    let private exclusions = 
+        [
+            typeof<CompilationMappingAttribute> 
+            typeof<DebuggerNonUserCodeAttribute> 
+            typeof<CompilerGeneratedAttribute>
+            typeof<DebuggerBrowsableAttribute>
+        ]
+
     //The intent here is to exclude attributes emitted by the compiler
     //Of course, this will not always work because any attributes filtered
     //out could be manually applied by a developer...
     let getUserAttributes( reflectedElement : obj) =        
-        let exclusions = 
-            [
-                typeof<CompilationMappingAttribute> 
-                typeof<DebuggerNonUserCodeAttribute> 
-                typeof<CompilerGeneratedAttribute>
-                typeof<DebuggerBrowsableAttribute>
-             ]
         
         match reflectedElement with
         | :? Assembly as x -> 
@@ -42,6 +44,9 @@ module internal ClrAttribute =
             Attribute.GetCustomAttributes(x) |> filter exclusions 
         | _ -> nosupport()
         |> List.ofSeq
+
+    let getUserReturnAttributes(m : MethodInfo) =
+        m.ReturnTypeCustomAttributes.GetCustomAttributes(false).Cast<Attribute>() |> filter exclusions |> List.ofSeq
 
 module ClrAttribution =
     let tryFind (attribType  : Type) (attributions : ClrAttribution seq)= 
@@ -88,7 +93,6 @@ module internal ClrAttributionExtensions =
         member this.UserAttributions = 
             this |> ClrAttribute.getUserAttributes |> ClrAttribution.create (this.MemberName |> MemberElementName)
                
-
     type PropertyInfo
     with
 
@@ -106,8 +110,10 @@ module internal ClrAttributionExtensions =
 
     type ParameterInfo
     with
-        member this.UserAttributions = this |> ClrAttribute.getUserAttributes |> ClrAttribution.create this.ElementName
+        member this.UserAttributions = 
+            this |> ClrAttribute.getUserAttributes |> ClrAttribution.create this.ElementName
 
     type MethodInfo
     with
-        member this.UserReturnAttributions = this |> MethodInfo.getReturnAttributes |> ClrAttribution.create this.ElementName
+        member this.UserReturnAttributions = 
+            this |> ClrAttribute.getUserReturnAttributes |> ClrAttribution.create this.ElementName

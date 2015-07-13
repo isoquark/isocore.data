@@ -233,9 +233,14 @@ module ClrDescriptionExtensions =
                             |> List.map(fun x -> x.Name, x) 
                             |> Map.ofList               
     /// <summary>
-    /// Describes the type identified by a type prameter
+    /// Describes the type identified by type prameter
     /// </summary>
     let typeinfo<'T> = typeof<'T>.TypeName |> ClrMetadata().FindType
+
+    /// <summary>
+    /// Describes the type identified by type prameter
+    /// </summary>
+    let enuminfo<'T> = match typeinfo<'T> with | EnumType(x) -> x | _ -> ArgumentException("Not an enumeration") |> raise
 
     /// <summary>
     /// Gets the methods defined by a type

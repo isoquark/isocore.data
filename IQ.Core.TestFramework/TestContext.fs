@@ -13,6 +13,7 @@ type ITestContext =
     abstract ConfigurationManager : IConfigurationManager
     abstract AppContext : IAppContext
     abstract ExecutionLog : ISqlDataStore
+    abstract OutputDirectory : string
 
 [<AbstractClass>]
 type TestContext(assemblyRoot : Assembly, register:ICompositionRegistry->unit) = 
@@ -27,6 +28,7 @@ type TestContext(assemblyRoot : Assembly, register:ICompositionRegistry->unit) =
     let root = compose()
     let context = root.CreateContext()
     let configManager = context.Resolve<IConfigurationManager>()
+    let outdir = Path.Combine(@"C:\Temp\IQ\Tests\", assemblyRoot.SimpleName)
         
     let getSqlDataStore(): ISqlDataStore =
         ConfigSettingNames.LogConnectionString 
@@ -36,12 +38,17 @@ type TestContext(assemblyRoot : Assembly, register:ICompositionRegistry->unit) =
 
     let store = getSqlDataStore()
         
+    do
+        if Directory.Exists(outdir) |> not then Directory.CreateDirectory(outdir) |>ignore
+
     new (assemblyRoot:Assembly) =
         new TestContext(assemblyRoot, fun _ -> ())
+
                  
     member this.ConfigurationManager = configManager
     member this.AppContext = context
     member this.SqlDataStore = store
+    member this.OutputDirectory = outdir
                                                    
             
     interface IDisposable with
@@ -53,6 +60,7 @@ type TestContext(assemblyRoot : Assembly, register:ICompositionRegistry->unit) =
         member this.ConfigurationManager = configManager
         member this.AppContext = context
         member this.ExecutionLog = store
+        member this.OutputDirectory = outdir
 
 
     static member inline GetTempDir() =

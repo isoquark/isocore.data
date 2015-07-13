@@ -428,6 +428,8 @@ type ClrTypeInfo = {
     /// the Name whenever dealing with options, collections and other
     /// parametrized types
     ItemValueType : ClrTypeName
+    /// The namespace in which the type is defined
+    Namespace :string
 
 }
 
