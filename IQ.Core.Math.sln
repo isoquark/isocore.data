@@ -1,0 +1,92 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.22823.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Math", "IQ.Core.Math\IQ.Core.Math.fsproj", "{D01A6D75-53F1-4814-BE92-5F69113AD1B9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IQ.Core.Math.Cpp", "IQ.Core.Math.Cpp\IQ.Core.Math.Cpp.vcxproj", "{0102B994-89C7-4BA0-8FEE-095210F850E5}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Framework", "IQ.Core.Framework\IQ.Core.Framework.fsproj", "{8E2497E0-941B-4CA7-AB78-4CA15291C56A}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Math.Test", "IQ.Core.Math.Test\IQ.Core.Math.Test.fsproj", "{5F254826-9D3F-478A-9741-4649088D3F72}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Debug|x64.Build.0 = Debug|Any CPU
+		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Debug|x86.Build.0 = Debug|Any CPU
+		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Release|x64.ActiveCfg = Release|Any CPU
+		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Release|x64.Build.0 = Release|Any CPU
+		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Release|x86.ActiveCfg = Release|Any CPU
+		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Release|x86.Build.0 = Release|Any CPU
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|x64.ActiveCfg = Debug|x64
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|x64.Build.0 = Debug|x64
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|x86.ActiveCfg = Debug|Win32
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|x86.Build.0 = Debug|Win32
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|Any CPU.ActiveCfg = Release|Win32
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x64.ActiveCfg = Release|x64
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x64.Build.0 = Release|x64
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x86.ActiveCfg = Release|Win32
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x86.Build.0 = Release|Win32
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Debug|x64.Build.0 = Debug|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Debug|x86.Build.0 = Debug|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Release|x64.ActiveCfg = Release|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Release|x64.Build.0 = Release|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Release|x86.ActiveCfg = Release|Any CPU
+		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Release|x86.Build.0 = Release|Any CPU
+		{5F254826-9D3F-478A-9741-4649088D3F72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F254826-9D3F-478A-9741-4649088D3F72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F254826-9D3F-478A-9741-4649088D3F72}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{5F254826-9D3F-478A-9741-4649088D3F72}.Debug|x64.Build.0 = Debug|Any CPU
+		{5F254826-9D3F-478A-9741-4649088D3F72}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{5F254826-9D3F-478A-9741-4649088D3F72}.Debug|x86.Build.0 = Debug|Any CPU
+		{5F254826-9D3F-478A-9741-4649088D3F72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F254826-9D3F-478A-9741-4649088D3F72}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F254826-9D3F-478A-9741-4649088D3F72}.Release|x64.ActiveCfg = Release|Any CPU
+		{5F254826-9D3F-478A-9741-4649088D3F72}.Release|x64.Build.0 = Release|Any CPU
+		{5F254826-9D3F-478A-9741-4649088D3F72}.Release|x86.ActiveCfg = Release|Any CPU
+		{5F254826-9D3F-478A-9741-4649088D3F72}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 5
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://isoquark.visualstudio.com/defaultcollection
+		SccProjectUniqueName0 = IQ.Core.Math\\IQ.Core.Math.fsproj
+		SccProjectName0 = IQ.Core.Math
+		SccLocalPath0 = IQ.Core.Math
+		SccProjectUniqueName1 = IQ.Core.Math.Cpp\\IQ.Core.Math.Cpp.vcxproj
+		SccProjectName1 = IQ.Core.Math.Cpp
+		SccLocalPath1 = IQ.Core.Math.Cpp
+		SccProjectUniqueName2 = IQ.Core.Framework\\IQ.Core.Framework.fsproj
+		SccProjectName2 = IQ.Core.Framework
+		SccLocalPath2 = IQ.Core.Framework
+		SccProjectUniqueName3 = IQ.Core.Math.Test\\IQ.Core.Math.Test.fsproj
+		SccProjectName3 = IQ.Core.Math.Test
+		SccLocalPath3 = IQ.Core.Math.Test
+		SccLocalPath4 = .
+	EndGlobalSection
+EndGlobal
