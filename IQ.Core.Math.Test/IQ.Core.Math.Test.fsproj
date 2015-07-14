@@ -65,6 +65,7 @@
     <Compile Include="CalculatorTest.fs" />
     <Compile Include="DistributionTest.fs" />
     <Compile Include="VectorCalculatorTest.fs" />
+    <Compile Include="ExpressionBuilderTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MathNet.Numerics">

@@ -64,6 +64,7 @@
     <Compile Include="ISequenceProvider.fs" />
     <Compile Include="IClrMetadataProvider.fs" />
     <Compile Include="IDataProxyMetadataProvider.fs" />
+    <Compile Include="Delegates.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

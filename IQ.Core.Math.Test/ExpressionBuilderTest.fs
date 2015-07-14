@@ -1,10 +1,11 @@
-﻿namespace IQ.Core.Framework.Test
+﻿namespace IQ.Core.Math.Test
 
 open System
 open System.Collections.Generic
 
 open System.Linq.Expressions
 
+open IQ.Core.Math
 
 //Note, this is just for testing - would be far too slow otherwise!
 [<AutoOpen>]

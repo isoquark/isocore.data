@@ -261,22 +261,5 @@ module Lang =
             | Some(x) -> x |> snd |> Some
             | None -> None
 
-    type BinaryFunc<'T,'TResult> = Func<'T,'T,'TResult>
-    type BinaryFunc<'T> = BinaryFunc<'T,'T>
-
-    type BinaryPredicate<'T0,'T1> = Func<'T0,'T1,bool>
-    type BinaryPredicate<'T> = BinaryPredicate<'T,'T>
-
-    type UnaryFunc<'T,'TResult> = Func<'T,'TResult>
-    type UnaryFunc<'T> = Func<'T,'T>
 
 
-    //See http://blogs.msdn.com/b/jaredpar/archive/2010/07/27/converting-system-func-lt-t1-tn-gt-to-fsharpfunc-lt-t-tresult-gt.aspx
-    type FSharpFunc() = 
-        static member ToFSharpFunc<'a,'b> (func:System.Converter<'a,'b>) = fun x -> func.Invoke(x)
-        static member ToFSharpFunc<'a,'b> (func:System.Func<'a,'b>) = fun x -> func.Invoke(x)
-        static member ToFSharpFunc<'a,'b,'c> (func:System.Func<'a,'b,'c>) = fun x y -> func.Invoke(x,y)
-        static member ToFSharpFunc<'a,'b,'c,'d> (func:System.Func<'a,'b,'c,'d>) = fun x y z -> func.Invoke(x,y,z)        
-        static member Create<'a,'b> (func:System.Func<'a,'b>) = FSharpFunc.ToFSharpFunc func
-        static member Create<'a,'b,'c> (func:System.Func<'a,'b,'c>) = FSharpFunc.ToFSharpFunc func
-        static member Create<'a,'b,'c,'d> (func:System.Func<'a,'b,'c,'d>) = FSharpFunc.ToFSharpFunc func

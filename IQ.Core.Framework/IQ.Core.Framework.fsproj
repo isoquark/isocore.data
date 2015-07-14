@@ -70,7 +70,6 @@
     <Compile Include="Framework\Txt.fs" />
     <Compile Include="Framework\Configuration.fs" />
     <Compile Include="Framework\ClrUtilities.fs" />
-    <Compile Include="Framework\ExpressionBuilder.fs" />
     <Compile Include="Framework\CompositionRoot.fs" />
     <Compile Include="Framework\TransformerVocabulary.fs" />
     <Compile Include="Framework\Time.fs" />

@@ -78,7 +78,6 @@
     <Compile Include="LangTest.fs" />
     <Compile Include="TxtTest.fs" />
     <Compile Include="ClrUtilitiesTest.fs" />
-    <Compile Include="ExpressionBuilderTest.fs" />
     <Compile Include="TransformerTest.fs" />
     <Compile Include="TimeTest.fs" />
     <Compile Include="ClrElementTest.fs" />
