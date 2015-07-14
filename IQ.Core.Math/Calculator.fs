@@ -5,36 +5,55 @@ open System.Linq
 open System.Linq.Expressions
 open System.Reflection
 open System.Collections
+open System.Numerics
 
 open IQ.Core.Framework
 
 module CalcOps = 
     type Ops<'T>() =
         static member Init() = ()
-        static member val Add : BinaryFunc<'T> = ExpressionBuilder.binaryLambda Expression.Add |> ExpressionBuilder.compile 
-        static member val AddChecked : BinaryFunc<'T> = ExpressionBuilder.binaryLambda Expression.AddChecked |> ExpressionBuilder.compile    
+        static member val Add : BinaryFunc<'T> = 
+            ExpressionBuilder.binaryLambda Expression.Add |> ExpressionBuilder.compile 
+        static member val AddChecked : BinaryFunc<'T> = 
+            ExpressionBuilder.binaryLambda Expression.AddChecked |> ExpressionBuilder.compile    
         
-        static member val Subtract : BinaryFunc<'T> = ExpressionBuilder.binaryLambda Expression.Subtract |> ExpressionBuilder.compile 
-        static member val SubtractChecked : BinaryFunc<'T> = ExpressionBuilder.binaryLambda Expression.SubtractChecked |> ExpressionBuilder.compile 
+        static member val Subtract : BinaryFunc<'T> = 
+            ExpressionBuilder.binaryLambda Expression.Subtract |> ExpressionBuilder.compile 
+        static member val SubtractChecked : BinaryFunc<'T> = 
+            ExpressionBuilder.binaryLambda Expression.SubtractChecked |> ExpressionBuilder.compile 
         
-        static member val Multiply  : BinaryFunc<'T> = ExpressionBuilder.binaryLambda Expression.Multiply |> ExpressionBuilder.compile         
-        static member val MultiplyChecked : BinaryFunc<'T> = ExpressionBuilder.binaryLambda Expression.MultiplyChecked |> ExpressionBuilder.compile 
+        static member val Multiply  : BinaryFunc<'T> = 
+            ExpressionBuilder.binaryLambda Expression.Multiply |> ExpressionBuilder.compile         
+        static member val MultiplyChecked : BinaryFunc<'T> = 
+            ExpressionBuilder.binaryLambda Expression.MultiplyChecked |> ExpressionBuilder.compile 
         
-        static member val Divide : BinaryFunc<'T> = ExpressionBuilder.binaryLambda Expression.Divide |> ExpressionBuilder.compile 
-        static member val Modulo : BinaryFunc<'T> = ExpressionBuilder.binaryLambda Expression.Modulo |> ExpressionBuilder.compile 
+        static member val Divide : BinaryFunc<'T> = 
+            ExpressionBuilder.binaryLambda Expression.Divide |> ExpressionBuilder.compile 
+        static member val Modulo : BinaryFunc<'T> = 
+            ExpressionBuilder.binaryLambda Expression.Modulo |> ExpressionBuilder.compile 
         
-        static member val Increment : UnaryFunc<'T> = ExpressionBuilder.unaryLambda Expression.Increment |> ExpressionBuilder.compile 
-        static member val Decrement : UnaryFunc<'T> = ExpressionBuilder.unaryLambda Expression.Decrement |> ExpressionBuilder.compile 
+        static member val Increment : UnaryFunc<'T> = 
+            ExpressionBuilder.unaryLambda Expression.Increment |> ExpressionBuilder.compile 
+        static member val Decrement : UnaryFunc<'T> = 
+            ExpressionBuilder.unaryLambda Expression.Decrement |> ExpressionBuilder.compile 
         
-        static member val Equal : BinaryPredicate<'T> = ExpressionBuilder.binaryLambda Expression.Equal |> ExpressionBuilder.compile 
-        static member val LessThan : BinaryPredicate<'T> = ExpressionBuilder.binaryLambda Expression.LessThan |> ExpressionBuilder.compile 
-        static member val LessThanOrEqual : BinaryPredicate<'T> = ExpressionBuilder.binaryLambda Expression.LessThanOrEqual |> ExpressionBuilder.compile 
-        static member val GreaterThan : BinaryPredicate<'T> = ExpressionBuilder.binaryLambda Expression.GreaterThan |> ExpressionBuilder.compile 
-        static member val GreaterThanOrEqual : BinaryPredicate<'T> = ExpressionBuilder.binaryLambda Expression.GreaterThanOrEqual |> ExpressionBuilder.compile 
+        static member val Equal : BinaryPredicate<'T> = 
+            ExpressionBuilder.binaryLambda Expression.Equal |> ExpressionBuilder.compile 
+        static member val LessThan : BinaryPredicate<'T> = 
+            ExpressionBuilder.binaryLambda Expression.LessThan |> ExpressionBuilder.compile 
+        static member val LessThanOrEqual : BinaryPredicate<'T> = 
+            ExpressionBuilder.binaryLambda Expression.LessThanOrEqual |> ExpressionBuilder.compile 
+        static member val GreaterThan : BinaryPredicate<'T> = 
+            ExpressionBuilder.binaryLambda Expression.GreaterThan |> ExpressionBuilder.compile 
+        static member val GreaterThanOrEqual : BinaryPredicate<'T> = 
+            ExpressionBuilder.binaryLambda Expression.GreaterThanOrEqual |> ExpressionBuilder.compile 
         
-        static member val Zero : 'T = Unchecked.defaultof<'T>
-        static member val MaxValue : 'T = typeof<'T>.GetField("MaxValue", BindingFlags.Public ||| BindingFlags.Static).GetValue(null) :?> 'T    
-        static member val MinValue : 'T = typeof<'T>.GetField("MinValue", BindingFlags.Public ||| BindingFlags.Static).GetValue(null) :?> 'T    
+        static member val Zero : 'T = 
+            Unchecked.defaultof<'T>
+        static member val MaxValue : 'T = 
+            typeof<'T>.GetField("MaxValue", BindingFlags.Public ||| BindingFlags.Static).GetValue(null) :?> 'T    
+        static member val MinValue : 'T = 
+            typeof<'T>.GetField("MinValue", BindingFlags.Public ||| BindingFlags.Static).GetValue(null) :?> 'T    
 
 
     let inline add x y =  Ops.Add.Invoke(x,y)
@@ -219,6 +238,31 @@ type Number<'T>(value : 'T) =
     struct
         member this.Value = value
         static member val Ops : ICalculator<'T> = Calculator.get()          
+        static member MinValue : 'T = Ops.MinValue
+        static member MaxValue : 'T = Ops.MaxValue
+        static member Zero : 'T = Ops.Zero
         static member inline (+) (x : Number<_>, y: Number<_>) = Number<_>.Ops.Add(x.Value, y.Value) |> Number<_>           
         static member inline (-) (x : Number<_>, y: Number<_>) = Number<_>.Ops.Subtract(x.Value, y.Value) |> Number<_>           
     end
+
+module VectorCaclulator = 
+    let multiply (x : Vector<'T>) (y : Vector<'T>) =
+        let (Vector xcomp) = x
+        let (Vector ycomp) = y
+        let result = Array.zeroCreate<'T>(xcomp.Length)
+        for i in 0..xcomp.Length-1 do
+            result.[i] <- CalcOps.multiply xcomp.[i] ycomp.[i]
+        result |> Vector
+
+    let sumComponents (x : Vector<'T>) =
+        let (Vector xcomp) = x
+        let mutable result = Number<'T>.Zero
+        for i in 0..xcomp.Length-1 do
+            result <-  CalcOps.add result xcomp.[i]
+        result
+        
+    let dot (x : Vector<_>) (y : Vector<_>) =
+        multiply x y |> sumComponents
+    
+        
+        

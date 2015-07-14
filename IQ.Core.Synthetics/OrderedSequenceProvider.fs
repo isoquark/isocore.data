@@ -187,7 +187,6 @@ module OrderedSequenceProvider =
     let private createSequence (config : OrderedSequenceConfig) =
         match config.ItemDataKind with
         | DataKind.UInt8 ->
-            //UInt8Sequence(config |> toGenericConfig<uint8>) :> ISequenceProvider       
             config |> getProvider<uint8> :> ISequenceProvider
         | DataKind.UInt16 ->
             config |> getProvider<uint16> :> ISequenceProvider
@@ -203,7 +202,6 @@ module OrderedSequenceProvider =
             config |> getProvider<int32> :> ISequenceProvider
         | DataKind.Int64 ->
             Int64Sequence(config |> toGenericConfig<int64>) :> ISequenceProvider       
-            //config |> getProvider<int64> :> ISequenceProvider
         | DataKind.DateTime ->
             nosupport()
         | DataKind.TimeOfDay ->

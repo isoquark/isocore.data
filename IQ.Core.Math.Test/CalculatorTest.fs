@@ -10,7 +10,7 @@ open IQ.Core.Math
 
 open CalcOps
 
-module CalculatorTests =
+module Calculator =
     
     let addBaseline(items : ('T*'T) seq) =
         if typeof<'T> = typeof<uint8> then

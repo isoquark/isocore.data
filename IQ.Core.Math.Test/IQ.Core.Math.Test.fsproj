@@ -30,6 +30,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
     <DocumentationFile>bin\Debug\IQ.Core.Math.Test.XML</DocumentationFile>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -62,6 +63,8 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="TestConfiguration.fs" />
     <Compile Include="CalculatorTest.fs" />
+    <Compile Include="DistributionTest.fs" />
+    <Compile Include="VectorCalculatorTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IQ.Core.Data.Sql\IQ.Core.Data.Sql.fsproj">
@@ -69,6 +72,10 @@
       <Project>{29aedcf6-3187-4c89-aa30-d3d60a8e3379}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <Reference Include="MathNet.Numerics">
+      <HintPath>..\packages\MathNet.Numerics.3.7.0\lib\net40\MathNet.Numerics.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
@@ -84,6 +91,11 @@
     <ProjectReference Include="..\IQ.Core.Framework\IQ.Core.Framework.fsproj">
       <Name>IQ.Core.Framework</Name>
       <Project>{8e2497e0-941b-4ca7-ab78-4ca15291c56a}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\IQ.Core.Math.Cpp\IQ.Core.Math.Cpp.vcxproj">
+      <Name>IQ.Core.Math.Cpp</Name>
+      <Project>{0102b994-89c7-4ba0-8fee-095210f850e5}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Math\IQ.Core.Math.fsproj">

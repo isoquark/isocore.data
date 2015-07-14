@@ -1,5 +1,10 @@
 ﻿namespace IQ.Core.Math
 
+open System
+open System.Numerics
+
+type Vector<'T> = Vector of Components : 'T[]
+
 type ICalculator =
     abstract Add:'T*'T->'T
     abstract Subtract:'T*'T->'T
@@ -29,3 +34,8 @@ type ICalculator<'T> =
     abstract Zero:'T
     abstract MinValue : 'T
     abstract MaxValue : 'T
+
+type IVectorCalculator<'T when 'T:(new:unit->'T) and 'T : struct and 'T :> ValueType> =
+    abstract Dot:Vector<'T>*Vector<'T>->'T
+
+
