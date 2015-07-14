@@ -35,7 +35,9 @@ type ICalculator<'T> =
     abstract MinValue : 'T
     abstract MaxValue : 'T
 
-type IVectorCalculator<'T when 'T:(new:unit->'T) and 'T : struct and 'T :> ValueType> =
+type IVectorCalculator<'T> =
     abstract Dot:Vector<'T>*Vector<'T>->'T
 
+//type IVectorCalculator<'T when 'T:(new:unit->'T) and 'T : struct and 'T :> ValueType> =
+//    abstract Dot:Vector<'T>*Vector<'T>->'T
 

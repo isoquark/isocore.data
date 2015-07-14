@@ -245,8 +245,8 @@ type Number<'T>(value : 'T) =
         static member inline (-) (x : Number<_>, y: Number<_>) = Number<_>.Ops.Subtract(x.Value, y.Value) |> Number<_>           
     end
 
-module VectorCaclulator = 
-    let multiply (x : Vector<'T>) (y : Vector<'T>) =
+module VectorCalcs = 
+    let inline multiply (x : Vector<'T>) (y : Vector<'T>) =
         let (Vector xcomp) = x
         let (Vector ycomp) = y
         let result = Array.zeroCreate<'T>(xcomp.Length)
@@ -254,14 +254,14 @@ module VectorCaclulator =
             result.[i] <- CalcOps.multiply xcomp.[i] ycomp.[i]
         result |> Vector
 
-    let sumComponents (x : Vector<'T>) =
+    let inline sumComponents (x : Vector<'T>) =
         let (Vector xcomp) = x
         let mutable result = Number<'T>.Zero
         for i in 0..xcomp.Length-1 do
             result <-  CalcOps.add result xcomp.[i]
         result
         
-    let dot (x : Vector<_>) (y : Vector<_>) =
+    let inline dot (x : Vector<_>) (y : Vector<_>) =
         multiply x y |> sumComponents
     
         

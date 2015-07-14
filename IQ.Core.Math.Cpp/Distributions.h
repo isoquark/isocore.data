@@ -7,7 +7,13 @@
 #include <chrono>
 #include <array>
 
+#pragma warning(disable : 4793)
+#include <armadillo>
+
+
 using namespace System;
+
+using namespace arma;
 
 typedef _int8 int8;
 typedef unsigned _int8 uint8;
@@ -93,6 +99,28 @@ namespace IQ { namespace Core {namespace Math {
 		}
 	};
 
+	private ref class CalculatorServiceInt32 : public  IVectorCalculator<int32>
+	{
+	public:
+		virtual int Dot(Vector<int>^ x, Vector<int>^ y)
+		{
+			auto xcomp = x->Components;
+			pin_ptr<int> pX = &xcomp[0];
+
+			auto ycomp = y->Components;
+			pin_ptr<int> pY = &ycomp[0];
+
+			Row<int> row(pX, xcomp->Length, false, true);
+			Col<int> col(pY, ycomp->Length, false, true);
+			
+
+			auto d = row*col;
+			return as_scalar(d);
+		}
+	};
+
+
+
 	public ref class MathServices
 	{
 	public:
@@ -100,6 +128,20 @@ namespace IQ { namespace Core {namespace Math {
 			static IStats^ Stats()
 			{
 				return gcnew StatsService();
+			}
+	
+		generic <typename T>
+			static IVectorCalculator<T>^ VectorCalcs()
+			{
+				if (T::typeid == int32::typeid)
+				{
+					auto calc = gcnew CalculatorServiceInt32();
+					return (IVectorCalculator<T>^) calc;
+				}
+				else
+				{
+					throw gcnew NotSupportedException();
+				}
 			}
 	};
 
