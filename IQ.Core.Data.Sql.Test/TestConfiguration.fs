@@ -13,11 +13,18 @@ open IQ.Core.Data.Sql
 module TestConfiguration =
                         
     //This is instantiated/cleaned-up once per collection
-    type ProjectTestContext() = 
-        inherit TestContext(thisAssembly(), ProjectTestContext.RegisterDependencies) 
-                                                
+    type ProjectTestContext() as this = 
+        inherit TestContext(ProjectTestContext.RegisterDependencies |> CoreRegistration.compose (thisAssembly()))
+                
+        let store : ISqlDataStore = 
+            "csSqlDataStore" |> this.ConfigurationManager.GetValue |> ConnectionString.parse |> this.AppContext.Resolve
+
+        member this.Store = store
+        
         static member private RegisterDependencies(registry : ICompositionRegistry) =
             registry.RegisterFactory(fun config -> config |> SqlDataStore.access)
+
+        
         
 
     [<Literal>]
@@ -29,7 +36,7 @@ module TestConfiguration =
         inherit TestCollection<ProjectTestContext>()
 
     [<AbstractClass; TestContainer(TestCollectionName)>]
-    type ProjectTestContainer(context,log) =
-        member this.Context : ProjectTestContext = context
+    type ProjectTestContainer(ctx : ProjectTestContext,log) =
+        member this.Context = ctx
         member this.Log : ITestLog = log
 

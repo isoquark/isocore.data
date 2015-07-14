@@ -4,7 +4,6 @@ open System
 open System.Collections.Generic
 
 open IQ.Core.Data
-open IQ.Core.Data.Sql
 open IQ.Core.Math
 
 open IQ.Core.Synthetics

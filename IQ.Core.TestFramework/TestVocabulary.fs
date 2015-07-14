@@ -11,14 +11,6 @@ open Xunit
 open Xunit.Sdk
 open Xunit.Abstractions
 
-open IQ.Core.Data
-open IQ.Core.Framework
-
-
-
-module ConfigSettingNames =
-    [<Literal>]
-    let LogConnectionString = "csSqlDataStore"
 
 
 [<AutoOpen>]

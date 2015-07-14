@@ -4,9 +4,10 @@ open System
 open System.IO
 open System.Diagnostics
 open System.Reflection
+open System.Data
+open System.Data.SqlClient
 
-open IQ.Core.Data
-open IQ.Core.Framework
+
 
 /// <summary>
 /// Defines the Benchmark domain vocabulary
@@ -51,12 +52,6 @@ module BenchmarkVocabulary =
             match this with BenchmarkResult(detail=x) ->x
         
         override this.ToString() = this.Summary.ToString()
-
-    [<Schema("Core")>]
-     type ICoreTestFrameworkProcedures =
-        [<Procedure>]
-        abstract pBenchmarkResultPut:BenchmarkName : string -> DeclaringType : string -> OpCount : int -> MachineName : string -> StartTime : BclDateTime -> EndTime : BclDateTime -> Duration : int -> [<return : RoutineParameter("Id", 5)>] int
- 
 
     type BenchmarkParameter = BenchmarkParameter of name : string * value : string
     with
@@ -128,26 +123,47 @@ module BenchmarkInternals =
                 Duration = sw.Elapsed.TotalMilliseconds |> int
             }, detail)
 
-    let record (store : ISqlDataStore) (result : BenchmarkResult<_>)  =
-        let store = store.GetContract<ICoreTestFrameworkProcedures>()           
-        let summary = result.Summary
-        store.pBenchmarkResultPut summary.Name summary.DeclaringType summary.OperationCount summary.MachineName summary.StartTime summary.EndTime summary.Duration |> ignore
+    
+    let private pBenchmarkResultPut cs (summary: BenchmarkSummary) =        
+        //I'm doing this right now instead of relying on framework so I can eliminate 
+        //dependencies on external libraries; eventually, capability to emit
+        //diagnostics will be injected so there will be no direct dependency
+        //on any particular external resource (such as SQL Server!)
+        use con = new SqlConnection(cs)        
+        con.Open()
+        use cmd = new SqlCommand("Core.pBenchmarkResultPut", con)
+        cmd.CommandType <- CommandType.StoredProcedure
+        let addParameter name (value : obj) =
+            cmd.Parameters.Add(new SqlParameter(name,value)) |> ignore
 
-                    
-                        
-            
+        summary.Name |> addParameter "@BenchmarkName" 
+        summary.DeclaringType |> addParameter "@DeclaringType"
+        summary.OperationCount |> addParameter "@OpCount"
+        summary.MachineName |> addParameter "@MachineName"
+        summary.StartTime |> addParameter "@StartTime"
+        summary.EndTime |> addParameter "@EndTime"
+        summary.Duration |> addParameter "@Duration"
 
+        let id = SqlParameter("@Id", 0)
+        id.Direction <- ParameterDirection.Output
+        cmd.Parameters.Add(id) |> ignore
+        cmd.ExecuteNonQuery() |> ignore
+
+    let record (ctx : ITestContext) (result : BenchmarkResult<_>)  =                
+        result.Summary |> pBenchmarkResultPut ctx.LogConnectionString
+        
+         
 /// <summary>
 /// Implements capabilities related to benchmarking
 /// </summary>
 module Benchmark =                                         
 
     let inline capture (ctx : ITestContext) (f:unit->unit) =
-        f |> BenchmarkInternals.run (thisMethod()) |> BenchmarkInternals.record ctx.ExecutionLog
+        f |> BenchmarkInternals.run (thisMethod()) |> BenchmarkInternals.record ctx
     
     let inline getBenchmarkName() =
         thisMethod() |> BenchmarkInternals.getBenchmarkName
 
-//module BenchmarkExtensions =
+
     
 

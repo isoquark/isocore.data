@@ -67,11 +67,6 @@
     <Compile Include="VectorCalculatorTest.fs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\IQ.Core.Data.Sql\IQ.Core.Data.Sql.fsproj">
-      <Name>IQ.Core.Data.Sql</Name>
-      <Project>{29aedcf6-3187-4c89-aa30-d3d60a8e3379}</Project>
-      <Private>True</Private>
-    </ProjectReference>
     <Reference Include="MathNet.Numerics">
       <HintPath>..\packages\MathNet.Numerics.3.7.0\lib\net40\MathNet.Numerics.dll</HintPath>
       <Private>True</Private>

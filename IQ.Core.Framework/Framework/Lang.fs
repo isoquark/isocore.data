@@ -193,6 +193,11 @@ module Lang =
     let (?) (map : Map<string,_>) key = map.[key]
 
     /// <summary>
+    /// Convenience operator to enhance concision
+    /// </summary>
+    let inline defaultOf<'T> = Unchecked.defaultof<'T>
+    
+    /// <summary>
     /// Specifies the range of allowable values for a given element
     /// </summary>
     type Multiplicity = 

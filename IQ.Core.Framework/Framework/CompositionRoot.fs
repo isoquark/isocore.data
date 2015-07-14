@@ -53,30 +53,8 @@ module CompositionRoot =
             member this.Dispose() = scope.Dispose()
             member this.Resolve(key,value) = scope.Resolve(NamedParameter(key,value))
             member this.Resolve<'C,'I>(c : 'C) = scope.Resolve<'I>(new NamedParameter("config", c))
-    
-        
-    
-    type private CompositionRoot(assroot : Assembly) =
-        let build() =
-            let builder = ContainerBuilder()               
-            let asscore = Assembly.GetExecutingAssembly()            
-            assroot |> Assembly.loadReferences (Some(CoreConfiguration.UserAssemblyPrefix))
-            builder |> registerCore asscore
-            builder            
-        
-        let builder = build()
 
-        let c() = container.Value
-                        
-        interface ICompositionRoot with
-            member this.RegisterInstance instance = builder |> registerInstance instance
-            member this.RegisterInterfaces<'T>() = builder |> registerInterfaces<'T>
-            member this.RegisterFactory<'TConfig,'I when 'I : not struct> f = builder |> registerFactory<'TConfig,'I> f
-            member this.Seal() = container := builder.Build()
-            member this.Dispose() = container.Value.Dispose()
-            member this.CreateContext() = new AppContext(c()) :> IAppContext
-
-    type private CompositionRoot2() = 
+    type private CompositionRoot() = 
         let builder = ContainerBuilder()
         
         interface ICompositionRoot with
@@ -87,18 +65,12 @@ module CompositionRoot =
             member this.Dispose() = container.Value.Dispose()
             member this.CreateContext() = new AppContext(container.Value) :> IAppContext
         
-
-    let build(assroot : Assembly) =
-        root <- new CompositionRoot(assroot) :> ICompositionRoot
-        root
-
     let compose(register:ICompositionRegistry -> unit) =               
-        let _root = (new CompositionRoot2()) :> ICompositionRoot
+        let _root = (new CompositionRoot()) :> ICompositionRoot
         _root |> register
         _root.Seal()
         root <- _root
-        _root
-                        
+        _root                        
                 
     let internal resolve<'T when 'T : not struct>() =
         container.Value.Resolve<'T>()
@@ -108,10 +80,6 @@ module CompositionRoot =
             RootNotInitializedException() |> raise
         new AppContext(container.Value) :> IAppContext
             
-        
-       
-     
-
 [<AutoOpen>]
 module CompositionRootExtensions = 
     let Configuration() = CompositionRoot.ConfigurationManager()    

@@ -11,8 +11,8 @@ open Xunit
 open Xunit.Sdk
 open Xunit.Abstractions
 
-open IQ.Core.Data
-open IQ.Core.Framework
+
+
 
 //See: https://github.com/xunit/samples.xunit/blob/master/TraitExtensibility/
 

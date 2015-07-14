@@ -14,10 +14,10 @@ open IQ.Core.Framework
 
 module Routine =
     
-    type Tests(ctx, log) as this= 
+    type Tests(ctx, log)= 
         inherit ProjectTestContainer(ctx,log)
         
-        let store = this.Context.SqlDataStore
+        let store = ctx.Store
 
         [<FactAttribute>]
         let ``Executed [SqlTest].[pTable02Insert] procedure - Direct``() =

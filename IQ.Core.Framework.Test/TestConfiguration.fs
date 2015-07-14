@@ -13,8 +13,7 @@ module TestConfiguration =
                             
     //This is instantiated/cleaned-up once per collection
     type ProjectTestContext()= 
-        inherit TestContext(thisAssembly(), 
-            fun registry -> registry.RegisterFactory(fun config -> config |> SqlDataStore.access)) 
+        inherit TestContext( (fun x -> ()) |> CoreRegistration.compose (thisAssembly()))
                                                 
 
     [<Literal>]

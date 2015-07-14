@@ -30,4 +30,11 @@ module CoreRegistration =
         //Register time provider
         registry.RegisterInstance<ITimeProvider>(DefaultTimeProvider.get())
         
-    
+
+    let compose (rootAssembly : Assembly) (_register:ICompositionRegistry->unit) =
+        let root = CompositionRoot.compose(fun registry ->                        
+            registry |> register rootAssembly
+            registry |> _register
+        )
+        root
+            
