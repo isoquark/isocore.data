@@ -13,14 +13,14 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Contracts", "IQ.Cor
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.TestFramework", "IQ.Core.TestFramework\IQ.Core.TestFramework.fsproj", "{F9D5CBBF-94DC-43BE-BFFE-7987D14040B8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configuration", "Configuration", "{2A8E2E3A-32B4-4A2C-B518-71E9BCCF6A3E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{831EC863-9956-429D-AEB8-B422C8A55938}"
 	ProjectSection(SolutionItems) = preProject
 		unittests.runsettings = unittests.runsettings
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{831EC863-9956-429D-AEB8-B422C8A55938}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IQ.Core.Math.Cli", "IQ.Core.Math.Cli\IQ.Core.Math.Cli.vcxproj", "{0102B994-89C7-4BA0-8FEE-095210F850E5}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IQ.Core.Math.Cpp", "IQ.Core.Math.Cpp\IQ.Core.Math.Cpp.vcxproj", "{6D78A3CB-21B2-4678-914B-711660064F48}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -141,12 +141,26 @@ Global
 		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x64.Build.0 = Release|x64
 		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x86.ActiveCfg = Release|Win32
 		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x86.Build.0 = Release|Win32
+		{6D78A3CB-21B2-4678-914B-711660064F48}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{6D78A3CB-21B2-4678-914B-711660064F48}.Debug|x64.ActiveCfg = Debug|Win32
+		{6D78A3CB-21B2-4678-914B-711660064F48}.Debug|x86.ActiveCfg = Debug|Win32
+		{6D78A3CB-21B2-4678-914B-711660064F48}.Debug|x86.Build.0 = Debug|Win32
+		{6D78A3CB-21B2-4678-914B-711660064F48}.Dx64|Any CPU.ActiveCfg = Release|Win32
+		{6D78A3CB-21B2-4678-914B-711660064F48}.Dx64|Any CPU.Build.0 = Release|Win32
+		{6D78A3CB-21B2-4678-914B-711660064F48}.Dx64|x64.ActiveCfg = Release|Win32
+		{6D78A3CB-21B2-4678-914B-711660064F48}.Dx64|x64.Build.0 = Release|Win32
+		{6D78A3CB-21B2-4678-914B-711660064F48}.Dx64|x86.ActiveCfg = Debug|Win32
+		{6D78A3CB-21B2-4678-914B-711660064F48}.Dx64|x86.Build.0 = Debug|Win32
+		{6D78A3CB-21B2-4678-914B-711660064F48}.Release|Any CPU.ActiveCfg = Release|Win32
+		{6D78A3CB-21B2-4678-914B-711660064F48}.Release|x64.ActiveCfg = Release|Win32
+		{6D78A3CB-21B2-4678-914B-711660064F48}.Release|x86.ActiveCfg = Release|Win32
+		{6D78A3CB-21B2-4678-914B-711660064F48}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 7
+		SccNumberOfProjects = 8
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://isoquark.visualstudio.com/defaultcollection
 		SccLocalPath0 = .
@@ -168,5 +182,8 @@ Global
 		SccProjectUniqueName6 = IQ.Core.Math.Cli\\IQ.Core.Math.Cli.vcxproj
 		SccProjectName6 = IQ.Core.Math.Cli
 		SccLocalPath6 = IQ.Core.Math.Cli
+		SccProjectUniqueName7 = IQ.Core.Math.Cpp\\IQ.Core.Math.Cpp.vcxproj
+		SccProjectName7 = IQ.Core.Math.Cpp
+		SccLocalPath7 = IQ.Core.Math.Cpp
 	EndGlobalSection
 EndGlobal
