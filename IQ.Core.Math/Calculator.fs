@@ -158,6 +158,7 @@ module Calculator =
         else
             NotSupportedException() |> raise
 
+    
                
     let private create<'T>() = 
         let add = Ops<'T>.Add
@@ -222,6 +223,8 @@ module Calculator =
     let get<'T>() =
         calculators.[typeof<'T>] :?> ICalculator<'T>
 
+
+
     let get1() =
         {new ICalculator with
             member this.Add (x,y) =  add x y
@@ -264,5 +267,23 @@ module VectorCalcs =
     let inline dot (x : Vector<_>) (y : Vector<_>) =
         multiply x y |> sumComponents
     
+
+module ArrayCalculator =
+    
+    let multiply (x : 'T[]) (y : 'T[]) =
+        if x.Length <> y.Length then
+            ArgumentException("Arrays must be of the same length") |> raise
         
+        let inline multiplyAt idx =
+            y.[idx] |> CalcOps.multiply x.[idx]
+        
+        Array.init x.Length multiplyAt
+        
+            
+    
+    let get() =
+        {
+            new IArrayCalculator with
+                member this.Multiply(x,y) = y |> multiply x
+        }       
         

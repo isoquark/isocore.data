@@ -12,6 +12,10 @@ type ICalculator =
     abstract Divide:'T*'T->'T
     abstract Zero:unit->'T
 
+type IArrayCalculator =
+    abstract Multiply: 'T[]*'T[]->'T[]
+
+
 type ICalculator<'T> =
     abstract Add: 'T*'T->'T
     abstract Add: 'T seq -> 'T    
@@ -34,6 +38,9 @@ type ICalculator<'T> =
     abstract Zero:'T
     abstract MinValue : 'T
     abstract MaxValue : 'T
+
+type IVectorCalculator =
+    abstract Dot:Vector<'T>*Vector<'T>->'T    
 
 type IVectorCalculator<'T> =
     abstract Dot:Vector<'T>*Vector<'T>->'T

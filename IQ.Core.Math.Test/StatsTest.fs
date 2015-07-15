@@ -10,12 +10,11 @@ open IQ.Core.Math
 
 open MathNet.Numerics.Distributions
 
-module Distribution =
+module Stats =
     
     [<Literal>]
     let opcount = 1000000
         
-
     let stats = MathServices.Stats()
 
     let runifd<'T>(count) =
@@ -52,6 +51,10 @@ module Distribution =
         [<Fact>]
         let ``Benchmark - UInt8 - Uniform Distribution Sample``() =            
             (fun () -> runifd<uint8>(opcount)) |> Benchmark.capture ctx
+
+        [<Fact>]
+        let ``Benchmark - Int8 - Uniform Distribution Sample``() =            
+            (fun () -> runifd<int8>(opcount)) |> Benchmark.capture ctx
 
         [<Fact>]
         let ``Benchmark - Int16 - Uniform Distribution Sample``() =            

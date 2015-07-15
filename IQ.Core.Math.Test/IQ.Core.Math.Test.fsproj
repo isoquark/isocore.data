@@ -106,9 +106,10 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="TestConfiguration.fs" />
     <Compile Include="CalculatorTest.fs" />
-    <Compile Include="DistributionTest.fs" />
+    <Compile Include="StatsTest.fs" />
     <Compile Include="VectorCalculatorTest.fs" />
     <Compile Include="ExpressionBuilderTest.fs" />
+    <Compile Include="ArrayCalcTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MathNet.Numerics">
@@ -130,11 +131,6 @@
     <ProjectReference Include="..\IQ.Core.Framework\IQ.Core.Framework.fsproj">
       <Name>IQ.Core.Framework</Name>
       <Project>{8e2497e0-941b-4ca7-ab78-4ca15291c56a}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\IQ.Core.Math.Cpp\IQ.Core.Math.Cpp.vcxproj">
-      <Name>IQ.Core.Math.Cpp</Name>
-      <Project>{0102b994-89c7-4ba0-8fee-095210f850e5}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Math\IQ.Core.Math.fsproj">

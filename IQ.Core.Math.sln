@@ -5,8 +5,6 @@ VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Math", "IQ.Core.Math\IQ.Core.Math.fsproj", "{D01A6D75-53F1-4814-BE92-5F69113AD1B9}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IQ.Core.Math.Cpp", "IQ.Core.Math.Cpp\IQ.Core.Math.Cpp.vcxproj", "{0102B994-89C7-4BA0-8FEE-095210F850E5}"
-EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Framework", "IQ.Core.Framework\IQ.Core.Framework.fsproj", "{8E2497E0-941B-4CA7-AB78-4CA15291C56A}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Math.Test", "IQ.Core.Math.Test\IQ.Core.Math.Test.fsproj", "{5F254826-9D3F-478A-9741-4649088D3F72}"
@@ -14,6 +12,11 @@ EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Contracts", "IQ.Core.Contracts\IQ.Core.Contracts.fsproj", "{8690D158-DD5F-4B78-B542-A4CD5757C20C}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.TestFramework", "IQ.Core.TestFramework\IQ.Core.TestFramework.fsproj", "{F9D5CBBF-94DC-43BE-BFFE-7987D14040B8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configuration", "Configuration", "{2A8E2E3A-32B4-4A2C-B518-71E9BCCF6A3E}"
+	ProjectSection(SolutionItems) = preProject
+		unittests.runsettings = unittests.runsettings
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -46,19 +49,6 @@ Global
 		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Release|x64.Build.0 = Release|Any CPU
 		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Release|x86.ActiveCfg = Release|Any CPU
 		{D01A6D75-53F1-4814-BE92-5F69113AD1B9}.Release|x86.Build.0 = Release|Any CPU
-		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|x64.ActiveCfg = Debug|Win32
-		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|x86.ActiveCfg = Debug|Win32
-		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|x86.Build.0 = Debug|Win32
-		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Dx64|Any CPU.ActiveCfg = Debug|Win32
-		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Dx64|x64.ActiveCfg = Dx64|x64
-		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Dx64|x64.Build.0 = Dx64|x64
-		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Dx64|x86.ActiveCfg = Debug|Win32
-		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Dx64|x86.Build.0 = Debug|Win32
-		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|Any CPU.ActiveCfg = Release|Win32
-		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x64.ActiveCfg = Release|Win32
-		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x86.ActiveCfg = Release|Win32
-		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x86.Build.0 = Release|Win32
 		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8E2497E0-941B-4CA7-AB78-4CA15291C56A}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -136,27 +126,24 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 7
+		SccNumberOfProjects = 6
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://isoquark.visualstudio.com/defaultcollection
 		SccLocalPath0 = .
 		SccProjectUniqueName1 = IQ.Core.Math\\IQ.Core.Math.fsproj
 		SccProjectName1 = IQ.Core.Math
 		SccLocalPath1 = IQ.Core.Math
-		SccProjectUniqueName2 = IQ.Core.Math.Cpp\\IQ.Core.Math.Cpp.vcxproj
-		SccProjectName2 = IQ.Core.Math.Cpp
-		SccLocalPath2 = IQ.Core.Math.Cpp
-		SccProjectUniqueName3 = IQ.Core.Framework\\IQ.Core.Framework.fsproj
-		SccProjectName3 = IQ.Core.Framework
-		SccLocalPath3 = IQ.Core.Framework
-		SccProjectUniqueName4 = IQ.Core.Math.Test\\IQ.Core.Math.Test.fsproj
-		SccProjectName4 = IQ.Core.Math.Test
-		SccLocalPath4 = IQ.Core.Math.Test
-		SccProjectUniqueName5 = IQ.Core.Contracts\\IQ.Core.Contracts.fsproj
-		SccProjectName5 = IQ.Core.Contracts
-		SccLocalPath5 = IQ.Core.Contracts
-		SccProjectUniqueName6 = IQ.Core.TestFramework\\IQ.Core.TestFramework.fsproj
-		SccProjectName6 = IQ.Core.TestFramework
-		SccLocalPath6 = IQ.Core.TestFramework
+		SccProjectUniqueName2 = IQ.Core.Framework\\IQ.Core.Framework.fsproj
+		SccProjectName2 = IQ.Core.Framework
+		SccLocalPath2 = IQ.Core.Framework
+		SccProjectUniqueName3 = IQ.Core.Math.Test\\IQ.Core.Math.Test.fsproj
+		SccProjectName3 = IQ.Core.Math.Test
+		SccLocalPath3 = IQ.Core.Math.Test
+		SccProjectUniqueName4 = IQ.Core.Contracts\\IQ.Core.Contracts.fsproj
+		SccProjectName4 = IQ.Core.Contracts
+		SccLocalPath4 = IQ.Core.Contracts
+		SccProjectUniqueName5 = IQ.Core.TestFramework\\IQ.Core.TestFramework.fsproj
+		SccProjectName5 = IQ.Core.TestFramework
+		SccLocalPath5 = IQ.Core.TestFramework
 	EndGlobalSection
 EndGlobal
