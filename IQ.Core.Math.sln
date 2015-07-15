@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Configuration", "Configurat
 		unittests.runsettings = unittests.runsettings
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IQ.Core.Math.Cpp", "IQ.Core.Math.Cli\IQ.Core.Math.Cpp.vcxproj", "{0102B994-89C7-4BA0-8FEE-095210F850E5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,12 +123,27 @@ Global
 		{F9D5CBBF-94DC-43BE-BFFE-7987D14040B8}.Release|x64.Build.0 = Release|Any CPU
 		{F9D5CBBF-94DC-43BE-BFFE-7987D14040B8}.Release|x86.ActiveCfg = Release|Any CPU
 		{F9D5CBBF-94DC-43BE-BFFE-7987D14040B8}.Release|x86.Build.0 = Release|Any CPU
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|x64.ActiveCfg = Debug|x64
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|x64.Build.0 = Debug|x64
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|x86.ActiveCfg = Debug|Win32
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|x86.Build.0 = Debug|Win32
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Dx64|Any CPU.ActiveCfg = Dx64|Win32
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Dx64|x64.ActiveCfg = Dx64|x64
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Dx64|x64.Build.0 = Dx64|x64
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Dx64|x86.ActiveCfg = Dx64|Win32
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Dx64|x86.Build.0 = Dx64|Win32
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|Any CPU.ActiveCfg = Release|Win32
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x64.ActiveCfg = Release|x64
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x64.Build.0 = Release|x64
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x86.ActiveCfg = Release|Win32
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 6
+		SccNumberOfProjects = 7
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://isoquark.visualstudio.com/defaultcollection
 		SccLocalPath0 = .
@@ -145,5 +162,8 @@ Global
 		SccProjectUniqueName5 = IQ.Core.TestFramework\\IQ.Core.TestFramework.fsproj
 		SccProjectName5 = IQ.Core.TestFramework
 		SccLocalPath5 = IQ.Core.TestFramework
+		SccProjectUniqueName6 = IQ.Core.Math.Cli\\IQ.Core.Math.Cpp.vcxproj
+		SccProjectName6 = IQ.Core.Math.Cli
+		SccLocalPath6 = IQ.Core.Math.Cli
 	EndGlobalSection
 EndGlobal

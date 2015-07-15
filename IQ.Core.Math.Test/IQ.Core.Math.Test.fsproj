@@ -133,6 +133,11 @@
       <Project>{8e2497e0-941b-4ca7-ab78-4ca15291c56a}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\IQ.Core.Math.Cli\IQ.Core.Math.Cpp.vcxproj">
+      <Name>IQ.Core.Math.Cli</Name>
+      <Project>{0102b994-89c7-4ba0-8fee-095210f850e5}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Math\IQ.Core.Math.fsproj">
       <Name>IQ.Core.Math</Name>
       <Project>{d01a6d75-53f1-4814-be92-5f69113ad1b9}</Project>
