@@ -47,7 +47,7 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.MetaCode.Test", "IQ
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.MetaCode.Shell", "IQ.Core.MetaCode.Shell\IQ.Core.MetaCode.Shell.fsproj", "{DDC35261-4953-4F0D-99D9-8C5A1BB24636}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IQ.Core.Math.Cpp", "IQ.Core.Math.Cpp\IQ.Core.Math.Cpp.vcxproj", "{0102B994-89C7-4BA0-8FEE-095210F850E5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IQ.Core.Math.Cli", "IQ.Core.Math.Cli\IQ.Core.Math.Cpp.vcxproj", "{0102B994-89C7-4BA0-8FEE-095210F850E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -351,15 +351,18 @@ Global
 		{DDC35261-4953-4F0D-99D9-8C5A1BB24636}.Release|x86.ActiveCfg = Release|Any CPU
 		{DDC35261-4953-4F0D-99D9-8C5A1BB24636}.Release|x86.Build.0 = Release|Any CPU
 		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|x64.ActiveCfg = Debug|Win32
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|x64.ActiveCfg = Debug|x64
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|x64.Build.0 = Debug|x64
 		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|x86.ActiveCfg = Debug|Win32
 		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Debug|x86.Build.0 = Debug|Win32
 		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Dx64|Any CPU.ActiveCfg = Dx64|Win32
 		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Dx64|x64.ActiveCfg = Dx64|x64
 		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Dx64|x64.Build.0 = Dx64|x64
 		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Dx64|x86.ActiveCfg = Dx64|Win32
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Dx64|x86.Build.0 = Dx64|Win32
 		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|Any CPU.ActiveCfg = Release|Win32
-		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x64.ActiveCfg = Release|Win32
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x64.ActiveCfg = Release|x64
+		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x64.Build.0 = Release|x64
 		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x86.ActiveCfg = Release|Win32
 		{0102B994-89C7-4BA0-8FEE-095210F850E5}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
@@ -419,8 +422,8 @@ Global
 		SccProjectUniqueName16 = IQ.Core.MetaCode.Shell\\IQ.Core.MetaCode.Shell.fsproj
 		SccProjectName16 = IQ.Core.MetaCode.Shell
 		SccLocalPath16 = IQ.Core.MetaCode.Shell
-		SccProjectUniqueName17 = IQ.Core.Math.Cpp\\IQ.Core.Math.Cpp.vcxproj
-		SccProjectName17 = IQ.Core.Math.Cpp
-		SccLocalPath17 = IQ.Core.Math.Cpp
+		SccProjectUniqueName17 = IQ.Core.Math.Cli\\IQ.Core.Math.Cpp.vcxproj
+		SccProjectName17 = IQ.Core.Math.Cli
+		SccLocalPath17 = IQ.Core.Math.Cli
 	EndGlobalSection
 EndGlobal
