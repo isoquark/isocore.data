@@ -1,5 +1,4 @@
-// stdafx.cpp : source file that includes just the standard includes
-// IQ.Core.Math.Cpp.pch will be the pre-compiled header
-// stdafx.obj will contain the pre-compiled type information
+// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
+// the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 #include "stdafx.h"

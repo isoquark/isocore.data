@@ -1,6 +1,5 @@
-// stdafx.h : include file for standard system include files,
-// or project specific include files that are used frequently,
-// but are changed infrequently
+// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
+// the Apache License, Version 2.0.  See License.txt in the project root for license information.
 
 #pragma once
 

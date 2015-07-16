@@ -1,1 +1,2 @@
+REM To use this, you must install the visual studio modeling SDK
 msbuild "C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v14.0\Repository\Microsoft.Repository.targets" /t:LoadFiles /p:LoadFileSpec="C:\Dev\isoquark\IQ\IQ.Core.Contracts\bin\Debug\*.dll" /p:RepositoryServer=exa003 /p:RepositoryDb=MyCodeIndex
