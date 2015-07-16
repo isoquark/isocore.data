@@ -29,6 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		indexcode.bat = indexcode.bat
 		License.txt = License.txt
 		runtests.bat = runtests.bat
+		vs.gitignore = vs.gitignore
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQ.Core.DataStructLib", "IQ.Core.DataStructLib\IQ.Core.DataStructLib.csproj", "{4159CC44-092F-4FBC-B84E-226540E54396}"
