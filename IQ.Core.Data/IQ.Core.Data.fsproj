@@ -92,13 +92,15 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
-    <Compile Include="AssemblyInfo.fs" />
+    <Content Include="app.config" />
+    <Content Include="packages.config" />
     <None Include="Resources\DefaultClrStorageTypeMap.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="Resources\DefaultStorageKindAspects.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Compile Include="AssemblyInfo.fs" />
     <Compile Include="ConnectionString.fs" />
     <Compile Include="DataObjectName.fs" />
     <Compile Include="DataType.fs" />
@@ -110,8 +112,7 @@
     <Compile Include="DataTypeConverter.fs" />
     <Compile Include="DataTable.fs" />
     <Compile Include="CsvData.fs" />
-    <Content Include="packages.config" />
-    <Content Include="app.config" />
+    <Compile Include="EtlVocabulary.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Data">

@@ -141,21 +141,20 @@
     <None Include="packages.config" />
     <Content Include="app.config" />
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="Framework\Lang.fs" />
-    <Compile Include="Framework\Txt.fs" />
-    <Compile Include="Framework\Configuration.fs" />
-    <Compile Include="Framework\ClrUtilities.fs" />
-    <Compile Include="Framework\CompositionRoot.fs" />
-    <Compile Include="Framework\TransformerVocabulary.fs" />
-    <Compile Include="Framework\Time.fs" />
-    <Compile Include="Framework\ClrAttribute.fs" />
-    <Compile Include="Framework\ClrElement.fs" />
-    <Compile Include="Framework\ClrMetadataProvider.fs" />
-    <Compile Include="Framework\Transformer.fs" />
-    <Compile Include="Framework\RecordValue.fs" />
-    <Compile Include="Framework\DynamicContract.fs" />
-    <Compile Include="Framework\DataStructures.fs" />
-    <Compile Include="Etl\EtlVocabulary.fs" />
+    <Compile Include="Lang.fs" />
+    <Compile Include="Txt.fs" />
+    <Compile Include="Configuration.fs" />
+    <Compile Include="ClrUtilities.fs" />
+    <Compile Include="CompositionRoot.fs" />
+    <Compile Include="TransformerVocabulary.fs" />
+    <Compile Include="Time.fs" />
+    <Compile Include="ClrAttribute.fs" />
+    <Compile Include="ClrElement.fs" />
+    <Compile Include="ClrMetadataProvider.fs" />
+    <Compile Include="Transformer.fs" />
+    <Compile Include="RecordValue.fs" />
+    <Compile Include="DynamicContract.fs" />
+    <Compile Include="DataStructures.fs" />
     <Compile Include="CoreRegistration.fs" />
   </ItemGroup>
   <ItemGroup>
