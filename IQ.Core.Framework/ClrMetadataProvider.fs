@@ -166,6 +166,11 @@ module ClrMetadataProvider =
     
     let getCurrent() =
         CompositionRoot.resolve<IClrMetadataProvider>()
+
+    let getDefault() =
+        let assemblyNames = AppDomain.CurrentDomain.GetUserAssemblyNames()
+        {Assemblies = assemblyNames} |> get 
+        
     
 [<AutoOpen>]
 module ClrMetadataProviderExtensions =

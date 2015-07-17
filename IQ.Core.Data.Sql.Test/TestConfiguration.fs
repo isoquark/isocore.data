@@ -24,6 +24,7 @@ module TestConfiguration =
         member this.Store = store
         
         static member private RegisterDependencies(registry : ICompositionRegistry) =
+            ClrMetadataProvider.getDefault() |> registry.RegisterInstance
             registry.RegisterFactory(fun config -> config |> SqlDataStore.access)
 
         
