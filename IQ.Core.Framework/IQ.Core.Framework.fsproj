@@ -155,23 +155,6 @@
     <Compile Include="Framework\RecordValue.fs" />
     <Compile Include="Framework\DynamicContract.fs" />
     <Compile Include="Framework\DataStructures.fs" />
-    <None Include="Data\Resources\DefaultClrStorageTypeMap.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Data\Resources\DefaultStorageKindAspects.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <Compile Include="Data\ConnectionString.fs" />
-    <Compile Include="Data\DataObjectName.fs" />
-    <Compile Include="Data\DataType.fs" />
-    <Compile Include="Data\DataValue.fs" />
-    <Compile Include="Data\DataAttributes.fs" />
-    <Compile Include="Data\DataMetamodel.fs" />
-    <Compile Include="Data\DataProxyMetamodel.fs" />
-    <Compile Include="Data\DataProxyMetadata.fs" />
-    <Compile Include="Data\DataTypeConverter.fs" />
-    <Compile Include="Data\DataTable.fs" />
-    <Compile Include="Data\CsvData.fs" />
     <Compile Include="Etl\EtlVocabulary.fs" />
     <Compile Include="CoreRegistration.fs" />
   </ItemGroup>

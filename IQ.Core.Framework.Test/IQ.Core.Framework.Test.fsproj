@@ -199,6 +199,11 @@
       <Project>{4159cc44-092f-4fbc-b84e-226540e54396}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\IQ.Core.Data\IQ.Core.Data.fsproj">
+      <Name>IQ.Core.Data</Name>
+      <Project>{5d4ada5c-b453-432c-a419-81bf001edd14}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Framework\IQ.Core.Framework.fsproj">
       <Name>IQ.Core.Framework</Name>
       <Project>{8e2497e0-941b-4ca7-ab78-4ca15291c56a}</Project>

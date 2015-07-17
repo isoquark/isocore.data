@@ -140,6 +140,11 @@
     <Compile Include="OrderedSequenceTests.fs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\IQ.Core.Data\IQ.Core.Data.fsproj">
+      <Name>IQ.Core.Data</Name>
+      <Project>{5d4ada5c-b453-432c-a419-81bf001edd14}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Math\IQ.Core.Math.fsproj">
       <Name>IQ.Core.Math</Name>
       <Project>{d01a6d75-53f1-4814-be92-5f69113ad1b9}</Project>
