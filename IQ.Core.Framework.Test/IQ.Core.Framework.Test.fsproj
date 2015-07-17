@@ -145,9 +145,6 @@
   <ItemGroup>
     <None Include="packages.config" />
     <Content Include="app.config" />
-    <EmbeddedResource Include="Resources\CsvTestCase1.csv" />
-    <EmbeddedResource Include="Resources\CsvTestCase2.csv" />
-    <EmbeddedResource Include="Resources\CsvTestCase3.csv" />
     <EmbeddedResource Include="Resources\EmbeddedResource01.txt" />
     <None Include="xunit.bat" />
     <Compile Include="TestConfiguration.fs" />
@@ -160,12 +157,6 @@
     <Compile Include="ClrMetadataProviderTest.fs" />
     <Compile Include="RecordValueTest.fs" />
     <Compile Include="DataStructTest.fs" />
-    <Compile Include="Etl\EtlVocabularyTest.fs" />
-    <Compile Include="Data\DataStorageTypeTest.fs" />
-    <Compile Include="Data\ProxyTestCases.fs" />
-    <Compile Include="Data\ProxyDiscoveryTests.fs" />
-    <Compile Include="Data\DataTableTest.fs" />
-    <Compile Include="Data\CsvReaderTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="FSharp.Text.RegexProvider">
