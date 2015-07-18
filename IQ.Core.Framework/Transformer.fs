@@ -126,8 +126,6 @@ module Transformer =
 
 
     let private discover(config : TransformerConfig) =
-        use context = CompositionRoot.createContext()
-        let provider = context.Resolve<IClrMetadataProvider>()
         let delegateIndex = createDelegateIndex()
         let category = defaultArg config.Category DefaultTransformerCategory
         let identifiers = ResizeArray<TransformationIdentifier>()
@@ -146,7 +144,7 @@ module Transformer =
                    
                                 let parameter = parameters.Head.ReflectedElement |> Option.get
                                 let srcType = parameter.ParameterType
-                                let dstType = m.ReturnType |> Option.get |> provider.FindType |> fun x -> x.ReflectedElement.Value
+                                let dstType = m.ReturnType |> Option.get |> config.MetadataProvider.FindType |> fun x -> x.ReflectedElement.Value
                     
                                 let del = m.ReflectedElement.Value |> createDelegate
                                 let key = createKey srcType dstType
@@ -159,7 +157,7 @@ module Transformer =
             | _ -> ()
         
         [for q in config.SearchElements do 
-            yield! q |> provider.FindElements] |> List.iter (fun x -> x |> ClrElement.walk handler)
+            yield! q |> config.MetadataProvider.FindElements] |> List.iter (fun x -> x |> ClrElement.walk handler)
             
         delegateIndex, identifiers |> List.ofSeq
                    

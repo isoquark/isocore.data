@@ -140,6 +140,7 @@
     <Compile Include="IClrMetadataProvider.fs" />
     <Compile Include="IDataProxyMetadataProvider.fs" />
     <Compile Include="Delegates.fs" />
+    <Compile Include="ITransformer.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

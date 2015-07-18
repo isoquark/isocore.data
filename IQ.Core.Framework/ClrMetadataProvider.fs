@@ -164,12 +164,12 @@ module ClrMetadataProvider =
     let get(config) =
         ClrMetadataStore(config) :> IClrMetadataProvider
     
-    let getCurrent() =
-        CompositionRoot.resolve<IClrMetadataProvider>()
-
-    let getDefault() =
+    let private defaultProvider = lazy(
         let assemblyNames = AppDomain.CurrentDomain.GetUserAssemblyNames()
-        {Assemblies = assemblyNames} |> get 
+        {Assemblies = assemblyNames} |> get     
+    )
+    
+    let getDefault() = defaultProvider.Value
         
     
 [<AutoOpen>]
@@ -226,7 +226,7 @@ module ClrMetadataProviderExtensions =
 [<AutoOpen>]
 module internal ClrMetadataProviderInstance =
     //This sucks, but we really have to do this if we are going to have the convenient operators below
-    let ClrMetadata() = ClrMetadataProvider.getCurrent()        
+    let ClrMetadata() = ClrMetadataProvider.getDefault()        
         
                                            
 [<AutoOpen>]

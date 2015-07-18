@@ -65,7 +65,7 @@ module DataProxyMetadata =
             | _ -> nosupport()
 
     let private describeType(name : ClrTypeName) =        
-        name |> ClrMetadataProvider.getCurrent().FindType
+        name |> ClrMetadataProvider.getDefault().FindType
         
          
     /// <summary>

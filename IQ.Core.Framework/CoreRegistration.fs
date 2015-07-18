@@ -20,10 +20,7 @@ module CoreRegistration =
         //Load all referenced user assemblies assemblies so we can engage 
         //in profitable reflection exercises
         rootAssembly |> Assembly.loadReferences (Some(CoreConfiguration.UserAssemblyPrefix))            
-                    
-        //Register transformer
-        registry.RegisterFactory(fun config -> config |> Transformer.get)
-            
+                                
         //Register time provider
         registry.RegisterInstance<ITimeProvider>(DefaultTimeProvider.get())
         

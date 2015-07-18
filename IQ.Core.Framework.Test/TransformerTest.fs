@@ -34,15 +34,15 @@ module TestTransformations =
 
 module Transformer =
     
-    let getTransformerConfig() =
+    let getTransformerConfig(ctx : IAppContext) =
         let q = thisAssembly().AssemblyName |> FindAssemblyByName |> FindAssemblyElement |> List.singleton
-        TransformerConfig(q, None)
+        TransformerConfig(q, None, ctx.Resolve<IClrMetadataProvider>())
 
     type LogicTests(ctx,log) = 
         inherit ProjectTestContainer(ctx,log)
     
 
-        let transformer : ITransformer = getTransformerConfig() |>ctx.AppContext.Resolve
+        let transformer : ITransformer = getTransformerConfig(ctx.AppContext) |>ctx.AppContext.Resolve
     
         [<Fact>]
         let ``Converted optional and non-optional values``() =
@@ -90,7 +90,7 @@ module Transformer =
     type Benchmarks(ctx,log) =
         inherit ProjectTestContainer(ctx,log)
     
-        let transformer : ITransformer = getTransformerConfig() |>ctx.AppContext.Resolve
+        let transformer : ITransformer = getTransformerConfig(ctx.AppContext) |>ctx.AppContext.Resolve
 
         [<Fact>]
         let ``Benchmark - Called Method Invoke``() =

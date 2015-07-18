@@ -132,7 +132,7 @@ module internal Routine =
     /// <summary>
     /// Creates function that will be invoked whenever a contracted method is called to execute a stored procedure
     /// </summary>
-    let private createInvoker<'TContract,'TConfig>(context : IAppContext) =
+    let private createInvoker<'TContract,'TConfig>() =
         let proxies = routineproxies<'TContract> 
         let findProxy (mii : MethodInvocationInfo) = 
             mii.Method |>  findMethodProxy proxies
@@ -165,7 +165,8 @@ module internal Routine =
                     let typedesc = proxy.ResultProxy.ProxyElement
                     match typedesc with
                     | CollectionType(x) ->
-                        let provider = context.Resolve<IClrMetadataProvider>()
+                        //let provider = context.Resolve<IClrMetadataProvider>()
+                        let provider = ClrMetadataProvider.getDefault()
                         let itemType = typedesc.Name |> provider.FindType |> fun x -> x.ReflectedElement.Value.ItemValueType
                         let items = 
                             [for row in result ->
@@ -182,8 +183,7 @@ module internal Routine =
                 MethodArgs = args |> List.ofArray
             } |> invoke
                         
-    let getContract<'TContract when 'TContract : not struct>(cs : string) =        
-        use context = CompositionRoot.createContext()
-        context |> createInvoker<'TContract,string> |> DynamicContract.realize<'TContract,string> cs
+    let getContract<'TContract when 'TContract : not struct> (cs : string) =        
+        createInvoker<'TContract,string>() |> DynamicContract.realize<'TContract,string> cs
 
 
