@@ -11,12 +11,12 @@ open IQ.Core.Data
 
 [<AutoOpen>]
 module TestConfiguration =
-    let private register (registry : ICompositionRegistry) =
+    let private registerDependencies (registry : ICompositionRegistry) =
         ClrMetadataProvider.getDefault() |> registry.RegisterInstance
                             
     //This is instantiated/cleaned-up once per collection
     type ProjectTestContext()= 
-        inherit TestContext(register |> CoreRegistration.compose (thisAssembly()))
+        inherit TestContext(registerDependencies |> CoreRegistration.compose (thisAssembly()))
                                                 
 
     [<Literal>]

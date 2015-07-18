@@ -141,6 +141,7 @@
     <Compile Include="IDataProxyMetadataProvider.fs" />
     <Compile Include="Delegates.fs" />
     <Compile Include="ITransformer.fs" />
+    <Compile Include="IRecordValueConverter.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

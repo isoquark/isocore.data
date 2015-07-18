@@ -48,15 +48,18 @@ module internal SqlStoreCommand =
 
 
 
- 
+type SqlDataStoreConfig = SqlDataStoreConfig of cs : ConnectionString * clrMetadataProvider : IClrMetadataProvider
+with
+    member this.ConnectionString = match this with SqlDataStoreConfig(cs=x) -> x
+    member this.ClrMetadataProvider = match this with SqlDataStoreConfig(clrMetadataProvider=x) ->x
        
 /// <summary>
 /// Provides ISqlDataStore realization
 /// </summary>
 module SqlDataStore =    
         
-    type internal Realization(csSqlDataStore : ConnectionString) =
-        let cs = SqlConnectionString(csSqlDataStore.Components) |> fun x -> x.Text
+    type internal Realization(config : SqlDataStoreConfig) =
+        let cs = SqlConnectionString(config.ConnectionString.Components) |> fun x -> x.Text
         interface ISqlDataStore with
             member this.Get q : list<'T>= 
                 match q with
@@ -92,8 +95,8 @@ module SqlDataStore =
     /// Provides access to an identified data store
     /// </summary>
     /// <param name="cs">Connection string that identifies the data store</param>
-    let access (cs) =
-        Realization(cs) :> ISqlDataStore
+    let get (config) =
+        Realization(config) :> ISqlDataStore
 
 
 

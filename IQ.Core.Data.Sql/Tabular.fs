@@ -32,7 +32,7 @@ module internal Tabular =
         let proxy = tdesc |> DataProxyMetadata.describeTablularProxy
         let data = proxy.DataElement |> executeQuery cs
         let itemType = tdesc.ReflectedElement.Value
-        let items = [for row in data -> itemType |> RecordValue.fromValueArray row]
+        let items = [for row in data -> itemType |> RecordValueConverter.fromValueArray row]
         items |> Collection.create ClrCollectionKind.FSharpList itemType
 
    

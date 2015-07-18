@@ -13,23 +13,22 @@ open IQ.Core.Data.Sql
 
 [<AutoOpen>]
 module TestConfiguration =
-                        
+
+    let private registerDependencies(registry : ICompositionRegistry) =
+            ClrMetadataProvider.getDefault() |> registry.RegisterInstance
+            registry.RegisterFactory(fun config -> config |> SqlDataStore.get)
+                                
     //This is instantiated/cleaned-up once per collection
     type ProjectTestContext() as this = 
-        inherit TestContext(ProjectTestContext.RegisterDependencies |> CoreRegistration.compose (thisAssembly()))
-                
-        let store : ISqlDataStore = 
-            "csSqlDataStore" |> this.ConfigurationManager.GetValue |> ConnectionString.parse |> this.AppContext.Resolve
+        inherit TestContext(registerDependencies |> CoreRegistration.compose (thisAssembly()))
+
+        let clrMetadataProvider : IClrMetadataProvider = this.AppContext.Resolve()
+        let cs = "csSqlDataStore" |> this.ConfigurationManager.GetValue |> ConnectionString.parse
+        let store : ISqlDataStore = SqlDataStoreConfig(cs, clrMetadataProvider) |> this.AppContext.Resolve
 
         member this.Store = store
         
-        static member private RegisterDependencies(registry : ICompositionRegistry) =
-            ClrMetadataProvider.getDefault() |> registry.RegisterInstance
-            registry.RegisterFactory(fun config -> config |> SqlDataStore.access)
-
         
-        
-
     [<Literal>]
     let TestCollectionName = "Core Sql Tests"
 
