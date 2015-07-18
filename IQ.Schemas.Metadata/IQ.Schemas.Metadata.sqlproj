@@ -37,7 +37,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>bin\Dx00</OutputPath>
     <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <DebugSymbols>true</DebugSymbols>
@@ -61,6 +61,7 @@
     <Folder Include="Functions" />
     <Folder Include="Tables" />
     <Folder Include="Views" />
+    <Folder Include="Data" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Functions\fGetColumns.sql" />
@@ -80,6 +81,8 @@
     <Build Include="Views\vUserView.sql" />
     <Build Include="Views\vView.sql" />
     <Build Include="Metadata.sql" />
+    <None Include="Data\IntrinsicTypeMap.sql" />
+    <None Include="Data\Data.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">
@@ -90,5 +93,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Metadata.publish.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="postdeploy.sql" />
   </ItemGroup>
 </Project>

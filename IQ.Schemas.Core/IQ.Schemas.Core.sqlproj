@@ -75,6 +75,7 @@
     <Build Include="Core\Procedures\pBenchmarkResultInsert.sql" />
     <Build Include="Core\Tables\BclType.sql" />
     <None Include="Core\Data\BclType.sql" />
+    <Build Include="Core\Procedures\pGenerateMergeData.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">

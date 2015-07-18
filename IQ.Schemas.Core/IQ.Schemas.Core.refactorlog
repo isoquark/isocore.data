@@ -63,4 +63,11 @@
     <Property Name="ParentElementType" Value="SqlSchema" />
     <Property Name="NewName" Value="pBenchmarkResultPut" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="1f3948a0-548e-4211-89aa-2ea6064a0da9" ChangeDateTime="07/18/2015 15:38:24">
+    <Property Name="ElementName" Value="[Core].[sp_generate_merge]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[Core]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="pGenerateMerge" />
+  </Operation>
 </Operations>
