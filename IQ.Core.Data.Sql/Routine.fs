@@ -38,9 +38,9 @@ module internal Routine =
 
         [for i in [0..command.Parameters.Count-1] do
             let parameter = command.Parameters.[i]  
-            if  parameter.Direction = ParameterDirection.InputOutput || 
-                parameter.Direction = ParameterDirection.Output || 
-                parameter.Direction = ParameterDirection.ReturnValue then
+            if  parameter.Direction = System.Data.ParameterDirection.InputOutput || 
+                parameter.Direction = System.Data.ParameterDirection.Output || 
+                parameter.Direction = System.Data.ParameterDirection.ReturnValue then
                 yield parameter.ParameterName, i, parameter.Value
         ]|>ValueIndex.create                
         

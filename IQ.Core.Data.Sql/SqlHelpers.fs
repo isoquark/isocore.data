@@ -167,6 +167,6 @@ module internal SqlParameter =
                     SqlParameter(d.Name, DBNull.Value)
                 else
                     NotSupportedException() |> raise
-        p.Direction <- d.Direction
+        p.Direction <- enum<System.Data.ParameterDirection>(int d.Direction)
         p.SqlDbType <- d.StorageType |> DataType.toSqlDbType   
         p     

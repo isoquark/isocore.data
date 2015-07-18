@@ -4,7 +4,7 @@ namespace IQ.Core.Data
 
 open System
 open System.Reflection
-open System.Data
+//open System.Data
 open System.Text.RegularExpressions
 
 open FSharp.Data
