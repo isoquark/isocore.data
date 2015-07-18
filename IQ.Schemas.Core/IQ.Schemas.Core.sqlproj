@@ -61,10 +61,6 @@
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v$(VisualStudioVersion)\SSDT\Microsoft.Data.Tools.Schema.SqlTasks.targets" />
   <ItemGroup>
     <Folder Include="Properties" />
-    <Folder Include="Metadata" />
-    <Folder Include="Metadata\Views" />
-    <Folder Include="Metadata\Functions" />
-    <Folder Include="Metadata\Tables" />
     <Folder Include="Core" />
     <Folder Include="Core\Tables" />
     <Folder Include="Core\Data" />
@@ -72,25 +68,8 @@
     <Folder Include="Core\Procedures" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="Metadata\Metadata.sql" />
-    <Build Include="Metadata\Views\vDataType.sql" />
-    <Build Include="Metadata\Views\vSchema.sql" />
-    <Build Include="Metadata\Views\vTable.sql" />
-    <Build Include="Metadata\Views\vView.sql" />
-    <Build Include="Metadata\Functions\fGetColumns.sql" />
-    <Build Include="Metadata\Views\vUserView.sql" />
-    <Build Include="Metadata\Views\vUserTable.sql" />
-    <Build Include="Metadata\Views\vObject.sql" />
-    <Build Include="Metadata\Views\vDescription.sql" />
-    <Build Include="Metadata\Views\vUserColumn.sql" />
-    <Build Include="Metadata\Tables\IntrinsicTypeMap.sql" />
     <Build Include="Core\Core.sql" />
     <Build Include="Core\Tables\DataKind.sql" />
-    <Build Include="Metadata\Functions\fGetParameters.sql" />
-    <Build Include="Metadata\Views\vUserProcedure.sql" />
-    <Build Include="Metadata\Views\vProcedure.sql" />
-    <Build Include="Metadata\Views\vProcedureParameter.sql" />
-    <Build Include="Metadata\Views\vSequence.sql" />
     <Build Include="Core\Tables\BenchmarkResult.sql" />
     <Build Include="Core\Sequences\BenchmarkResultSequence.sql" />
     <Build Include="Core\Procedures\pBenchmarkResultInsert.sql" />
@@ -114,5 +93,13 @@
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="postdeply.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\IQ.Schemas.Metadata\IQ.Schemas.Metadata.sqlproj">
+      <Name>IQ.Schemas.Metadata</Name>
+      <Project>{8ce754ca-67ae-46ef-adca-e6a29eab433d}</Project>
+      <Private>True</Private>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+    </ProjectReference>
   </ItemGroup>
 </Project>

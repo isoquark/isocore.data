@@ -7,19 +7,9 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "IQ.Schemas.Core", "IQ.Schem
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "IQ.Schemas.Test", "IQ.Schemas.Test\IQ.Schemas.Test.sqlproj", "{43C6EBF6-B693-47E5-99F2-A446A96BB4F3}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "IQ.Schemas.Metadata", "IQ.Schemas.Metadata\IQ.Schemas.Metadata.sqlproj", "{8CE754CA-67AE-46EF-ADCA-E6A29EAB433D}"
+EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = https://isoquark.visualstudio.com/defaultcollection
-		SccProjectUniqueName0 = IQ.Schemas.Core\\IQ.Schemas.Core.sqlproj
-		SccProjectName0 = IQ.Schemas.Core
-		SccLocalPath0 = IQ.Schemas.Core
-		SccProjectUniqueName1 = IQ.Schemas.Test\\IQ.Schemas.Test.sqlproj
-		SccProjectName1 = IQ.Schemas.Test
-		SccLocalPath1 = IQ.Schemas.Test
-		SccLocalPath2 = .
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -37,6 +27,12 @@ Global
 		{43C6EBF6-B693-47E5-99F2-A446A96BB4F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43C6EBF6-B693-47E5-99F2-A446A96BB4F3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{43C6EBF6-B693-47E5-99F2-A446A96BB4F3}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{8CE754CA-67AE-46EF-ADCA-E6A29EAB433D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CE754CA-67AE-46EF-ADCA-E6A29EAB433D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CE754CA-67AE-46EF-ADCA-E6A29EAB433D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{8CE754CA-67AE-46EF-ADCA-E6A29EAB433D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CE754CA-67AE-46EF-ADCA-E6A29EAB433D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CE754CA-67AE-46EF-ADCA-E6A29EAB433D}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
