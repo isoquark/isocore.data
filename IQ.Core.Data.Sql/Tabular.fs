@@ -28,12 +28,12 @@ module internal Tabular =
         command.CommandType <- CommandType.Text
         command |> SqlCommand.executeQuery tabular.Columns
 
-    let executeProxyQuery cs (tdesc : ClrType) =
+    let executeProxyQuery<'T> cs (tdesc : ClrType) : list<'T> =
         let proxy = tdesc |> DataProxyMetadata.describeTablularProxy
         let data = proxy.DataElement |> executeQuery cs
         let itemType = tdesc.ReflectedElement.Value
         let items = [for row in data -> itemType |> RecordValueConverter.fromValueArray row]
-        items |> Collection.create ClrCollectionKind.FSharpList itemType
+        items |> Collection.create ClrCollectionKind.FSharpList itemType :?> list<'T>
 
    
 

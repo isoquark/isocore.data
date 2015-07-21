@@ -141,6 +141,7 @@
     <Compile Include="SqlFormatterTest.fs" />
     <Compile Include="TabularTest.fs" />
     <Compile Include="RoutineTest.fs" />
+    <Compile Include="SqlMetadataProviderTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IQ.Core.Contracts\IQ.Core.Contracts.fsproj">

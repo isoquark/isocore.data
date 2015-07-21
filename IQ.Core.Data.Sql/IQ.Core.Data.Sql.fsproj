@@ -138,6 +138,7 @@
     <Compile Include="SqlHelpers.fs" />
     <Compile Include="Routine.fs" />
     <Compile Include="Tabular.fs" />
+    <Compile Include="SqlMetadataProvider.fs" />
     <Compile Include="SqlDataStore.fs" />
   </ItemGroup>
   <ItemGroup>

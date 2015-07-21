@@ -5,9 +5,9 @@ with Objects as (select
 		x.name as ObjectName,
 		x.parent_object_id as ParentObjectId,
 		x.type_desc as ObjectType,
-		convert(bit,case x.is_ms_shipped 
+		isnull(convert(bit,case x.is_ms_shipped 
 			when 0 then 1
-			when 1 then 0 end) as IsUserDefined
+			when 1 then 0 end), 0) as IsUserDefined
 	from 
 		sys.objects x 
 )

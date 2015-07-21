@@ -12,6 +12,7 @@
 		c.IsComputed,
 		c.IsIdentity,
 		c.IsNullable,
+		t.IsUserDefined,
 		c.MaxLength,
 		c.Precision,
 		c.Scale

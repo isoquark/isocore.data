@@ -44,34 +44,28 @@ module internal SqlStoreCommand =
         use connection = cs |> SqlConnection.create
         use sqlcommand = new SqlCommand(sql, connection)
         sqlcommand.ExecuteNonQuery() |> ignore
-
-
-
-
-type SqlDataStoreConfig = SqlDataStoreConfig of cs : ConnectionString * clrMetadataProvider : IClrMetadataProvider
-with
-    member this.ConnectionString = match this with SqlDataStoreConfig(cs=x) -> x
-    member this.ClrMetadataProvider = match this with SqlDataStoreConfig(clrMetadataProvider=x) ->x
        
 /// <summary>
 /// Provides ISqlDataStore realization
 /// </summary>
 module SqlDataStore =    
         
+
     type internal Realization(config : SqlDataStoreConfig) =
         let cs = SqlConnectionString(config.ConnectionString.Components) |> fun x -> x.Text
+        let mp = config |> SqlMetadataProvider.get
         interface ISqlDataStore with
             member this.Get q : list<'T>= 
                 match q with
                 | TabularQuery(tabularName,columnNames) ->
-                    typeinfo<'T> |> Tabular.executeProxyQuery cs :?> list<'T>
+                    typeinfo<'T> |> Tabular.executeProxyQuery cs 
                 | TableFunctionQuery(functionName, parameters) ->
                     []
                 | ProcedureQuery(procedureName, parameters) ->
                     []
             
             member this.Get() : list<'T> =
-                typeinfo<'T> |> Tabular.executeProxyQuery cs :?> list<'T>
+                typeinfo<'T> |> Tabular.executeProxyQuery cs 
                 
             
             member this.Put items = 
@@ -89,7 +83,8 @@ module SqlDataStore =
                 Routine.getContract<'TContract> cs
 
             member this.ConnectionString = cs
-                
+            
+            member this.MetadataProvider = mp    
                                              
     /// <summary>
     /// Provides access to an identified data store

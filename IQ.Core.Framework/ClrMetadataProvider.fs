@@ -191,6 +191,12 @@ module ClrMetadataProviderExtensions =
             name |> FindTypeByName |> this.FindType 
 
         /// <summary>
+        /// Finds the type identified by type prameter
+        /// </summary>
+        member this.FindType<'T>() =
+            typeof<'T>.TypeName  |> this.FindType
+
+        /// <summary>
         /// Finds property identified by the query and raises error if not found
         /// </summary>
         /// <param name="q">Identifies the property</param>

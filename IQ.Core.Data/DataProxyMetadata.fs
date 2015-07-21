@@ -324,8 +324,6 @@ module DataProxyMetadata =
         | _ ->
              nosupport()           
 
-type IDataProxyMetadataProvider =
-    abstract DescribeProxies:DataElementKind->ClrElement->DataObjectProxy list
 
 
 module DataProxyMetadataProvider =        

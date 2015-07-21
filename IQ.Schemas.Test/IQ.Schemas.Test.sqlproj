@@ -81,6 +81,12 @@
       <Private>True</Private>
       <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
     </ProjectReference>
+    <ProjectReference Include="..\IQ.Schemas.Metadata\IQ.Schemas.Metadata.sqlproj">
+      <Name>IQ.Schemas.Metadata</Name>
+      <Project>{8ce754ca-67ae-46ef-adca-e6a29eab433d}</Project>
+      <Private>True</Private>
+      <SuppressMissingDependenciesErrors>False</SuppressMissingDependenciesErrors>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">
