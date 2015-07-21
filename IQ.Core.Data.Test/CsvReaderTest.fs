@@ -153,3 +153,15 @@ module CsvReader =
                 NetWorth = 50000m |> Some
             }
             patty_actual |> Claim.equal patty_expect
+        
+        [<Fact>]
+        let ``Wrote proxies to CSV file - no attribute override``() =
+            let expect = "CsvTestCase2.csv" |> hydrate<CsvTestCase2A> 
+            let filename = sprintf "%s-writer-test.csv" typeof<CsvTestCase2A>.Name
+            let path = Path.Combine(ctx.OutputDirectory, filename)
+            let format = CsvReader.getDefaultFormat()
+            expect |> CsvWriter.writeFile format path
+
+            let actual =  CsvReader.readFile<CsvTestCase2A> format path
+
+            actual |> Claim.equal expect

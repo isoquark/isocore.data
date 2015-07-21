@@ -73,8 +73,7 @@ module CsvReader =
                     colproxy.DataElement.Name, fun (value : string) -> 
                         value |> Transformer.convert colproxy.ProxyElement.ReflectedElement.Value.PropertyType
                 ) |> Map.ofArray
-            | None ->
-                NotSupportedException("CSV file requires headers") |> raise
+            | None -> nosupport()
 
         let colnames = file.Headers |> Option.get
       
@@ -146,5 +145,36 @@ module CsvReader =
         use file = CsvFile.Load(path, format.Separator, format.Quote, format.HasHeaders, false).Cache()
         read<'T>  file
         
-                      
+
+
+/// <summary>
+/// Defines operations for writing delimited text
+/// </summary>
+module CsvWriter =
+    /// <summary>
+    /// Writes a sequence of records to a file in CSV format
+    /// </summary>
+    let writeFile<'T> (format : CsvFormat) (path : string) (items : 'T seq) =        
+        let proxy = tabularproxy<'T> |> TabularProxy
+        let headerRow = 
+            proxy.Columns |> List.map(fun c -> c.DataElement.Name) |> Txt.delemit format.Separator
+
+        //TODO: This is very crude; needs to escape quotes, for example
+        let formatValue (v : obj) =
+            match v with
+            | :? string as v -> "\"" + v + "\""
+            | _ -> v.ToString()
+
+        use writer = new StreamWriter(path)
+        if format.HasHeaders then
+                proxy.Columns |> List.map(fun c -> c.DataElement.Name) 
+                              |> Txt.delemit format.Separator 
+                              |> writer.WriteLine
+        for item in items do
+             item |> RecordValueConverter.toValueList
+                  |> List.map formatValue 
+                  |> Txt.delemit format.Separator 
+                  |> writer.WriteLine
+               
+        
                 

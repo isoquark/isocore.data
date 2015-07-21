@@ -41,10 +41,10 @@ module RecordValueConverter =
                 |> ValueIndex.create
 
     /// <summary>
-    /// Creates an array of field values, in declaration order, for a specified record value
+    /// Creates a list of field values, in declaration order, for a specified record value
     /// </summary>
-    /// <param name="record"></param>
-    let toValueArray (o : obj) =
+    /// <param name="o"></param>
+    let toValueList (o : obj) =
         let t = o.GetType()
         if t |> Type.isRecordType |> not then
             argerrord "o" o "Not a record value"
@@ -52,7 +52,13 @@ module RecordValueConverter =
             |> ClrMetadata().FindType
             |> fun x -> x.Properties
             |> List.map(fun p -> p.ReflectedElement.Value.GetValue(o))
-            |> Array.ofList
+    
+    /// <summary>
+    /// Creates an array of field values, in declaration order, for a specified record value
+    /// </summary>
+    /// <param name="o"></param>
+    let toValueArray (o : obj) =
+            o |> toValueList |> Array.ofList
 
     /// <summary>
     /// Creates a record from an array of values that are specified in declaration order
