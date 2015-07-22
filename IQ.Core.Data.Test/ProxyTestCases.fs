@@ -81,7 +81,7 @@ module ProxyTestCases =
             DataTypeName : string
             SchemaId : int
             SchemaName : string   
-            Nullable : bool 
+            IsNullable : bool 
             IsUserDefined: bool
             BaseTypeId : uint8 option
         }
@@ -96,7 +96,7 @@ module ProxyTestCases =
             MaxLength : decimal
             Precision : uint8
             Scale : uint8
-            Nullable : bool 
+            IsNullable : bool 
             IsUserDefined: bool
             BaseTypeId : uint8 option
         }

@@ -158,6 +158,16 @@
       <Project>{8690d158-dd5f-4b78-b542-a4cd5757c20c}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <ProjectReference Include="..\IQ.Core.Data.Sql\IQ.Core.Data.Sql.fsproj">
+      <Name>IQ.Core.Data.Sql</Name>
+      <Project>{29aedcf6-3187-4c89-aa30-d3d60a8e3379}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\IQ.Core.Data\IQ.Core.Data.fsproj">
+      <Name>IQ.Core.Data</Name>
+      <Project>{5d4ada5c-b453-432c-a419-81bf001edd14}</Project>
+      <Private>True</Private>
+    </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Framework\IQ.Core.Framework.fsproj">
       <Name>IQ.Core.Framework</Name>
       <Project>{8e2497e0-941b-4ca7-ab78-4ca15291c56a}</Project>

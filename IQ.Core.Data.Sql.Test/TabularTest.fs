@@ -35,7 +35,7 @@ module Tabular =
                      |> Map.ofList
             let money = items.["money"]
             money.IsUserDefined |> Claim.isFalse
-            money.Nullable |> Claim.isTrue
+            money.IsNullable |> Claim.isTrue
             money.SchemaName |> Claim.equal "sys"
 
         [<FactAttribute>]
@@ -48,7 +48,7 @@ module Tabular =
             money.MaxLength |> Claim.equal 8m
             money.Precision |> Claim.equal 19uy
             money.Scale |> Claim.equal 4uy
-            money.Nullable |> Claim.isTrue 
+            money.IsNullable |> Claim.isTrue 
             money.IsUserDefined |> Claim.isFalse      
         
         [<FactAttribute>]

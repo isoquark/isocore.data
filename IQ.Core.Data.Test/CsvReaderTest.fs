@@ -155,7 +155,7 @@ module CsvReader =
             patty_actual |> Claim.equal patty_expect
         
         [<Fact>]
-        let ``Wrote proxies to CSV file - no attribute override``() =
+        let ``Wrote proxies to CSV file - no optional values``() =
             let expect = "CsvTestCase2.csv" |> hydrate<CsvTestCase2A> 
             let filename = sprintf "%s-writer-test.csv" typeof<CsvTestCase2A>.Name
             let path = Path.Combine(ctx.OutputDirectory, filename)
@@ -163,5 +163,17 @@ module CsvReader =
             expect |> CsvWriter.writeFile format path
 
             let actual =  CsvReader.readFile<CsvTestCase2A> format path
+
+            actual |> Claim.equal expect
+
+        [<Fact>]
+        let ``Wrote proxies to CSV file - optional values``() =
+            let expect = "CsvTestCase2.csv" |> hydrate<CsvTestCase2B> 
+            let filename = sprintf "%s-writer-test.csv" typeof<CsvTestCase2B>.Name
+            let path = Path.Combine(ctx.OutputDirectory, filename)
+            let format = CsvReader.getDefaultFormat()
+            expect |> CsvWriter.writeFile format path
+
+            let actual =  CsvReader.readFile<CsvTestCase2B> format path
 
             actual |> Claim.equal expect

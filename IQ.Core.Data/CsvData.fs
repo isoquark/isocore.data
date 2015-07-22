@@ -161,9 +161,19 @@ module CsvWriter =
 
         //TODO: This is very crude; needs to escape quotes, for example
         let formatValue (v : obj) =
-            match v with
-            | :? string as v -> "\"" + v + "\""
-            | _ -> v.ToString()
+            let value = 
+                if v = null then
+                    null
+                else
+                    if v |> Option.isOptionValue then 
+                        match v |> Option.unwrapValue with
+                        | Some(x) -> x
+                        | None -> null
+                    else
+                        v
+            match value with
+            | :? string as x -> "\"" + x + "\""
+            | _ -> value.ToString()
 
         use writer = new StreamWriter(path)
         if format.HasHeaders then
