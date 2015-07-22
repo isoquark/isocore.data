@@ -10,7 +10,7 @@ open System.Runtime.InteropServices
 [<assembly: AssemblyTitle("IQ.Core.Data")>]
 [<assembly: AssemblyDescription("")>]
 [<assembly: AssemblyConfiguration("")>]
-[<assembly: AssemblyCompany("Microsoft")>]
+[<assembly: AssemblyCompany("eXaPhase")>]
 [<assembly: AssemblyProduct("IQ.Core.Data")>]
 [<assembly: AssemblyCopyright("Copyright © Microsoft 2015")>]
 [<assembly: AssemblyTrademark("")>]

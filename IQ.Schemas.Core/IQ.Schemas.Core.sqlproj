@@ -27,6 +27,7 @@
     <SccProvider>SAK</SccProvider>
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
+    <DefaultSchema>Core</DefaultSchema>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <OutputPath>bin\Release\</OutputPath>
@@ -40,7 +41,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>bin\Dx00</OutputPath>
+    <OutputPath>..\build\targets\$(Platform)\</OutputPath>
+    <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
+    <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
     <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <DebugSymbols>true</DebugSymbols>
@@ -90,7 +93,7 @@
   <ItemGroup>
     <None Include="Core\Data\Data.sql" />
     <None Include="Core\Data\DataKind.sql" />
-    <None Include="Core.publish.xml" />
+    <None Include="eXa003.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="postdeply.sql" />

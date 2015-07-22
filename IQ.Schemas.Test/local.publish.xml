@@ -2,9 +2,9 @@
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
-    <TargetDatabaseName>IQ.Metadata</TargetDatabaseName>
-    <DeployScriptFileName>IQ.Metadata.sql</DeployScriptFileName>
+    <TargetDatabaseName>IQ.Schemas.Test</TargetDatabaseName>
+    <DeployScriptFileName>IQ.Schemas.Test.sql</DeployScriptFileName>
+    <TargetConnectionString>Data Source=localhost;Integrated Security=True;Pooling=False</TargetConnectionString>
     <ProfileVersionNumber>1</ProfileVersionNumber>
-    <TargetConnectionString>Data Source=exa003;Integrated Security=True;Pooling=False</TargetConnectionString>
   </PropertyGroup>
 </Project>

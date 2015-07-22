@@ -31,7 +31,7 @@ module Routine =
                 |> List.map DataParameterValue
             let outputvalues = proc |> Routine.executeProcedure store.ConnectionString inputValues
             let col01Value = outputvalues.["col01"] :?> int
-            Claim.greater col01Value 1
+            Claim.greaterOrEqual col01Value 1
 
         [<FactAttribute>]
         let ``Executed [SqlTest].[pTable02Insert] procedure - Contract``() =

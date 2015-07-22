@@ -43,7 +43,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>bin\Dx00</OutputPath>
+    <OutputPath>..\build\targets\$(Platform)\</OutputPath>
+    <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
+    <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
     <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <DebugSymbols>true</DebugSymbols>
@@ -72,7 +74,8 @@
     <Folder Include="SqlTest\Functions" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="IQ.publish.xml" />
+    <None Include="eXa003.publish.xml" />
+    <None Include="local.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IQ.Schemas.Core\IQ.Schemas.Core.sqlproj">

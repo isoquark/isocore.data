@@ -24,7 +24,8 @@ type TestContext(root : ICompositionRoot) as this =
     let assemblyRoot = this.GetType().Assembly
     let context = root.CreateContext()
     let configManager = context.Resolve<IConfigurationManager>()
-    let outdir = Path.Combine(@"C:\Temp\IQ\Tests\", assemblyRoot.GetName().Name)
+     
+    let outdir = Path.Combine("TestOutputDir" |> configManager.GetValue, assemblyRoot.GetName().Name)
     let cs = "csSqlDataStore" |> configManager.GetValue         
         
     do
