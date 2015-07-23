@@ -7,10 +7,10 @@ open IQ.Core.Services.Wcf
 
 open IQ.Core.Services.Wcf.SampleService
 
-[<TestContainer>]
+
 module ``No-Host No-Channel Helper Tests`` =
 
-    [<Test>]
+    [<Fact>]
     let ``Bucket Sort Success Test``() =
         let k1 = [ "x"; "a"; "c"; "0"; "a"; "b"; "x"; "t"; "x" ]
         let b = Helpers.bucketSort(k1);
@@ -29,14 +29,13 @@ module ``No-Host No-Channel Helper Tests`` =
         Claim.isSome actual
         actual |> Claim.equal expect
 
-    [<Test>]
+    [<Fact>]
     let ``Test Singleton``() =
         let cm1 = ServiceFacade.create()
         let cm2 = ServiceFacade.create()
         cm1 |> Claim.equal cm2
 
 
-[<TestContainer>]
 module ``Channel and Service Hosting Tests`` =
 
     let clientEndpointName = "TestClientEndpoint" //must match that from the configuration file
@@ -47,14 +46,14 @@ module ``Channel and Service Hosting Tests`` =
     let mutable result = ""
     let _hostFactory : CustomServiceHostUtil.ConsoleServiceHostFactory = new CustomServiceHostUtil.ConsoleServiceHostFactory()
 
-    [<TestInit>]
-    let Init() =
-        _hostFactory.StartRun()
-
-    [<TestCleanup>]
-    let Cleanup() =
-        //ChannelAdapter.disposeEndpointMap() //cannot dispose after each test because it is a singleton
-        _hostFactory.StopRun()
+// TODO: fix for xunit
+//    [<TestInit>]
+//    let Init() =
+//        _hostFactory.StartRun()
+//
+//    [<TestCleanup>]
+//    let Cleanup() =
+//        _hostFactory.StopRun()
 
     let inputName = 
           { FirstName = firstName; LastName = lastName; MiddleInitial = 'X' }
@@ -73,71 +72,71 @@ module ``Channel and Service Hosting Tests`` =
     let svcOpActionOneWay : (ISimpleService -> unit) = fun (x : ISimpleService) -> x.MyOneWayMessage(10, true) //argument values are irrelevant
 
     //FSharp interface tests
-    [<Test>]
+    [<Fact>]
     let ``Invoke Service With Action and Endpoint Name``() =
         cm.Invoke (svcOpAction, epnOpt)
         validateResult result
 
-    [<Test>]
+    [<Fact>]
     let ``Invoke Service With Func and Endpoint Name ``() =
         let r = cm.InvokeFun (svcOpFunc, epnOpt)
         validateResult r
 
-    [<Test>]
+    [<Fact>]
     let ``Invoke Service With Action and Without Endpoint Name``() =
         cm.Invoke svcOpAction
         validateResult result
 
-    [<Test>]
+    [<Fact>]
     let ``Invoke Service With Func and Without Endpoint Name``() =
         let r = cm.InvokeFun svcOpFunc
         validateResult r
 
-    [<Test>]
+    [<Fact>]
     let ``Invoke OneWay Service With Action and Endpoint Name``() =
         cm.Invoke (svcOpActionOneWay, epnOpt)
         validateResult result
 
-    [<Test>]
+    [<Fact>]
     let ``Invoke OneWay Service With Action and Without Endpoint Name``() =
         cm.Invoke svcOpActionOneWay
         validateResult result
 
-    [<Test>] 
+    [<Fact>]
     let ``FAIL Invoke Service With Func and Invalid Endpoint Name``() =
         (fun () -> cm.InvokeFun (svcOpFunc, Some "invalid endpoint name") |> ignore)  |> Claim.failWith<ApplicationException> 
 
-    [<Test>] 
+    [<Fact>]
     let ``FAIL Invoke Service With Action and Invalid Endpoint Name``() =
         (fun () -> cm.InvokeFun (svcOpAction, Some "invalid endpoint name") |> ignore)  |> Claim.failWith<ApplicationException> 
 
 
     //CSharp interface tests
-    [<Test>]
+    [<Fact>]
     let ``CSharp Invoke Service With Action and Endpoint Name``() =
         cmCs.Invoke (svcOpActionCs, epnStr)
         validateResult result
 
-    [<Test>]
+    [<Fact>]
     let ``CSharp Invoke Service With Func and Endpoint Name``() =
         let r = cmCs.Invoke (svcOpFuncCs, epnStr) 
         validateResult r
 
-    [<Test>]
+    [<Fact>]
     let ``CSharp Invoke Service With Action and Without Endpoint Name``() =
         cmCs.Invoke svcOpActionCs
         validateResult result
 
-    [<Test>]
+    [<Fact>]
     let ``CSharp Invoke Service With Func and Without Endpoint Name``() =
         let r = cmCs.Invoke svcOpFuncCs
         validateResult r
 
-    [<Test>] 
+    [<Fact>]
     let ``FAIL CSharp Invoke Service With Func and Invalid Endpoint Name``() =
         (fun () -> cmCs.Invoke (svcOpFuncCs, "invalid endpoint name") |> ignore)  |> Claim.failWith<ApplicationException> 
 
-    [<Test>] 
+    [<Fact>]
     let ``FAIL CSharp Invoke Service With Action and Invalid Endpoint Name``() =
         (fun () -> cmCs.Invoke (svcOpActionCs, "invalid endpoint name") |> ignore)  |> Claim.failWith<ApplicationException> 
 
