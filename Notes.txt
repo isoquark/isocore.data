@@ -1,0 +1,1 @@
+See this alternative to ILMerge: http://blogs.msdn.com/b/microsoft_press/archive/2010/02/03/jeffrey-richter-excerpt-2-from-clr-via-c-third-edition.aspx
