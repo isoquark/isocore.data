@@ -26,6 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{B525A3
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0F6D4AD3-7F33-45B2-8343-A3710FE39048}"
 	ProjectSection(SolutionItems) = preProject
+		build.props = build.props
 		indexcode.bat = indexcode.bat
 		License.txt = License.txt
 		runtests.bat = runtests.bat
@@ -84,12 +85,12 @@ Global
 		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Debug|x64.Build.0 = Debug|x64
 		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Debug|x86.ActiveCfg = Debug|x86
 		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Debug|x86.Build.0 = Debug|x86
-		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Release|x64.ActiveCfg = Release|x64
-		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Release|x64.Build.0 = Release|x64
-		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Release|x86.ActiveCfg = Release|x86
-		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Release|x86.Build.0 = Release|x86
+		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Release|Any CPU.Build.0 = Debug|Any CPU
+		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Release|x64.ActiveCfg = Debug|Any CPU
+		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Release|x64.Build.0 = Debug|Any CPU
+		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Release|x86.ActiveCfg = Debug|Any CPU
+		{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}.Release|x86.Build.0 = Debug|Any CPU
 		{F9D5CBBF-94DC-43BE-BFFE-7987D14040B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F9D5CBBF-94DC-43BE-BFFE-7987D14040B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9D5CBBF-94DC-43BE-BFFE-7987D14040B8}.Debug|x64.ActiveCfg = Debug|x64

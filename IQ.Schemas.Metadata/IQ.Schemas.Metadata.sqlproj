@@ -26,7 +26,9 @@
     <DefaultSchema>Metadata</DefaultSchema>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\build\targets\$(Platform)\</OutputPath>
+    <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
+    <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
     <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
     <TreatWarningsAsErrors>False</TreatWarningsAsErrors>
     <DebugType>pdbonly</DebugType>

@@ -73,13 +73,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(ProjectDir)bin\Dx32\</OutDir>
-    <IntDir>$(ProjectDir)bin\Dx32\</IntDir>
+    <OutDir>..\build\targets\x86\</OutDir>
+    <IntDir>..\build\intermediate\$(ProjectName)\x86\</IntDir>
     <IncludePath>$(VC_IncludePath);$(UniversalCRT_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(ProjectDir)bin\Dx64\</OutDir>
-    <IntDir>$(ProjectDir)bin\Dx64\</IntDir>
+    <OutDir>..\build\targets\x64\</OutDir>
+    <IntDir>..\build\intermediate\$(ProjectName)\x64</IntDir>
     <IncludePath>$(VC_IncludePath);$(UniversalCRT_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

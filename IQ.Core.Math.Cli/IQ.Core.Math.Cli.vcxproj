@@ -24,7 +24,7 @@
     <SccAuxPath>SAK</SccAuxPath>
     <SccLocalPath>SAK</SccLocalPath>
     <SccProvider>SAK</SccProvider>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <Keyword>ManagedCProj</Keyword>
     <RootNamespace>IQCoreMathCpp</RootNamespace>
     <TargetPlatformVersion>8.1</TargetPlatformVersion>
@@ -79,13 +79,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(ProjectDir)bin\Dx32\</OutDir>
-    <IntDir>$(ProjectDir)bin\Dx32\</IntDir>
+    <OutDir>..\build\targets\x86\</OutDir>
+    <IntDir>..\build\intermediate\$(ProjectName)\x86\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(ProjectDir)bin\Dx64\</OutDir>
-    <IntDir>$(ProjectDir)bin\Dx64\</IntDir>
+    <OutDir>..\build\targets\x64\</OutDir>
+    <IntDir>..\build\intermediate\$(ProjectName)\x64</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
