@@ -32,6 +32,7 @@ module ClrEnumGenerator =
                     Position = 0
                     Types = types
                     Attributes = []
+                    References = []
                 }
 
         let generateAssembly types =

@@ -32,6 +32,7 @@ module ClrMetadataProvider =
         typeIndex.GetOrAdd(t.TypeName, fun n -> ClrType.describe pos t)
         
     let private describeAssembly (a : Assembly) =                               
+
         assemblyDescriptions.GetOrAdd(typeof<int>.Assembly, fun corlib ->
             {
                 Name = ClrAssemblyName(corlib.SimpleName, corlib.FullName |> Some)
@@ -44,6 +45,7 @@ module ClrMetadataProvider =
                         ] |> List.mapi(fun pos t -> acquireTypeDescription pos t) 
                 ReflectedElement = corlib |> Some
                 Attributes = []
+                References = []
             }        
         )|>ignore
 
@@ -54,6 +56,11 @@ module ClrMetadataProvider =
                 Types = a.GetTypes() |> Array.mapi(fun pos t -> ClrType.describe pos t) |> List.ofArray
                 ReflectedElement = a |> Some
                 Attributes = a.GetCustomAttributes() |> ClrAttribution.create a.ElementName
+                References= 
+                    a.GetReferencedAssemblies() 
+                    |> Array.map(fun x -> ClrAssemblyName(x.Name, x.FullName |> Some))
+                    |> List.ofArray
+
             })    
 
     let private describeType (t : Type) =

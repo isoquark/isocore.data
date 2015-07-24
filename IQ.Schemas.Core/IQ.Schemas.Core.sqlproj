@@ -81,6 +81,15 @@
     <Build Include="Core\Tables\BclType.sql" />
     <None Include="Core\Data\BclType.sql" />
     <Build Include="Core\Procedures\pGenerateMergeData.sql" />
+    <None Include="Core\Data\DataTransferFieldType.sql" />
+    <None Include="Core\Data\XsdDataType.sql" />
+    <Build Include="Core\Tables\DataTransferField.sql" />
+    <Build Include="Core\Tables\DataTransferFieldType.sql" />
+    <Build Include="Core\Tables\DataTransferObject.sql" />
+    <Build Include="Core\Tables\EnumerationType.sql" />
+    <Build Include="Core\Tables\EnumerationValue.sql" />
+    <Build Include="Core\Tables\WsdlDocument.sql" />
+    <Build Include="Core\Tables\XsdDataType.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">
@@ -96,6 +105,7 @@
     <None Include="Core\Data\Data.sql" />
     <None Include="Core\Data\DataKind.sql" />
     <None Include="eXa003.publish.xml" />
+    <None Include="local.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="postdeply.sql" />

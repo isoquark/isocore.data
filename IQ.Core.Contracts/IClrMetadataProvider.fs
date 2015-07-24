@@ -501,6 +501,8 @@ type ClrAssembly = {
     Types : ClrType list
     /// The attributes applied to the assembly
     Attributes : ClrAttribution list
+    /// The assemblies referenced by the subject
+    References : ClrAssemblyName list
 }
 
 /// <summary>
