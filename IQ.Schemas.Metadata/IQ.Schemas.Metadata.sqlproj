@@ -88,6 +88,9 @@
     <None Include="Data\IntrinsicTypeMap.sql" />
     <None Include="Data\Data.sql" />
     <Build Include="Views\vDataDictionary.sql" />
+    <Build Include="Views\vUserDataType.sql" />
+    <Build Include="Views\vUserTableType.sql" />
+    <Build Include="Views\vUserTableTypeColumn.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">

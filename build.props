@@ -8,8 +8,8 @@
       <Tailcalls>false</Tailcalls>
       <DefineConstants>DEBUG;TRACE</DefineConstants>
       <WarningLevel>3</WarningLevel>
-      <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
-      <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
+      <BaseIntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</BaseIntermediateOutputPath>
+      <BaseIntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</BaseIntermediateOutputPath>
       <OutputPath>..\build\targets\$(Platform)\</OutputPath>
       <DocumentationFile>..\build\targets\$(Platform)\$(MSBuildProjectName).XML</DocumentationFile>
       <ErrorReport>prompt</ErrorReport>
@@ -22,8 +22,8 @@
       <Tailcalls>false</Tailcalls>
       <DefineConstants>DEBUG;TRACE</DefineConstants>
       <WarningLevel>3</WarningLevel>
-      <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
-      <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
+      <BaseIntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</BaseIntermediateOutputPath>
+      <BaseIntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</BaseIntermediateOutputPath>
       <OutputPath>..\build\targets\$(Platform)\</OutputPath>
       <DocumentationFile>..\build\targets\$(Platform)\$(MSBuildProjectName).XML</DocumentationFile>
       <ErrorReport>prompt</ErrorReport>
@@ -37,7 +37,7 @@
       <Tailcalls>false</Tailcalls>
       <DefineConstants>DEBUG;TRACE</DefineConstants>
       <WarningLevel>3</WarningLevel>
-      <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
+      <BaseIntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</BaseIntermediateOutputPath>
       <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
       <OutputPath>..\build\targets\$(Platform)\</OutputPath>
       <DocumentationFile>..\build\targets\$(Platform)\$(MSBuildProjectName).XML</DocumentationFile>
@@ -51,8 +51,8 @@
     <Tailcalls>true</Tailcalls>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
-    <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
+      <BaseIntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</BaseIntermediateOutputPath>
+      <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
     <OutputPath>..\build\targets\$(Platform)\</OutputPath>
     <DocumentationFile>..\build\targets\$(Platform)\$(MSBuildProjectName).XML</DocumentationFile>
     <ErrorReport>prompt</ErrorReport>
@@ -64,7 +64,7 @@
     <Tailcalls>true</Tailcalls>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
+    <BaseIntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</BaseIntermediateOutputPath>
     <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
     <OutputPath>..\build\targets\$(Platform)\</OutputPath>
     <DocumentationFile>..\build\targets\$(Platform)\$(MSBuildProjectName).XML</DocumentationFile>
@@ -78,8 +78,8 @@
     <Tailcalls>true</Tailcalls>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
-    <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
+      <BaseIntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</BaseIntermediateOutputPath>
+      <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
     <OutputPath>..\build\targets\$(Platform)\</OutputPath>
     <DocumentationFile>..\build\targets\$(Platform)\$(MSBuildProjectName).XML</DocumentationFile>
     <ErrorReport>prompt</ErrorReport>

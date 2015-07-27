@@ -163,4 +163,4 @@ type DataObjectProxy =
 | TableFunctionProxy of TableFunctionProxyDescription
 
 type IDataProxyMetadataProvider =
-    abstract DescribeProxies:DataElementKind->ClrElement->DataObjectProxy list
+    abstract DescribeProxies:SqlElementKind->ClrElement->DataObjectProxy list

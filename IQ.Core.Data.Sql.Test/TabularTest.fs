@@ -19,7 +19,7 @@ module Tabular =
     let private verifyBulkInsert<'T>(input : 'T list) (sortBy: 'T->IComparable) (store : ISqlDataStore)=
         tabularproxy<'T>.DataElement.Name |> TruncateTable |> store.ExecuteCommand
         store.Get<'T>() |> Claim.seqIsEmpty
-        input |> store.BulkInsert
+        input |> store.Insert
         let output = store.Get<'T>() |> List.sortBy sortBy
         output |> Claim.equal input
 

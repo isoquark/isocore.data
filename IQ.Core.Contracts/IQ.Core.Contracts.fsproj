@@ -36,11 +36,16 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
+    <Content Include="settings.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Common.fs" />
     <Compile Include="ICalculator.fs" />
     <Compile Include="IStats.fs" />
     <Compile Include="ISqlMetadataProvider.fs" />
+    <Compile Include="IDataStore.fs" />
+    <Compile Include="IExcelDataStore.fs" />
     <Compile Include="ISqlDataStore.fs" />
     <Compile Include="IConfigurationManager.fs" />
     <Compile Include="ICompositionRoot.fs" />
@@ -50,9 +55,6 @@
     <Compile Include="Delegates.fs" />
     <Compile Include="ITransformer.fs" />
     <Compile Include="IRecordValueConverter.fs" />
-    <Content Include="settings.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

@@ -11,33 +11,35 @@ open System.Diagnostics
 type SqlQueryParameter = SqlQueryParameter of name : string * value : obj    
 
 /// <summary>
-/// Represents a query to the store
+/// Represents the intent to retrieve data from a SQL data store
 /// </summary>
-type DataStoreQuery =
+type SqlDataStoreQuery =
     | TabularQuery of tabularName : string * columnNames : string list
     | TableFunctionQuery of  functionName : string * parameters : SqlQueryParameter list
     | ProcedureQuery of procedureName : string * parameters : SqlQueryParameter list
 
-
-
 /// <summary>
 /// Classifies supported data object/element types
 /// </summary>
-type DataElementKind =
+type SqlElementKind =
+    /// Identifies a table
     | Table = 1uy
+    /// Identifies a view
     | View = 2uy
+    /// Identifies a stored procedure
     | Procedure = 3uy
+    /// Identifies a table-valued function
     | TableFunction = 4uy
+    /// Identifies a scalar function
     | ScalarFunction = 6uy
+    /// Identifies a sequence object
     | Sequence = 5uy
+    /// Identifies a column
     | Column = 1uy
-    /// Identifies a top-level namescope within a data store. This has
-    /// an obvious interpretation in the context of relational data stores.
-    /// Otherwise, interpretation is dependent on the type of store
+    /// Identifies a schema
     | Schema = 1uy
-    /// Identifies a custom primitive. In SQL server, for example, this
-    /// is eqivalent to an object created via CREATE TYPE and based on
-    /// an intrinsic type
+    /// Identifies a custom primitive, e.g., an object created by issuing
+    /// a CREATE TYPE command that is based on an intrinsic type
     | CustomPrimitive = 1uy
 
 /// <summary>
@@ -46,17 +48,7 @@ type DataElementKind =
 type SqlStoreCommand =
 | TruncateTable of tableName : DataObjectName
 
-/// <summary>
-/// Responsible for identifying a Data Store, Network Address or other resource
-/// </summary>
-type ConnectionString = ConnectionString of string list
-with
-    /// <summary>
-    /// The components of the connection string
-    /// </summary>
-    member this.Components = match this with ConnectionString(components) -> components
-    
-        
+
 /// <summary>
 /// Defines the contract for a SQL Server Data Store
 /// </summary>
@@ -64,7 +56,7 @@ type ISqlDataStore =
     /// <summary>
     /// Retrieves an identified collection of data entities from the store
     /// </summary>
-    abstract Get:DataStoreQuery -> 'T list
+    abstract Get:SqlDataStoreQuery -> 'T list
 
     /// <summary>
     /// Retrieves all entities of a given type from the store
@@ -79,7 +71,7 @@ type ISqlDataStore =
     /// <summary>
     /// Deletes and identified collection of data entities from the store
     /// </summary>
-    abstract Del:DataStoreQuery -> unit
+    abstract Del:SqlDataStoreQuery -> unit
 
     /// <summary>
     /// Obtains an identified contract from the store
@@ -87,9 +79,9 @@ type ISqlDataStore =
     abstract GetContract: unit -> 'TContract when 'TContract : not struct
 
     /// <summary>
-    /// Inserts an arbitrary number of records into a table
+    /// Inserts an arbitrary number of entities into the store, eliding existence checks
     /// </summary>
-    abstract BulkInsert:'T seq ->unit
+    abstract Insert:'T seq ->unit
 
     /// <summary>
     /// Executes a supplied command against the store

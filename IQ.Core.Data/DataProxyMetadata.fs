@@ -327,9 +327,9 @@ module DataProxyMetadata =
 
 
 module DataProxyMetadataProvider =        
-    let private describeProxies (dek : DataElementKind) (clrElement : ClrElement) =
+    let private describeProxies (dek : SqlElementKind) (clrElement : ClrElement) =
         match dek with
-        | DataElementKind.Procedure ->
+        | SqlElementKind.Procedure ->
             match clrElement with
             | MemberElement(x) ->
                 clrElement |> DataProxyMetadata.describeProcedureProxy |> List.singleton
@@ -341,7 +341,7 @@ module DataProxyMetadataProvider =
                 ]
             | _ -> nosupport()
                 
-        | DataElementKind.TableFunction ->
+        | SqlElementKind.TableFunction ->
             match clrElement with
             | MemberElement(x) ->
                 clrElement |> DataProxyMetadata.describeTableFunctionProxy |> List.singleton
@@ -353,7 +353,7 @@ module DataProxyMetadataProvider =
                 
             | _ ->
                  nosupport()           
-        | DataElementKind.Table | DataElementKind.View ->
+        | SqlElementKind.Table | SqlElementKind.View ->
             match clrElement with
             | TypeElement(x) ->
                 x |> DataProxyMetadata.describeTablularProxy |> TabularProxy |> List.singleton

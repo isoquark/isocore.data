@@ -73,7 +73,7 @@ module SqlDataStore =
             
             member this.Del q = ()
 
-            member this.BulkInsert (items : 'T seq) =
+            member this.Insert (items : 'T seq) =
                 items |> Tabular.bulkInsert cs
 
             member this.ExecuteCommand c =
