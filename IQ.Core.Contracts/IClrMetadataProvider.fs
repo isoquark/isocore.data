@@ -165,9 +165,10 @@ type ClrAccessKind =
     /// Indicates that the target is visible throughout the assembly in which it is defined
     | Internal = 4
     /// Indicates that the target is visible to subclasses and the defining assembly
-    /// Not supported in F#
+    /// Not supported in F#; supported in C# using the protected internal modifiers
     | ProtectedOrInternal = 5
-    /// Indicates that the target is visible to subclasses in the defining assemlby
+    /// Indicates that the target is visible to subclasses in the defining assembl
+    /// Not supported in C# or F#
     | ProtectedAndInternal = 6
         
 /// <summary>

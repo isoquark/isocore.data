@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.MetaCode", "IQ.Core.MetaCode\IQ.Core.MetaCode.fsproj", "{1B4F1280-E097-4A56-8181-FB9668E2C618}"
 EndProject
@@ -22,6 +22,10 @@ EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Framework.Test", "IQ.Core.Framework.Test\IQ.Core.Framework.Test.fsproj", "{DE54CD5C-085F-4401-B4DF-EFFED26EEC33}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BBD36001-C377-4E66-98F3-C01C3D665D64}"
+	ProjectSection(SolutionItems) = preProject
+		build.props = build.props
+		unittests.runsettings = unittests.runsettings
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IQ.Core.DataStructLib", "IQ.Core.DataStructLib\IQ.Core.DataStructLib.csproj", "{4159CC44-092F-4FBC-B84E-226540E54396}"
 EndProject

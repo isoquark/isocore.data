@@ -35,13 +35,6 @@ type GenerationContext(builder) =
     member this.Builder : StringBuilder = builder
     member this.IndentText = if this.CurrentIndent = 0 then String.Empty else String.replicate this.CurrentIndent " "
 
-module ClrAccessKind =    
-    let generate(subject : ClrAccessKind) = function
-        | ClrAccessKind.Public -> "public"
-        | ClrAccessKind.Internal -> "internal"
-        | ClrAccessKind.Private -> "private"
-        | _ -> nosupport()
-
 module ClrEnum =
     let generate (context : GenerationContext) (e : ClrEnum) =
         let appendLine text = context.Builder |> StringBuilder.appendLine text
@@ -55,6 +48,14 @@ module ClrEnum =
         )
           
 module ClrType =
+    
+    module ClrAccessKind =    
+        let generate(subject : ClrAccessKind) = function
+            | ClrAccessKind.Public -> "public"
+            | ClrAccessKind.Internal -> "internal"
+            | ClrAccessKind.Private -> "private"
+            | _ -> nosupport()
+
     let private genEnumLiteral (eb : EnumBuilder)  (f : ClrField) =
         let value = Convert.ChangeType(f.LiteralValue |> Option.get, eb.GetEnumUnderlyingType() )
         eb.DefineLiteral(f.Name.Text, value)        
