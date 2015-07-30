@@ -3,6 +3,8 @@
 namespace IQ.Core.MetaCode
 
 open System
+open System.Text;
+open System.IO;
 
 open Microsoft.CodeAnalysis;
 open Microsoft.CodeAnalysis.Formatting
@@ -27,7 +29,7 @@ type UnsupportedConstruct(language, construct) =
         sprintf "The %A language does not support the %s construct" language construct
 
 
-module ClrAccessKind =
+module internal ClrAccessKind =
     let getKeywords(access : ClrAccessKind) =
         match access with
         | ClrAccessKind.Public -> 
@@ -137,7 +139,7 @@ module internal CU =
 module CSharpGenerator =
 
     
-    let genType (t : ClrType) =
+    let private genType (t : ClrType) =
         match t with
         | ClassType(t) -> 
             t |> ClrClass.declare  :> TypeDeclarationSyntax            
@@ -162,12 +164,20 @@ module CSharpGenerator =
         | InterfaceType(t) -> 
             nosupport()    
     
-    let genProject(a : ClrAssembly) =
+
+    let genProject (dstFolder : string) (a : ClrAssembly) =
         let cu = CU.create() |> CU.using "System"  
                              |> CU.using "System.Collections.Generic" 
                              |> CU.addTypes (a.Types |> List.map genType)
-        cu
+        use workspace = new AdhocWorkspace()
+        let format = Formatter.Format(cu, workspace)
+        let sb = StringBuilder()
+        let path = Path.Combine(dstFolder, "Gen.cs")
+        use writer = new StreamWriter(path)
+        format.WriteTo(writer)
         
+   
+
         
         
                     
