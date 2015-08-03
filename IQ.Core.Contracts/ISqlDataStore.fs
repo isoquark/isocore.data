@@ -4,6 +4,7 @@ namespace IQ.Core.Data
 
 open System
 open System.Diagnostics
+open System.Collections.Generic
 
 /// <summary>
 /// Represents a query pameter
