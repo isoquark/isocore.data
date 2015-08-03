@@ -29,6 +29,11 @@ type ICompositionRegistry =
     /// </summary>
     abstract RegisterFactory<'TConfig, 'I> : ServiceFactory<'TConfig,'I> -> unit when 'I : not struct
 
+    /// <summary>
+    /// Registers a service factory method from a delegate (to place nice with C#)
+    /// </summary>
+    abstract RegisterFactoryDelegate<'TConfig, 'I> : Func<'TConfig,'I> ->unit when 'I : not struct
+
 /// <summary>
 /// Defines contract for an application execution context for a given container/root
 /// </summary>

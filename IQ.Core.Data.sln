@@ -26,6 +26,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E8BBADE0-E4E8-476B-B4B7-5F9284E8C608}"
 	ProjectSection(SolutionItems) = preProject
 		build.props = build.props
+		isocore.nuspec = isocore.nuspec
+		package.fsx = package.fsx
 		test_IQ.Core.Data.bat = test_IQ.Core.Data.bat
 	EndProjectSection
 EndProject

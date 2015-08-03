@@ -78,6 +78,7 @@
   <ItemGroup>
     <None Include="eXa003.publish.xml" />
     <None Include="local.publish.xml" />
+    <None Include="eXaCore03.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IQ.Schemas.Core\IQ.Schemas.Core.sqlproj">

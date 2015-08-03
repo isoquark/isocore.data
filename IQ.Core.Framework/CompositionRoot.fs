@@ -50,6 +50,9 @@ module internal CompositionRoot =
             member this.Seal() = container := builder.Build()
             member this.Dispose() = container.Value.Dispose()
             member this.CreateContext() = new AppContext(container.Value) :> IAppContext
+            member this.RegisterFactoryDelegate(f : Func<'TConfig, 'I> ) =
+                builder |> registerFactory (fun config -> f.Invoke(config))
+                
         
     let compose(register:ICompositionRegistry -> unit) =               
         let root = (new CompositionRoot()) :> ICompositionRoot
