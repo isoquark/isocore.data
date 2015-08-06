@@ -170,7 +170,7 @@ module internal Routine =
                         let itemType = typedesc.Name |> provider.FindType |> fun x -> x.ReflectedElement.Value.ItemValueType
                         let items = 
                             [for row in result ->
-                                itemType |> RecordValueConverter.fromValueArray row]
+                                itemType |> DataRecord.fromValueArray row]
                         items |> Collection.create x.Kind itemType |> Some                    
                     | _ -> NotSupportedException() |> raise                                            
             | _ -> nosupport()

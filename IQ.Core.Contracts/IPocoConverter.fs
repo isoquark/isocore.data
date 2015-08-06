@@ -5,9 +5,9 @@ namespace IQ.Core.Framework
 open System
 
 /// <summary>
-/// Specifies operations for converting F# record values to/from alternate representations
+/// Specifies operations for converting POCO values to/from alternate representations
 /// </summary>
-type IRecordValueConverter =
+type IPocoConverter =
     /// <summary>
     /// Creates a <see cref="ValueIndex"/> from a record value
     /// </summary>
@@ -32,3 +32,7 @@ type IRecordValueConverter =
     abstract FromValueIndex: idx : ValueIndex * t : Type -> obj
 
 
+/// <summary>
+/// Defines the configuration contract for <see cref="IPocoConverter"/> realizations
+/// </summary>
+type PocoConverterConfig = PocoConverterConfig of clrMetadataProvider : IClrMetadataProvider

@@ -11,9 +11,8 @@ open System.Collections.Concurrent
 open Microsoft.FSharp.Reflection
 
 
-type RecordValueConverterConfig = RecordValueConverterConfig of clrMetadataProvider : IClrMetadataProvider
 
-module RecordValueConverter = 
+module DataRecord = 
     let private factories = 
         ConcurrentDictionary<Type, obj[]->obj>()
     
@@ -98,12 +97,12 @@ module RecordValueConverter =
                 |> Transformer.convertArray types
                 |> getRecordFactory(t)
                        
-    type private Realization(config : RecordValueConverterConfig) =
-        interface IRecordValueConverter with
+    type private Realization(config : PocoConverterConfig) =
+        interface IPocoConverter with
             member this.ToValueIndex record  = record |> toValueIndex 
             member this.ToValueArray record = record |> toValueArray
             member this.FromValueArray (valueArray, t) = fromValueArray valueArray t
             member this.FromValueIndex (idx, t) = fromValueIndex idx t
     
-    let get(config) =
-        Realization(config) :> IRecordValueConverter
+    let getPocoConverter(config) =
+        Realization(config) :> IPocoConverter

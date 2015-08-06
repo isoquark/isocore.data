@@ -37,7 +37,7 @@ module RecordValue =
                 FieldA3 = 14.1m
             }
             let actual = typeof<RecordA> 
-                      |> RecordValueConverter.fromValueArray [|expect.FieldA1 :> obj; expect.FieldA2 :> obj; expect.FieldA3 :> obj|]
+                      |> DataRecord.fromValueArray [|expect.FieldA1 :> obj; expect.FieldA2 :> obj; expect.FieldA3 :> obj|]
                       :?> RecordA
             actual |> Claim.equal expect
 
@@ -48,7 +48,7 @@ module RecordValue =
                 FieldA2 = "Hello"
                 FieldA3 = 38.12m
             }
-            let valueArray = recordValue |> RecordValueConverter.toValueArray
+            let valueArray = recordValue |> DataRecord.toValueArray
             Claim.equal (recordValue.FieldA1 :> obj) valueArray.[0]
             Claim.equal (recordValue.FieldA2 :> obj) valueArray.[1]
             Claim.equal (recordValue.FieldA3 :> obj) valueArray.[2]
@@ -66,7 +66,7 @@ module RecordValue =
                 FieldA2 = "Hello"
                 FieldA3 = 38.12m
             }
-            let actual =  typeof<RecordA> |> RecordValueConverter.fromValueIndex valueMap :?> RecordA
+            let actual =  typeof<RecordA> |> DataRecord.fromValueIndex valueMap :?> RecordA
             actual |> Claim.equal expect
 
 
@@ -83,7 +83,7 @@ module RecordValue =
                 FieldB2 = 38.12m
                 FieldB3 = BclDateTime(2015, 5, 6) |> Some
             }
-            let actual1 =  typeof<RecordB> |> RecordValueConverter.fromValueIndex valueMap1 :?> RecordB
+            let actual1 =  typeof<RecordB> |> DataRecord.fromValueIndex valueMap1 :?> RecordB
             actual1 |> Claim.equal expect1
 
             let valueMap2 = 
@@ -97,7 +97,7 @@ module RecordValue =
                 FieldB2 = 38.12m
                 FieldB3 = None
             }
-            let actual2 =  typeof<RecordB> |> RecordValueConverter.fromValueIndex valueMap2 :?> RecordB
+            let actual2 =  typeof<RecordB> |> DataRecord.fromValueIndex valueMap2 :?> RecordB
             actual2 |> Claim.equal expect2
 
         [<Fact>]
@@ -114,7 +114,7 @@ module RecordValue =
                 (FieldB3Name.Text, 2, value1.FieldB3:> obj)
                 ] |> ValueIndex.create
 
-            let actual1 = value1 |> RecordValueConverter.toValueIndex 
+            let actual1 = value1 |> DataRecord.toValueIndex 
             actual1 |> Claim.equal expect1
 
             let value2 = {
@@ -129,5 +129,5 @@ module RecordValue =
                 (FieldB3Name.Text, 2, value1.FieldB3:> obj)
                 ] |> ValueIndex.create
 
-            let actual2 = value1 |> RecordValueConverter.toValueIndex 
+            let actual2 = value1 |> DataRecord.toValueIndex 
             actual2 |> Claim.equal expect2

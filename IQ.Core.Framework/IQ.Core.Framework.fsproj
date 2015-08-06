@@ -69,7 +69,7 @@
     <Compile Include="ClrElement.fs" />
     <Compile Include="ClrMetadataProvider.fs" />
     <Compile Include="Transformer.fs" />
-    <Compile Include="RecordValue.fs" />
+    <Compile Include="DataRecord.fs" />
     <Compile Include="DynamicContract.fs" />
     <Compile Include="DataStructures.fs" />
     <Compile Include="CoreRegistration.fs" />

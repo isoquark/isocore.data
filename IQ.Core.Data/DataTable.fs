@@ -74,7 +74,7 @@ module DataTable =
         let table = d.DataElement |> fromTabularDescription
            
         for value in values do
-            let valueidx = value |>RecordValueConverter.toValueIndex
+            let valueidx = value |>DataRecord.toValueIndex
             [|for column in columns do 
                 yield valueidx.[column.ProxyElement.Name.Text] |> DataTypeConverter.toBclTransportValue column.DataElement.StorageType
             |] |> table.Rows.Add |> ignore
@@ -98,13 +98,13 @@ module DataTable =
         | CollectionType(x) ->
             let items = 
                 [for row in dataTable.Rows ->
-                    t.ReflectedElement.Value |> RecordValueConverter.fromValueArray row.ItemArray]
+                    t.ReflectedElement.Value |> DataRecord.fromValueArray row.ItemArray]
             let itemType = t.ReflectedElement.Value 
             items |> Collection.create x.Kind itemType :?> IEnumerable
         | _ ->
             [for row in dataTable.Rows ->
                 
-                t.ReflectedElement.Value |> RecordValueConverter.fromValueArray row.ItemArray] :> IEnumerable
+                t.ReflectedElement.Value |> DataRecord.fromValueArray row.ItemArray] :> IEnumerable
 
     /// <summary>
     /// Creates a collection of proxies from rows in a data table

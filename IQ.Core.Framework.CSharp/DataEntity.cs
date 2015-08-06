@@ -28,7 +28,7 @@ namespace IQ.Core.Framework
         /// <typeparam name="T">The entity type</typeparam>
         /// <param name="o"></param>
         /// <returns></returns>
-        public static object[] ToItemArray<T>(T o) =>
+        public static object[] ToValueArray<T>(T o) =>
             props<T>().Map(p => p.GetValue(o)).ToArray<object>();
 
         /// <summary>
@@ -38,7 +38,7 @@ namespace IQ.Core.Framework
         /// <typeparam name="T"></typeparam>
         /// <param name="items"></param>
         /// <returns></returns>
-        public static T FromItemArray<T>(object[] items)
+        public static T FromValueArray<T>(object[] items)
         {
             var props = props<T>();
             if (props.Count != items.Length)
@@ -62,7 +62,7 @@ namespace IQ.Core.Framework
         {
             var table = new DataTable();
             props<T>().Map(p => table.Columns.Add(p.Name, p.PropertyType));
-            items.Map(ToItemArray).Map(x => table.LoadDataRow(x, true));
+            items.Map(ToValueArray).Map(x => table.LoadDataRow(x, true));
             return table;
         }
 
@@ -97,6 +97,39 @@ namespace IQ.Core.Framework
             return items;
 
         }
+
+
+        private class PocoConverter : IPocoConverter
+        {
+            public PocoConverter(PocoConverterConfig config)
+            {
+
+            }
+
+            object IPocoConverter.FromValueArray(object[] valueArray, Type t)
+            {
+                throw new NotImplementedException();
+            }
+
+            object IPocoConverter.FromValueIndex(ValueIndex idx, Type t)
+            {
+                throw new NotImplementedException();
+            }
+
+            object[] IPocoConverter.ToValueArray(object value)
+            {
+                throw new NotImplementedException();
+            }
+
+            ValueIndex IPocoConverter.ToValueIndex(object record)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public static IPocoConverter getPocoConverter(PocoConverterConfig config) => new PocoConverter(config);
+
+
     }
 
 

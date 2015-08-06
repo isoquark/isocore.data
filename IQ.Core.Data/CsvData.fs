@@ -90,7 +90,7 @@ module CsvReader =
         file.Rows |> Seq.map createValueMap 
                   |> Seq.map (fun valueMap -> 
                     match proxy.ProxyElement with
-                    |TypeElement(t) -> t.ReflectedElement.Value |> RecordValueConverter.fromValueIndex valueMap :?> 'T
+                    |TypeElement(t) -> t.ReflectedElement.Value |> DataRecord.fromValueIndex valueMap :?> 'T
                     | _ ->
                         ArgumentException() |> raise)
                     
@@ -181,7 +181,7 @@ module CsvWriter =
                               |> Txt.delemit format.Separator 
                               |> writer.WriteLine
         for item in items do
-             item |> RecordValueConverter.toValueList
+             item |> DataRecord.toValueList
                   |> List.map formatValue 
                   |> Txt.delemit format.Separator 
                   |> writer.WriteLine
