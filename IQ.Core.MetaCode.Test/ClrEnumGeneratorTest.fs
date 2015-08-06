@@ -51,13 +51,13 @@ module ClrEnumGenerator =
             
 
 
-        [<Fact>]
-        let ``Generated Enums``() =
-            let inputs = [typeinfo<Enum1>; typeinfo<Enum2>]
-            let assembly = generateAssembly inputs
-            let provider = ClrMetadataProvider.get {Assemblies = [assembly.AssemblyName]}
-            let outputs = inputs |> List.map(fun x -> x, x.Name |> provider.FindType ) 
-            outputs |> List.iter(fun (expect, actual) -> verifyEnum expect actual)
+//        [<Fact>]
+//        let ``Generated Enums``() =
+//            let inputs = [typeinfo<Enum1>; typeinfo<Enum2>]
+//            let assembly = generateAssembly inputs
+//            let provider = ClrMetadataProvider.get {Assemblies = [assembly.AssemblyName]}
+//            let outputs = inputs |> List.map(fun x -> x, x.Name |> provider.FindType ) 
+//            outputs |> List.iter(fun (expect, actual) -> verifyEnum expect actual)
             
            
         

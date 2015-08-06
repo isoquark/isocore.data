@@ -5,13 +5,16 @@
 //I just don't have time right now to deal with properly-automated package
 //creation
 
+//TODO: Read version from NUSPEC file
+//TODO: Read VS local package repository setting from (registry?)
+
 let nuspecSrcFile = Path.Combine(__SOURCE_DIRECTORY__, "isocore.nuspec")
-let nuspecDstFile = Path.Combine(__SOURCE_DIRECTORY__, @"build\packaging\isocore.x.x.x\isocore.nuspec")
+let nuspecDstFile = Path.Combine(__SOURCE_DIRECTORY__, @"build\packaging\package\isocore.nuspec")
 File.Copy(nuspecSrcFile, nuspecDstFile, true)
 
 let srcDir = Path.Combine(__SOURCE_DIRECTORY__, @"build\targets\anycpu")
 let srcFiles = Directory.GetFiles(srcDir, "IQ.Core.*") |> Array.filter(fun x -> x.IndexOf(".Test.") = - 1 && x.IndexOf("TestFramework") = -1)
-let dstDir = Path.Combine(__SOURCE_DIRECTORY__, @"build\packaging\isocore.x.x.x\lib\net45\")
+let dstDir = Path.Combine(__SOURCE_DIRECTORY__, @"build\packaging\package\lib\net45\")
 if Directory.Exists(dstDir) then
     Directory.Delete(dstDir, true)
 Directory.CreateDirectory(dstDir)
@@ -20,7 +23,7 @@ srcFiles |> Array.iter(fun srcFile ->
     File.Copy(srcFile, dstFile, true)
 )
 
-let batFilePath = Path.Combine(__SOURCE_DIRECTORY__, @"build\packaging\isocore.x.x.x\package.bat")
+let batFilePath = Path.Combine(__SOURCE_DIRECTORY__, @"build\packaging\package\nupak.bat")
 File.WriteAllText(batFilePath, @"..\..\..\.nuget\nuget pack isocore.nuspec")
 
  

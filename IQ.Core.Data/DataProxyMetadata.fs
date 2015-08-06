@@ -18,33 +18,34 @@ type DescriptionAttribute = System.ComponentModel.DescriptionAttribute
 /// Defines operations that populate a Data Proxy Metamodel
 /// </summary>
 module DataProxyMetadata =    
-    [<Literal>]
-    let private DefaultClrTypeMapResource = "Resources/DefaultClrStorageTypeMap.csv"
     
-    type private DefaultClrTypeMap = CsvProvider<DefaultClrTypeMapResource, Separators="|">
-    
-    let private getDefaultClrStorageTypeMap() =
-        let mapdata = DefaultClrTypeMap.Load(DefaultClrTypeMapResource)
-        [for row in mapdata.Rows ->
-            try
-                Type.GetType(row.ClrTypeName, true), row.DataType |> DataType.parse |> Option.get
-            with
-                e ->
-                    reraise()
+    let private unsafeParse x = x |> DataType.parse |> Option.get
+    let private typeMap = 
+        [
+            Type.GetType("System.Boolean"), unsafeParse "Bit"
+            Type.GetType("System.Byte"), unsafeParse "UInt8"
+            Type.GetType("System.Byte[]"), unsafeParse "BinaryMax"
+            Type.GetType("System.DateTime"), unsafeParse "DateTime(7)"
+            Type.GetType("System.DateTimeOffset"), unsafeParse "DateTimeOffset"
+            Type.GetType("System.Decimal"), unsafeParse "Decimal(19,4)"
+            Type.GetType("System.Double"), unsafeParse "Float64"
+            Type.GetType("System.Guid"), unsafeParse "Guid"
+            Type.GetType("System.Int16"), unsafeParse "Int16"
+            Type.GetType("System.Int32"), unsafeParse "Int32"
+            Type.GetType("System.Int64"), unsafeParse "Int64"
+            Type.GetType("System.Object"), unsafeParse "Variant"
+            Type.GetType("System.Single"), unsafeParse "Float32"
+            Type.GetType("System.Char"), unsafeParse "UnicodeTextFixed(1)"
+            Type.GetType("System.String"), unsafeParse "UnicodeTextVariable(250)"
+            Type.GetType("System.TimeSpan"), unsafeParse "Int64"        
         ] |> dict
-                    
-    let private defaultClrStorageTypeMap = getDefaultClrStorageTypeMap()
-
-    let private getMemberDescription(m : MemberInfo) =
-        if Attribute.IsDefined(m, typeof<DescriptionAttribute>) then
-            (Attribute.GetCustomAttribute(m, typeof<DescriptionAttribute>) :?> DescriptionAttribute).Description |> Some
-        else
-            None        
+    
+       
         
     let inferStorageType(description : ClrElement) =
         let fromClrType (t : Type) =
-            if defaultClrStorageTypeMap.ContainsKey(t.ItemValueType) then
-                defaultClrStorageTypeMap.[t.ItemValueType]
+            if typeMap.ContainsKey(t.ItemValueType) then
+                typeMap.[t.ItemValueType]
             else
                 TypedDocumentDataType(t)
 
@@ -68,6 +69,12 @@ module DataProxyMetadata =
         name |> ClrMetadataProvider.getDefault().FindType
         
          
+    let private getMemberDescription(m : MemberInfo) =
+        if Attribute.IsDefined(m, typeof<DescriptionAttribute>) then
+            (Attribute.GetCustomAttribute(m, typeof<DescriptionAttribute>) :?> DescriptionAttribute).Description |> Some
+        else
+            None        
+
     /// <summary>
     /// Infers the name of the schema in which the element lives or represents
     /// </summary>

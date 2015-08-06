@@ -17,22 +17,26 @@ open IQ.Core.Framework
 
     
 module DataKind =
-    [<Literal>]
-    let private DefaultDataTypeKindAspectsResource = "Resources/DefaultStorageKindAspects.csv"                
-    type private DefaultDataTypeKindAspects = CsvProvider<DefaultDataTypeKindAspectsResource, Separators="|", PreferOptionals=true>
-        
     type private DataTypeKindAspects = | DataTypeKindAspects of length : int option * precision : uint8 option * scale : uint8 option
     with
         member this.Length = match this with DataTypeKindAspects(length=x) -> x |> Option.get
         member this.Precision = match this with DataTypeKindAspects(precision=x) -> x |> Option.get
         member this.Scale = match this with DataTypeKindAspects(scale=x) -> x |> Option.get
+    
+    let private defaults = 
+        [
+            DataKind.BinaryFixed, DataTypeKindAspects(Some(250), None, None)
+            DataKind.BinaryVariable, DataTypeKindAspects(Some(250), None, None)
+            DataKind.AnsiTextFixed, DataTypeKindAspects(Some(250), None, None)
+            DataKind.AnsiTextVariable, DataTypeKindAspects(Some(250), None, None)
+            DataKind.UnicodeTextFixed, DataTypeKindAspects(Some(250), None, None)
+            DataKind.UnicodeTextVariable, DataTypeKindAspects(Some(250), None, None)
+            DataKind.DateTime, DataTypeKindAspects(None, Some(7uy), None)
+            DataKind.TimeOfDay, DataTypeKindAspects(None, Some(7uy), None)
+            DataKind.Decimal, DataTypeKindAspects(None, Some(19uy), Some(4uy))
+            DataKind.Money, DataTypeKindAspects(None, None, None)
+        ] |> dict
 
-    let private loadDefaults() =
-        [for row in (DefaultDataTypeKindAspectsResource |> DefaultDataTypeKindAspects.Load).Cache().Rows ->
-            (DataKind.Parse row.DataTypeName, DataTypeKindAspects(row.Length, row.Precision |> Convert.ToUInt8Option , row.Scale |> Convert.ToUInt8Option))
-        ] |> dict        
-
-    let private defaults = loadDefaults() 
         
     /// <summary>
     /// Gets the DataType kind's default length

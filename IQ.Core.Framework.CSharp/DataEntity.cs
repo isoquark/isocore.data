@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Data;
 
 
+
 namespace IQ.Core.Framework
 {
     /// <summary>
@@ -97,4 +98,6 @@ namespace IQ.Core.Framework
 
         }
     }
+
+
 }
