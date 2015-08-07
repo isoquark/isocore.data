@@ -8,6 +8,7 @@ open System.Data
 open System.Data.SqlClient
 open System.Reflection
 open System.Diagnostics
+open System.Collections.Generic;
 
 open IQ.Core.Data
 open IQ.Core.Framework
@@ -28,7 +29,7 @@ module internal Tabular =
         command.CommandType <- CommandType.Text
         command |> SqlCommand.executeQuery tabular.Columns
 
-    let executeProxyQuery<'T> cs (tdesc : ClrType) : list<'T> =
+    let executeProxyQuery<'T> cs (tdesc : ClrType)  =
         let proxy = tdesc |> DataProxyMetadata.describeTablularProxy
         let data = proxy.DataElement |> executeQuery cs
         let itemType = tdesc.ReflectedElement.Value

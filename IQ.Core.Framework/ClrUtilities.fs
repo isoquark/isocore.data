@@ -8,6 +8,7 @@ open System.IO
 open System.Collections.Generic
 open System.Linq.Expressions
 open System.Diagnostics
+open System.Runtime.CompilerServices
 
 open Microsoft.FSharp.Reflection
 open Microsoft.FSharp.Quotations.Patterns
@@ -873,6 +874,9 @@ module ReflectionExtensions =
     with
         member this.MemberName = ClrMemberName(this.Name)
     
+
+[<AutoOpen>]
+module CommonExtensions = 
     /// <summary>
     /// Defines augmentations for the <see cref="System.Type"/> type
     /// </summary>
@@ -912,7 +916,6 @@ module ReflectionExtensions =
 
 
                 
-
     /// <summary>
     /// Defines augmentations for the <see cref="System.Assembly"/> type
     /// </summary>

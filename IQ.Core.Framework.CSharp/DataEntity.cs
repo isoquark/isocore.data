@@ -31,6 +31,35 @@ namespace IQ.Core.Framework
         public static object[] ToValueArray<T>(T o) =>
             props<T>().Map(p => p.GetValue(o)).ToArray<object>();
 
+
+        /// <summary>
+        /// Projects a data entity onto an array (in property declaration order)
+        /// </summary>
+        /// <param name="o">The source entity</param>
+        /// <returns></returns>
+        public static object[] ToValueArray(object o) =>
+                o.GetType().GetProperties().Map(p => p.GetValue(o)).ToArray<object>();
+
+        /// <summary>
+        /// Hydrates a data entity from an item array, assuming the items in the array
+        /// are arranged in property declaration order
+        /// </summary>
+        /// <param name="items"></param>
+        /// <returns></returns>
+        public static object FromValueArray(object[] items, System.Type t)
+        {
+            var props = t.GetProperties();
+            if(props.Length != items.Length)
+                throw new ArgumentException(
+                    $"Array length of {items.Length} does not match the {props.Length} public properties on the entity");
+
+            var o = Activator.CreateInstance(t);
+            for (int i = 0; i < props.Length; i++)
+                props[i].SetValue(o, items[i]);
+            return o;
+
+        }
+
         /// <summary>
         /// Hydrates a data entity from an item array, assuming the items in the array
         /// are arranged in property declaration order
@@ -40,15 +69,7 @@ namespace IQ.Core.Framework
         /// <returns></returns>
         public static T FromValueArray<T>(object[] items)
         {
-            var props = props<T>();
-            if (props.Count != items.Length)
-                throw new ArgumentException(
-                    $"Array length of {items.Length} does not match the {props.Count} public properties on the entity");
-
-            var o = Activator.CreateInstance<T>();
-            for (int i = 0; i < props.Count; i++)
-                props[i].SetValue(o, items[i]);
-            return o;
+            return (T) FromValueArray(items, typeof(T));
         }
 
 
@@ -97,38 +118,6 @@ namespace IQ.Core.Framework
             return items;
 
         }
-
-
-        private class PocoConverter : IPocoConverter
-        {
-            public PocoConverter(PocoConverterConfig config)
-            {
-
-            }
-
-            object IPocoConverter.FromValueArray(object[] valueArray, Type t)
-            {
-                throw new NotImplementedException();
-            }
-
-            object IPocoConverter.FromValueIndex(ValueIndex idx, Type t)
-            {
-                throw new NotImplementedException();
-            }
-
-            object[] IPocoConverter.ToValueArray(object value)
-            {
-                throw new NotImplementedException();
-            }
-
-            ValueIndex IPocoConverter.ToValueIndex(object record)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        public static IPocoConverter getPocoConverter(PocoConverterConfig config) => new PocoConverter(config);
-
 
     }
 

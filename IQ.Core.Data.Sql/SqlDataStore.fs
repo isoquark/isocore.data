@@ -6,6 +6,7 @@ open System
 open System.Data
 open System.Text
 open System.Data.SqlClient
+open System.Collections.Generic
 
 open IQ.Core.Contracts
 open IQ.Core.Framework
@@ -55,7 +56,7 @@ module SqlDataStore =
         let cs = SqlConnectionString(config.ConnectionString.Components) |> fun x -> x.Text
         let mp = config |> SqlMetadataProvider.get
         interface ISqlDataStore with
-            member this.Get q : list<'T>= 
+            member this.Get q : list<'T> = 
                 match q with
                 | TabularQuery(tabularName,columnNames) ->
                     typeinfo<'T> |> Tabular.executeProxyQuery cs 
