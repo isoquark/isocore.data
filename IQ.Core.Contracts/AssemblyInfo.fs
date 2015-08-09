@@ -29,5 +29,9 @@ open System.Runtime.InteropServices
 [<assembly: AssemblyVersion("1.0.*")>]
 [<assembly: AssemblyFileVersion("1.0.*")>]
 
+[<assembly: AutoOpen("IQ.Core.Framework.Contracts")>]
+[<assembly: AutoOpen("IQ.Core.Data.Contracts")>]
+[<assembly: AutoOpen("IQ.Core.Synthetics.Contracts")>]
+[<assembly: AutoOpen("IQ.Core.Math.Contracts")>]
 do
     ()

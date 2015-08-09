@@ -159,11 +159,11 @@ module internal SqlConnection =
 
 module internal SqlParameter =
     let create (paramValues : DataParameterValue list) (d : RoutineParameterDescription) =
-        let p = if d.Direction = ParameterDirection.ReturnValue then 
+        let p = if d.Direction = RoutineParameterDirection.ReturnValue then 
                     SqlParameter("Return", DBNull.Value) 
-                else if d.Direction = ParameterDirection.Input then
+                else if d.Direction = RoutineParameterDirection.Input then
                     SqlParameter(d.Name |> SqlFormatter.formatParameterName, paramValues |> List.find(fun v -> v.Name = d.Name) |> fun value -> value.Value)
-                else if d.Direction = ParameterDirection.Output then
+                else if d.Direction = RoutineParameterDirection.Output then
                     SqlParameter(d.Name, DBNull.Value)
                 else
                     NotSupportedException() |> raise

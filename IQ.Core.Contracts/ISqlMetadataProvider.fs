@@ -1,12 +1,10 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data
+namespace IQ.Core.Data.Contracts
 
 open System
 open System.Diagnostics
 
-
-open IQ.Core.Framework
 
 
 /// <summary>
@@ -211,7 +209,7 @@ type TabularDescription = {
 /// <summary>
 /// Specifies the direction of a routine parameter
 /// </summary>
-type ParameterDirection = 
+type RoutineParameterDirection = 
     | Input       = 1 
     | Output      = 2 
     | InputOutput = 3 
@@ -228,7 +226,7 @@ type RoutineParameterDescription = {
     /// The column's data type
     StorageType : DataType
     /// The direction of the parameter
-    Direction : ParameterDirection
+    Direction : RoutineParameterDirection
 }
 
 /// <summary>

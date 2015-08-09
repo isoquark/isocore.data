@@ -52,9 +52,8 @@
     <Compile Include="Routine.fs" />
     <Compile Include="Tabular.fs" />
     <Compile Include="SqlMetadataProvider.fs" />
+    <Compile Include="SqlStoreCommand.fs" />
     <Compile Include="SqlDataStore.fs" />
-    <None Include="Package.nuspec" />
-    <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />
@@ -62,10 +61,6 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Collections.Immutable">
-      <HintPath>..\packages\System.Collections.Immutable.1.1.36\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Linq" />

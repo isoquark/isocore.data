@@ -36,15 +36,6 @@ with
                                         
         
         
-module internal SqlStoreCommand =
-    let execute cs command =
-        let sql = 
-            match command with
-            | TruncateTable tableName ->
-                tableName |> SqlFormatter.formatTruncateTable   
-        use connection = cs |> SqlConnection.create
-        use sqlcommand = new SqlCommand(sql, connection)
-        sqlcommand.ExecuteNonQuery() |> ignore
        
 /// <summary>
 /// Provides ISqlDataStore realization
@@ -78,7 +69,7 @@ module SqlDataStore =
                 items |> Tabular.bulkInsert cs
 
             member this.ExecuteCommand c =
-                c |> SqlStoreCommand.execute cs
+                c |> SqlStoreCommand.execute cs 
             
             member this.GetContract() =
                 Routine.getContract<'TContract> cs

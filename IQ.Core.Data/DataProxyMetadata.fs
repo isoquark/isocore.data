@@ -195,7 +195,7 @@ module DataProxyMetadata =
                 | None ->
                     description.Name.Text, attrib.Direction, position                
             | None ->
-                (description.Name.Text, ParameterDirection.Input, description.Position)
+                (description.Name.Text, RoutineParameterDirection.Input, description.Position)
         {
             RoutineParameterDescription.Name = name
             Position = position
@@ -222,7 +222,7 @@ module DataProxyMetadata =
             let position =  match attrib.Position with |Some(p) -> p |None -> -1
             {
                 RoutineParameterDescription.Name = attrib.Name |> Option.get                   
-                Direction = ParameterDirection.Output //Must always be output so value in attribute can be ignored
+                Direction = RoutineParameterDirection.Output //Must always be output so value in attribute can be ignored
                 StorageType = storageType
                 Position = position
             }
@@ -231,7 +231,7 @@ module DataProxyMetadata =
             {
                 RoutineParameterDescription.Name = "Return"
                 Position = -1
-                Direction = ParameterDirection.ReturnValue
+                Direction = RoutineParameterDirection.ReturnValue
                 StorageType = storageType
             }
                                                                  

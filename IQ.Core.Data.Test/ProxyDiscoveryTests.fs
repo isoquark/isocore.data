@@ -143,15 +143,15 @@ module DataProxyMetadata =
             proc.Parameters.Length |> Claim.equal 3
 
             let param01 = proc.FindParameter "col01"
-            param01.Direction |> Claim.equal ParameterDirection.Output
+            param01.Direction |> Claim.equal RoutineParameterDirection.Output
             param01.StorageType |> Claim.equal Int32DataType
         
             let param02 = proc.FindParameter "col02"
-            param02.Direction |> Claim.equal ParameterDirection.Input
+            param02.Direction |> Claim.equal RoutineParameterDirection.Input
             param02.StorageType |> Claim.equal (DateTimeDataType(7uy))
 
             let param03 = proc.FindParameter "col03"
-            param03.Direction |> Claim.equal ParameterDirection.Input
+            param03.Direction |> Claim.equal RoutineParameterDirection.Input
             param03.StorageType |> Claim.equal Int64DataType       
 
 

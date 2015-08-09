@@ -10,7 +10,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>IQ.Core.MetaCode.Shell</RootNamespace>
     <AssemblyName>IQ.Core.MetaCode.Shell</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
     <Name>IQ.Core.MetaCode.Shell</Name>

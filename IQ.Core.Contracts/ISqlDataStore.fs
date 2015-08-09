@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data
+namespace IQ.Core.Data.Contracts
 
 open System
 open System.Diagnostics
@@ -47,8 +47,17 @@ type SqlElementKind =
 /// Represents a store command
 /// </summary>
 type SqlStoreCommand =
-| TruncateTable of tableName : DataObjectName
+    /// Represents the intent to truncate a table
+    | TruncateTable of tableName : DataObjectName
+    /// Represents the intent to allocate a range of sequence values
+    | AllocateSequenceRange of sequenceName : DataObjectName * count : int
 
+/// <summary>
+/// Represents a store command result
+/// </summary>
+type SqlStoreCommandResult =
+    | TruncateTableResult of rows : int
+    | AllocateSequenceRangeResult of first : obj
 
 /// <summary>
 /// Defines the contract for a SQL Server Data Store
@@ -87,7 +96,7 @@ type ISqlDataStore =
     /// <summary>
     /// Executes a supplied command against the store
     /// </summary>
-    abstract ExecuteCommand:command : SqlStoreCommand -> unit
+    abstract ExecuteCommand:command : SqlStoreCommand -> SqlStoreCommandResult
 
     /// <summary>
     /// Gets the connection string that identifies the represented store

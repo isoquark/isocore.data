@@ -48,6 +48,7 @@
     <Compile Include="TabularTest.fs" />
     <Compile Include="RoutineTest.fs" />
     <Compile Include="SqlMetadataProviderTest.fs" />
+    <Compile Include="SqlCommandTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IQ.Core.Contracts\IQ.Core.Contracts.fsproj">
@@ -84,10 +85,6 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Collections.Immutable">
-      <HintPath>..\packages\System.Collections.Immutable.1.1.36\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />

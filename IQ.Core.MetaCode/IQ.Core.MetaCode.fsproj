@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>IQ.Core.MetaCode</RootNamespace>
     <AssemblyName>IQ.Core.MetaCode</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Name>IQ.Core.MetaCode</Name>

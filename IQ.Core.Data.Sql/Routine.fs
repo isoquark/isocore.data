@@ -147,7 +147,7 @@ module internal Routine =
                 let results = 
                     proxy.DataElement |> executeProcedure mii.ConnectionString routineArgs
                 let outputs = 
-                    proxy.Parameters |> List.filter(fun x -> x.DataElement.Direction = ParameterDirection.Output)
+                    proxy.Parameters |> List.filter(fun x -> x.DataElement.Direction = RoutineParameterDirection.Output)
                 
                 if outputs.Length = 0 then
                     results |> ValueIndex.tryFindNamedValue "Return"

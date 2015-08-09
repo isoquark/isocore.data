@@ -3,12 +3,12 @@
   
   <metadata>
       <id>isocore</id>     
-      <version>1.0.8</version>
+      <version>1.0.15</version>
       <authors>Chris Moore</authors>
       <projectUrl>https://github.com/isoquark/isocore.git</projectUrl>
       <requireLicenseAcceptance>false</requireLicenseAcceptance>
       <description>Supporting infrastructure for data-oriented and metadata-driven development (ALPHA!)</description>
-      
+     
       <dependencies>
           <group targetFramework=".NETFramework4.5">
             <dependency id="Autofac" version="3.5.2" />

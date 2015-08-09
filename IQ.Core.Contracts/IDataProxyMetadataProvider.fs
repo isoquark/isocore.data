@@ -1,11 +1,12 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data
+namespace IQ.Core.Data.Contracts
 
 open System
 open System.Diagnostics
 
 open IQ.Core.Framework
+open IQ.Core.Framework.Contracts
 
 /// <summary>
 /// Describes a column proxy

@@ -275,10 +275,10 @@ module DataAttributes =
         inherit DataElementAttribute(name)
 
         new (name) =
-            RoutineParameterAttribute(name, ParameterDirection.Input, UnspecifiedPosition)
+            RoutineParameterAttribute(name, RoutineParameterDirection.Input, UnspecifiedPosition)
 
         new (name, position) =
-            RoutineParameterAttribute(name, ParameterDirection.Input, position)
+            RoutineParameterAttribute(name, RoutineParameterDirection.Input, position)
 
         new (direction) =
             RoutineParameterAttribute(UnspecifiedName, direction, UnspecifiedPosition)
@@ -287,7 +287,7 @@ module DataAttributes =
             RoutineParameterAttribute(UnspecifiedName, direction, position)
 
         new (position) =
-            RoutineParameterAttribute(UnspecifiedName, ParameterDirection.Input, position)
+            RoutineParameterAttribute(UnspecifiedName, RoutineParameterDirection.Input, position)
 
         new (name,direction) =
             RoutineParameterAttribute(name, direction, UnspecifiedPosition)
