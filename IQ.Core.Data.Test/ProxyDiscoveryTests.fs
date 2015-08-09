@@ -12,7 +12,7 @@ open IQ.Core.TestFramework
 open IQ.Core.Data
 
 open IQ.Core.Data.Test.ProxyTestCases
-open IQ.Core.Data.Test.Proxies.CSharp
+
 
 open IQ.Core.Framework.Test
 
@@ -205,8 +205,3 @@ module DataProxyMetadata =
             (fun () -> "SomeObject," |> DataObjectName.parse |> ignore ) |> Claim.failWith<ArgumentException>
             (fun () -> "(SomeSchema,)" |> DataObjectName.parse |> ignore ) |> Claim.failWith<ArgumentException>
 
-        [<Fact>]
-        let ``Discovered C# table types``() =
-            let t = typeinfo<DataProxies.DataProxy01>
-            let description = t |> DataProxyMetadata.describeTablularProxy
-            ()

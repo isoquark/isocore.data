@@ -22,6 +22,7 @@ module ClrMetadataProvider =
             FieldB3 : RecordA option
         }
 
+
     [<AttributeUsage(AttributeTargets.All)>]
     type MyAttribute() =
         inherit Attribute()
@@ -39,6 +40,12 @@ module ClrMetadataProvider =
         abstract Property01:BclDateTime
         abstract Property02:BclDateTime with get,set
         
+    type SimpleClass() = 
+        member val Field1 = 0 with get,set
+        member val Field2 = "" with get,set
+        member val Field3 = 5m with get,set    
+    
+    
     type ClassA() =   
         let mutable p2Val = 0
         let p3Val = Some(4L)
@@ -284,3 +291,10 @@ module ClrMetadataProvider =
         let ``Discovered enum types``() =
             let t = typeinfo<EnumA>
             t.Kind |> Claim.equal ClrTypeKind.Enum        
+
+        
+        [<Fact>]
+        let ``Described Simple Class``() =
+           let t = typeinfo<SimpleClass>
+           ()
+                        

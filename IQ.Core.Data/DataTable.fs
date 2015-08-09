@@ -73,8 +73,9 @@ module DataTable =
         
         let table = d.DataElement |> fromTabularDescription
            
+        let pocoConverter =  ClrMetadataProvider.getDefault() |> PocoConverterConfig |> PocoConverter.get
         for value in values do
-            let valueidx = value |>DataRecord.toValueIndex
+            let valueidx = value |> pocoConverter.ToValueIndex
             [|for column in columns do 
                 yield valueidx.[column.ProxyElement.Name.Text] |> DataTypeConverter.toBclTransportValue column.DataElement.StorageType
             |] |> table.Rows.Add |> ignore
@@ -94,17 +95,19 @@ module DataTable =
     /// <param name="t">The proxy type</param>
     /// <param name="dataTable">The data table</param>
     let toProxyValues (t : ClrType) (dataTable : DataTable) =
+        let pocoConverter =  ClrMetadataProvider.getDefault() |> PocoConverterConfig |> PocoConverter.get
         match t with
         | CollectionType(x) ->
             let items = 
                 [for row in dataTable.Rows ->
-                    t.ReflectedElement.Value |> DataRecord.fromValueArray row.ItemArray]
+                    pocoConverter.FromValueArray(row.ItemArray, t.ReflectedElement.Value)
+                    ]
             let itemType = t.ReflectedElement.Value 
             items |> Collection.create x.Kind itemType :?> IEnumerable
         | _ ->
             [for row in dataTable.Rows ->
                 
-                t.ReflectedElement.Value |> DataRecord.fromValueArray row.ItemArray] :> IEnumerable
+                pocoConverter.FromValueArray(row.ItemArray, t.ReflectedElement.Value)] :> IEnumerable
 
     /// <summary>
     /// Creates a collection of proxies from rows in a data table

@@ -12,7 +12,7 @@ open Microsoft.FSharp.Reflection
 
 
 
-module DataRecord = 
+module internal DataRecord = 
     let private factories = 
         ConcurrentDictionary<Type, obj[]->obj>()
     
@@ -22,6 +22,24 @@ module DataRecord =
             factories.[t] <- FSharpValue.PreComputeRecordConstructor(t, true)
         factories.[t]
         
+    /// <summary>
+    /// Creates a record from an array of values that are specified in declaration order
+    /// </summary>
+    /// <param name="valueArray">An array of values in declaration order</param>
+    /// <param name="tref">Reference to type</param>
+    let fromValueArray (valueArray : obj[]) (t : Type) =
+        if t |> Type.isRecordType |> not then
+            argerrord "o" t "Not a record type"
+
+        let types = 
+            t.TypeName   
+                |> ClrMetadata().FindType 
+                |> fun x -> x.Properties
+                |> List.map(fun p -> p.ReflectedElement.Value.PropertyType) |> Array.ofList
+            
+        valueArray |> Transformer.convertArray types 
+                   |> getRecordFactory(t)
+
     
     /// <summary>
     /// Retrieves record field values indexed by field name
@@ -59,23 +77,6 @@ module DataRecord =
     let toValueArray (o : obj) =
             o |> toValueList |> Array.ofList
 
-    /// <summary>
-    /// Creates a record from an array of values that are specified in declaration order
-    /// </summary>
-    /// <param name="valueArray">An array of values in declaration order</param>
-    /// <param name="tref">Reference to type</param>
-    let fromValueArray (valueArray : obj[]) (t : Type) =
-        if t |> Type.isRecordType |> not then
-            argerrord "o" t "Not a record type"
-
-        let types = 
-            t.TypeName   
-                |> ClrMetadata().FindType 
-                |> fun x -> x.Properties
-                |> List.map(fun p -> p.ReflectedElement.Value.PropertyType) |> Array.ofList
-            
-        valueArray |> Transformer.convertArray types 
-                   |> getRecordFactory(t)
 
     /// <summary>
     /// Instantiates a type using the data supplied in a value map

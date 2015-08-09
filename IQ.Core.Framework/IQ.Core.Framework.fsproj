@@ -74,6 +74,7 @@
     <Compile Include="DynamicContract.fs" />
     <Compile Include="DataStructures.fs" />
     <Compile Include="CoreRegistration.fs" />
+    <Compile Include="PocoConverter.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Autofac">

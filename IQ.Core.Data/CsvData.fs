@@ -86,11 +86,13 @@ module CsvReader =
             colnames |> Array.map(fun colname -> colname |> getColumnProxy |> fun c -> 
                                     c.ProxyElement.Name.Text, c.ProxyElement.Position, colname|> row.GetColumn |> convert colname) 
                      |> ValueIndex.create
+        let pocoConverter =  ClrMetadataProvider.getDefault() |> PocoConverterConfig |> PocoConverter.get
 
         file.Rows |> Seq.map createValueMap 
-                  |> Seq.map (fun valueMap -> 
+                  |> Seq.map (fun valueIndex -> 
                     match proxy.ProxyElement with
-                    |TypeElement(t) -> t.ReflectedElement.Value |> DataRecord.fromValueIndex valueMap :?> 'T
+                    |TypeElement(t) -> 
+                        pocoConverter.FromValueIndex(valueIndex, t.ReflectedElement.Value) :?> 'T                        
                     | _ ->
                         ArgumentException() |> raise)
                     
@@ -180,8 +182,11 @@ module CsvWriter =
                 proxy.Columns |> List.map(fun c -> c.DataElement.Name) 
                               |> Txt.delemit format.Separator 
                               |> writer.WriteLine
+        
+        let pocoConverter =  ClrMetadataProvider.getDefault() |> PocoConverterConfig |> PocoConverter.get
         for item in items do
-             item |> DataRecord.toValueList
+             item |> pocoConverter.ToValueArray
+                  |> List.ofArray
                   |> List.map formatValue 
                   |> Txt.delemit format.Separator 
                   |> writer.WriteLine

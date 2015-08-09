@@ -46,9 +46,15 @@ module Transformer =
                 if value |> Option.isOptionValue then
                     //Convert an option value to a non-option type
                     Convert.ChangeType(value |> Option.unwrapValue |> Option.get, valueType)
-                else
+                else 
                    //Convert a non-option value to a non-option type
-                    Convert.ChangeType(value, valueType)
+                   
+                   //If nullable...
+                    let nt = Nullable.GetUnderlyingType(valueType)
+                    if nt <> null then
+                        Convert.ChangeType(value, nt)
+                    else   
+                        Convert.ChangeType(value, valueType)
 
     /// <summary>
     /// Converts a value to generically-specified type

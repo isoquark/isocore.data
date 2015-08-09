@@ -165,12 +165,12 @@ module internal Routine =
                     let typedesc = proxy.ResultProxy.ProxyElement
                     match typedesc with
                     | CollectionType(x) ->
-                        //let provider = context.Resolve<IClrMetadataProvider>()
                         let provider = ClrMetadataProvider.getDefault()
+                        let pocoConverter =  provider |> PocoConverterConfig |> PocoConverter.get
+
                         let itemType = typedesc.Name |> provider.FindType |> fun x -> x.ReflectedElement.Value.ItemValueType
                         let items = 
-                            [for row in result ->
-                                itemType |> DataRecord.fromValueArray row]
+                            [for row in result -> pocoConverter.FromValueArray(row, itemType)]
                         items |> Collection.create x.Kind itemType |> Some                    
                     | _ -> NotSupportedException() |> raise                                            
             | _ -> nosupport()
