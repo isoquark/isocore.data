@@ -21,6 +21,7 @@ module ExcelDataSet =
             let xlspath = thisAssembly() |> Assembly.emitResource "WB01.xlsx" ctx.OutputDirectory
             let csvpath = thisAssembly() |> Assembly.emitResource "WB01.WS01.csv" ctx.OutputDirectory
             let xlsTable = xlspath |> ExcelDataSet.read |> fun ds -> ds.Tables.["WS01"]
+            let xlsProxies = xlsTable |> DataTable.toProxyValuesT<WB01.WS01> (typeinfo<WB01.WS01>)
             let csvTable = csvpath |> CsvReader.readTable (CsvReader.getDefaultFormat())
            
             ()    
