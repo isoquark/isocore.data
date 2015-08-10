@@ -4,6 +4,7 @@ namespace IQ.Core.Data
 
 open System
 open System.IO
+open System.Data
 
 open FSharp.Data
 
@@ -54,6 +55,7 @@ module CsvDataVocabulary =
 /// </summary>
 module CsvReader =
        
+    
     /// <summary>
     /// Hydrates list of records from file content
     /// </summary>
@@ -145,8 +147,23 @@ module CsvReader =
     /// <param name="path">The path to the CSV file</param>
     let readFile<'T>(format : CsvFormat) (path : string) =
         use file = CsvFile.Load(path, format.Separator, format.Quote, format.HasHeaders, false).Cache()
-        read<'T>  file
-        
+        read<'T>  file        
+
+    let readTable (format : CsvFormat) (path : string) =
+        use file = CsvFile.Load(path, format.Separator, format.Quote, format.HasHeaders, false).Cache()
+        let getArray(row : CsvRow) =
+            let colcount = row.Columns.Length
+            let result = Array.zeroCreate<obj>(colcount)
+            for i in 0..colcount-1 do
+                result.[i] <- row.[i] :> obj
+            result
+
+        let colnames = file.Headers |> Option.get
+        let table = new DataTable(Path.GetFileNameWithoutExtension(path))
+        colnames |> Array.map(table.Columns.Add) |> ignore
+        for csvRow in file.Rows do
+            table.LoadDataRow( csvRow |> getArray, LoadOption.OverwriteChanges) |> ignore                    
+        table
 
 
 /// <summary>

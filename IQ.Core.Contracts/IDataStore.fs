@@ -3,6 +3,7 @@
 namespace IQ.Core.Data.Contracts
 
 open System
+open System.Collections.Generic
 
 /// <summary>
 /// Responsible for identifying a Data Store, Network Address or other resource
@@ -16,33 +17,41 @@ with
     
         
 /// <summary>
-/// Defines the contract to which all data stores must adhere
+/// Defines contract for queryable data store
 /// </summary>
-type IDataStore<'Q> =
+type IQueryableDataStore<'Q> =
     /// <summary>
     /// Retrieves a query-identified collection of data entities from the store
     /// </summary>
-    abstract Get:'Q->'T list
+    abstract Select:'Q->'T IReadOnlyList
+    
+    /// <summary>
+    /// Gets the connection string used to connect to the store
+    /// </summary>
+    abstract ConnectionString : ConnectionString
+
+
+/// <summary>
+/// Defines contract for read/write data stores
+/// </summary>
+type IDataStore<'Q> =
+    inherit IQueryableDataStore<'Q>
 
     /// <summary>
     /// Deletes a query-identified collection of data entities from the store
     /// </summary>
-    abstract Del:'Q->unit
+    abstract Delete:'Q->unit
 
     /// <summary>
     /// Persists a collection of data entities to the store, inserting or updating as appropriate
     /// </summary>
-    abstract Put:'T seq->unit
+    abstract Merge:'T seq->unit
     
     /// <summary>
     /// Inserts an arbitrary number of entities into the store, eliding existence checks
     /// </summary>
     abstract Insert:'T seq ->unit
     
-    /// <summary>
-    /// Gets the connection string that identifies the represented store
-    /// </summary>
-    abstract ConnectionString :string
 
 
 

@@ -76,12 +76,12 @@ type ISqlDataStore =
     /// <summary>
     /// Persists a collection of data entities to the store, inserting or updating as appropriate
     /// </summary>
-    abstract Put:'T seq -> unit
+    abstract Merge:'T seq -> unit
 
     /// <summary>
     /// Deletes and identified collection of data entities from the store
     /// </summary>
-    abstract Del:SqlDataStoreQuery -> unit
+    abstract Delete:SqlDataStoreQuery -> unit
 
     /// <summary>
     /// Obtains an identified contract from the store

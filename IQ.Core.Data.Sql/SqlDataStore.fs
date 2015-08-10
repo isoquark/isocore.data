@@ -60,10 +60,10 @@ module SqlDataStore =
                 typeinfo<'T> |> Tabular.executeProxyQuery cs 
                 
             
-            member this.Put items = 
+            member this.Merge items = 
                 items |> Tabular.bulkInsert cs
             
-            member this.Del q = ()
+            member this.Delete q = ()
 
             member this.Insert (items : 'T seq) =
                 items |> Tabular.bulkInsert cs

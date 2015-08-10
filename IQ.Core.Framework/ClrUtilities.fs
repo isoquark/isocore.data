@@ -720,6 +720,18 @@ module Assembly =
             ArgumentException(sprintf "Resource %s not found" shortName) |> raise
         path
 
+    /// <summary>
+    /// Writes an embedded resource to a file
+    /// </summary>
+    /// <param name="subject">The starting assembly</param>
+    let emitResource (shortName : string) (outputDir : string) (subject : Assembly) =
+        let path = Path.Combine(outputDir, shortName)
+        let name = subject.GetManifestResourceNames() 
+                    |> Array.find(fun x -> shortName |> x.Contains)
+        use src = name |> subject.GetManifestResourceStream
+        use dst = path |> File.Create
+        dst |> src.CopyTo
+        path
     
 
         

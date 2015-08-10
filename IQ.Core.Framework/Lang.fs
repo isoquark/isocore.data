@@ -8,6 +8,7 @@ open System.Diagnostics
 open System.Linq
 open System.Collections.Generic
 open System.IO
+open System.Runtime.CompilerServices
 
 open Microsoft.FSharp.Reflection
 open Microsoft.FSharp.Quotations.Patterns
@@ -185,7 +186,9 @@ module Lang =
         /// Recursively loads assembly references into the current application domain
         /// </summary>
         /// <param name="subject">The starting assembly</param>
-        member this.LoadReferences (filter : string option) = this |> Assembly.loadReferences filter
+        member this.LoadReferences (filter : string option) = 
+            this |> Assembly.loadReferences filter
+        
 
     /// <summary>
     /// Lookup operator to retrieve the value identified by a key in a map
