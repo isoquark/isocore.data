@@ -31,7 +31,7 @@ module RecordValue =
     type Tests(ctx,log) =
         inherit ProjectTestContainer(ctx,log)
      
-        let converter = ctx.ClrMetadataProvider |> PocoConverterConfig |>  PocoConverter.get
+        let converter =  PocoConverter.getDefault()
 
         [<Fact>]
         let ``Created record value from array - No optional fields``() =

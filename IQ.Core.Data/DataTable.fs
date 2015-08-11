@@ -13,6 +13,15 @@ open System.Collections
 open System.Collections.Generic
 
 
+
+type IDataTableConverter =
+    abstract FromProxyValues: TabularProxyDescription->values : obj seq -> DataTable
+    abstract ToProxyValues: Type-> DataTable->IEnumerable
+
+type IDataTableConverter<'T> =
+    abstract FromProxyValues: TabularProxyDescription->values : 'T seq -> DataTable
+    abstract ToProxyValues: Type-> DataTable->'T seq
+
 /// <summary>
 /// Defines operations for working with Data Tables
 /// </summary>
@@ -73,20 +82,13 @@ module DataTable =
         
         let table = d.DataElement |> fromTabularDescription
            
-        let pocoConverter =  ClrMetadataProvider.getDefault() |> PocoConverterConfig |> PocoConverter.get
+        let pocoConverter =  PocoConverter.getDefault()
         for value in values do
             let valueidx = value |> pocoConverter.ToValueIndex
             [|for column in columns do 
                 yield valueidx.[column.ProxyElement.Name.Text] |> DataTypeConverter.toBclTransportValue column.DataElement.StorageType
             |] |> table.Rows.Add |> ignore
         table                
-
-    /// <summary>
-    /// Creates a <see cref="System.Data.DataTable"/> from a sequence of records
-    /// </summary>
-    /// <param name="values">The record values that will be transformed into table rows</param>
-    let fromProxyValuesT (values : 'T seq) =
-         values |> Seq.map(fun x -> x :> obj) |> fromProxyValues (tabularproxy<'T> )
                 
 
     /// <summary>
@@ -95,7 +97,7 @@ module DataTable =
     /// <param name="t">The proxy type</param>
     /// <param name="dataTable">The data table</param>
     let toProxyValues (t : ClrType) (dataTable : DataTable) =
-        let pocoConverter =  ClrMetadataProvider.getDefault() |> PocoConverterConfig |> PocoConverter.get
+        let pocoConverter =  PocoConverter.getDefault()
         match t with
         | CollectionType(x) ->
             let items = 
@@ -105,9 +107,12 @@ module DataTable =
             let itemType = t.ReflectedElement.Value 
             items |> Collection.create x.Kind itemType :?> IEnumerable
         | _ ->
-            [for row in dataTable.Rows ->
-                
-                pocoConverter.FromValueArray(row.ItemArray, t.ReflectedElement.Value)] :> IEnumerable
+            let items = 
+                [for row in dataTable.Rows ->                
+                    pocoConverter.FromValueArray(row.ItemArray, t.ReflectedElement.Value)] 
+            let itemType = t.ReflectedElement.Value 
+            items |> Collection.create ClrCollectionKind.GenericList itemType :?> IEnumerable
+
 
     /// <summary>
     /// Creates a collection of proxies from rows in a data table
@@ -118,4 +123,29 @@ module DataTable =
         dataTable |> toProxyValues t :?> IEnumerable<'T>
 
  
-    
+    /// <summary>
+    /// Creates a <see cref="System.Data.DataTable"/> from a sequence of records
+    /// </summary>
+    /// <param name="values">The record values that will be transformed into table rows</param>
+    let fromProxyValuesT (values : 'T seq) =
+         values |> Seq.map(fun x -> x :> obj) |> fromProxyValues (tabularproxy<'T> )
+
+
+    let getUntypedConverter() =
+        {new IDataTableConverter with
+            member this.ToProxyValues t dataTable =
+                let clrType = ClrMetadataProvider.getDefault().FindType(t.TypeName) 
+                dataTable |> toProxyValues clrType
+            member this.FromProxyValues d values =
+                fromProxyValues d values        
+        }
+
+    let getTypedConverter<'T>() =
+        {new IDataTableConverter<'T> with
+            member this.ToProxyValues t dataTable =
+                let clrType = ClrMetadataProvider.getDefault().FindType(t.TypeName) 
+                dataTable |> toProxyValues clrType :?> IEnumerable<'T>
+            member this.FromProxyValues d values =
+                values |> Seq.map(fun x -> x :> obj) |> fromProxyValues (tabularproxy<'T> )    
+        }
+            

@@ -27,17 +27,17 @@ module internal DataRecord =
     /// </summary>
     /// <param name="valueArray">An array of values in declaration order</param>
     /// <param name="tref">Reference to type</param>
-    let fromValueArray (valueArray : obj[]) (t : Type) =
+    let private fromValueArray (config : PocoConverterConfig)  (valueArray : obj[]) (t : Type) =
         if t |> Type.isRecordType |> not then
             argerrord "o" t "Not a record type"
 
         let types = 
             t.TypeName   
-                |> ClrMetadata().FindType 
+                |> config.ClrMetadataProvider.FindType 
                 |> fun x -> x.Properties
                 |> List.map(fun p -> p.ReflectedElement.Value.PropertyType) |> Array.ofList
             
-        valueArray |> Transformer.convertArray types 
+        valueArray |> config.Transformer.TransformArray types 
                    |> getRecordFactory(t)
 
     
@@ -45,7 +45,7 @@ module internal DataRecord =
     /// Retrieves record field values indexed by field name
     /// </summary>
     /// <param name="record">The record whose values will be retrieved</param>
-    let toValueIndex (o : obj) =
+    let private toValueIndex (o : obj) =
         let t = o.GetType()
         if t |> Type.isRecordType |> not then
             argerrord "o" o "Not a record value"
@@ -61,12 +61,12 @@ module internal DataRecord =
     /// Creates a list of field values, in declaration order, for a specified record value
     /// </summary>
     /// <param name="o"></param>
-    let toValueList (o : obj) =
+    let private toValueList (config : PocoConverterConfig) (o : obj) =
         let t = o.GetType()
         if t |> Type.isRecordType |> not then
             argerrord "o" o "Not a record value"
         t.TypeName   
-            |> ClrMetadata().FindType
+            |> config.ClrMetadataProvider.FindType
             |> fun x -> x.Properties
             |> List.map(fun p -> p.ReflectedElement.Value.GetValue(o))
     
@@ -74,8 +74,8 @@ module internal DataRecord =
     /// Creates an array of field values, in declaration order, for a specified record value
     /// </summary>
     /// <param name="o"></param>
-    let toValueArray (o : obj) =
-            o |> toValueList |> Array.ofList
+    let private toValueArray (config : PocoConverterConfig) (o : obj) =
+            o |> toValueList config |> Array.ofList
 
 
     /// <summary>
@@ -83,11 +83,11 @@ module internal DataRecord =
     /// </summary>
     /// <param name="valueMap">The value map</param>
     /// <param name="tref"></param>
-    let fromValueIndex (valueMap : ValueIndex) (t : Type) =
+    let private fromValueIndex (config : PocoConverterConfig) (valueMap : ValueIndex) (t : Type) =
         if t |> Type.isRecordType |> not then
             argerrord "o" t "Not a record type"
 
-        let fields =  t.TypeName   |> ClrMetadata().FindType |> fun x -> x.Properties
+        let fields =  t.TypeName   |> config.ClrMetadataProvider.FindType |> fun x -> x.Properties
 
         let types = 
              fields |> List.map(fun p -> p.ReflectedElement.Value.PropertyType) 
@@ -95,15 +95,15 @@ module internal DataRecord =
 
         fields |> List.map(fun field -> valueMap.[field.Name.Text]) 
                 |> Array.ofList 
-                |> Transformer.convertArray types
+                |> config.Transformer.TransformArray types
                 |> getRecordFactory(t)
                        
     type private Realization(config : PocoConverterConfig) =
         interface IPocoConverter with
             member this.ToValueIndex record  = record |> toValueIndex 
-            member this.ToValueArray record = record |> toValueArray
-            member this.FromValueArray (valueArray, t) = fromValueArray valueArray t
-            member this.FromValueIndex (idx, t) = fromValueIndex idx t
+            member this.ToValueArray record = record |> toValueArray config
+            member this.FromValueArray (valueArray, t) = fromValueArray config valueArray t
+            member this.FromValueIndex (idx, t) = fromValueIndex config idx t
     
     let getPocoConverter(config) =
         Realization(config) :> IPocoConverter

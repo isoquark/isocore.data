@@ -165,7 +165,7 @@ module TimeConversions =
     // ------------------------------------------------------------------------
 
     /// <summary>
-    /// <see cref="DateTime"> => <see cref="BclDateTime"/>
+    /// <see cref="DateTime"/> => <see cref="BclDateTime"/>
     /// </summary>
     /// <param name="src">The source value</param>
     [<Transformation>]
@@ -182,14 +182,14 @@ module TimeConversions =
     // ------------------------------------------------------------------------
 
     /// <summary>
-    /// Converts a <see cref="BclDateTime"> to a <see cref="DateTime"/>
+    /// Converts a <see cref="BclDateTime"/> to a <see cref="DateTime"/>
     /// </summary>
     /// <param name="src">The source value</param>
     [<Transformation>]
     let bclDateTimeToDateTime(src : BclDateTime) = src |> DateTime.FromDateTime
 
     /// <summary>
-    /// Converts a <see cref="BclDateTime"> to a <see cref="Date"/>
+    /// Converts a <see cref="BclDateTime"/> to a <see cref="Date"/>
     /// </summary>
     /// <param name="src">The source value</param>
     [<Transformation>]
@@ -199,7 +199,7 @@ module TimeConversions =
     // ------------------------------------------------------------------------
 
     /// <summary>
-    /// Converts a <see cref="BclTimeSpan"> to a <see cref="Duration"/>
+    /// Converts a <see cref="BclTimeSpan"/> to a <see cref="Duration"/>
     /// </summary>
     /// <param name="src">The source value</param>
     [<Transformation>]
@@ -214,32 +214,39 @@ module TimeConversions =
 
     
     /// <summary>
-    /// Converts a <see cref="UnixTickCount"> to a <see cref="Duration"/>
+    /// Converts a <see cref="UnixTickCount"/> to a <see cref="Duration"/>
     /// </summary>
     /// <param name="src">The source value</param>
     [<Transformation>]
     let unixTicksToDuration(src : UnixTickCount) = src.Value |> Duration.FromTicks
     
     /// <summary>
-    /// Converts a <see cref="Duration"> to a <see cref="UnixTickCount"/>
+    /// Converts a <see cref="Duration"/> to a <see cref="UnixTickCount"/>
     /// </summary>
     /// <param name="src">The source value</param>
     [<Transformation>]
     let durationToUnixTicks(src : Duration) = src.Ticks |> UnixTickCount
 
     /// <summary>
-    /// Converts a <see cref="TimeOfDay"> to a <see cref="DateTime"/>
+    /// Converts a <see cref="TimeOfDay"/> to a <see cref="DateTime"/>
     /// </summary>
     /// <param name="src">The source value</param>
     [<Transformation>]
     let timeOfDayToDateTime(src : TimeOfDay) = src.LocalDateTime
     
     /// <summary>
-    /// Converts a <see cref="TimeOfDay"> to a <see cref="BclDateTime"/>
+    /// Converts a <see cref="TimeOfDay"/> to a <see cref="BclDateTime"/>
     /// </summary>
     /// <param name="src">The source value</param>
     [<Transformation>]
     let timeOfDayToBclDateTime(src : TimeOfDay) = src |> timeOfDayToDateTime |> dateTimeToBclDateTime
+
+    /// <summary>
+    /// Converts a <see cref="string"/> to a <see cref="DateTime"/>
+    /// </summary>
+    /// <param name="src">The source value</param>
+    [<Transformation>]
+    let textToLocalDateTime(src : string) =  src |> BclDateTime.Parse |> NodaTime.LocalDateTime.FromDateTime
 
 module DefaultTimeProvider =
     let private clock = NodaTime.SystemClock.Instance

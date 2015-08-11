@@ -166,7 +166,7 @@ module internal Routine =
                     match typedesc with
                     | CollectionType(x) ->
                         let provider = ClrMetadataProvider.getDefault()
-                        let pocoConverter =  provider |> PocoConverterConfig |> PocoConverter.get
+                        let pocoConverter =  PocoConverter.getDefault()
 
                         let itemType = typedesc.Name |> provider.FindType |> fun x -> x.ReflectedElement.Value.ItemValueType
                         let items = 

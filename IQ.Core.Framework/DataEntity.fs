@@ -13,7 +13,8 @@ open Microsoft.FSharp.Reflection
 
 module internal DataEntity =
     type private PocoConverter(config : PocoConverterConfig) =
-        let metadataProvider = match config with PocoConverterConfig(x) -> x
+        let transforer = config.Transformer
+        let metadataProvider = config.ClrMetadataProvider
         
         let getTypeMetadata (t : Type) =
             t.TypeName |> metadataProvider.FindType
@@ -38,7 +39,7 @@ module internal DataEntity =
                 
                 let props = t |> getProperties                
                 let types =  props |> getPropertyTypes
-                let values = valueArray |> Transformer.convertArray types 
+                let values = valueArray |> config.Transformer.TransformArray types 
                 
                 let o = Activator.CreateInstance(t);
                 props |> List.iteri(fun i p ->
@@ -52,7 +53,7 @@ module internal DataEntity =
                 let types =  props |> getPropertyTypes
                 let values = props |> List.map(fun p -> idx.[p.Name.Text]) 
                                    |> Array.ofList 
-                                   |> Transformer.convertArray types
+                                   |> config.Transformer.TransformArray types
 
                 let o = Activator.CreateInstance(t);
                 props |> List.iteri(fun i p ->

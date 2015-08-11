@@ -29,3 +29,6 @@ module PocoConverter =
 
     let get(config : PocoConverterConfig) =
         Realization(config) :> IPocoConverter
+
+    let getDefault() =
+        PocoConverterConfig(ClrMetadataProvider.getDefault(), Transformer.getDefault())  |> get

@@ -68,7 +68,7 @@ module Transformer =
     /// </summary>
     /// <param name="dstTypes">The destination types</param>
     /// <param name="values">The source values</param>
-    let convertArray (dstTypes : Type[]) (values : obj[])  =
+    let private convertArray (dstTypes : Type[]) (values : obj[])  =
         if values.Length <> dstTypes.Length then
             raise <| ArgumentException(
                 sprintf "Value array (length = %i) and type array (length = %i) must be of the same length" values.Length dstTypes.Length)
@@ -170,21 +170,19 @@ module Transformer =
     type private Realization(config : TransformerConfig) =
         let delegates, identifiers = config |> discover
         let category = match config.Category with | Some(c) -> c | None -> DefaultTransformerCategory
-        
+
+        let canTransform srcType dstType =
+            let key = dstType |> createKey srcType            
+            delegates |> hasTransformation key         
         
         let transform dstType srcValue =
             let srcType = srcValue.GetType()
-            try
+            if dstType |> canTransform srcType then
                 let transformation = getTransformation srcType dstType delegates
                 transformation.Invoke(srcValue)
-            with
-                | :? KeyNotFoundException as e ->   
-                    TransformationUndefinedException(srcType, dstType) |> raise
-        
-        let canTransform srcType dstType =
-            let key = dstType |> createKey srcType            
-            delegates |> hasTransformation key 
-            
+            else
+                srcValue |> convert dstType
+                                                            
         interface ITransformer with
             member this.Transform dstType srcValue =               
                 transform dstType srcValue
@@ -197,24 +195,31 @@ module Transformer =
                     let t = getTransformation srcType dstType delegates
                     srcValues |> Seq.map t.Invoke
             
-            member this.GetTargetTypes srcType  = []
+            member this.GetTargetTypes srcType  = 
+                nosupport()
             
             member this.GetKnownTransformations() = identifiers
             
             member this.CanTransform srcType dstType =
                 dstType |> canTransform srcType 
 
+            member this.TransformArray dstTypes srcValues =
+                //srcValues |> convertArray dstTypes
+                (Array.zip dstTypes srcValues) |> Array.map( fun(dstType, srcValue) -> transform dstType srcValue)
+
             member this.AsTyped() = this :> ITypedTransformer
         interface ITypedTransformer with
             member this.Transform value = 
                 value |> transform typeof<'TDst> :?> 'TDst
             
-            member this.TransformMany values =
-                [] |> Seq.ofList
+            member this.TransformMany values = 
+                nosupport()            
             
-            member this.GetTargetTypes<'TSrc> category = nosupport()
+            member this.GetTargetTypes<'TSrc> category = 
+                nosupport()            
             
-            member this.GetKnownTransformations() = identifiers
+            member this.GetKnownTransformations() = 
+                identifiers
             
             member this.CanTransform<'TSrc,'TDst>() = 
                 typeof<'TDst> |> canTransform typeof<'TSrc>
@@ -223,6 +228,12 @@ module Transformer =
            
     let get(config : TransformerConfig) =        
         Realization(config) :> ITransformer
+
+    let getDefault() =
+        let assemblyQuery = IQ.Core.Framework.AssemblyDescriptor.AssemblyName |> FindAssemblyByName  |> FindAssemblyElement |> List.singleton
+        let transconfig = TransformerConfig(assemblyQuery, None, ClrMetadataProvider.getDefault())
+        transconfig |> get
+        
 
 [<AutoOpen>]
 module ConvertExtensions =

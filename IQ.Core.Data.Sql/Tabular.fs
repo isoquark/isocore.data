@@ -33,7 +33,7 @@ module internal Tabular =
         let proxy = tdesc |> DataProxyMetadata.describeTablularProxy
         let data = proxy.DataElement |> executeQuery cs
         let itemType = tdesc.ReflectedElement.Value
-        let pocoConverter =  ClrMetadataProvider.getDefault() |> PocoConverterConfig |> PocoConverter.get
+        let pocoConverter =  PocoConverter.getDefault()
         let items = [for row in data -> pocoConverter.FromValueArray(row, itemType)]            
         items |> Collection.create ClrCollectionKind.FSharpList itemType :?> list<'T>
 

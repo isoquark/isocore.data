@@ -50,6 +50,12 @@ type ITransformer =
     /// <param name="srcType">The source Type</param>
     /// <param name="dstType">The destination type</param>
     abstract CanTransform : srcType : Type -> dstType : Type -> bool
+
+    /// <summary>
+    /// Converts an array of possibly heterogenous source values to an array of possibly heterogenous 
+    /// target values
+    /// </summary>
+    abstract TransformArray: dstTypes : Type[] -> srcValues : obj[] -> obj[]
         
     /// <summary>
     /// Converts to a generic version of itself

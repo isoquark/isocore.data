@@ -33,7 +33,7 @@ module PocoConverter =
         inherit ProjectTestContainer(ctx,log)
 
     
-        let converter = ctx.ClrMetadataProvider |> PocoConverterConfig |>  PocoConverter.get
+        let converter =  PocoConverter.getDefault()
 
         [<Fact>]
         let ``Created data entity from value array``() =

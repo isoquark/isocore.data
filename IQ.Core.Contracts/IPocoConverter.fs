@@ -35,4 +35,7 @@ type IPocoConverter =
 /// <summary>
 /// Defines the configuration contract for <see cref="IPocoConverter"/> realizations
 /// </summary>
-type PocoConverterConfig = PocoConverterConfig of clrMetadataProvider : IClrMetadataProvider
+type PocoConverterConfig = PocoConverterConfig of clrMetadataProvider : IClrMetadataProvider * transformer : ITransformer
+with
+    member this.Transformer = match this with PocoConverterConfig(transformer=x) -> x
+    member this.ClrMetadataProvider = match this with PocoConverterConfig(clrMetadataProvider=x) -> x

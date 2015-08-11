@@ -88,7 +88,8 @@ module CsvReader =
             colnames |> Array.map(fun colname -> colname |> getColumnProxy |> fun c -> 
                                     c.ProxyElement.Name.Text, c.ProxyElement.Position, colname|> row.GetColumn |> convert colname) 
                      |> ValueIndex.create
-        let pocoConverter =  ClrMetadataProvider.getDefault() |> PocoConverterConfig |> PocoConverter.get
+        
+        let pocoConverter =  PocoConverter.getDefault()
 
         file.Rows |> Seq.map createValueMap 
                   |> Seq.map (fun valueIndex -> 
@@ -200,7 +201,7 @@ module CsvWriter =
                               |> Txt.delemit format.Separator 
                               |> writer.WriteLine
         
-        let pocoConverter =  ClrMetadataProvider.getDefault() |> PocoConverterConfig |> PocoConverter.get
+        let pocoConverter =  PocoConverter.getDefault()
         for item in items do
              item |> pocoConverter.ToValueArray
                   |> List.ofArray
