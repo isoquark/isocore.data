@@ -187,7 +187,9 @@ type ColumnDescription = {
     /// The column's position relative to the other columns
     Position : int
     /// The column's data type
-    StorageType : DataType                
+    StorageType : DataType    
+    /// The column's documentation
+    Documentation : string option            
     /// Specifies whether the column allows null
     Nullable : bool           
     /// Specifies the means by which the column is automatically populated, if applicable 
@@ -200,8 +202,8 @@ type ColumnDescription = {
 type TabularDescription = {
     /// The name of the table
     Name : DataObjectName        
-    /// Specifies the  purpose of the table
-    Description : string option
+    /// The tabular's documentation
+    Documentation : string option
     /// The columns in the table
     Columns : ColumnDescription list
 }
@@ -223,6 +225,8 @@ type RoutineParameterDescription = {
     Name : string
     /// The parameter's position relative to the other columns
     Position : int
+    /// The parameter's documentation
+    Documentation : string option
     /// The column's data type
     StorageType : DataType
     /// The direction of the parameter
@@ -237,6 +241,8 @@ type ProcedureDescription = {
     Name : DataObjectName
     /// The parameters
     Parameters : RoutineParameterDescription list
+    /// The procedures's documentation
+    Documentation : string option
 }
    
 /// <summary>
@@ -247,6 +253,8 @@ type TableFunctionDescription = {
     Name : DataObjectName    
     /// The parameters
     Parameters : RoutineParameterDescription list
+    /// The function's documentation
+    Documentation : string option
     /// The columns in the result set
     Columns : ColumnDescription list
 }

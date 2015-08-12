@@ -50,7 +50,7 @@ module internal SqlMetadataProvider =
                         let vTables = clrmp.FindType<vTable>() |> Tabular.executeProxyQuery<vTable> cs 
                         [for vTable in vTables ->
                             {TabularDescription.Name = DataObjectName(vTable.SchemaName, vTable.TableName)
-                             Description = vTable.Description
+                             Documentation = vTable.Description
                              Columns = []
                             } |> TabularObject
                         ]

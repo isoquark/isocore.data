@@ -71,12 +71,13 @@ module DataProxyMetadata =
         
             let tableExpect = {
                 TabularDescription.Name = DataObjectName("Proxies", typeof<RecordA>.Name)
-                Description = None
+                Documentation = None
                 Columns = 
                 [
                     { 
                       Name = (propname<@ fun (x : RecordA) -> x.AField1 @>).Text
                       Position = 0
+                      Documentation = None
                       StorageType = Int32DataType
                       Nullable = false  
                       AutoValue = None              
@@ -84,6 +85,7 @@ module DataProxyMetadata =
                     { 
                       Name = (propname<@ fun (x : RecordA) -> x.AField2 @>).Text
                       Position = 1
+                      Documentation = None
                       StorageType = BitDataType
                       Nullable = false                
                       AutoValue = None              
@@ -91,6 +93,7 @@ module DataProxyMetadata =
                     { 
                       Name = (propname<@ fun (x : RecordA) -> x.AField3 @>).Text
                       Position = 2
+                      Documentation = None
                       StorageType = Int64DataType
                       Nullable = true
                       AutoValue = None              

@@ -151,6 +151,7 @@ module DataProxyMetadata =
                     | Some(name) -> name
                     | None -> description.Name.Text
                 Position = description.Position |> defaultArg attrib.Position 
+                Documentation = None
                 StorageType = storageType
                 Nullable = description.IsOptional 
                 AutoValue = None
@@ -160,6 +161,7 @@ module DataProxyMetadata =
             {
                 ColumnDescription.Name = description.Name.Text
                 Position = description.Position
+                Documentation = None
                 StorageType = storageType
                 Nullable = description.IsOptional 
                 AutoValue = None
@@ -200,6 +202,7 @@ module DataProxyMetadata =
             RoutineParameterDescription.Name = name
             Position = position
             Direction = direction
+            Documentation = None
             StorageType = description |> ParameterElement|> inferStorageType 
         }
     
@@ -225,6 +228,7 @@ module DataProxyMetadata =
                 Direction = RoutineParameterDirection.Output //Must always be output so value in attribute can be ignored
                 StorageType = storageType
                 Position = position
+                Documentation = None
             }
         | None ->
             //No attribute, so assume stored procedure return value
@@ -233,6 +237,7 @@ module DataProxyMetadata =
                 Position = -1
                 Direction = RoutineParameterDirection.ReturnValue
                 StorageType = storageType
+                Documentation = None
             }
                                                                  
     /// <summary>
@@ -259,6 +264,7 @@ module DataProxyMetadata =
                 let procedure = {
                     ProcedureDescription.Name = objectName
                     Parameters = parameters |> List.map(fun p -> p.DataElement)
+                    Documentation = None
                 }            
                 ProcedureCallProxyDescription(m, procedure, parameters) |> ProcedureProxy
             | _ -> nosupport()
@@ -274,7 +280,7 @@ module DataProxyMetadata =
         let columnProxies = description |> describeColumnProxies
         let table = {
             TabularDescription.Name = objectName
-            Description = description.ReflectedElement.Value|> getMemberDescription
+            Documentation = description.ReflectedElement.Value|> getMemberDescription
             Columns = columnProxies |> List.map(fun p -> p.DataElement)
         }
         TablularProxyDescription(description, table, columnProxies) 
@@ -300,6 +306,7 @@ module DataProxyMetadata =
             TableFunctionDescription.Name = objectName   
             Parameters = parameterProxies|> List.map(fun p -> p.DataElement)
             Columns = columnProxies |> List.map(fun c -> c.DataElement)
+            Documentation = None
         }
         let callProxy = TableFunctionCallProxyDescription(clrMethod, tableFunction, parameterProxies)
         let resultProxy = TabularResultProxyDescription(returnType, tableFunction, columnProxies)
