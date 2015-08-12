@@ -3,7 +3,7 @@
   
   <metadata>
       <id>isocore</id>     
-      <version>1.0.15</version>
+      <version>1.0.16</version>
       <authors>Chris Moore</authors>
       <projectUrl>https://github.com/isoquark/isocore.git</projectUrl>
       <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -13,7 +13,7 @@
           <group targetFramework=".NETFramework4.5">
             <dependency id="Autofac" version="3.5.2" />
             <dependency id="Castle.Core" version="3.3.3" />
-            <dependency id="closedxml" version="0.76.0" />
+            <dependency id="EPPlus" version="4.0.4"/>
             <dependency id="FSharp.Core" version="4.0.0.1" />
             <dependency id="FSharp.Data" version="2.2.5" />
             <dependency id="FSharp.Text.RegexProvider" version="0.0.7" />
