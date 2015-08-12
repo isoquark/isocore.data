@@ -5,8 +5,11 @@ namespace IQ.Core.Data
 open System
 open System.IO
 open System.Data
+open System.Collections.Generic
 
 open FSharp.Data
+
+open CsvHelper
 
 open IQ.Core.Framework
 
@@ -209,5 +212,71 @@ module CsvWriter =
                   |> Txt.delemit format.Separator 
                   |> writer.WriteLine
                
+
+type CsvDataStoreQuery =
+    | FindCsvByFilename of filename : string
+
+type ICsvDataStore =
+    inherit IDataStore<DataTable,CsvDataStoreQuery>
+
+module CsvDataStore  =
+    let private rolist(items : seq<_>) = List<_>(items) :> IReadOnlyList<_>
+
+    let private readTable (csvPath)=
+        let table = new DataTable( csvPath |> Path.GetFileName)
+        use sr = new StreamReader(csvPath)
+        use reader = new CsvReader(sr)
+
         
+        let mutable columnsAdded = false        
+        while(reader.Read()) do
+
+            if columnsAdded = false then
+                reader.FieldHeaders |> Array.iter(fun header -> 
+                    table.Columns.Add(header) |> ignore)
+                columnsAdded <- true
+
+            let data = [|for col in reader.FieldHeaders ->                        
+                            try
+                                reader.GetField(col)  :> obj
+                            with
+                                e ->
+                                    Unchecked.defaultof<obj>
+            
+                       |]
+            table.LoadDataRow(data, true) |> ignore
+        table
+    
+    let private writeTable (csvPath : string) (csvTable : DataTable) = 
+        use stream = new StreamWriter(csvPath) 
+        use writer = new CsvWriter(stream)
+        let colCount = csvTable.Columns.Count
+        for col in  csvTable.Columns do col.ColumnName |> writer.WriteField
+        writer.NextRecord()
+        for row in csvTable.Rows do
+            for i in 0..colCount-1 do
+                writer.WriteField<obj>(row.[i])
+            writer.NextRecord()
+    
+    type Realization(cs) =
+        do
+            if cs |> Directory.Exists |> not then
+                Directory.CreateDirectory(cs) |> ignore
                 
+        interface ICsvDataStore with
+            member this.Select(q) =  
+                match q with
+                | FindCsvByFilename(filename) -> 
+                    Path.Combine(cs, filename) |> readTable |> List.singleton |> rolist
+            member this.Delete(q) = 
+                nosupport()
+
+            member this.Merge(table) = 
+                nosupport()
+            
+            member this.Insert(tables) = 
+                tables |> Seq.iter(fun table ->
+                    table |> writeTable (Path.Combine(cs, table.TableName))
+                )
+
+            member this.ConnectionString = ConnectionString([cs])

@@ -15,7 +15,7 @@ type IExcelDataStore =
     inherit IDataStore<DataTable,ExcelDataStoreQuery>
 
 module ExcelDataStore =
-    let private rol(items : seq<_>) = List<_>(items) :> IReadOnlyList<_>
+    let private rolist(items : seq<_>) = List<_>(items) :> IReadOnlyList<_>
 
     let private hasValue (range : ExcelRange) =
         range <> null &&
@@ -94,10 +94,7 @@ module ExcelDataStore =
         let table = worksheet.Tables.Add(tableRange, "table_" + worksheet.Name)        
         table.ShowTotal <- false
         table.TableStyle <- TableStyles.Light9
-        
-        
-        
-            
+                                   
     type private Realization(cs) =
         
         let openPackage() =
@@ -118,9 +115,9 @@ module ExcelDataStore =
                     use workbook = openPackage()
                     match workbook.Workbook.Worksheets |> Seq.tryFind(fun x -> x.Name = worksheetName) with
                     | Some(ws) ->
-                        ws |> readWorksheet |> List.singleton |> rol
+                        ws |> readWorksheet |> List.singleton |> rolist
                     | None ->
-                        [] |> rol
+                        [] |> rolist
                 | FindTableByName(tableName) ->
                     nosupport()
                 | FindAllWorksheets ->
