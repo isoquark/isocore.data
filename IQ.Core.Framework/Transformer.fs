@@ -175,13 +175,16 @@ module Transformer =
             let key = dstType |> createKey srcType            
             delegates |> hasTransformation key         
         
-        let transform dstType srcValue =
-            let srcType = srcValue.GetType()
-            if dstType |> canTransform srcType then
-                let transformation = getTransformation srcType dstType delegates
-                transformation.Invoke(srcValue)
+        let transform dstType (srcValue : obj) =
+            if srcValue <> null then
+                let srcType = srcValue.GetType()
+                if dstType |> canTransform srcType then
+                    let transformation = getTransformation srcType dstType delegates
+                    transformation.Invoke(srcValue)
+                else
+                    srcValue |> convert dstType
             else
-                srcValue |> convert dstType
+                null
                                                             
         interface ITransformer with
             member this.Transform dstType srcValue =               

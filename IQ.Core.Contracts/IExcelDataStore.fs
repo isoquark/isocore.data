@@ -10,4 +10,8 @@ open System
 /// </summary>
 type ExcelDataStoreQuery =
     /// Retrieves the data contained within a named worksheet
-    | WorksheetQuery of worksheetName : string
+    | FindWorksheetByName of worksheetName : string
+    /// Retrieves data contained in an excel table identified by name
+    | FindTableByName of tableName : string
+    /// Retrieves all worksheets in the workbook
+    | FindAllWorksheets

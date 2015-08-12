@@ -20,7 +20,13 @@ type IDataTableConverter =
 
 type IDataTableConverter<'T> =
     abstract FromProxyValues: TabularProxyDescription->values : 'T seq -> DataTable
-    abstract ToProxyValues: Type-> DataTable->'T seq
+    abstract ToProxyValues: DataTable->'T seq
+
+type IDataTableStore =
+    abstract Merge:DataTable->unit
+    abstract Delete:'Q->unit
+    abstract Select: 'Q->DataTable
+    abstract Insert:DataTable->unit
 
 /// <summary>
 /// Defines operations for working with Data Tables
@@ -119,7 +125,8 @@ module DataTable =
     /// </summary>
     /// <param name="t">The proxy type</param>
     /// <param name="dataTable">The data table</param>
-    let toProxyValuesT<'T> (t : ClrType) (dataTable : DataTable) =
+    let toProxyValuesT<'T>  (dataTable : DataTable) =        
+        let t = ClrMetadataProvider.getDefault().FindType(typeof<'T>.TypeName)
         dataTable |> toProxyValues t :?> IEnumerable<'T>
 
  
@@ -140,11 +147,11 @@ module DataTable =
                 fromProxyValues d values        
         }
 
+
     let getTypedConverter<'T>() =
         {new IDataTableConverter<'T> with
-            member this.ToProxyValues t dataTable =
-                let clrType = ClrMetadataProvider.getDefault().FindType(t.TypeName) 
-                dataTable |> toProxyValues clrType :?> IEnumerable<'T>
+            member this.ToProxyValues dataTable =
+                dataTable |> toProxyValuesT<'T>
             member this.FromProxyValues d values =
                 values |> Seq.map(fun x -> x :> obj) |> fromProxyValues (tabularproxy<'T> )    
         }

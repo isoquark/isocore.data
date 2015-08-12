@@ -63,7 +63,7 @@ module DataTable=
 
         [<Fact>]
         let ``Created record values from a DataTable - weakly  typed``() =
-            let description = typeinfo<DataTableRecord>
+            //let description = typeinfo<DataTableRecord>
         
             let src = 
                 [
@@ -73,10 +73,10 @@ module DataTable=
                 ] 
 
             let dst =  src |> DataTable.fromProxyValues (tabularproxy<DataTableRecord>)
-                           |> DataTable.toProxyValuesT<obj> description
+                           |> DataTable.toProxyValuesT<DataTableRecord>
                            |> List.ofSeq
-            Claim.equal src.[0] dst.[0]
-            Claim.equal src.[1] dst.[1]
-            Claim.equal src.[2] dst.[2]
+            Claim.equal src.[0] (dst.[0] :> obj)
+            Claim.equal src.[1] (dst.[1] :> obj)
+            Claim.equal src.[2] (dst.[2] :> obj)
 
 
