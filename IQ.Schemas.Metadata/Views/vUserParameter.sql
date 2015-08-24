@@ -1,8 +1,6 @@
-﻿create view Metadata.vUserColumn as
+﻿CREATE VIEW [Metadata].[vUserParameter] as
 	select 
 		x.*
 	from 
-		Metadata.vColumn x 
+		Metadata.vParameter x 
 		inner join Metadata.vUserObject o on o.ObjectId = x.ParentId
-		
-

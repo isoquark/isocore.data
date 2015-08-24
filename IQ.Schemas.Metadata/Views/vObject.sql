@@ -9,7 +9,7 @@ with Objects as (select
 			when 0 then 1
 			when 1 then 0 end), 0) as IsUserDefined
 	from 
-		sys.objects x 
+		sys.all_objects x 
 )
 select 
 	[o].[SchemaId], 

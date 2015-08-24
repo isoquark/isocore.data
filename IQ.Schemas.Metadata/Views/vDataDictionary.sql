@@ -1,17 +1,17 @@
 ﻿create view Metadata.vDataDictionary as
 select top(25000) 
-	c.SchemaName, 
-	c.TableName, 
+	c.ParentSchemaId, 
+	c.ParentName, 
 	t.Description as TableDescription,
 	c.ColumnName, 
-	c.ColumnDescription,
+	c.Description as ColumnDescrption,
 	c.Position,
 	c.DataTypeName,
 	c.IsNullable
 from 
 	Metadata.vUserColumn c
-	inner join Metadata.vTable t on c.TableId = t.TableId	
+	inner join Metadata.vTable t on c.ParentId = t.TableId	
 where 
-	c.SchemaName not in ('Metadata', 'dbo')
+	c.ParentSchemaName not in ('Metadata', 'dbo')
 order by 
-	c.SchemaName, c.TableName, c.Position
+	c.ParentSchemaName, c.ParentName, c.Position

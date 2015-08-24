@@ -1,4 +1,5 @@
 ﻿create view Metadata.vUserTable as
 	select 
-*	from 
+		x.*
+	from 
 		Metadata.vTable x where x.IsUserDefined = 1

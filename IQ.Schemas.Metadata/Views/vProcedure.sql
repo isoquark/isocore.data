@@ -1,13 +1,19 @@
-﻿create view Metadata.vProcedure as
+﻿--Note that in some cases, metadata for a procedure can be determined as follows:
+-- select * from sys.dm_exec_describe_first_result_set('[schema].[proc]', null, 0);
+
+
+create view Metadata.vProcedure as
 	select 
-		o.SchemaId,
-		o.SchemaName,
-		x.object_id as ProcedureId,
-		x.name as ProcedureName,
-		o.IsUserDefined,
+		x.SchemaId,
+		x.SchemaName,
+		x.ObjectId as ProcedureId,
+		x.ObjectName as ProcedureName,
+		x.IsUserDefined,
 		d.Value as Description
 	from 
-		sys.procedures x 
-		inner join Metadata.vObject o on o.ObjectId = x.object_id
-		left join Metadata.vDescription d on d.MajorId = x.object_id and d.MinorId = 0
+		Metadata.vObject x 
+		left join Metadata.vDescription d on d.MajorId = x.ObjectId and d.MinorId = 0
+	where
+		x.ObjectType = 'SQL_STORED_PROCEDURE'
+
 	

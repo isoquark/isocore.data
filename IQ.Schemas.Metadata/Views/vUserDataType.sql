@@ -1,22 +1,8 @@
 ﻿CREATE VIEW [Metadata].[vUserDataType] as
 	select 
-		[DataTypeId], 
-		[DataTypeName], 
-		[Description], 
-		[SchemaId], 
-		[SchemaName], 
-		[MappedBclType], 
-		[MappedSqlDbTypeEnum], 
-		[MaxLength], 
-		[Precision], 
-		[Scale], 
-		[IsNullable], 
-		[IsTableType], 
-		[IsAssemblyType], 
-		[IsUserDefined], 
-		[BaseTypeId] 
+		x.*
 	from 
-		Metadata.vDataType
+		Metadata.vDataType x
 	 where 
-		IsUserDefined = 1
+		x.IsUserDefined = 1
 

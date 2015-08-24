@@ -91,6 +91,13 @@
     <Build Include="Views\vUserDataType.sql" />
     <Build Include="Views\vUserTableType.sql" />
     <Build Include="Views\vUserTableTypeColumn.sql" />
+    <Build Include="Views\vUserObject.sql" />
+    <Build Include="Views\vColumn.sql" />
+    <Build Include="Views\vTableFunction.sql" />
+    <Build Include="Views\vTableFunctionColumn.sql" />
+    <Build Include="Views\vParameter.sql" />
+    <Build Include="Views\vUserParameter.sql" />
+    <Build Include="Views\vTableFunctionParameter.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">
