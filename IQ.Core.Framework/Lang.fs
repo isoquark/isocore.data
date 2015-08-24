@@ -6,12 +6,35 @@ open System
 open System.Reflection
 open System.Diagnostics
 open System.Linq
+open System.Collections;
 open System.Collections.Generic
 open System.IO
 open System.Runtime.CompilerServices
 
 open Microsoft.FSharp.Reflection
 open Microsoft.FSharp.Quotations.Patterns
+
+
+type ReadOnlyList<'T>(l : list<'T>) =
+    static member Empty() = List<'T>() 
+
+    override this.GetHashCode() = (l:>obj).GetHashCode()
+    override this.Equals(other) = (l:>obj).Equals(other)
+
+
+    interface IReadOnlyList<'T> with
+            member this.Count: int = 
+                l.Length
+              
+            member this.GetEnumerator(): Collections.IEnumerator = 
+                (l :> IEnumerable).GetEnumerator()
+              
+            member this.GetEnumerator(): IEnumerator<'T> = 
+                (l :> IEnumerable<'T>).GetEnumerator()
+              
+            member this.Item
+                with get (index: int): 'T = 
+                    l.[index]                                                         
 
 /// <summary>
 /// Defines core global operations and types
@@ -31,6 +54,7 @@ module Lang =
     /// </summary>
     type UInt8 = Byte
                                             
+
     /// <summary>
     /// Defines custom Seq module operations
     /// </summary>
@@ -44,6 +68,8 @@ module Lang =
         /// </remarks>
         let count (items : seq<'T>) = items.Count()
     
+        let asReadOnlyList (s : seq<_>) = ReadOnlyList(s |> List.ofSeq) :> IReadOnlyList<_>
+    
     /// <summary>
     /// Defines custom Array module operations
     /// </summary>
@@ -52,6 +78,20 @@ module Lang =
         /// Maps items in an array in parallel
         /// </summary>
         let pmap = Array.Parallel.map
+          
+    module RoList =
+        let map  (f:('T -> 'U))  (l :'T rolist) =
+            [|for item in l -> f(item) |] :> rolist<_>                
+        
+        let sortBy f l =
+            l |> Seq.sortBy f |> Seq.asReadOnlyList
+
+        let toList (l : 'T rolist) =
+            [for item in l -> item]
+
+    module Map =
+        let ofReadOnlyList (items : ('K*'V) rolist) =
+            items |> Map.ofSeq
 
     /// <summary>
     /// Defines custom List module operations
@@ -63,6 +103,9 @@ module Lang =
 
         let chain3 f1 f2 f3 l =
             l |> chain2 f1 f2 |> f3
+
+        let asReadOnlyList (l : list<_>) = ReadOnlyList(l) :> IReadOnlyList<_>
+
 
     /// <summary>
     /// Raises a debugging assertion if a supplied predicate fails and emits a diagnostic message

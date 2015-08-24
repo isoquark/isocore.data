@@ -1,5 +1,4 @@
-﻿open System.IO
-//OK, this is quite lame but is the absolute minimum I need to be able to package up
+﻿//OK, this is quite lame but is the absolute minimum I need to be able to package up
 //my work; it assumes the existence of a folder structure organized like a NUGET
 //package...then manual steps are required to specify the version
 //I just don't have time right now to deal with properly-automated package
@@ -8,6 +7,7 @@
 //TODO: Read version from NUSPEC file
 //TODO: Read VS local package repository setting from (registry?)
 
+open System.IO
 let nuspecSrcFile = Path.Combine(__SOURCE_DIRECTORY__, "isocore.nuspec")
 let nuspecDstFile = Path.Combine(__SOURCE_DIRECTORY__, @"build\packaging\package\isocore.nuspec")
 File.Copy(nuspecSrcFile, nuspecDstFile, true)

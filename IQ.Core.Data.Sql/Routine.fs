@@ -56,7 +56,7 @@ module internal Routine =
         let sql = f |> SqlFormatter.formatTableFunctionSelect
         use command = new SqlCommand(sql, connection)
         f.Parameters |> List.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
-        command |> SqlCommand.executeQuery f.Columns                
+        command |> SqlCommand.executeQuery (f.Columns |> List.map(fun c -> c.Name) |> List.asReadOnlyList)
                    
 
     /// <summary>

@@ -2,6 +2,8 @@
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
 namespace IQ.Core.Framework.Contracts
 
+open System.Collections.Generic
+
 /// <summary>
 /// Responsible for identifying a value in a ValueMap
 /// </summary>
@@ -14,3 +16,5 @@ with
 /// Represents a collection of name-indexed or position-indexed values
 /// </summary>
 type ValueIndex = ValueIndex of (ValueIndexKey*obj) list
+
+type rolist<'T> = IReadOnlyList<'T>

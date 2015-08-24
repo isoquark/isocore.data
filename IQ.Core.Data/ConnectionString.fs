@@ -17,7 +17,7 @@ module ConnectionString =
     /// </summary>
     /// <param name="cs">The connection string to format</param>
     let format (cs : ConnectionString) =
-        cs.Components |> Txt.delemit ";"
+        cs.Components |> List.asReadOnlyList |> Txt.delimit ";"
 
 [<AutoOpen>]
 module ConnectionStringExtensions =

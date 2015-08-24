@@ -49,8 +49,9 @@
     <EmbeddedResource Include="Resources\IntrinsicPrimitiveTypes.csv" />
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="SqlHelpers.fs" />
+    <Compile Include="SqlDataType.fs" />
+    <Compile Include="SqlFormatter.fs" />
     <Compile Include="Routine.fs" />
-    <Compile Include="Tabular.fs" />
     <Compile Include="SqlMetadataProvider.fs" />
     <Compile Include="SqlStoreCommand.fs" />
     <Compile Include="SqlDataStore.fs" />

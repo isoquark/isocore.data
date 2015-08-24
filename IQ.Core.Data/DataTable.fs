@@ -22,11 +22,6 @@ type IDataTableConverter<'T> =
     abstract FromProxyValues: TabularProxyDescription->values : 'T seq -> DataTable
     abstract ToProxyValues: DataTable->'T seq
 
-type IDataTableStore =
-    abstract Merge:DataTable->unit
-    abstract Delete:'Q->unit
-    abstract Select: 'Q->DataTable
-    abstract Insert:DataTable->unit
 
 /// <summary>
 /// Defines operations for working with Data Tables
@@ -155,4 +150,3 @@ module DataTable =
             member this.FromProxyValues d values =
                 values |> Seq.map(fun x -> x :> obj) |> fromProxyValues (tabularproxy<'T> )    
         }
-            

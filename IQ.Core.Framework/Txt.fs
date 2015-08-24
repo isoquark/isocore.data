@@ -5,6 +5,7 @@ namespace IQ.Core.Framework
 open System
 open System.Text
 open System.Text.RegularExpressions
+open System.Collections.Generic
 
 open FSharp.Text.RegexProvider
 
@@ -104,7 +105,7 @@ module Txt =
     /// </summary>
     /// <param name="groupNames">The group names</param>
     /// <param name="m">The match</param>
-    let private attemptGroupMatches (groupNames : string list) (m : Match) =
+    let private attemptGroupMatches (groupNames : string list) (m : Match) =        
         groupNames |> List.map( fun groupName -> 
                         let group = m.Groups.[groupName]
                         if group.Success |> not then
@@ -153,11 +154,11 @@ module Txt =
     /// </summary>
     /// <param name="delimiter">The delimiter use to demarcate the components</param>
     /// <param name="components">The components</param>
-    let delemit (delimiter : string) (components : string list) =
+    let delimit (delimiter : string) (components : string rolist) =
         let sb = new StringBuilder()
-        for i in 0..components.Length-1 do
+        for i in 0..components.Count-1 do
             components.[i] |> sb.Append |> ignore
-            if i <> components.Length - 1 then
+            if i <> components.Count - 1 then
                 delimiter |> sb.Append |> ignore         
         sb.ToString()               
 

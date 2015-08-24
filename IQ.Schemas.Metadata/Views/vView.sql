@@ -2,8 +2,8 @@
 	select 
 		o.SchemaId,
 		o.SchemaName,
-		x.object_id as TableId,
-		x.name as TableName,
+		x.object_id as ViewId,
+		x.name as ViewName,
 		o.IsUserDefined,
 		d.Value as Description
 	from 

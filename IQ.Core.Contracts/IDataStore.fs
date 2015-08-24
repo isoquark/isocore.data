@@ -6,6 +6,8 @@ open System
 open System.Collections.Generic
 open System.Runtime.CompilerServices
 
+open IQ.Core.Framework.Contracts
+
 /// <summary>
 /// Responsible for identifying a Data Store, Network Address or other resource
 /// </summary>
@@ -152,6 +154,71 @@ type IDataStore<'T,'Q> =
     /// </summary>
     abstract Insert:'T seq ->unit
 
+
+/// <summary>
+/// Defines contract for a tabular data source
+/// </summary>
+type ITabularData =
+    /// <summary>
+    /// Describes the encapsulated data
+    /// </summary>
+    abstract Description : TabularDescription
+    /// <summary>
+    /// The encapsulared data
+    /// </summary>
+    abstract RowValues : IReadOnlyList<obj[]>
+
+type TabularData = TabularData of description : TabularDescription * rowValues : rolist<obj[]>
+with
+    member this.RowValues = match this with TabularData(rowValues=x) -> x
+    member this.Description = match this with TabularData(description=x) -> x
+    interface ITabularData with
+        member this.RowValues = this.RowValues
+        member this.Description = this.Description
+    
+type ITabularStore =
+    abstract Merge:ITabularData->unit
+    abstract Delete:'Q->unit
+    abstract Select: 'Q->ITabularData
+    abstract Insert:ITabularData->unit
+
+
+type ColumnFilter = 
+    | Equal of columnName : string * value : obj
+    | NotEqual of columnName : string * value : obj
+    | GreaterThan of columnName : string * value : obj
+    | NotGreaterThan of columnName : string * value : obj
+    | LessThan of columnName : string * value : obj
+    | NotLessThan of columnName : string * value : obj
+    | GreaterThanOrEqual of columnName : string * value : obj
+    | LessThanOrEqual of columnName : string * value : obj
+    | StartsWith of columnName : string * value : obj
+    | EndsWith of columnName : string * value : obj
+    | Contains of columnName : string * value : obj
+
+type ColumnSortCriterion =
+    | AscendingSort of columnName : string
+    | DescendingSort of columnName : string
+
+type TabularPageInfo = TabularPageInfo of pageNumber : int option * pageSize : int option
+
+type ColumnFilterJoin =
+    | AndFilter of ColumnFilter
+    | OrFilter of ColumnFilter
+with
+    member this.Filter = match this with |AndFilter(x)|OrFilter(x) -> x
+
+type TabularDataQuery = 
+     TabularDataQuery of 
+        tabularName : DataObjectName * 
+        columnNames : string rolist *
+        filters : ColumnFilterJoin rolist*
+        sortCriteria : ColumnSortCriterion rolist*
+        pageInfo : TabularPageInfo option
+with
+    member this.ColumnNames = match this with TabularDataQuery(columnNames=x) -> x
+    member this.TabularName = match this with TabularDataQuery(tabularName=x) -> x
+       
 [<AutoOpen; Extension>]
 module DataStoreExtensions =
     [<Extension>]

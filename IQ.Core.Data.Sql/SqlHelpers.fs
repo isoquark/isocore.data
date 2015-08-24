@@ -16,140 +16,18 @@ open IQ.Core.Framework
 open IQ.Core.Data
 
 
-module DataType = 
-    let toSqlDbType (t : DataType) =
-        match t with
-        | BitDataType -> SqlDbType.Bit
-        | UInt8DataType -> SqlDbType.TinyInt
-        | UInt16DataType -> SqlDbType.Int
-        | UInt32DataType -> SqlDbType.BigInt
-        | UInt64DataType -> SqlDbType.VarBinary 
-        | Int8DataType -> SqlDbType.SmallInt
-        | Int16DataType -> SqlDbType.SmallInt
-        | Int32DataType -> SqlDbType.Int
-        | Int64DataType -> SqlDbType.BigInt
-                        
-        | BinaryFixedDataType(_) -> SqlDbType.Binary
-        | BinaryVariableDataType(_) -> SqlDbType.VarBinary
-        | BinaryMaxDataType -> SqlDbType.VarBinary
-            
-        | AnsiTextFixedDataType(length) -> SqlDbType.Char
-        | AnsiTextVariableDataType(length) -> SqlDbType.VarChar
-        | AnsiTextMaxDataType -> SqlDbType.VarChar
-            
-        | UnicodeTextFixedDataType(_) -> SqlDbType.NChar
-        | UnicodeTextVariableDataType(_) -> SqlDbType.NVarChar
-        | UnicodeTextMaxDataType -> SqlDbType.NVarChar
-            
-        | DateTimeDataType(_)-> SqlDbType.DateTime2
-        | DateTimeOffsetDataType -> SqlDbType.DateTimeOffset
-        | TimeOfDayDataType(_) -> SqlDbType.Time
-        | DateDataType -> SqlDbType.Date
-        | TimespanDataType -> SqlDbType.BigInt
-
-        | Float32DataType -> SqlDbType.Real
-        | Float64DataType -> SqlDbType.Float
-        | DecimalDataType(precision,scale) -> SqlDbType.Decimal
-        | MoneyDataType -> SqlDbType.Money
-        | GuidDataType -> SqlDbType.UniqueIdentifier
-        | XmlDataType(_) -> SqlDbType.Xml
-        | JsonDataType -> SqlDbType.NVarChar
-        | VariantDataType -> SqlDbType.Variant
-        | CustomTableDataType(_) -> SqlDbType.Structured
-        | CustomObjectDataType(_,_) -> SqlDbType.VarBinary 
-        | CustomPrimitiveDataType(name) -> SqlDbType.Udt
-        | TypedDocumentDataType(_) -> SqlDbType.NVarChar
-
-
-module SqlFormatter =
-    
-    /// <summary>
-    /// Formats a given value in a form suitable for inclusion in a SQL script
-    /// </summary>
-    /// <param name="value">The value to format</param>
-    let formatValue (value : obj) =
-        if(value <> null) then
-            match value with
-            | :? DBNull as x -> "null"
-            | :? bool as x -> if x = true then "1" else "0"
-            | :? BclDateTime as x -> sprintf "'%s'" (x.ToString("yyyy-MM-dd HH:mm:ss.fff"))
-            | :? char as x -> if x = ''' then @"''" else x.ToString()
-            | :? string as x -> String.Format("'{0}'", x.Replace("'", @"''"))
-            | :? Guid as x -> sprintf "'%O'" x
-            | _ -> value.ToString()
-        else
-            "null"
-
-    /// <summary>
-    /// Formats an object name in a form suitable for inclusion in a SQL script 
-    /// </summary>
-    /// <param name="value">The name of the data object</param>
-    let formatObjectName (value : DataObjectName) =
-        sprintf "[%s].[%s]" value.SchemaName value.LocalName
-
-    /// <summary>
-    /// Formats an element name, such as the name of a parameter or column, in a form suitable for inclusion
-    /// in a SQL script
-    /// </summary>
-    /// <param name="name">The name of the element</param>
-    let formatElementName name =
-        name |> Txt.enclose "[" "]"         
-
-    /// <summary>
-    /// Formats a parameter name using the @-convention
-    /// </summary>
-    /// <param name="paramName">The name of the parameter</param>
-    let formatParameterName paramName =
-        if paramName |> Txt.startsWith "@" |> not then
-            sprintf "@%s" paramName
-        else
-            paramName
-    
-    /// <summary>
-    /// Creates a SQL SELECT statement of the form "select * from [Schema].[Function](@Param1, ..., @ParamN)
-    /// </summary>
-    /// <param name="f">The table-valued function</param>
-    let formatTableFunctionSelect (f : TableFunctionDescription) =
-        let parameters = f.Parameters |> List.map (fun x -> x.Name |> formatParameterName)
-                       |> Txt.delemit ","
-        sprintf "select * from %s(%s)" (f.Name |> formatObjectName) parameters
-
-    /// <summary>
-    /// Create a SQL TRUNCATE TABLE statement
-    /// </summary>
-    /// <param name="n">The name of the table to be truncated</param>
-    let formatTruncateTable (n : DataObjectName) =
-        n |> formatObjectName |> sprintf "truncate table %s"
-
-    /// <summary>
-    /// Formats a select statement for a tabular element
-    /// </summary>
-    let formatTabularSelect(t : TabularDescription) =
-        let columns = t.Columns |> List.map(fun c -> c.Name |> formatElementName) |> Txt.delemit ","
-        let tableName = t.Name |> formatObjectName
-        sprintf "select %s from %s" columns tableName
-
-    /// <summary>
-    /// Formats a select statement for a tabular proxy
-    /// </summary>
-    let formatTabularSelectT<'T>() =
-        let ptype = tabularproxy<'T>
-        ptype.DataElement |> formatTabularSelect
-        
-
 module internal SqlCommand =
-    let executeQuery (columns : ColumnDescription list) (command : SqlCommand) =
+    let executeQuery (colnames : string rolist) (command : SqlCommand) =
         use reader = command.ExecuteReader()
         if reader.HasRows then
-            [while reader.Read() do
-                let buffer = Array.zeroCreate<obj>(columns.Length)
+            [|while reader.Read() do
+                let buffer = Array.zeroCreate<obj>(colnames.Count)
                 let valueCount = buffer |> reader.GetValues
-                Debug.Assert((valueCount = columns.Length), "Column / Value count mismatch")
+                Debug.Assert((valueCount = colnames.Count), "Column / Value count mismatch")
                 yield buffer 
-            ]
+            |] :> rolist<_>
         else
-            []
-        
+            [||] :> rolist<_>
         
 module internal SqlConnection = 
     let create cs = 
@@ -157,16 +35,3 @@ module internal SqlConnection =
         connection.Open() 
         connection
 
-module internal SqlParameter =
-    let create (paramValues : DataParameterValue list) (d : RoutineParameterDescription) =
-        let p = if d.Direction = RoutineParameterDirection.ReturnValue then 
-                    SqlParameter("Return", DBNull.Value) 
-                else if d.Direction = RoutineParameterDirection.Input then
-                    SqlParameter(d.Name |> SqlFormatter.formatParameterName, paramValues |> List.find(fun v -> v.Name = d.Name) |> fun value -> value.Value)
-                else if d.Direction = RoutineParameterDirection.Output then
-                    SqlParameter(d.Name, DBNull.Value)
-                else
-                    NotSupportedException() |> raise
-        p.Direction <- enum<System.Data.ParameterDirection>(int d.Direction)
-        p.SqlDbType <- d.StorageType |> DataType.toSqlDbType   
-        p     

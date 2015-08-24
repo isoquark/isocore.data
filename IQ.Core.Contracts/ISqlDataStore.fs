@@ -6,16 +6,19 @@ open System
 open System.Diagnostics
 open System.Collections.Generic
 
+open IQ.Core.Framework.Contracts
+
 /// <summary>
 /// Represents a query pameter
 /// </summary>
 type SqlQueryParameter = SqlQueryParameter of name : string * value : obj    
 
+
 /// <summary>
 /// Represents the intent to retrieve data from a SQL data store
 /// </summary>
 type SqlDataStoreQuery =
-    | TabularQuery of tabularName : string * columnNames : string list
+    | TabularQuery of tabularQuery : TabularDataQuery
     | TableFunctionQuery of  functionName : string * parameters : SqlQueryParameter list
     | ProcedureQuery of procedureName : string * parameters : SqlQueryParameter list
 
@@ -59,19 +62,55 @@ type SqlStoreCommandResult =
     | TruncateTableResult of rows : int
     | AllocateSequenceRangeResult of first : obj
 
+
 /// <summary>
 /// Defines the contract for a SQL Server Data Store
 /// </summary>
 type ISqlDataStore =
     /// <summary>
+    /// Deletes and identified collection of data entities from the store
+    /// </summary>
+    abstract Delete:SqlDataStoreQuery -> unit
+    /// <summary>
+    /// Inserts the specified tabular data
+    /// </summary>
+    abstract Insert:ITabularData->unit
+    /// <summary>
+    /// Gets the connection string that identifies the represented store
+    /// </summary>
+    abstract ConnectionString :string
+    /// <summary>
+    /// Gets the store's metadata provider
+    /// </summary>
+    abstract MetadataProvider : ISqlMetadataProvider
+    /// <summary>
+    /// Obtains an identified contract from the store
+    /// </summary>
+    abstract GetContract: unit -> 'TContract when 'TContract : not struct
+    /// <summary>
+    /// Executes a supplied command against the store
+    /// </summary>
+    abstract ExecuteCommand:command : SqlStoreCommand -> SqlStoreCommandResult
+    /// <summary>
+    /// Retrieves an identified set of tabular data from the store
+    /// </summary>
+    abstract GetTabular:SqlDataStoreQuery -> ITabularData
+        
+
+/// <summary>
+/// Defines the contract for a SQL Server Data Store that can persist and hydrate data via proxies
+/// </summary>
+type ISqlProxyDataStore =
+    inherit ISqlDataStore
+    /// <summary>
     /// Retrieves an identified collection of data entities from the store
     /// </summary>
-    abstract Get:SqlDataStoreQuery -> 'T list
+    abstract Get:SqlDataStoreQuery -> 'T rolist
 
     /// <summary>
     /// Retrieves all entities of a given type from the store
     /// </summary>
-    abstract Get:unit -> 'T list
+    abstract Get:unit -> 'T rolist
 
     /// <summary>
     /// Persists a collection of data entities to the store, inserting or updating as appropriate
@@ -79,32 +118,8 @@ type ISqlDataStore =
     abstract Merge:'T seq -> unit
 
     /// <summary>
-    /// Deletes and identified collection of data entities from the store
-    /// </summary>
-    abstract Delete:SqlDataStoreQuery -> unit
-
-    /// <summary>
-    /// Obtains an identified contract from the store
-    /// </summary>
-    abstract GetContract: unit -> 'TContract when 'TContract : not struct
-
-    /// <summary>
     /// Inserts an arbitrary number of entities into the store, eliding existence checks
     /// </summary>
     abstract Insert:'T seq ->unit
-
-    /// <summary>
-    /// Executes a supplied command against the store
-    /// </summary>
-    abstract ExecuteCommand:command : SqlStoreCommand -> SqlStoreCommandResult
-
-    /// <summary>
-    /// Gets the connection string that identifies the represented store
-    /// </summary>
-    abstract ConnectionString :string
    
-    /// <summary>
-    /// Gets the store's metadata provider
-    /// </summary>
-    abstract MetadataProvider : ISqlMetadataProvider
    

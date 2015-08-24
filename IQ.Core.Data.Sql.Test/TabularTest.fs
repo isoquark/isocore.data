@@ -7,6 +7,8 @@ open System.ComponentModel
 open System.Data
 open System.Data.SqlClient
 open System.Reflection
+open System.Threading
+open System.Collections.Generic
 
 open IQ.Core.TestFramework
 open IQ.Core.Data
@@ -14,13 +16,17 @@ open IQ.Core.Data.Test.ProxyTestCases
 open IQ.Core.Data.Sql
 open IQ.Core.Framework
 
+
+
+
+
 module Tabular =
     
-    let private verifyBulkInsert<'T>(input : 'T list) (sortBy: 'T->IComparable) (store : ISqlDataStore)=
+    let private verifyBulkInsert<'T>(input : 'T list) (sortBy: 'T->IComparable) (store : ISqlProxyDataStore)=
         let count = tabularproxy<'T>.DataElement.Name |> TruncateTable |> store.ExecuteCommand 
         store.Get<'T>() |> Claim.seqIsEmpty
         input |> store.Insert
-        let output = store.Get<'T>() |> List.sortBy sortBy
+        let output = store.Get<'T>() |> RoList.sortBy sortBy |> RoList.toList
         output |> Claim.equal input
 
     type Tests(ctx, log) = 
@@ -31,8 +37,8 @@ module Tabular =
         [<FactAttribute>]
         let ``Queried vDataType metadata - Partial column set A``() =
             let items = store.Get<Metadata.vDataTypeA>() 
-                     |> List.map(fun item -> item.DataTypeName, item) 
-                     |> Map.ofList
+                     |> RoList.map(fun item -> item.DataTypeName, item) 
+                     |> Map.ofReadOnlyList
             let money = items.["money"]
             money.IsUserDefined |> Claim.isFalse
             money.IsNullable |> Claim.isTrue
@@ -41,8 +47,8 @@ module Tabular =
         [<FactAttribute>]
         let ``Queried vDataType metadata - Partial column set B``() =
             let items = store.Get<Metadata.vDataTypeB>() 
-                     |> List.map(fun item -> item.DataTypeName, item) 
-                     |> Map.ofList
+                     |> RoList.map(fun item -> item.DataTypeName, item) 
+                     |> Map.ofReadOnlyList
             let money = items.["money"]
             money.SchemaName |> Claim.equal "sys"
             money.MaxLength |> Claim.equal 8m
@@ -80,4 +86,45 @@ module Tabular =
             ]
             store |> verifyBulkInsert input (fun x -> x.Col02 :> IComparable)
 
-    
+        [<Fact>]
+        let ``Retrieved paged tabular data``() =
+            
+            let rowidx = ref(0)
+            
+            let createNextRow() =                
+                let nextid() =
+                    Interlocked.Increment(rowidx)
+
+                let id = nextid()
+                [| id:> obj; (sprintf "Row%i Description" id) :> obj; (id * 5 |> int16) :> obj|]
+                            
+            let colnames = [|"Col01"; "Col02"; "Col03"|] :> rolist<_>
+            let tabularName = DataObjectName("SqlTest", "Table08")
+            tabularName |> TruncateTable |> store.ExecuteCommand |> ignore
+            let builder = TabularDescriptionBuilder(tabularName)
+            let description = 
+                builder.AddColumn(colnames.[0], "Int32")
+                       .AddColumn(colnames.[1], "UnicodeTextVariable(50)")
+                       .AddColumn(colnames.[2], "Int16")
+                       .Finish()
+            
+            let rowValues = 
+                    [|
+                        for i in [1..100] ->
+                            createNextRow()
+                    |] :> rolist<_>
+            let data = {                                
+                new ITabularData with
+                    member this.Description = description
+                    member this.RowValues =  rowValues
+            }
+            store.Insert(data)
+
+            let sort = [|AscendingSort(colnames.[0])|] :> rolist<_>
+            let page = TabularPageInfo(Some(1), Some(10))
+            let q = TabularDataQuery(tabularName, colnames, ReadOnlyList.Empty(), sort, Some(page)) |> TabularQuery
+            let result = store.GetTabular(q);
+            ()
+            
+            
+

@@ -17,7 +17,7 @@ module Main =
         use context = new ShellContext()
         let cs = "csSqlDataStore" |> context.ConfigurationManager.GetValue  |> ConnectionString.parse
         let storeConfig = SqlDataStoreConfig(cs, context.AppContext.Resolve())
-        let store : ISqlDataStore = storeConfig |> context.AppContext.Resolve
+        let store : ISqlProxyDataStore = storeConfig |> context.AppContext.Resolve
 
     
         let prop = {

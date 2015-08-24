@@ -283,10 +283,12 @@ type SchemaMetadataQuery =
 
 type ViewMetadataQuery =
     | FindAllViews
+    | FindUserViews
     | FindViewsBySchema of schemaName : string
 
 type TableMetadataQuery =
     | FindAllTables
+    | FindUserTables
     | FindTablesBySchema of schemaName : string
 
 type TableFunctionMetadataQuery =
@@ -297,9 +299,6 @@ type ProcedureMetadataQuery =
     | FindAllProcedures
     | FindProceduresBySchema of schemaName : string
 
-type TabularColumnMetadataQuery =
-    | FindAllTabularColumns
-    | FindTabularColumnsBySchema
 
 type SequenceMetadataQuery = 
     | FindAllSequences
@@ -311,7 +310,6 @@ type SqlMetadataQuery =
     | FindTables of TableMetadataQuery
     | FindProcedures of ProcedureMetadataQuery
     | FindSequences of SequenceMetadataQuery
-    | FindTabularColumns of TabularColumnMetadataQuery
 
 type ISqlMetadataProvider =
     abstract Describe:SqlMetadataQuery->DataObjectDescription list
