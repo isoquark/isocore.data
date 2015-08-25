@@ -1,5 +1,7 @@
 ﻿create view Metadata.vTable as
 	select 
+		o.CatalogId,
+		o.CatalogName,
 		o.SchemaId,
 		o.SchemaName,
 		x.object_id as TableId,

@@ -13,6 +13,7 @@ open IQ.Core.Framework
 open IQ.Core.Data
 
 
+    
 /// <summary>
 /// Represents a SQL Server connection string
 /// </summary>
@@ -39,65 +40,13 @@ type SqlDataStoreConfig = SqlDataStoreConfig of cs : ConnectionString * clrMetad
 with
     member this.ConnectionString = match this with SqlDataStoreConfig(cs=x) -> x
     member this.ClrMetadataProvider = match this with SqlDataStoreConfig(clrMetadataProvider=x) ->x
-
         
-type BulkInsertConfig = {
-    OverwriteDefaults : bool
-    OverwriteIdentity : bool
-}
        
 /// <summary>
 /// Provides ISqlDataStore realization
 /// </summary>
 module SqlDataStore =    
      
-    let bulkInsert<'T> cs (items : 'T seq) =
-        let config = {
-            OverwriteDefaults = true
-            OverwriteIdentity = false
-        }
-   
-        let proxy = tabularproxy<'T>
-        use bcp = new SqlBulkCopy(cs, SqlBulkCopyOptions.CheckConstraints)
-        bcp.DestinationTableName <- proxy.DataElement.Name |> SqlFormatter.formatObjectName
-        use table = items |> DataTable.fromProxyValuesT 
-        bcp.WriteToServer(table)
-
-    let bulkInsertTabularData cs (data : ITabularData) =
-        use table = data.Description |> DataTable.fromTabularDescription
-        data.RowValues |> Seq.iter(fun x ->table.LoadDataRow(x,true) |> ignore)
-        use bcp = new SqlBulkCopy(cs, SqlBulkCopyOptions.CheckConstraints)
-        bcp.DestinationTableName <- data.Description.Name |> SqlFormatter.formatObjectName
-        bcp.WriteToServer(table)
-    
-    let private selectTabular cs (q : TabularDataQuery) =
-        let sql = q |> SqlFormatter.formatTabularQuery
-        use connection = cs |> SqlConnection.create
-        use command = new SqlCommand(sql, connection)
-        command.CommandType <- CommandType.Text
-        let rowValues = command |> SqlCommand.executeQuery (q.ColumnNames) 
-        let description = {
-            TabularDescription.Name = q.TabularName
-            Documentation = None
-            Columns = []                       
-        }
-        TabularData(description, rowValues)
-
-    let private selectAllTabular cs (d : TabularDescription) =
-        let sql = d |> SqlFormatter.formatTabularSelect
-        use connection = cs |> SqlConnection.create
-        use command = new SqlCommand(sql, connection)
-        command.CommandType <- CommandType.Text
-        command |> SqlCommand.executeQuery (d.Columns |> List.map(fun c -> c.Name) |> List.asReadOnlyList)
-
-    let private selectAllProxies<'T> cs  =
-        let tinfo = typeinfo<'T>
-        let proxy = tinfo |> DataProxyMetadata.describeTablularProxy
-        let data = proxy.DataElement |> selectAllTabular cs
-        let itemType = tinfo.ReflectedElement.Value
-        let pocoConverter =  PocoConverter.getDefault()
-        let items = [for row in data -> pocoConverter.FromValueArray(row, itemType)]            
-        items |> Collection.create ClrCollectionKind.Array itemType :?> rolist<'T>
         
     type private MetadataProvider(config : SqlDataStoreConfig) =
         let cs = config.ConnectionString.Text
@@ -107,12 +56,12 @@ module SqlDataStore =
                 | FindTables(q) ->
                     match q  with
                     | FindAllTables ->
-                        let vTables = cs |> selectAllProxies<Metadata.vTable>  
+                        let vTables = cs |> SqlProxyReader.selectAll<Metadata.vTable>  
                         [for vTable in vTables ->
                             {TabularDescription.Name = DataObjectName(vTable.SchemaName, vTable.TableName)
                              Documentation = vTable.Description
                              Columns = []
-                            } |> TabularObject
+                            } |> TableDescription
                         ]
                     | FindUserTables ->
                         nosupport()
@@ -143,9 +92,7 @@ module SqlDataStore =
                     | FindSequencesBySchema(schemaName) ->
                         nosupport()
 
-                | _ ->
-                    nosupport()
-
+                
 
     type internal Realization(config : SqlDataStoreConfig) =
         let cs = SqlConnectionString(config.ConnectionString.Components) |> fun x -> x.Text
@@ -154,7 +101,7 @@ module SqlDataStore =
             member this.Get q  = 
                 match q with
                 | TabularQuery(x) ->
-                    cs |> selectAllProxies<'T> 
+                    cs |> SqlProxyReader.selectAll<'T> 
                 | TableFunctionQuery(functionName, parameters) ->
                     nosupport()
                 | ProcedureQuery(procedureName, parameters) ->
@@ -163,26 +110,26 @@ module SqlDataStore =
             member this.GetTabular q =
                 match q with
                 | TabularQuery(x) ->
-                    x |> selectTabular cs :> ITabularData
+                    (x |> SqlTabularReader.selectSome cs) :> ITabularData
                 | TableFunctionQuery(functionName, parameters) ->
                     nosupport()
                 | ProcedureQuery(procedureName, parameters) ->
                     nosupport()
                     
             member this.Get()  =
-                cs |> selectAllProxies<'T>
+                cs |> SqlProxyReader.selectAll<'T>
                 
             
             member this.Merge items = 
-                items |> bulkInsert cs
+                items |> SqlProxyWriter.bulkInsert cs
             
             member this.Delete q = ()
 
             member this.Insert (items : 'T seq) =
-                items |> bulkInsert cs
+                items |> SqlProxyWriter.bulkInsert cs
             
             member this.Insert (data : ITabularData) =
-                data |> bulkInsertTabularData cs
+                data |> SqlTableWriter.bulkInsert cs
 
             member this.ExecuteCommand c =
                 c |> SqlStoreCommand.execute cs 

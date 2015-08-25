@@ -1,5 +1,7 @@
 ﻿create view Metadata.vProcedureParameter as
 	select 
+		x.CatalogId,
+		x.CatalogName,
 		[x].[SchemaId], 
 		[x].[SchemaName], 
 		[x].[ProcedureId], 

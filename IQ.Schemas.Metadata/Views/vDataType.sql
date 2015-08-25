@@ -20,5 +20,5 @@
 	from 
 		sys.types t 
 		inner join Metadata.vSchema s on s.SchemaId = t.schema_id
-		left join Metadata.IntrinsicTypeMap m on m.EngineTypeName = t.name
+		left join Metadata.AdoTypeMap m on m.SqlTypeName = t.name
 		left join Metadata.vDescription d on d.MajorId = t.user_type_id and d.MinorId = 0

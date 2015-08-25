@@ -5,7 +5,7 @@ namespace IQ.Core.Data.Contracts
 open System
 open System.Diagnostics
 
-
+open IQ.Core.Framework.Contracts
 
 /// <summary>
 /// Responsible for identifying a data object within the scope of some container
@@ -160,7 +160,23 @@ type DataType =
     | CustomObjectDataType of name : DataObjectName * clrType : Type
     | CustomPrimitiveDataType of name : DataObjectName
     | TypedDocumentDataType of doctype : Type
-               
+
+/// <summary>
+/// Represents a numeric value, duh.
+/// </summary>
+type NumericValue =
+    | UInt8Value of uint8
+    | UInt16Value of uint16
+    | UInt32Value of uint32
+    | UInt64Value of uint64
+    | Int8Value of int8
+    | Int16Value of int16
+    | Int32Value of int32
+    | Int64Value of int64
+    | Float32Value of float32
+    | Float64Value of float
+    | DecimalValue of decimal
+                   
 /// <summary>
 /// Enumerates the available means that lead to a column being automatically populated
 /// with a valid value
@@ -259,24 +275,53 @@ type TableFunctionDescription = {
     Columns : ColumnDescription list
 }
 
+/// <summary>
+/// Describes a sequence 
+/// </summary>
+type SequenceObjectDescription = {
+    Name : DataObjectName 
+    StartValue : NumericValue
+    Increment : NumericValue 
+    MinimumValue : NumericValue
+    MaximumValue : NumericValue 
+    DataType : DataType
+    CurrentValue : NumericValue
+    IsCycling : bool
+    IsExhaused : bool
+    IsCached : bool
+    CacheSize : int
+}
 
 /// <summary>
 /// Unifies data object types
 /// </summary>
 type DataObjectDescription =
-| TableFunctionObject of TableFunctionDescription
-| ProcedureObject of ProcedureDescription
-| TabularObject of TabularDescription
+| TableFunctionDescription of TableFunctionDescription
+| ProcedureDescription of ProcedureDescription
+| TableDescription of TabularDescription
+| ViewDescription of TabularDescription
+| SequenceDescription of SequenceObjectDescription
 
+
+type SchemaDescription = {
+    Name : string
+    Objects : DataObjectDescription list
+}
+
+type SqlMetadataCatalog = {
+    CatalogName : string
+    Schemas : SchemaDescription list
+}
 
 /// <summary>
-/// Represents a data parameter value
+/// Represents routine parameter value
 /// </summary>
-type DataParameterValue = DataParameterValue of  name : string * position : int * value : obj
+type RoutineParameterValue = RoutineParameterValue of  name : string * position : int * value : obj
 with
-    member this.Position = match this with DataParameterValue(position=x) -> x
-    member this.Name = match this with DataParameterValue(name=x) -> x
-    member this.Value = match this with DataParameterValue(value=x) -> x
+    member this.Position = match this with RoutineParameterValue(position=x) -> x
+    member this.Name = match this with RoutineParameterValue(name=x) -> x
+    member this.Value = match this with RoutineParameterValue(value=x) -> x
+
 
 type SchemaMetadataQuery =
     | FindAllSchemas

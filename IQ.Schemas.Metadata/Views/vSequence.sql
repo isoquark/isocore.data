@@ -1,5 +1,7 @@
 ﻿create view Metadata.vSequence as
 	select 
+		o.CatalogId,
+		o.CatalogName,
 		x.object_id as SequenceId,
 		x.name as SequenceName,
 		x.schema_id as SchemaId,

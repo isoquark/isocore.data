@@ -126,4 +126,7 @@
   <ItemGroup>
     <RefactorLog Include="IQ.Schemas.Test.refactorlog" />
   </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="postdeply.sql" />
+  </ItemGroup>
 </Project>

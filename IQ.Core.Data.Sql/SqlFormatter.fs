@@ -191,7 +191,7 @@ module SqlFormatter =
         
 
 module internal SqlParameter =
-    let create (paramValues : DataParameterValue list) (d : RoutineParameterDescription) =
+    let create (paramValues : RoutineParameterValue list) (d : RoutineParameterDescription) =
         let p = if d.Direction = RoutineParameterDirection.ReturnValue then 
                     SqlParameter("Return", DBNull.Value) 
                 else if d.Direction = RoutineParameterDirection.Input then

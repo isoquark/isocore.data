@@ -1,5 +1,7 @@
 ﻿create view Metadata.vUserTableTypeColumn as
 	select 
+		o.CatalogId,
+		o.CatalogName,
 		s.SchemaId,
 		s.SchemaName,
 		o.ObjectId as TableId,

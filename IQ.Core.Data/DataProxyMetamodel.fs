@@ -44,11 +44,11 @@ module DataObjectProxy =
     let getDataElement (subject : DataObjectProxy) =
         match subject with
         | TabularProxy(proxy) -> 
-            proxy.DataElement |> TabularObject
+            proxy.DataElement |> TableDescription
         | ProcedureProxy(proxy) -> 
-            proxy.DataElement |> ProcedureObject
+            proxy.DataElement |> ProcedureDescription
         | TableFunctionProxy(proxy) ->
-            proxy.CallProxy.DataElement |> TableFunctionObject
+            proxy.CallProxy.DataElement |> TableFunctionDescription
 
     let unwrapTableFunctionProxy (subject : DataObjectProxy) =
         match subject with

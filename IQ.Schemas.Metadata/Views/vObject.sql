@@ -1,5 +1,7 @@
 ﻿create view Metadata.vObject as
 with Objects as (select 
+		DB_ID() as CatalogId,
+		DB_NAME() as CatalogName,
 		x.schema_id as SchemaId,
 		x.object_id as ObjectId,
 		x.name as ObjectName,
@@ -12,6 +14,8 @@ with Objects as (select
 		sys.all_objects x 
 )
 select 
+	[o].CatalogId,
+	[o].CatalogName,
 	[o].[SchemaId], 
 	[s].[name] as SchemaName, 
 	[o].[ObjectId], 

@@ -1,1 +1,1 @@
-﻿:r IntrinsicTypeMap.sql
+﻿:r AdoTypeMap.sql

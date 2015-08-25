@@ -16,29 +16,41 @@ open IQ.Core.Framework
 module DataObjectDescription =
     let getName (subject : DataObjectDescription) =
         match subject with
-        | TableFunctionObject(x) -> 
+        | TableFunctionDescription(x) -> 
             x.Name
-        | ProcedureObject(x) -> 
+        | ProcedureDescription(x) -> 
             x.Name
-        | TabularObject(x) ->
+        | TableDescription(x) ->
+            x.Name
+        | ViewDescription(x) ->
+            x.Name
+        | SequenceDescription(x) ->
             x.Name
 
     let getParameters (subject : DataObjectDescription) =
         match subject with
-        | TableFunctionObject(x) -> 
+        | TableFunctionDescription(x) -> 
             x.Parameters
-        | ProcedureObject(x) -> 
+        | ProcedureDescription(x) -> 
             x.Parameters
-        | TabularObject(x) ->
+        | TableDescription(x) ->
+            []
+        | ViewDescription(x) ->
+            []
+        | SequenceDescription(x) ->
             []
     
     let tryFindParameter name (subject : DataObjectDescription) =
         match subject with
-        | TableFunctionObject(x) -> 
+        | TableFunctionDescription(x) -> 
             x.Parameters |> List.tryFind(fun p -> p.Name = name)
-        | ProcedureObject(x) -> 
+        | ProcedureDescription(x) -> 
             x.Parameters |> List.tryFind(fun p -> p.Name = name)
-        | TabularObject(x) ->
+        | TableDescription(x) ->
+            None
+        | ViewDescription(x) ->
+            None
+        | SequenceDescription(x) ->
             None
 
     let findParameter name (subject : DataObjectDescription) =
@@ -46,17 +58,18 @@ module DataObjectDescription =
 
     let unwrapTableFunction (subject : DataObjectDescription) =
         match subject with
-        | TableFunctionObject(x) -> x
+        | TableFunctionDescription(x) -> x
         | _ -> ArgumentException() |> raise
         
     let unwrapProcedure (subject : DataObjectDescription) =
         match subject with
-        | ProcedureObject(x) -> x
+        | ProcedureDescription(x) -> x
         | _ -> ArgumentException() |> raise
 
     let unwrapTabular (subject : DataObjectDescription) =
         match subject with
-        | TabularObject(x) -> x
+        | TableDescription(x) -> x
+        | ViewDescription(x) -> x
         | _ -> ArgumentException() |> raise
 
 [<AutoOpen>]

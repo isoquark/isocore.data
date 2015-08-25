@@ -51,6 +51,8 @@
     <Compile Include="SqlHelpers.fs" />
     <Compile Include="SqlDataType.fs" />
     <Compile Include="SqlFormatter.fs" />
+    <Compile Include="SqlReaders.fs" />
+    <Compile Include="SqlWriters.fs" />
     <Compile Include="Routine.fs" />
     <Compile Include="SqlMetadataProvider.fs" />
     <Compile Include="SqlStoreCommand.fs" />

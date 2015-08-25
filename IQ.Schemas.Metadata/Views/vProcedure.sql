@@ -4,6 +4,8 @@
 
 create view Metadata.vProcedure as
 	select 
+		x.CatalogId,
+		x.CatalogName,
 		x.SchemaId,
 		x.SchemaName,
 		x.ObjectId as ProcedureId,

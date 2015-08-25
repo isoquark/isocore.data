@@ -26,7 +26,7 @@ module internal Routine =
     /// <param name="cs">The connection string</param>
     /// <param name="paramValues">The values of the parameters</param>
     /// <param name="proc">The procedure to execute</param>
-    let executeProcedure cs (paramValues : DataParameterValue list) (proc : ProcedureDescription) =
+    let executeProcedure cs (paramValues : RoutineParameterValue list) (proc : ProcedureDescription) =
         use connection = cs |> SqlConnection.create
         use command = new SqlCommand(proc.Name |> SqlFormatter.formatObjectName, connection)
         command.CommandType <- CommandType.StoredProcedure
@@ -51,7 +51,7 @@ module internal Routine =
     /// <param name="cs">The connection string</param>
     /// <param name="paramValues">The values of the parameters</param>
     /// <param name="proc">The function to execute</param>
-    let executeTableFunction cs (paramValues : DataParameterValue list) (f : TableFunctionDescription) =
+    let executeTableFunction cs (paramValues : RoutineParameterValue list) (f : TableFunctionDescription) =
         use connection = cs |> SqlConnection.create
         let sql = f |> SqlFormatter.formatTableFunctionSelect
         use command = new SqlCommand(sql, connection)
@@ -65,7 +65,7 @@ module internal Routine =
     /// <param name="cs">The connection string</param>
     /// <param name="paramValues">The values of the parameters</param>
     /// <param name="proc">The function to execute</param>
-    let executeTableFunctionDataTable cs (paramValues : DataParameterValue list) (f : TableFunctionDescription) =
+    let executeTableFunctionDataTable cs (paramValues : RoutineParameterValue list) (f : TableFunctionDescription) =
         use connection = cs |> SqlConnection.create
         let sql = f |> SqlFormatter.formatTableFunctionSelect
         use command = new SqlCommand(sql, connection)
@@ -116,14 +116,14 @@ module internal Routine =
                 let key = ValueIndexKey(p |> getMethodParameterName , p.ProxyParameterPosition)
                 match methodParameterValues |> ValueIndex.tryFindValue key  with
                 | Some(value) ->
-                    yield DataParameterValue(p.DataElement.Name, p.DataElement.Position, value)
+                    yield RoutineParameterValue(p.DataElement.Name, p.DataElement.Position, value)
                 | None ->
                     ()
             ]         
         | TableFunctionProxy(proxy) -> 
              mii.MethodArgs |> List.zip proxy.CallProxy.Parameters
                             |> List.map (fun (param, value) -> 
-                                        DataParameterValue(param.DataElement.Name, param.DataElement.Position, value))
+                                        RoutineParameterValue(param.DataElement.Name, param.DataElement.Position, value))
         | _ -> []
 
 

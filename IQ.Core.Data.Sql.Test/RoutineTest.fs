@@ -28,7 +28,7 @@ module Routine =
             let proc = procProxy.DataElement |> DataObjectDescription.unwrapProcedure
             let inputValues =  
                 [("col01", 0, DBNull.Value :> obj); ("col02", 1, BclDateTime(2015, 5, 16) :> obj); ("col03", 2, 507L :> obj);]
-                |> List.map DataParameterValue
+                |> List.map RoutineParameterValue
             let outputvalues = proc |> Routine.executeProcedure store.ConnectionString inputValues
             let col01Value = outputvalues.["col01"] :?> int
             Claim.greaterOrEqual col01Value 1
@@ -47,7 +47,7 @@ module Routine =
             let proc = procProxy.DataElement |> DataObjectDescription.unwrapProcedure
             let inputValues =
                 [("Col01", 0, 5uy :> obj); ("Col02", 1, 10s :> obj); ("Col03", 2, 15 :> obj); ("Col04", 3, 20L :> obj)]
-                |> List.map DataParameterValue
+                |> List.map RoutineParameterValue
 
             let outputValues = proc |> Routine.executeProcedure store.ConnectionString inputValues
             ()

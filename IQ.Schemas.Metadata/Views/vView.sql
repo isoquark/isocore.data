@@ -1,5 +1,7 @@
 ﻿create view Metadata.vView as
 	select 
+		o.CatalogId,
+		o.CatalogName,
 		o.SchemaId,
 		o.SchemaName,
 		x.object_id as ViewId,
@@ -12,6 +14,8 @@
 		left join Metadata.vDescription d on d.MajorId = x.object_id and d.MinorId = 0
 	union
 		select 
+			DB_ID() as CatalogId,
+			DB_NAME() as CatalogName,
 			x.schema_id as SchemaId,
 			s.name as SchemaName,
 			x.object_id as ViewId,

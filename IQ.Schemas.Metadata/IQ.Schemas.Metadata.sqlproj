@@ -70,7 +70,7 @@
   <ItemGroup>
     <Build Include="Functions\fGetColumns.sql" />
     <Build Include="Functions\fGetParameters.sql" />
-    <Build Include="Tables\IntrinsicTypeMap.sql" />
+    <Build Include="Tables\AdoTypeMap.sql" />
     <Build Include="Views\vDataType.sql" />
     <Build Include="Views\vDescription.sql" />
     <Build Include="Views\vObject.sql" />
@@ -85,7 +85,7 @@
     <Build Include="Views\vUserView.sql" />
     <Build Include="Views\vView.sql" />
     <Build Include="Metadata.sql" />
-    <None Include="Data\IntrinsicTypeMap.sql" />
+    <None Include="Data\AdoTypeMap.sql" />
     <None Include="Data\Data.sql" />
     <Build Include="Views\vDataDictionary.sql" />
     <Build Include="Views\vUserDataType.sql" />
@@ -98,6 +98,11 @@
     <Build Include="Views\vParameter.sql" />
     <Build Include="Views\vUserParameter.sql" />
     <Build Include="Views\vTableFunctionParameter.sql" />
+    <Build Include="Views\vTableColumn.sql" />
+    <Build Include="Views\vViewColumn.sql" />
+    <Build Include="Views\vUserTableColumn.sql" />
+    <Build Include="Views\vUserViewColumn.sql" />
+    <Build Include="Views\vUserSchema.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">
@@ -115,5 +120,8 @@
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="postdeploy.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="IQ.Schemas.Metadata.refactorlog" />
   </ItemGroup>
 </Project>

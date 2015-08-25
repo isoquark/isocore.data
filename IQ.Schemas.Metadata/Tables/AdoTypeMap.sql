@@ -1,13 +1,13 @@
-﻿CREATE TABLE Metadata.IntrinsicTypeMap
+﻿CREATE TABLE Metadata.AdoTypeMap
 (
-	EngineTypeName nvarchar(15) not null,
+	SqlTypeName nvarchar(15) not null,
 	BclTypeName nvarchar(25) not null,
 	SqlDbTypeEnum nvarchar(25) not null,
 	SqlDbTypeDataReader nvarchar(25) not null,
 	DbTypeEnum nvarchar(25) not null,
 	DbTypeDataReader nvarchar(25) not null
 
-	constraint PK_DataTypeMap primary key(EngineTypeName)
+	constraint PK_DataTypeMap primary key(SqlTypeName)
 )
 
 GO
@@ -16,6 +16,6 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'Metadata',
     @level1type = N'TABLE',
-    @level1name = N'IntrinsicTypeMap',
+    @level1name = N'AdoTypeMap',
     @level2type = NULL,
     @level2name = NULL

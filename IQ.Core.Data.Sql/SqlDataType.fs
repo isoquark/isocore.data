@@ -56,4 +56,82 @@ module DataType =
         | TypedDocumentDataType(_) -> SqlDbType.NVarChar
 
 
+(**
+select 
+	'[<Literal>] let ' + DataTypeName + ' ="' + DataTypeName + '"'
+from 
+	Metadata.vDataType 
+where 
+	IsUserDefined = 0
 
+*)
+module internal SqlDataTypeNames = 
+    [<Literal>]  
+    let bigint ="bigint"
+    [<Literal>]  
+    let binary ="binary"
+    [<Literal>]  
+    let bit ="bit"
+    [<Literal>]  
+    let char ="char"
+    [<Literal>]  
+    let date ="date"
+    [<Literal>]  
+    let datetime ="datetime"
+    [<Literal>]  
+    let datetime2 ="datetime2"
+    [<Literal>]  
+    let datetimeoffset ="datetimeoffset"
+    [<Literal>]  
+    let decimal ="decimal"
+    [<Literal>]  
+    let float ="float"
+    [<Literal>]  
+    let geography ="geography"
+    [<Literal>]  
+    let geometry ="geometry"
+    [<Literal>]  
+    let hierarchyid ="hierarchyid"
+    [<Literal>]  
+    let image ="image"
+    [<Literal>]  
+    let int ="int"
+    [<Literal>]  
+    let money ="money"
+    [<Literal>]  
+    let nchar ="nchar"
+    [<Literal>]  
+    let ntext ="ntext"
+    [<Literal>]  
+    let numeric ="numeric"
+    [<Literal>]  
+    let nvarchar ="nvarchar"
+    [<Literal>]  
+    let real ="real"
+    [<Literal>]  
+    let smalldatetime ="smalldatetime"
+    [<Literal>]  
+    let smallint ="smallint"
+    [<Literal>]  
+    let smallmoney ="smallmoney"
+    [<Literal>]  
+    let sql_variant ="sql_variant"
+    [<Literal>]  
+    let sysname ="sysname"
+    [<Literal>]  
+    let text ="text"
+    [<Literal>]  
+    let time ="time"
+    [<Literal>]  
+    let timestamp ="timestamp"
+    [<Literal>] 
+    let tinyint ="tinyint"
+    [<Literal>]  
+    let uniqueidentifier ="uniqueidentifier"
+    [<Literal>]  
+    let varbinary ="varbinary"
+    [<Literal>]  
+    let varchar ="varchar"
+    [<Literal>]  let xml ="xml"
+
+    

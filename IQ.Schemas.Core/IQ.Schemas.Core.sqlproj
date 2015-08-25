@@ -109,7 +109,7 @@
     <None Include="eXaCore03.publish.xml" />
   </ItemGroup>
   <ItemGroup>
-    <PostDeploy Include="postdeply.sql" />
+    <PostDeploy Include="postdeploy.sql" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IQ.Schemas.Metadata\IQ.Schemas.Metadata.sqlproj">

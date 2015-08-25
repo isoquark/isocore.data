@@ -1,5 +1,7 @@
 ﻿CREATE VIEW [Metadata].[vTableFunction] as
 	select 
+		x.CatalogId,
+		x.CatalogName,
 		x.SchemaId,
 		x.SchemaName,
 		x.ObjectId as FunctionId,

@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="d65e444e-f8c4-4ee3-9893-1329cd5490c7" ChangeDateTime="08/25/2015 00:12:01">
+    <Property Name="ElementName" Value="[Metadata].[IntrinsicTypeMap]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[Metadata]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="BclTypeMap" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6df1a747-0de9-48a3-9a01-47fe41a89176" ChangeDateTime="08/25/2015 00:12:21">
+    <Property Name="ElementName" Value="[Metadata].[BclTypeMap]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[Metadata]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="SqlBclTypeMap" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="3bd0e45d-ce5d-42d4-8b36-69782e02e62c" ChangeDateTime="08/25/2015 00:12:31">
+    <Property Name="ElementName" Value="[Metadata].[SqlBclTypeMap].[EngineTypeName]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[Metadata].[SqlBclTypeMap]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SqlTypeName" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="eb0d344a-c1c9-4345-86a5-7bb9b6173061" ChangeDateTime="08/25/2015 00:25:02">
+    <Property Name="ElementName" Value="[Metadata].[SqlBclTypeMap]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[Metadata]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="AdoTypeMap" />
+  </Operation>
+</Operations>

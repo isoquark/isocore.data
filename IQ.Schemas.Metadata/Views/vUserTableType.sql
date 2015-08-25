@@ -1,5 +1,7 @@
 ﻿create view Metadata.vUserTableType as
 	select 
+		DB_ID() as CatalogId,
+		DB_NAME() as CatalogName,
 		o.SchemaId,
 		o.SchemaName,
 		x.user_type_id as TableTypeId,

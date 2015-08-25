@@ -1,5 +1,7 @@
 ﻿CREATE VIEW [Metadata].[vColumn] as
 	select 
+		o.CatalogId,
+		o.CatalogName,
 		s.SchemaId as ParentSchemaId,
 		s.SchemaName as ParentSchemaName,
 		o.ObjectId as ParentId,
