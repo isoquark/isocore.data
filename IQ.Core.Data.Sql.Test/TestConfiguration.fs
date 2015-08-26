@@ -15,7 +15,6 @@ open IQ.Core.Data.Sql
 module TestConfiguration =
 
     let private registerDependencies(registry : ICompositionRegistry) =
-            //ClrMetadataProvider.getDefault() |> registry.RegisterInstance
             registry.RegisterFactory(fun config -> config |> SqlDataStore.get)
                                 
     //This is instantiated/cleaned-up once per collection

@@ -32,4 +32,6 @@ module CoreRegistration =
             registry |> _register
         )
         root
-            
+
+    let composeWithAction (rootAssembly : Assembly)  (_register: Action<ICompositionRegistry>) =
+        compose rootAssembly (fun registry -> _register.Invoke(registry) )
