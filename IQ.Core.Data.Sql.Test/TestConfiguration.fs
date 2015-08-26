@@ -23,7 +23,7 @@ module TestConfiguration =
         inherit TestContext(registerDependencies |> CoreRegistration.compose (thisAssembly()))
 
         let clrMetadataProvider : IClrMetadataProvider = this.AppContext.Resolve()
-        let cs = "csSqlDataStore" |> this.ConfigurationManager.GetValue |> ConnectionString.parse
+        let cs = "csSqlDataStore" |> this.ConfigurationManager.GetValue 
         let store : ISqlProxyDataStore = SqlDataStoreConfig(cs, clrMetadataProvider) |> this.AppContext.Resolve
 
         member this.Store = store

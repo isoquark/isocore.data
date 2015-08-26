@@ -80,11 +80,6 @@
       <Project>{5d4ada5c-b453-432c-a419-81bf001edd14}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\IQ.Core.Framework.CSharp\IQ.Core.Framework.CSharp.csproj">
-      <Name>IQ.Core.Framework.CSharp</Name>
-      <Project>{5837fb4d-d4a9-4c53-8997-8578bac1b1d6}</Project>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Framework\IQ.Core.Framework.fsproj">
       <Name>IQ.Core.Framework</Name>
       <Project>{8e2497e0-941b-4ca7-ab78-4ca15291c56a}</Project>

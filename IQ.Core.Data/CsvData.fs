@@ -281,4 +281,4 @@ module CsvDataStore  =
                     table |> writeTable (Path.Combine(cs, table.TableName))
                 )
 
-            member this.ConnectionString = ConnectionString([cs])
+            member this.ConnectionString = cs

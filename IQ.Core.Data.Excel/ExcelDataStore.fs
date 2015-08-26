@@ -6,7 +6,7 @@ open System.Data
 open System.IO
 
 
-
+open IQ.Core.Data
 
 open OfficeOpenXml
 open OfficeOpenXml.Table
@@ -137,7 +137,7 @@ module ExcelDataStore =
                 tables |> Seq.iter(fun table -> table |> addWorksheet package.Workbook) 
                 package.Save()                                                                                 
 
-            member this.ConnectionString = ConnectionString([cs])
+            member this.ConnectionString = cs
 
 
     let get(cs) =

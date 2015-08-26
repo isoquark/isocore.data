@@ -14,7 +14,7 @@ namespace IQ.Core.Framework
     /// Defines utility functions for working with data entities which
     /// are distinguished from "data records" by the fact that they are mutable
     /// </summary>
-    public static class DataEntity
+    public static class SqlDataTable
     {
         public static IReadOnlyList<PropertyInfo> props<T>() =>
             typeof(T).GetProperties();

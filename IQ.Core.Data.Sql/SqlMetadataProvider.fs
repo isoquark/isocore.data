@@ -8,7 +8,7 @@ open System.Data
 open System.Data.SqlClient
 
 type internal MetadataReaderConfig = {
-    ConnectionString : ConnectionString
+    ConnectionString : string
     IgnoreSystemObjects : bool
 }
 
@@ -101,9 +101,9 @@ module internal Metadata=
 
     let private getMetadataView<'T when 'T :> IMetadataView> (config : MetadataReaderConfig) =
         if config.IgnoreSystemObjects then
-            SqlProxyReader.selectSome<'T> config.ConnectionString.Text ("IsUserDefined=1")
+            SqlProxyReader.selectSome<'T> config.ConnectionString ("IsUserDefined=1")
         else
-            SqlProxyReader.selectAll<'T> config.ConnectionString.Text
+            SqlProxyReader.selectAll<'T> config.ConnectionString
 
 //    let private getColumnDataType(c : vColumn) =
 //       match c.DataTypeName with
@@ -144,7 +144,7 @@ module internal Metadata=
 
     let getCatalog(config : MetadataReaderConfig)  =         
         {
-            CatalogName = SqlConnectionStringBuilder(config.ConnectionString.Text).InitialCatalog
+            CatalogName = SqlConnectionStringBuilder(config.ConnectionString).InitialCatalog
             SqlMetadataCatalog.Schemas = []
         }
 

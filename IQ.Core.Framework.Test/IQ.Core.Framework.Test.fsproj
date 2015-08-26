@@ -62,7 +62,7 @@
     <Compile Include="ClrElementTest.fs" />
     <Compile Include="ClrMetadataProviderTest.fs" />
     <Compile Include="DataRecordTest.fs" />
-    <Compile Include="DataStructTest.fs" />
+    <None Include="DataStructTest.fs" />
     <Compile Include="PocoConverterTest.fs" />
   </ItemGroup>
   <ItemGroup>
@@ -79,10 +79,6 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
-    <Reference Include="System.Collections.Immutable">
-      <HintPath>..\packages\System.Collections.Immutable.1.1.36\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />
@@ -94,11 +90,6 @@
     <ProjectReference Include="..\IQ.Core.Data.Sql\IQ.Core.Data.Sql.fsproj">
       <Name>IQ.Core.Data.Sql</Name>
       <Project>{29aedcf6-3187-4c89-aa30-d3d60a8e3379}</Project>
-      <Private>True</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\IQ.Core.DataStructLib\IQ.Core.DataStructLib.csproj">
-      <Name>IQ.Core.DataStructLib</Name>
-      <Project>{4159cc44-092f-4fbc-b84e-226540e54396}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Data\IQ.Core.Data.fsproj">

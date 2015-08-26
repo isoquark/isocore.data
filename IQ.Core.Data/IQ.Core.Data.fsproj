@@ -38,7 +38,6 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="ConnectionString.fs" />
     <Compile Include="DataObjectName.fs" />
     <Compile Include="DataType.fs" />
     <Compile Include="DataValue.fs" />

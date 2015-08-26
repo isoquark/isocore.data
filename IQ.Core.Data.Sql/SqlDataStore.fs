@@ -14,29 +14,9 @@ open IQ.Core.Data
 
 
     
-/// <summary>
-/// Represents a SQL Server connection string
-/// </summary>
-type internal SqlConnectionString = | SqlConnectionString of components : string list
-with
-    /// <summary>
-    /// Specifies the connection string components
-    /// </summary>
-    member this.Components = match this with |SqlConnectionString(components) -> components
-    
-    /// <summary>
-    /// Renders the connection string
-    /// </summary>
-    member this.Text =
-        let sb = StringBuilder()
-        for i in [0..this.Components.Length-1] do
-            sb.Append(this.Components.[i]) |> ignore
-            if i <> this.Components.Length - 1 then
-                sb.Append(';') |> ignore
-        sb.ToString()
                                         
         
-type SqlDataStoreConfig = SqlDataStoreConfig of cs : ConnectionString * clrMetadataProvider : IClrMetadataProvider
+type SqlDataStoreConfig = SqlDataStoreConfig of cs : string * clrMetadataProvider : IClrMetadataProvider
 with
     member this.ConnectionString = match this with SqlDataStoreConfig(cs=x) -> x
     member this.ClrMetadataProvider = match this with SqlDataStoreConfig(clrMetadataProvider=x) ->x
@@ -49,7 +29,7 @@ module SqlDataStore =
      
         
     type private MetadataProvider(config : SqlDataStoreConfig) =
-        let cs = config.ConnectionString.Text
+        let cs = config.ConnectionString
         interface ISqlMetadataProvider with
             member this.Describe q = 
                 match q with
@@ -95,7 +75,7 @@ module SqlDataStore =
                 
 
     type internal Realization(config : SqlDataStoreConfig) =
-        let cs = SqlConnectionString(config.ConnectionString.Components) |> fun x -> x.Text
+        let cs = config.ConnectionString
         let mp = config |> MetadataProvider :> ISqlMetadataProvider
         interface ISqlProxyDataStore with
             member this.Get q  = 

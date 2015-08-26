@@ -15,7 +15,7 @@ module Main =
     [<EntryPoint>]
     let main argv = 
         use context = new ShellContext()
-        let cs = "csSqlDataStore" |> context.ConfigurationManager.GetValue  |> ConnectionString.parse
+        let cs = "csSqlDataStore" |> context.ConfigurationManager.GetValue 
         let storeConfig = SqlDataStoreConfig(cs, context.AppContext.Resolve())
         let store : ISqlProxyDataStore = storeConfig |> context.AppContext.Resolve
 
