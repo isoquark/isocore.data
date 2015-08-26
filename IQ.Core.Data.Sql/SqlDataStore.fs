@@ -16,10 +16,9 @@ open IQ.Core.Data
     
                                         
         
-type SqlDataStoreConfig = SqlDataStoreConfig of cs : string * clrMetadataProvider : IClrMetadataProvider
+type SqlDataStoreConfig = SqlDataStoreConfig of cs : string  
 with
     member this.ConnectionString = match this with SqlDataStoreConfig(cs=x) -> x
-    member this.ClrMetadataProvider = match this with SqlDataStoreConfig(clrMetadataProvider=x) ->x
         
        
 /// <summary>

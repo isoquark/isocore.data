@@ -28,6 +28,7 @@ module CoreRegistration =
     let compose (rootAssembly : Assembly) (_register:ICompositionRegistry->unit) =
         let root = CompositionRoot.compose(fun registry ->                        
             registry |> register rootAssembly
+            ClrMetadataProvider.getDefault() |> registry.RegisterInstance
             registry |> _register
         )
         root

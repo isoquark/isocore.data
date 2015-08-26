@@ -17,7 +17,7 @@ open IQ.Core.Data
 module TestConfiguration =
     
     let private register (registry : ICompositionRegistry) =
-        ClrMetadataProvider.getDefault() |> registry.RegisterInstance
+        //ClrMetadataProvider.getDefault() |> registry.RegisterInstance
         registry.RegisterFactory(fun config -> config |> Transformer.get)
 
     //This is instantiated/cleaned-up once per collection

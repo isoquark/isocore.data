@@ -8,7 +8,7 @@ open IQ.Core.Data.Sql
 
 type ShellContext()= 
     let registerDependencies(registry : ICompositionRegistry) =
-            ClrMetadataProvider.getDefault() |> registry.RegisterInstance
+            //ClrMetadataProvider.getDefault() |> registry.RegisterInstance
             registry.RegisterFactory(fun config -> config |> SqlDataStore.get)
 
     let root = registerDependencies |> CoreRegistration.compose (thisAssembly())
