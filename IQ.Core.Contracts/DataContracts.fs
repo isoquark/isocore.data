@@ -216,6 +216,8 @@ module Contracts =
         IsUserDefined : bool
         BaseTypeName : DataObjectName option
     }
+    with
+        override this.ToString() = this.Name.ToString()
 
     /// <summary>
     /// Describes a column in a table or view
@@ -303,10 +305,15 @@ module Contracts =
     /// Describes a sequence 
     /// </summary>
     type SequenceDescription = {
+        /// The name of the sequence
         Name : DataObjectName 
+        /// The start value fo the sequence
         StartValue : NumericValue
+        /// The distance between each sequence element
         Increment : NumericValue 
+        /// The inclusive lower bound of the sequence
         MinimumValue : NumericValue
+        /// The inclusive upper bound of the sequence
         MaximumValue : NumericValue 
         DataType : DataType
         CurrentValue : NumericValue

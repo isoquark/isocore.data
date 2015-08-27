@@ -25,6 +25,7 @@ module TestConfiguration =
         let store : ISqlProxyDataStore = SqlDataStoreConfig(cs) |> this.AppContext.Resolve
 
         member this.Store = store
+        member this.ConnectionString = cs
         
         
     [<Literal>]

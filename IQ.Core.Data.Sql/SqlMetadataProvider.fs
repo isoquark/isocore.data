@@ -1,6 +1,7 @@
 ﻿namespace IQ.Core.Data.Sql
 
 open System
+open System.Linq
 
 open IQ.Core.Contracts
 open IQ.Core.Framework
@@ -31,6 +32,7 @@ module internal Metadata =
         member val SqlDbTypeEnum = String.Empty with get, set
     
     type vDataType() = 
+        member val DataTypeId = 0 with get, set
         member val DataTypeName = String.Empty with get, set
         member val SchemaName = String.Empty with get, set
         member val Description = String.Empty  with get, set    
@@ -43,7 +45,7 @@ module internal Metadata =
         member val IsTableType = false with get, set
         member val IsAssemblyType = false with get, set
         member val IsUserDefined = false with get, set
-        member val BaseTypeInt : Nullable<uint8> = Nullable<uint8>() with get, set
+        member val BaseTypeId : Nullable<uint8> = Nullable<uint8>() with get, set
     with
         interface IMetadataView with
             member this.IsUserDefined = this.IsUserDefined
@@ -174,10 +176,18 @@ module internal Metadata =
 
 type internal SqlMetadataReader(config : SqlMetadataReaderConfig) =
     
-    let getDataTypes() =
-        [for item in config |> Metadata.getMetadataView<Metadata.vDataType> ->
-            {
-                DataTypeDescription.Name = DataObjectName(item.SchemaName, item.DataTypeName)
+    member this.GetDataTypes() =
+        
+        let index = (SqlProxyReader.selectAll<Metadata.vDataType> config.ConnectionString).ToDictionary(fun x -> x.DataTypeId)
+        
+        let getName id =
+            let item = index.[id]
+            DataObjectName(item.SchemaName, item.DataTypeName)
+
+        [for id in index.Keys do
+            let item = index.[id]
+            yield {
+                DataTypeDescription.Name = getName(id)
                 MaxLength = item.MaxLength
                 Precision = item.Precision
                 Scale = item.Scale
@@ -185,10 +195,12 @@ type internal SqlMetadataReader(config : SqlMetadataReaderConfig) =
                 IsTableType = item.IsTableType
                 IsCustomObject = item.IsAssemblyType
                 IsUserDefined = item.IsUserDefined
-                BaseTypeName = None                
+                BaseTypeName = if item.BaseTypeId.HasValue then 
+                                    getName(item.BaseTypeId.Value |> int) |> Some 
+                               else 
+                                None                                    
             }                
         ]
 
-    let getDataTypes() =
-        ()
+
 

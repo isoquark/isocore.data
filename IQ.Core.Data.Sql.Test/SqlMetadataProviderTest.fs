@@ -19,4 +19,12 @@ module SqlMetadataProvider =
             let tables = FindAllTables |> FindTables |> mdp.Describe
             ()
 
-        
+        [<Fact>]
+        let ``Discovered Data Types``() =
+            let reader = 
+                {
+                    ConnectionString = ctx.ConnectionString
+                    IgnoreSystemObjects = true
+                } |> SqlMetadataReader
+            let dataTypes = reader.GetDataTypes()
+            ()

@@ -50,9 +50,14 @@ module Transformer =
                    //Convert a non-option value to a non-option type
                    
                    //If nullable...
-                    let nt = Nullable.GetUnderlyingType(valueType)
+                    let nt = Nullable.GetUnderlyingType(valueType)                        
                     if nt <> null then
-                        Convert.ChangeType(value, nt)
+                        if value.GetType() = typeof<DBNull> then
+                            //Should create the right type of nullable type instance but have no value
+                            Activator.CreateInstance(valueType);
+                        else
+                            //Should create the right type of nullable type instance but with a value
+                            Activator.CreateInstance(valueType, Convert.ChangeType(value, nt))
                     else   
                         Convert.ChangeType(value, valueType)
 
