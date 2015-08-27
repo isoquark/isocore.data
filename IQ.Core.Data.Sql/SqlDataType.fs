@@ -45,15 +45,16 @@ module DataType =
         | Float32DataType -> SqlDbType.Real
         | Float64DataType -> SqlDbType.Float
         | DecimalDataType(precision,scale) -> SqlDbType.Decimal
-        | MoneyDataType -> SqlDbType.Money
+        | MoneyDataType(_,_) -> SqlDbType.Money
         | GuidDataType -> SqlDbType.UniqueIdentifier
         | XmlDataType(_) -> SqlDbType.Xml
         | JsonDataType -> SqlDbType.NVarChar
         | VariantDataType -> SqlDbType.Variant
-        | CustomTableDataType(_) -> SqlDbType.Structured
-        | CustomObjectDataType(_,_) -> SqlDbType.VarBinary 
+        | TableDataType(_) -> SqlDbType.Structured
+        | ObjectDataType(_,_) -> SqlDbType.VarBinary 
         | CustomPrimitiveDataType(name) -> SqlDbType.Udt
         | TypedDocumentDataType(_) -> SqlDbType.NVarChar
+        | RowversionDataType -> SqlDbType.Timestamp
 
 
 (**
@@ -124,6 +125,8 @@ module internal SqlDataTypeNames =
     let time ="time"
     [<Literal>]  
     let timestamp ="timestamp"
+    [<Literal>]  
+    let rowversion ="rowversion"
     [<Literal>] 
     let tinyint ="tinyint"
     [<Literal>]  

@@ -45,15 +45,15 @@ module DataProxyMetadata =
         }
 
 
-    type private RecordB = {
-        [<DataTypeAttribute(DataKind.DateTime, 5uy); Column("BField_1")>]
-        BField1 : BclDateTime
-        [<DataTypeAttribute(DataKind.DateTime, 4uy)>]
-        BField2 : BclDateTime option
-        [<DataTypeAttribute(DataKind.DateTime); Column("BField_3")>]
-        BField3 : BclDateTime
-        BField4 : BclDateTime
-    }
+//    type private RecordB = {
+//        [<DataTypeAttribute(DataKind.DateTime, 5uy); Column("BField_1")>]
+//        BField1 : BclDateTime
+//        [<DataTypeAttribute(DataKind.DateTime, 4uy)>]
+//        BField2 : BclDateTime option
+//        [<DataTypeAttribute(DataKind.DateTime); Column("BField_3")>]
+//        BField3 : BclDateTime
+//        BField4 : BclDateTime
+//    }
 
     module ModuleC =
         type RecordC = {
@@ -113,26 +113,26 @@ module DataProxyMetadata =
             proxyColumsActual |> Claim.equal proxyColumsActual
         
     
-        [<Fact>]
-        let ``Read DateTimeStorage from table proxy metadata - attribute overrides``() =
-            let proxy = tabularproxy<RecordB> 
-            proxy.Columns.Length |> Claim.equal 4
-
-            proxy.[0].DataElement.StorageType |> Claim.equal (DateTimeDataType(5uy))
-            proxy.[1].DataElement.StorageType |> Claim.equal (DateTimeDataType(4uy))
-            proxy.[2].DataElement.StorageType |> Claim.equal (DateTimeDataType(DataKind.DateTime.DefaultPrecision))
-            proxy.[3].DataElement.StorageType |> Claim.equal (DateTimeDataType(DataKind.DateTime.DefaultPrecision))
-
-
-        [<Fact>]
-        let ``Read Column names from table proxy metadata - attribute overrides``() =
-            let proxy = tabularproxy<RecordB> 
-            proxy.Columns.Length |> Claim.equal 4
-        
-            proxy.[0].DataElement.Name |> Claim.equal "BField_1"
-            proxy.[1].DataElement.Name |> Claim.equal "BField2"
-            proxy.[2].DataElement.Name |> Claim.equal "BField_3"
-            proxy.[3].DataElement.Name |> Claim.equal "BField4"
+//        [<Fact>]
+//        let ``Read DateTimeStorage from table proxy metadata - attribute overrides``() =
+//            let proxy = tabularproxy<RecordB> 
+//            proxy.Columns.Length |> Claim.equal 4
+//
+//            proxy.[0].DataElement.StorageType |> Claim.equal (DateTimeDataType(5uy))
+//            proxy.[1].DataElement.StorageType |> Claim.equal (DateTimeDataType(4uy))
+//            proxy.[2].DataElement.StorageType |> Claim.equal (DateTimeDataType(DataKind.DateTime.DefaultPrecision))
+//            proxy.[3].DataElement.StorageType |> Claim.equal (DateTimeDataType(DataKind.DateTime.DefaultPrecision))
+//
+//
+//        [<Fact>]
+//        let ``Read Column names from table proxy metadata - attribute overrides``() =
+//            let proxy = tabularproxy<RecordB> 
+//            proxy.Columns.Length |> Claim.equal 4
+//        
+//            proxy.[0].DataElement.Name |> Claim.equal "BField_1"
+//            proxy.[1].DataElement.Name |> Claim.equal "BField2"
+//            proxy.[2].DataElement.Name |> Claim.equal "BField_3"
+//            proxy.[3].DataElement.Name |> Claim.equal "BField4"
     
         [<Fact>]
         let ``Described [SqlTest].[pTable02Insert] procedure from proxy``() =
@@ -151,7 +151,7 @@ module DataProxyMetadata =
         
             let param02 = proc.FindParameter "col02"
             param02.Direction |> Claim.equal RoutineParameterDirection.Input
-            param02.StorageType |> Claim.equal (DateTimeDataType(7uy))
+            param02.StorageType |> Claim.equal (DateTimeDataType(27uy,7uy))
 
             let param03 = proc.FindParameter "col03"
             param03.Direction |> Claim.equal RoutineParameterDirection.Input
@@ -188,7 +188,7 @@ module DataProxyMetadata =
             let param1 = proxy.CallProxy.Parameters.[0]
             param1.DataElement.Name |> Claim.equal "startDate"
             param1.DataElement.Position |> Claim.equal 0
-            param1.DataElement.StorageType |> Claim.equal (DateTimeDataType(7uy))
+            param1.DataElement.StorageType |> Claim.equal (DateTimeDataType(27uy,7uy))
 
             let resultProxy = proxy.ResultProxy
             resultProxy.Columns.Length |> Claim.equal 4

@@ -151,21 +151,22 @@ module Contracts =
         | UnicodeTextFixedDataType of len : int
         | UnicodeTextVariableDataType of maxlen : int
         | UnicodeTextMaxDataType
-        | DateTimeDataType of precision : uint8
+        | DateTimeDataType of precision : uint8 * scale : uint8
         | DateTimeOffsetDataType
-        | TimeOfDayDataType of precision : uint8
+        | TimeOfDayDataType of precision : uint8 * scale : uint8
         | TimespanDataType 
+        | RowversionDataType
         | DateDataType
         | Float32DataType
         | Float64DataType
         | DecimalDataType of precision : uint8 * scale : uint8
-        | MoneyDataType
+        | MoneyDataType of precision : uint8 * scale : uint8
         | GuidDataType
         | XmlDataType of schema : string
         | JsonDataType
         | VariantDataType
-        | CustomTableDataType of name : DataObjectName
-        | CustomObjectDataType of name : DataObjectName * clrType : Type
+        | TableDataType of name : DataObjectName
+        | ObjectDataType of name : DataObjectName * clrTypeName : string
         | CustomPrimitiveDataType of name : DataObjectName
         | TypedDocumentDataType of doctype : Type
 
@@ -214,7 +215,9 @@ module Contracts =
         IsTableType : bool
         IsCustomObject : bool
         IsUserDefined : bool
+        DefaultBclTypeName : string
         BaseTypeName : DataObjectName option
+
     }
     with
         override this.ToString() = this.Name.ToString()

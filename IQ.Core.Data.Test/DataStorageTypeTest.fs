@@ -40,11 +40,11 @@ module DataType =
             DataTypeAttribute(DataKind.BinaryMax) |> verifyAttribute (BinaryMaxDataType)
             DataTypeAttribute(DataKind.BinaryVariable, 150) |> verifyAttribute (BinaryVariableDataType(150))
             DataTypeAttribute(DataKind.Bit) |> verifyAttribute BitDataType
-            DataTypeAttribute(DataKind.CustomObject, typeof<int>, "X", "Y") |> verifyAttribute (CustomObjectDataType(DataObjectName("X", "Y"), typeof<int>))        
+            DataTypeAttribute(DataKind.CustomObject, typeof<int>, "X", "Y") |> verifyAttribute (ObjectDataType(DataObjectName("X", "Y"), typeof<int>.FullName))        
             DataTypeAttribute(DataKind.CustomPrimitive, "X", "Y") |> verifyAttribute (CustomPrimitiveDataType(DataObjectName("X","Y")))
-            DataTypeAttribute(DataKind.CustomTable, "X", "Y") |> verifyAttribute (CustomTableDataType(DataObjectName("X","Y")))
+            DataTypeAttribute(DataKind.CustomTable, "X", "Y") |> verifyAttribute (TableDataType(DataObjectName("X","Y")))
             DataTypeAttribute(DataKind.Date) |> verifyAttribute DateDataType
-            DataTypeAttribute(DataKind.DateTime, 3uy) |> verifyAttribute (DateTimeDataType(3uy))
+            DataTypeAttribute(DataKind.DateTime) |> verifyAttribute (DateTimeDataType(27uy,7uy))
             DataTypeAttribute(DataKind.DateTimeOffset) |> verifyAttribute (DateTimeOffsetDataType)
             DataTypeAttribute(DataKind.Decimal,12uy,4uy) |> verifyAttribute (DecimalDataType(12uy,4uy))
             DataTypeAttribute(DataKind.Float32) |> verifyAttribute (Float32DataType)
@@ -54,8 +54,8 @@ module DataType =
             DataTypeAttribute(DataKind.Int16) |> verifyAttribute (Int16DataType)
             DataTypeAttribute(DataKind.Int32) |> verifyAttribute (Int32DataType)
             DataTypeAttribute(DataKind.Int64) |> verifyAttribute (Int64DataType)        
-            DataTypeAttribute(DataKind.Money) |> verifyAttribute MoneyDataType
-            DataTypeAttribute(DataKind.TimeOfDay,7uy) |> verifyAttribute (TimeOfDayDataType(7uy))
+            DataTypeAttribute(DataKind.Money) |> verifyAttribute (MoneyDataType(19uy,4uy))
+            DataTypeAttribute(DataKind.TimeOfDay) |> verifyAttribute (TimeOfDayDataType(16uy,7uy))
             DataTypeAttribute(DataKind.UInt8) |> verifyAttribute (UInt8DataType)
             DataTypeAttribute(DataKind.UInt16) |> verifyAttribute (UInt16DataType)
             DataTypeAttribute(DataKind.UInt32) |> verifyAttribute (UInt32DataType)

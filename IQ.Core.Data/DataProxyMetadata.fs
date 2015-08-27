@@ -25,7 +25,7 @@ module DataProxyMetadata =
             Type.GetType("System.Boolean"), unsafeParse "Bit"
             Type.GetType("System.Byte"), unsafeParse "UInt8"
             Type.GetType("System.Byte[]"), unsafeParse "BinaryMax"
-            Type.GetType("System.DateTime"), unsafeParse "DateTime(7)"
+            Type.GetType("System.DateTime"), unsafeParse "DateTime(27,7)"
             Type.GetType("System.DateTimeOffset"), unsafeParse "DateTimeOffset"
             Type.GetType("System.Decimal"), unsafeParse "Decimal(19,4)"
             Type.GetType("System.Double"), unsafeParse "Float64"

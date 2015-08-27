@@ -171,12 +171,18 @@ module DataAttributes =
             | DataKind.Int64 -> Int64DataType
             | DataKind.Float32 -> Float32DataType
             | DataKind.Float64 -> Float64DataType
-            | DataKind.Money -> MoneyDataType
+            | DataKind.Money -> 
+                MoneyDataType(
+                    defaultArg attrib.Precision DataKind.Money.DefaultPrecision, 
+                    defaultArg attrib.Scale DataKind.Money.DefaultScale)
             | DataKind.Guid -> GuidDataType
             | DataKind.AnsiTextMax -> AnsiTextMaxDataType
             | DataKind.DateTimeOffset -> DateTimeOffsetDataType
             | DataKind.TimeOfDay -> 
-                TimeOfDayDataType(defaultArg attrib.Precision DataKind.TimeOfDay.DefaultPrecision)
+                TimeOfDayDataType(
+                    defaultArg attrib.Precision DataKind.TimeOfDay.DefaultPrecision,
+                    defaultArg attrib.Scale DataKind.TimeOfDay.DefaultScale
+                    )
             | DataKind.Flexible -> VariantDataType
             | DataKind.UnicodeTextMax -> UnicodeTextMaxDataType
             | DataKind.BinaryFixed -> 
@@ -193,7 +199,9 @@ module DataAttributes =
             | DataKind.UnicodeTextVariable -> 
                 UnicodeTextVariableDataType(defaultArg attrib.Length DataKind.UnicodeTextVariable.DefaultLength)
             | DataKind.DateTime -> 
-                DateTimeDataType(defaultArg attrib.Precision DataKind.DateTime.DefaultPrecision)  
+                DateTimeDataType(
+                    defaultArg attrib.Precision DataKind.DateTime.DefaultPrecision, 
+                    defaultArg attrib.Scale DataKind.DateTime.DefaultScale)  
             | DataKind.Date -> DateDataType
             | DataKind.Decimal -> 
                 DecimalDataType(
@@ -201,11 +209,11 @@ module DataAttributes =
                     defaultArg attrib.Scale DataKind.Decimal.DefaultScale)
             | DataKind.Xml -> XmlDataType("")
             | DataKind.CustomTable -> 
-                CustomTableDataType(attrib.CustomTypeName |> Option.get)
+                TableDataType(attrib.CustomTypeName |> Option.get)
             | DataKind.CustomPrimitive -> 
                 CustomPrimitiveDataType(attrib.CustomTypeName |> Option.get)
             | DataKind.CustomObject | DataKind.Geography | DataKind.Geometry | DataKind.Hierarchy ->          
-                CustomObjectDataType(attrib.CustomTypeName |> Option.get, attrib.ClrType |> Option.get)
+                ObjectDataType(attrib.CustomTypeName |> Option.get, (attrib.ClrType |> Option.get).FullName)
             | _ ->
                 NotSupportedException(sprintf "The data type %A is not recognized" attrib.DataKind) |> raise
             

@@ -31,10 +31,10 @@ module DataKind =
             DataKind.AnsiTextVariable, DataTypeKindAspects(Some(250), None, None)
             DataKind.UnicodeTextFixed, DataTypeKindAspects(Some(250), None, None)
             DataKind.UnicodeTextVariable, DataTypeKindAspects(Some(250), None, None)
-            DataKind.DateTime, DataTypeKindAspects(None, Some(7uy), None)
-            DataKind.TimeOfDay, DataTypeKindAspects(None, Some(7uy), None)
+            DataKind.DateTime, DataTypeKindAspects(None, Some(27uy), Some(7uy))
+            DataKind.TimeOfDay, DataTypeKindAspects(None, Some(16uy), Some(7uy))
             DataKind.Decimal, DataTypeKindAspects(None, Some(19uy), Some(4uy))
-            DataKind.Money, DataTypeKindAspects(None, None, None)
+            DataKind.Money, DataTypeKindAspects(None, Some(19uy), Some(4uy))
         ] |> dict
 
         
@@ -216,7 +216,8 @@ module DataTypeLongNames =
     let CustomPrimitiveDataTypeName = "CustomPrimitive"
     [<Literal>]
     let TypedDocumentDataTypeName = "TypedDocument"
-
+    [<Literal>]
+    let RowversionDataTypeName = "Rowversion"
 open DataTypeLongNames
 
 /// <summary>
@@ -249,23 +250,24 @@ module DataType =
         | UnicodeTextFixedDataType(length) -> length |> sprintf "%s(%i)" UnicodeTextFixedDataTypeName
         | UnicodeTextVariableDataType(length) -> length |> sprintf "%s(%i)" UnicodeTextVariableDataTypeName
         | UnicodeTextMaxDataType -> UnicodeTextMaxDataTypeName            
-        | DateTimeDataType(precision)-> precision |> sprintf "%s(%i)" DateTimeDataTypeName
+        | DateTimeDataType(p,s)-> sprintf "%s(%i,%i)" DateTimeDataTypeName p s
         | DateTimeOffsetDataType -> DateTimeOffsetDataTypeName
-        | TimeOfDayDataType(precision) -> precision |> sprintf "%s(%i)" TimeOfDayDataTypeName
+        | TimeOfDayDataType(p,s) -> sprintf "%s(%i,%i)" TimeOfDayDataTypeName p s
         | DateDataType -> DateDataTypeName
         | TimespanDataType -> TimespanDataTypeName            
         | Float32DataType -> Float32DataTypeName
         | Float64DataType -> Float64DataTypeName
         | DecimalDataType(precision,scale) -> sprintf "%s(%i,%i)" DecimalDataTypeName precision scale
-        | MoneyDataType -> MoneyDataTypeName
+        | MoneyDataType(p,s)-> sprintf "%s(%i,%i)" MoneyDataTypeName p s
         | GuidDataType -> GuidDataTypeName
         | XmlDataType(schema) -> schema |> sprintf "%s(%s)" XmlDataTypeName
         | JsonDataType -> JsonDataTypeName
         | VariantDataType -> VariantDataTypeName
-        | CustomTableDataType(name) -> name |> sprintf "%s%O" CustomTableDataTypeName
-        | CustomObjectDataType(name,t) -> sprintf "%s%O:%s" CustomObjectDataTypeName name t.AssemblyQualifiedName
+        | TableDataType(name) -> name |> sprintf "%s%O" CustomTableDataTypeName
+        | ObjectDataType(name,clrTypeName) -> sprintf "%s%O:%s" CustomObjectDataTypeName name clrTypeName
         | CustomPrimitiveDataType(name) -> sprintf "%s%O" CustomPrimitiveDataTypeName name 
         | TypedDocumentDataType(t) -> sprintf "%s%s" TypedDocumentDataTypeName t.AssemblyQualifiedName
+        | RowversionDataType -> RowversionDataTypeName
         
     /// <summary>
     /// Gets the kind of DataType required by the data type
@@ -281,7 +283,8 @@ module DataType =
         | Int8DataType -> DataKind.Int8
         | Int16DataType -> DataKind.Int16
         | Int32DataType -> DataKind.Int32
-        | Int64DataType -> DataKind.Int64           
+        | Int64DataType -> DataKind.Int64  
+        | RowversionDataType -> DataKind.BinaryFixed         
             
         | BinaryFixedDataType(_) -> DataKind.BinaryFixed
         | BinaryVariableDataType(_) -> DataKind.BinaryVariable
@@ -295,7 +298,7 @@ module DataType =
         | UnicodeTextVariableDataType(_) -> DataKind.UnicodeTextVariable
         | UnicodeTextMaxDataType -> DataKind.UnicodeTextMax
             
-        | DateTimeDataType(precision)-> DataKind.DateTime
+        | DateTimeDataType(_,_)-> DataKind.DateTime
         | DateTimeOffsetDataType -> DataKind.DateTimeOffset
         | TimeOfDayDataType(_) -> DataKind.TimeOfDay
         | DateDataType -> DataKind.Date
@@ -303,13 +306,13 @@ module DataType =
         | Float32DataType -> DataKind.Float32
         | Float64DataType -> DataKind.Float64
         | DecimalDataType(precision,scale) -> DataKind.Decimal
-        | MoneyDataType -> DataKind.Money
+        | MoneyDataType(_,_) -> DataKind.Money
         | GuidDataType -> DataKind.Guid
         | XmlDataType(_) -> DataKind.Xml
         | JsonDataType -> DataKind.Json
         | VariantDataType -> DataKind.Flexible
-        | CustomTableDataType(_) -> DataKind.CustomTable
-        | CustomObjectDataType(_) -> DataKind.CustomObject
+        | TableDataType(_) -> DataKind.CustomTable
+        | ObjectDataType(_) -> DataKind.CustomObject
         | CustomPrimitiveDataType(_) -> DataKind.CustomPrimitive
         | TypedDocumentDataType(_) -> DataKind.TypedDocument
 
@@ -327,7 +330,7 @@ module DataType =
             match text |> Txt.tryMatchGroups parameters expression  with
             | Some(groups) ->
                 match groups?StorageName with
-                | CustomTableDataTypeName -> CustomTableDataType(DataObjectName(groups?SchemaName, groups?LocalName)) |> Some
+                | CustomTableDataTypeName -> TableDataType(DataObjectName(groups?SchemaName, groups?LocalName)) |> Some
                 | _ ->
                     None
             | None ->
@@ -356,6 +359,9 @@ module DataType =
                 let s = Byte.Parse(groups?s)
                 match groups?StorageName with
                 | DecimalDataTypeName -> DecimalDataType(p,s) |> Some
+                | MoneyDataTypeName -> MoneyDataType(p,s) |> Some
+                | DateTimeDataTypeName -> DateTimeDataType(p,s) |> Some
+                | TimeOfDayDataTypeName -> TimeOfDayDataType(p,s) |> Some
                 | _ ->
                     None
             | None ->
@@ -374,8 +380,6 @@ module DataType =
                     | AnsiTextVariableDataTypeName -> AnsiTextVariableDataType(n) |> Some               
                     | UnicodeTextFixedDataTypeName -> UnicodeTextFixedDataType(n) |> Some                
                     | UnicodeTextVariableDataTypeName -> UnicodeTextVariableDataType(n) |> Some  
-                    | DateTimeDataTypeName -> DateTimeDataType(uint8(n)) |> Some
-                    | TimeOfDayDataTypeName -> TimeOfDayDataType(uint8(n)) |> Some
 
                     | _ -> None
             | None -> pattern2()
@@ -398,7 +402,6 @@ module DataType =
             | DateDataTypeName -> DateDataType |> Some
             | Float32DataTypeName -> Float32DataType |> Some
             | Float64DataTypeName-> Float64DataType |> Some
-            | MoneyDataTypeName -> MoneyDataType |> Some
             | GuidDataTypeName -> GuidDataType |> Some
             | VariantDataTypeName -> VariantDataType |> Some
             | _ -> pattern1()

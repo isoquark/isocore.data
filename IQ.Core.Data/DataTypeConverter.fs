@@ -29,7 +29,7 @@ module internal DataTypeConverter =
         | Int16DataType -> typeof<int16>
         | Int32DataType -> typeof<int>
         | Int64DataType -> typeof<int64>
-                        
+        | RowversionDataType -> typeof<byte[]>                        
         | BinaryFixedDataType(_) -> typeof<byte[]>
         | BinaryVariableDataType(_) -> typeof<byte[]>
         | BinaryMaxDataType -> typeof<byte[]>
@@ -42,7 +42,7 @@ module internal DataTypeConverter =
         | UnicodeTextVariableDataType(length) -> typeof<string>
         | UnicodeTextMaxDataType -> typeof<string>
             
-        | DateTimeDataType(precision)-> typeof<BclDateTime>
+        | DateTimeDataType(precision,scale)-> typeof<BclDateTime>
         | DateTimeOffsetDataType -> typeof<BclDateTimeOffset>
         | TimeOfDayDataType(_) -> typeof<BclTimeSpan>
         | DateDataType -> typeof<BclDateTime>
@@ -51,13 +51,13 @@ module internal DataTypeConverter =
         | Float32DataType -> typeof<float32>
         | Float64DataType -> typeof<float>
         | DecimalDataType(precision,scale) ->typeof<decimal>
-        | MoneyDataType -> typeof<decimal>
+        | MoneyDataType(_,_) -> typeof<decimal>
         | GuidDataType -> typeof<Guid>
         | XmlDataType(schema) -> typeof<string>
         | JsonDataType -> typeof<string>
         | VariantDataType -> typeof<obj>
-        | CustomTableDataType(name) -> typeof<obj>
-        | CustomObjectDataType(name,t) -> typeof<obj>
+        | TableDataType(name) -> typeof<obj>
+        | ObjectDataType(name,t) -> typeof<obj>
         | CustomPrimitiveDataType(name) -> typeof<obj>
         | TypedDocumentDataType(t) -> typeof<obj>
 

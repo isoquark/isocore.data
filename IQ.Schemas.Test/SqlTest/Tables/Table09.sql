@@ -29,7 +29,12 @@
 	Col28 varbinary(223) not null,
 	Col29 varchar(121) not null,
 	Col30 xml not null, 
-    Col31 sys.geography NULL
+    Col31 sys.geography NOT NULL,
+	Col32 image not null,
+	Col33 varbinary(MAX) not null,
+	Col34 varchar(MAX) not null,
+	Col35 nvarchar(MAX) not null, 
+    Col36 sysname NOT NULL
 )
 
 GO
@@ -302,3 +307,57 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level1name = N'Table09',
     @level2type = N'COLUMN',
     @level2name = N'Col31'
+GO
+EXEC sp_addextendedproperty @name = N'MS_Description',
+    @value = N'image',
+    @level0type = N'SCHEMA',
+    @level0name = N'SqlTest',
+    @level1type = N'TABLE',
+    @level1name = N'Table09',
+    @level2type = N'COLUMN',
+    @level2name = N'Col32'
+GO
+EXEC sp_addextendedproperty @name = N'MS_Description',
+    @value = N'varbinary(MAX)',
+    @level0type = N'SCHEMA',
+    @level0name = N'SqlTest',
+    @level1type = N'TABLE',
+    @level1name = N'Table09',
+    @level2type = N'COLUMN',
+    @level2name = N'Col33'
+GO
+
+GO
+
+GO
+
+GO
+
+GO
+
+EXEC sp_addextendedproperty @name = N'MS_Description',
+    @value = N'varchar(MAX)',
+    @level0type = N'SCHEMA',
+    @level0name = N'SqlTest',
+    @level1type = N'TABLE',
+    @level1name = N'Table09',
+    @level2type = N'COLUMN',
+    @level2name = N'Col34'
+GO
+EXEC sp_addextendedproperty @name = N'MS_Description',
+    @value = N'nvarchar(MAX)',
+    @level0type = N'SCHEMA',
+    @level0name = N'SqlTest',
+    @level1type = N'TABLE',
+    @level1name = N'Table09',
+    @level2type = N'COLUMN',
+    @level2name = N'Col35'
+GO
+EXEC sp_addextendedproperty @name = N'MS_Description',
+    @value = N'sysname',
+    @level0type = N'SCHEMA',
+    @level0name = N'SqlTest',
+    @level1type = N'TABLE',
+    @level1name = N'Table09',
+    @level2type = N'COLUMN',
+    @level2name = N'Col36'

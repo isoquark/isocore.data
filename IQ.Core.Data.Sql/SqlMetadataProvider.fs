@@ -107,33 +107,6 @@ module internal Metadata =
             SqlProxyReader.selectAll<'T> config.ConnectionString
 
 
-    let private getColumnDataType(c : vColumn) =
-       match c.DataTypeName with
-        | SqlDataTypeNames.bigint ->
-            Int64DataType
-        | SqlDataTypeNames.binary ->
-            BinaryFixedDataType(c.MaxLength)
-        | SqlDataTypeNames.bit ->
-            BitDataType
-        | SqlDataTypeNames.char ->
-            AnsiTextFixedDataType(c.MaxLength)
-        | SqlDataTypeNames.date ->
-            DateDataType
-        | SqlDataTypeNames.datetime ->
-            //See http://blogs.msdn.com/b/cdnsoldevs/archive/2011/06/22/why-you-should-never-use-datetime-again.aspx
-            //which notes that the the scale of the classic datetime type is 3; however, metadata correctly reports
-            //this as 3 so there is no need to hard-code anything
-            DateTimeDataType(c.Scale)
-        | SqlDataTypeNames.datetime2 ->
-            DateTimeDataType(c.Scale)
-        | SqlDataTypeNames.datetimeoffset ->
-            DateTimeOffsetDataType
-        | SqlDataTypeNames.decimal ->
-            DecimalDataType(c.Precision, c.Scale)
-        | SqlDataTypeNames.float ->
-            Float64DataType
-        | SqlDataTypeNames.geography ->
-            nosupport()
 
             
           
@@ -173,12 +146,13 @@ module internal Metadata =
             SqlMetadataCatalog.Schemas = []
         }
 
+open Metadata
 
 type internal SqlMetadataReader(config : SqlMetadataReaderConfig) =
-    
-    member this.GetDataTypes() =
+            
+    let describeDataTypes() =
         
-        let index = (SqlProxyReader.selectAll<Metadata.vDataType> config.ConnectionString).ToDictionary(fun x -> x.DataTypeId)
+        let index = (SqlProxyReader.selectAll<vDataType> config.ConnectionString).ToDictionary(fun x -> x.DataTypeId)
         
         let getName id =
             let item = index.[id]
@@ -198,9 +172,82 @@ type internal SqlMetadataReader(config : SqlMetadataReaderConfig) =
                 BaseTypeName = if item.BaseTypeId.HasValue then 
                                     getName(item.BaseTypeId.Value |> int) |> Some 
                                else 
-                                None                                    
+                                None  
+                DefaultBclTypeName = item.MappedBclType                                  
             }                
         ]
 
+    let dataTypes = describeDataTypes().ToDictionary(fun x -> x.Name)
+
+    member private this.GetColumnDataType(c : vColumn) =
+       match c.DataTypeName with
+        | SqlDataTypeNames.bigint ->
+            Int64DataType
+        | SqlDataTypeNames.binary ->
+            BinaryFixedDataType(c.MaxLength)
+        | SqlDataTypeNames.bit ->
+            BitDataType
+        | SqlDataTypeNames.char ->
+            AnsiTextFixedDataType(c.MaxLength)
+        | SqlDataTypeNames.date ->
+            DateDataType
+        | SqlDataTypeNames.datetime | SqlDataTypeNames.datetime2 | SqlDataTypeNames.smalldatetime ->
+            //See http://blogs.msdn.com/b/cdnsoldevs/archive/2011/06/22/why-you-should-never-use-datetime-again.aspx
+            //which notes that the the scale of the classic datetime type is 3; however, metadata correctly reports
+            //this as 3 so there is no need to hard-code anything
+            DateTimeDataType(c.Precision, c.Scale)        
+        | SqlDataTypeNames.datetimeoffset ->
+            DateTimeOffsetDataType
+        | SqlDataTypeNames.decimal ->
+            DecimalDataType(c.Precision, c.Scale)
+        | SqlDataTypeNames.float ->
+            Float64DataType
+        | SqlDataTypeNames.geography|SqlDataTypeNames.geometry|SqlDataTypeNames.hierarchyid  ->
+            let name = DataObjectName(c.SchemaName, c.DataTypeName)
+            ObjectDataType(name, dataTypes.[name].DefaultBclTypeName)
+        | SqlDataTypeNames.image ->
+            BinaryMaxDataType
+        | SqlDataTypeNames.int ->
+            Int32DataType
+        | SqlDataTypeNames.money | SqlDataTypeNames.smallmoney->
+            MoneyDataType(c.Precision, c.Scale)
+        | SqlDataTypeNames.nchar ->
+            UnicodeTextFixedDataType(c.MaxLength)
+        | SqlDataTypeNames.ntext ->
+            UnicodeTextMaxDataType
+        | SqlDataTypeNames.numeric ->
+            DecimalDataType(c.Precision, c.Scale)
+        | SqlDataTypeNames.nvarchar ->
+            match c.MaxLength with
+            | -1 -> UnicodeTextMaxDataType
+            | _ -> UnicodeTextVariableDataType(c.MaxLength)
+        | SqlDataTypeNames.real ->
+            Float32DataType
+        | SqlDataTypeNames.smallint ->
+            Int16DataType
+        | SqlDataTypeNames.sql_variant ->
+            VariantDataType
+        | SqlDataTypeNames.sysname ->
+            //This should be 128; metadata reports as 256
+            UnicodeTextVariableDataType(128)
+        | SqlDataTypeNames.text ->
+            AnsiTextMaxDataType
+        | SqlDataTypeNames.time ->
+            TimeOfDayDataType(c.Precision, c.Scale)
+        | SqlDataTypeNames.timestamp | SqlDataTypeNames.rowversion ->
+            RowversionDataType
+        | SqlDataTypeNames.tinyint ->
+            UInt8DataType
+        | SqlDataTypeNames.uniqueidentifier ->
+            GuidDataType
+        | SqlDataTypeNames.varbinary ->
+            BinaryVariableDataType(c.MaxLength)
+        | SqlDataTypeNames.xml ->
+            XmlDataType("TODO")
+        | _ ->
+            nosupport()
+            
+        
+            
 
 

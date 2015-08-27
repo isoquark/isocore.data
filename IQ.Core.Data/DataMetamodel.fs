@@ -26,6 +26,8 @@ module DataObjectDescription =
             x.Name
         | SequenceDescription(x) ->
             x.Name
+        | DataTypeDescription(x) ->
+            x.Name
 
     let getParameters (subject : DataObjectDescription) =
         match subject with
@@ -39,6 +41,8 @@ module DataObjectDescription =
             []
         | SequenceDescription(x) ->
             []
+        | DataTypeDescription(x) ->
+            []
     
     let tryFindParameter name (subject : DataObjectDescription) =
         match subject with
@@ -51,6 +55,8 @@ module DataObjectDescription =
         | ViewDescription(x) ->
             None
         | SequenceDescription(x) ->
+            None
+        | DataTypeDescription(x) ->
             None
 
     let findParameter name (subject : DataObjectDescription) =
