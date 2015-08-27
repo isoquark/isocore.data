@@ -1,19 +1,37 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <Import Project="..\build.props" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>5d4ada5c-b453-432c-a419-81bf001edd14</ProjectGuid>
+    <ProjectGuid>4a63b16d-2d65-4a6c-a1dd-b0d555ab9018</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>IQ.Core.Data</RootNamespace>
-    <AssemblyName>IQ.Core.Data</AssemblyName>
+    <RootNamespace>IQ.Core.Data.Test.Common</RootNamespace>
+    <AssemblyName>IQ.Core.Data.Test.Common</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Name>IQ.Core.Data</Name>
+    <Name>IQ.Core.Data.Test.Common</Name>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <Tailcalls>false</Tailcalls>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <DocumentationFile>bin\Debug\IQ.Core.Data.Test.Common.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <Tailcalls>true</Tailcalls>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <DocumentationFile>bin\Release\IQ.Core.Data.Test.Common.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
@@ -32,55 +50,26 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
-    <Content Include="app.config" />
-    <Content Include="packages.config" />
-    <None Include="Resources\DefaultStorageKindAspects.csv">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="DataObjectName.fs" />
-    <Compile Include="DataType.fs" />
-    <Compile Include="DataValue.fs" />
-    <Compile Include="DataAttributes.fs" />
-    <Compile Include="DataMetamodel.fs" />
-    <Compile Include="DataProxyMetamodel.fs" />
-    <Compile Include="DataProxyMetadata.fs" />
-    <Compile Include="DataTypeConverter.fs" />
-    <Compile Include="DataTable.fs" />
-    <Compile Include="CsvData.fs" />
-    <Compile Include="EtlVocabulary.fs" />
-    <Compile Include="TabularDescriptionBuilder.fs" />
+    <Compile Include="DataProxies.fs" />
+    <Content Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="CsvHelper">
-      <HintPath>..\packages\CsvHelper.2.13.2.0\lib\net40-client\CsvHelper.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="FSharp.Data">
-      <HintPath>..\packages\FSharp.Data.2.2.5\lib\net40\FSharp.Data.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="FSharp.Text.RegexProvider">
-      <HintPath>..\packages\FSharp.Text.RegexProvider.0.0.7\lib\net40\FSharp.Text.RegexProvider.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
       <Private>True</Private>
     </Reference>
-    <Reference Include="NodaTime">
-      <HintPath>..\packages\NodaTime.1.3.1\lib\net35-Client\NodaTime.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq" />
     <ProjectReference Include="..\IQ.Core.Contracts\IQ.Core.Contracts.fsproj">
       <Name>IQ.Core.Contracts</Name>
       <Project>{8690d158-dd5f-4b78-b542-a4cd5757c20c}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\IQ.Core.Data\IQ.Core.Data.fsproj">
+      <Name>IQ.Core.Data</Name>
+      <Project>{5d4ada5c-b453-432c-a419-81bf001edd14}</Project>
       <Private>True</Private>
     </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Framework\IQ.Core.Framework.fsproj">

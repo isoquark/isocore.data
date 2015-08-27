@@ -170,6 +170,7 @@ module CSharpGenerator =
                              |> CU.using "System.Collections.Generic" 
                              |> CU.addTypes (a.Types |> List.map genType)
         use workspace = new AdhocWorkspace()
+        //ProjectInfo.Create(ProjectId.CreateNewId("MyTestProjectId"), VersionStamp.Create(), "MyProject.dll", "C#");
         let format = Formatter.Format(cu, workspace)
         let sb = StringBuilder()
         let path = Path.Combine(dstFolder, "Gen.cs")

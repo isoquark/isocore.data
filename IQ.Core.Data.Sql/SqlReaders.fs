@@ -21,7 +21,7 @@ module internal SqlTabularReader =
         let rowValues = command |> SqlCommand.executeQuery (q.ColumnNames) 
         let description = {
             TabularDescription.Name = q.TabularName
-            Documentation = None
+            Documentation = String.Empty
             Columns = []                       
         }
         TabularData(description, rowValues)

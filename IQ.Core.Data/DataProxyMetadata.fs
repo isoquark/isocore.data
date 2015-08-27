@@ -71,9 +71,9 @@ module DataProxyMetadata =
          
     let private getMemberDescription(m : MemberInfo) =
         if Attribute.IsDefined(m, typeof<DescriptionAttribute>) then
-            (Attribute.GetCustomAttribute(m, typeof<DescriptionAttribute>) :?> DescriptionAttribute).Description |> Some
+            (Attribute.GetCustomAttribute(m, typeof<DescriptionAttribute>) :?> DescriptionAttribute).Description 
         else
-            None        
+            String.Empty
 
     /// <summary>
     /// Infers the name of the schema in which the element lives or represents
@@ -151,20 +151,20 @@ module DataProxyMetadata =
                     | Some(name) -> name
                     | None -> description.Name.Text
                 Position = description.Position |> defaultArg attrib.Position 
-                Documentation = None
+                Documentation = String.Empty
                 StorageType = storageType
                 Nullable = description.IsOptional 
-                AutoValue = None
+                AutoValue = AutoValueKind.None
             }
 
         | None ->
             {
                 ColumnDescription.Name = description.Name.Text
                 Position = description.Position
-                Documentation = None
+                Documentation = String.Empty
                 StorageType = storageType
                 Nullable = description.IsOptional 
-                AutoValue = None
+                AutoValue = AutoValueKind.None
             }
 
     let private describeColumnProxy(description : ClrProperty) =
@@ -202,7 +202,7 @@ module DataProxyMetadata =
             RoutineParameterDescription.Name = name
             Position = position
             Direction = direction
-            Documentation = None
+            Documentation = String.Empty
             StorageType = description |> ParameterElement|> inferStorageType 
         }
     
@@ -228,7 +228,7 @@ module DataProxyMetadata =
                 Direction = RoutineParameterDirection.Output //Must always be output so value in attribute can be ignored
                 StorageType = storageType
                 Position = position
-                Documentation = None
+                Documentation = String.Empty
             }
         | None ->
             //No attribute, so assume stored procedure return value
@@ -237,7 +237,7 @@ module DataProxyMetadata =
                 Position = -1
                 Direction = RoutineParameterDirection.ReturnValue
                 StorageType = storageType
-                Documentation = None
+                Documentation = String.Empty
             }
                                                                  
     /// <summary>
@@ -264,7 +264,7 @@ module DataProxyMetadata =
                 let procedure = {
                     ProcedureDescription.Name = objectName
                     Parameters = parameters |> List.map(fun p -> p.DataElement)
-                    Documentation = None
+                    Documentation = String.Empty
                 }            
                 ProcedureCallProxyDescription(m, procedure, parameters) |> ProcedureProxy
             | _ -> nosupport()
@@ -306,7 +306,7 @@ module DataProxyMetadata =
             TableFunctionDescription.Name = objectName   
             Parameters = parameterProxies|> List.map(fun p -> p.DataElement)
             Columns = columnProxies |> List.map(fun c -> c.DataElement)
-            Documentation = None
+            Documentation = String.Empty
         }
         let callProxy = TableFunctionCallProxyDescription(clrMethod, tableFunction, parameterProxies)
         let resultProxy = TabularResultProxyDescription(returnType, tableFunction, columnProxies)

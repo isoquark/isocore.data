@@ -11,11 +11,11 @@ open IQ.Core.Framework
 open IQ.Core.TestFramework
 open IQ.Core.Data
 
-open IQ.Core.Data.Test.ProxyTestCases
 
 
 open IQ.Core.Framework.Test
 
+open TestProxies
 
 module DataProxyMetadata =
 
@@ -71,32 +71,32 @@ module DataProxyMetadata =
         
             let tableExpect = {
                 TabularDescription.Name = DataObjectName("Proxies", typeof<RecordA>.Name)
-                Documentation = None
+                Documentation = String.Empty
                 Columns = 
                 [
                     { 
                       Name = (propname<@ fun (x : RecordA) -> x.AField1 @>).Text
                       Position = 0
-                      Documentation = None
+                      Documentation = String.Empty
                       StorageType = Int32DataType
                       Nullable = false  
-                      AutoValue = None              
+                      AutoValue = AutoValueKind.None
                     }
                     { 
                       Name = (propname<@ fun (x : RecordA) -> x.AField2 @>).Text
                       Position = 1
-                      Documentation = None
+                      Documentation = String.Empty
                       StorageType = BitDataType
                       Nullable = false                
-                      AutoValue = None              
+                      AutoValue = AutoValueKind.None
                     }
                     { 
                       Name = (propname<@ fun (x : RecordA) -> x.AField3 @>).Text
                       Position = 2
-                      Documentation = None
+                      Documentation = String.Empty
                       StorageType = Int64DataType
                       Nullable = true
-                      AutoValue = None              
+                      AutoValue = AutoValueKind.None  
                     }
                 ]
             }
@@ -137,7 +137,7 @@ module DataProxyMetadata =
         [<Fact>]
         let ``Described [SqlTest].[pTable02Insert] procedure from proxy``() =
             
-            let procName = thisMethod() |> ProxyTestCaseMethod.getDbObjectName
+            let procName = thisMethod().Name |> DataObjectName.fuzzyParse
             let proxies = routineproxies<ISqlTestRoutines>
             let proxy = proxies |> List.find(fun x -> x.DataElement.Name = procName) 
             let proc = proxy.DataElement
@@ -177,7 +177,7 @@ module DataProxyMetadata =
 
         [<Fact>]
         let ``Described [SqlTest].[fTable04Before] table function from proxy``() =
-            let dbElementName = thisMethod() |> ProxyTestCaseMethod.getDbObjectName
+            let dbElementName = thisMethod().Name |> DataObjectName.fuzzyParse
             dbElementName |> Claim.equal (DataObjectName("SqlTest", "fTable04Before"))
             let m = typeinfo<ISqlTestRoutines> |> fun x -> x.Methods |> List.find(fun m -> m.Name = ClrMemberName(dbElementName.LocalName))
         

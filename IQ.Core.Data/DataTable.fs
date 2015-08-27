@@ -64,8 +64,6 @@ module DataTable =
         let excludeIdentity = false
         let columns = [for c in d.Columns do 
                             match c.DataElement.AutoValue with
-                            | Some(autoval) ->
-                                match autoval with
                                 | AutoValueKind.Default ->
                                     if excludeDefaults |> not then
                                         yield c
@@ -77,8 +75,6 @@ module DataTable =
                                 | AutoValueKind.Sequence ->
                                     yield c
                                 | _ -> ()
-                            | None ->
-                                    yield c
                         ]
         
         let table = d.DataElement |> fromTabularDescription

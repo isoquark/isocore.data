@@ -1,7 +1,7 @@
 ﻿CREATE TABLE Metadata.AdoTypeMap
 (
-	SqlTypeName nvarchar(15) not null,
-	BclTypeName nvarchar(25) not null,
+	SqlTypeName nvarchar(25) not null,
+	BclTypeName nvarchar(250) not null,
 	SqlDbTypeEnum nvarchar(25) not null,
 	SqlDbTypeDataReader nvarchar(25) not null,
 	DbTypeEnum nvarchar(25) not null,

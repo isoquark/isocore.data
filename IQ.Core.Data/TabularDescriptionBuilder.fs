@@ -27,13 +27,9 @@ type TabularDescriptionBuilder(schemaName, localName, doc) =
                         Name = colname
                         Position = position
                         StorageType = dataTypeName |> DataType.parse |> Option.get
-                        Documentation = 
-                            if doc |> String.IsNullOrWhiteSpace then
-                                None 
-                            else 
-                                Some(doc)
+                        Documentation = doc
                         Nullable = nullable
-                        AutoValue = Some(autoKind)})
+                        AutoValue = autoKind})
         this
     member this.AddColumn(colname, dataTypeName) = 
         this.AddColumn(nextidx(), colname, dataTypeName, false, String.Empty, AutoValueKind.None)
@@ -47,12 +43,7 @@ type TabularDescriptionBuilder(schemaName, localName, doc) =
     member this.Finish() =
             {
                 TabularDescription.Name = DataObjectName(schemaName, localName)
-                Documentation = 
-                    if doc |> String.IsNullOrWhiteSpace then
-                        None 
-                    else 
-                        Some(doc)
-
+                Documentation = doc
                 Columns = columns |> List.ofSeq
             }
         

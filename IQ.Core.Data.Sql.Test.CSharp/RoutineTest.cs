@@ -11,18 +11,11 @@ using IQ.Core.Data.Sql;
 using IQ.Core.Framework;
 
 using static IQ.Core.Data.DataAttributes;
+using static IQ.Core.Data.Test.TestProxies;
 using Xunit;
 
 namespace IQ.Core.Data.Sql.Test.CSharp
 {
-
-    [Schema("SqlTest")]
-    public interface ISqlTestRoutines
-    {
-        [Procedure]
-        int pTable03Insert(Byte Col01, Int16 Col02, Int32 Col03, Int64 Col04);
-
-    }
 
 
     public class RoutineTest : UnitTest        

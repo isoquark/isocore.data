@@ -12,12 +12,11 @@ open System.Collections.Generic
 
 open IQ.Core.TestFramework
 open IQ.Core.Data
-open IQ.Core.Data.Test.ProxyTestCases
+open IQ.Core.Data.Test
 open IQ.Core.Data.Sql
 open IQ.Core.Framework
 
-
-
+open TestProxies
 
 
 module Tabular =

@@ -92,56 +92,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\build\targets\AnyCPU\FSharp.Compiler.Service.dll">
-      <Link>Assemblies\FSharp.Compiler.Service.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\build\targets\AnyCPU\FSharp.Core.dll">
-      <Link>Assemblies\FSharp.Core.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\build\targets\AnyCPU\FSharp.Data.dll">
-      <Link>Assemblies\FSharp.Data.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\build\targets\AnyCPU\FSharp.Text.RegexProvider.dll">
-      <Link>Assemblies\FSharp.Text.RegexProvider.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\build\targets\AnyCPU\Microsoft.CodeAnalysis.CSharp.dll">
-      <Link>Assemblies\Microsoft.CodeAnalysis.CSharp.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\build\targets\AnyCPU\Microsoft.CodeAnalysis.CSharp.Workspaces.dll">
-      <Link>Assemblies\Microsoft.CodeAnalysis.CSharp.Workspaces.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\build\targets\AnyCPU\Microsoft.CodeAnalysis.dll">
-      <Link>Assemblies\Microsoft.CodeAnalysis.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\build\targets\AnyCPU\Microsoft.CodeAnalysis.Workspaces.dll">
-      <Link>Assemblies\Microsoft.CodeAnalysis.Workspaces.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\build\targets\AnyCPU\NodaTime.dll">
-      <Link>Assemblies\NodaTime.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\build\targets\AnyCPU\System.Collections.Immutable.dll">
-      <Link>Assemblies\System.Collections.Immutable.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\build\targets\AnyCPU\System.Composition.AttributedModel.dll">
-      <Link>Assemblies\System.Composition.AttributedModel.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\build\targets\AnyCPU\System.Composition.Convention.dll">
-      <Link>Assemblies\System.Composition.Convention.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\build\targets\AnyCPU\System.Composition.Hosting.dll">
-      <Link>Assemblies\System.Composition.Hosting.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\build\targets\AnyCPU\System.Composition.Runtime.dll">
-      <Link>Assemblies\System.Composition.Runtime.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\build\targets\AnyCPU\System.Composition.TypedParts.dll">
-      <Link>Assemblies\System.Composition.TypedParts.dll</Link>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\build\targets\AnyCPU\System.Reflection.Metadata.dll">
-      <Link>Assemblies\System.Reflection.Metadata.dll</Link>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\IQ.Core.Contracts\IQ.Core.Contracts.fsproj">
       <Project>{8690d158-dd5f-4b78-b542-a4cd5757c20c}</Project>
       <Name>IQ.Core.Contracts</Name>

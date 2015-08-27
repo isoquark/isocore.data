@@ -4,7 +4,6 @@ namespace IQ.Core.Data.Sql.Test
 
 open IQ.Core.TestFramework
 open IQ.Core.Data
-open IQ.Core.Data.Test.ProxyTestCases
 open IQ.Core.Data.Sql
 open IQ.Core.Framework
 

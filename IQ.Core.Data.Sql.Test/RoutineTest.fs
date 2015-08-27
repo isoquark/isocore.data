@@ -10,12 +10,15 @@ open System.Reflection
 
 open IQ.Core.TestFramework
 open IQ.Core.Data
-open IQ.Core.Data.Test.ProxyTestCases
+open IQ.Core.Data.Test
 open IQ.Core.Data.Sql
 open IQ.Core.Framework
 
+open TestProxies
+
 module Routine =
     
+            
     type Tests(ctx, log)= 
         inherit ProjectTestContainer(ctx,log)
         
@@ -23,7 +26,7 @@ module Routine =
 
         [<FactAttribute>]
         let ``Executed [SqlTest].[pTable02Insert] procedure - Direct``() =
-            let procName = thisMethod() |> ProxyTestCaseMethod.getDbObjectName
+            let procName = thisMethod().Name |> DataObjectName.fuzzyParse
             let procProxy = routineproxies<ISqlTestRoutines> |> List.find(fun x -> x.DataElement.Name = procName)
             let proc = procProxy.DataElement |> DataObjectDescription.unwrapProcedure
             let inputValues =  
@@ -42,7 +45,7 @@ module Routine =
 
         [<FactAttribute>]
         let ``Executed [SqlTest].[pTable03Insert] procedure - Direct``() =
-            let procName = thisMethod() |> ProxyTestCaseMethod.getDbObjectName
+            let procName = thisMethod().Name |> DataObjectName.fuzzyParse
             let procProxy = routineproxies<ISqlTestRoutines> |> List.find(fun x -> x.DataElement.Name = procName) 
             let proc = procProxy.DataElement |> DataObjectDescription.unwrapProcedure
             let inputValues =

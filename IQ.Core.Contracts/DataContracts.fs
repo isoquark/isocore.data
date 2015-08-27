@@ -124,10 +124,14 @@ module Contracts =
         /// e.g. a specialized struct, DU, etc.
         | CustomPrimitive = 172uy 
 
+    
     /// <summary>
     /// Specifies a DataType class together with the information that is required to
     /// instantiate and store values corresponding to that class
     /// </summary>
+    /// <remarks>
+    /// This is really a DataTypeReference or "instantiation"
+    /// </remarks>
     type DataType =
         | BitDataType
         | UInt8DataType
@@ -198,6 +202,22 @@ module Contracts =
         | Sequence = 4
       
     /// <summary>
+    /// Describes a data type definition
+    /// </summary>
+    type DataTypeDescription = {
+        /// The data type's name
+        Name : DataObjectName
+        MaxLength : int16
+        Precision : uint8
+        Scale : uint8
+        IsNullable : bool
+        IsTableType : bool
+        IsCustomObject : bool
+        IsUserDefined : bool
+        BaseTypeName : DataObjectName option
+    }
+
+    /// <summary>
     /// Describes a column in a table or view
     /// </summary>
     [<DebuggerDisplay("{Position} {Name,nq} {StorageType}")>]
@@ -209,11 +229,11 @@ module Contracts =
         /// The column's data type
         StorageType : DataType    
         /// The column's documentation
-        Documentation : string option            
+        Documentation : string             
         /// Specifies whether the column allows null
         Nullable : bool           
         /// Specifies the means by which the column is automatically populated, if applicable 
-        AutoValue : AutoValueKind option    
+        AutoValue : AutoValueKind     
     }
 
     /// <summary>
@@ -223,7 +243,7 @@ module Contracts =
         /// The name of the table
         Name : DataObjectName        
         /// The tabular's documentation
-        Documentation : string option
+        Documentation : string 
         /// The columns in the table
         Columns : ColumnDescription list
     }
@@ -246,7 +266,7 @@ module Contracts =
         /// The parameter's position relative to the other columns
         Position : int
         /// The parameter's documentation
-        Documentation : string option
+        Documentation : string 
         /// The column's data type
         StorageType : DataType
         /// The direction of the parameter
@@ -262,7 +282,7 @@ module Contracts =
         /// The parameters
         Parameters : RoutineParameterDescription list
         /// The procedures's documentation
-        Documentation : string option
+        Documentation : string 
     }
    
     /// <summary>
@@ -274,7 +294,7 @@ module Contracts =
         /// The parameters
         Parameters : RoutineParameterDescription list
         /// The function's documentation
-        Documentation : string option
+        Documentation : string 
         /// The columns in the result set
         Columns : ColumnDescription list
     }
@@ -282,7 +302,7 @@ module Contracts =
     /// <summary>
     /// Describes a sequence 
     /// </summary>
-    type SequenceObjectDescription = {
+    type SequenceDescription = {
         Name : DataObjectName 
         StartValue : NumericValue
         Increment : NumericValue 
@@ -304,7 +324,8 @@ module Contracts =
     | ProcedureDescription of ProcedureDescription
     | TableDescription of TabularDescription
     | ViewDescription of TabularDescription
-    | SequenceDescription of SequenceObjectDescription
+    | SequenceDescription of SequenceDescription
+    | DataTypeDescription of DataTypeDescription
 
 
     type SchemaDescription = {
