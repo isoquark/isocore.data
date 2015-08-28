@@ -265,7 +265,7 @@ module DataType =
         | VariantDataType -> VariantDataTypeName
         | TableDataType(name) -> name |> sprintf "%s%O" CustomTableDataTypeName
         | ObjectDataType(name,clrTypeName) -> sprintf "%s%O:%s" CustomObjectDataTypeName name clrTypeName
-        | CustomPrimitiveDataType(name) -> sprintf "%s%O" CustomPrimitiveDataTypeName name 
+        | CustomPrimitiveDataType(name,baseType) -> sprintf "%s%O => %O" CustomPrimitiveDataTypeName name baseType
         | TypedDocumentDataType(t) -> sprintf "%s%s" TypedDocumentDataTypeName t.AssemblyQualifiedName
         | RowversionDataType -> RowversionDataTypeName
         

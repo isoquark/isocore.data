@@ -58,7 +58,7 @@ module internal DataTypeConverter =
         | VariantDataType -> typeof<obj>
         | TableDataType(name) -> typeof<obj>
         | ObjectDataType(name,t) -> typeof<obj>
-        | CustomPrimitiveDataType(name) -> typeof<obj>
+        | CustomPrimitiveDataType(name,_) -> typeof<obj>
         | TypedDocumentDataType(t) -> typeof<obj>
 
     [<TransformationAttribute>]

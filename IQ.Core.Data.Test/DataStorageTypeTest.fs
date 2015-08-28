@@ -41,7 +41,7 @@ module DataType =
             DataTypeAttribute(DataKind.BinaryVariable, 150) |> verifyAttribute (BinaryVariableDataType(150))
             DataTypeAttribute(DataKind.Bit) |> verifyAttribute BitDataType
             DataTypeAttribute(DataKind.CustomObject, typeof<int>, "X", "Y") |> verifyAttribute (ObjectDataType(DataObjectName("X", "Y"), typeof<int>.FullName))        
-            DataTypeAttribute(DataKind.CustomPrimitive, "X", "Y") |> verifyAttribute (CustomPrimitiveDataType(DataObjectName("X","Y")))
+            DataTypeAttribute(DataKind.CustomPrimitive, "X", "Y") |> verifyAttribute (CustomPrimitiveDataType(DataObjectName("X","Y"), Int32DataType))
             DataTypeAttribute(DataKind.CustomTable, "X", "Y") |> verifyAttribute (TableDataType(DataObjectName("X","Y")))
             DataTypeAttribute(DataKind.Date) |> verifyAttribute DateDataType
             DataTypeAttribute(DataKind.DateTime) |> verifyAttribute (DateTimeDataType(27uy,7uy))

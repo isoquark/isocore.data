@@ -52,7 +52,7 @@ module DataType =
         | VariantDataType -> SqlDbType.Variant
         | TableDataType(_) -> SqlDbType.Structured
         | ObjectDataType(_,_) -> SqlDbType.VarBinary 
-        | CustomPrimitiveDataType(name) -> SqlDbType.Udt
+        | CustomPrimitiveDataType(name,_) -> SqlDbType.Udt
         | TypedDocumentDataType(_) -> SqlDbType.NVarChar
         | RowversionDataType -> SqlDbType.Timestamp
 

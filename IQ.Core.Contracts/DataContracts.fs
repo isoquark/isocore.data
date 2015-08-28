@@ -167,7 +167,7 @@ module Contracts =
         | VariantDataType
         | TableDataType of name : DataObjectName
         | ObjectDataType of name : DataObjectName * clrTypeName : string
-        | CustomPrimitiveDataType of name : DataObjectName
+        | CustomPrimitiveDataType of name : DataObjectName * baseType : DataType
         | TypedDocumentDataType of doctype : Type
 
     /// <summary>
@@ -339,8 +339,12 @@ module Contracts =
 
 
     type SchemaDescription = {
+        /// The name of the schema
         Name : string
+        /// The objects defined in the schema
         Objects : DataObjectDescription list
+        /// The schema's documentattion
+        Documentation : string
     }
 
     type SqlMetadataCatalog = {

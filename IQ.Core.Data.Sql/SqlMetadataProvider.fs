@@ -2,6 +2,7 @@
 
 open System
 open System.Linq
+open System.Collections.Generic;
 
 open IQ.Core.Contracts
 open IQ.Core.Framework
@@ -24,6 +25,7 @@ module internal Metadata =
     
     let private toOptionalString s =
         if s |> System.String.IsNullOrEmpty then None else s |> Some
+    
     
     
     type AdoTypeMap() =
@@ -62,8 +64,8 @@ module internal Metadata =
 
     type vColumn() = 
         member val CatalogName = String.Empty  with get, set     
-        member val SchemaName = String.Empty  with get, set    
-        member val TableName = String.Empty  with get, set    
+        member val ParentSchemaName = String.Empty  with get, set    
+        member val ParentName = String.Empty  with get, set    
         member val ColumnName = String.Empty  with get, set    
         member val Description = String.Empty  with get, set    
         member val Position = 0  with get, set    
@@ -71,6 +73,7 @@ module internal Metadata =
         member val IsIdentity = false with get, set
         member val IsUserDefined = false with get, set
         member val IsNullable = false with get, set
+        member val DataTypeSchemaName = String.Empty with get,set
         member val DataTypeName = String.Empty with get,set
         member val MaxLength = 0 with get, set
         member val Precision = 0uy with get, set
@@ -92,7 +95,7 @@ module internal Metadata =
 
     type vView() = 
         member val SchemaName = String.Empty  with get, set    
-        member val TableName = String.Empty  with get, set    
+        member val ViewName = String.Empty  with get, set    
         member val Description = String.Empty  with get, set    
         member val IsUserDefined = false with get, set
     with
@@ -105,9 +108,6 @@ module internal Metadata =
             SqlProxyReader.selectSome<'T> config.ConnectionString ("IsUserDefined=1")
         else
             SqlProxyReader.selectAll<'T> config.ConnectionString
-
-
-
             
           
     let private getColumns(config : SqlMetadataReaderConfig) =
@@ -148,7 +148,7 @@ module internal Metadata =
 
 open Metadata
 
-type internal SqlMetadataReader(config : SqlMetadataReaderConfig) =
+type internal SqlMetadataReader(config : SqlMetadataReaderConfig) as this =
             
     let describeDataTypes() =
         
@@ -171,83 +171,196 @@ type internal SqlMetadataReader(config : SqlMetadataReaderConfig) =
                 IsUserDefined = item.IsUserDefined
                 BaseTypeName = if item.BaseTypeId.HasValue then 
                                     getName(item.BaseTypeId.Value |> int) |> Some 
-                               else 
+                                else 
                                 None  
                 DefaultBclTypeName = item.MappedBclType                                  
             }                
         ]
 
-    let dataTypes = describeDataTypes().ToDictionary(fun x -> x.Name)
 
-    member private this.GetColumnDataType(c : vColumn) =
-       match c.DataTypeName with
+    let dataTypes = describeDataTypes().ToDictionary(fun x -> x.Name)
+        
+    let columns = Dictionary<DataObjectName, ColumnDescription ResizeArray>()
+    let tables = Dictionary<string, TabularDescription ResizeArray>()
+    let views = Dictionary<string, TabularDescription ResizeArray>()
+    let schemas = Dictionary<string, SchemaDescription>()
+    do
+        this.IndexSchemas();
+        ()
+
+
+    member private this.GetMetadataView<'T when 'T :> IMetadataView>() =
+        config |> getMetadataView<'T>
+    
+
+    member private this.GetIntrinsicTypeReference(dataTypeName : DataObjectName, maxlen, precision, scale) =
+       match dataTypeName.LocalName with
         | SqlDataTypeNames.bigint ->
-            Int64DataType
+            Int64DataType |> Some
         | SqlDataTypeNames.binary ->
-            BinaryFixedDataType(c.MaxLength)
+            BinaryFixedDataType(maxlen) |> Some
         | SqlDataTypeNames.bit ->
-            BitDataType
+            BitDataType |> Some
         | SqlDataTypeNames.char ->
-            AnsiTextFixedDataType(c.MaxLength)
+            AnsiTextFixedDataType(maxlen)  |> Some
         | SqlDataTypeNames.date ->
-            DateDataType
+            DateDataType |> Some
         | SqlDataTypeNames.datetime | SqlDataTypeNames.datetime2 | SqlDataTypeNames.smalldatetime ->
             //See http://blogs.msdn.com/b/cdnsoldevs/archive/2011/06/22/why-you-should-never-use-datetime-again.aspx
             //which notes that the the scale of the classic datetime type is 3; however, metadata correctly reports
             //this as 3 so there is no need to hard-code anything
-            DateTimeDataType(c.Precision, c.Scale)        
+            DateTimeDataType(precision, scale) |> Some       
         | SqlDataTypeNames.datetimeoffset ->
-            DateTimeOffsetDataType
+            DateTimeOffsetDataType |> Some
         | SqlDataTypeNames.decimal ->
-            DecimalDataType(c.Precision, c.Scale)
+            DecimalDataType(precision, scale) |> Some
         | SqlDataTypeNames.float ->
-            Float64DataType
+            Float64DataType |> Some
         | SqlDataTypeNames.geography|SqlDataTypeNames.geometry|SqlDataTypeNames.hierarchyid  ->
-            let name = DataObjectName(c.SchemaName, c.DataTypeName)
-            ObjectDataType(name, dataTypes.[name].DefaultBclTypeName)
+            ObjectDataType(dataTypeName, dataTypes.[dataTypeName].DefaultBclTypeName) |> Some
         | SqlDataTypeNames.image ->
-            BinaryMaxDataType
+            BinaryMaxDataType |> Some
         | SqlDataTypeNames.int ->
-            Int32DataType
+            Int32DataType |> Some
         | SqlDataTypeNames.money | SqlDataTypeNames.smallmoney->
-            MoneyDataType(c.Precision, c.Scale)
+            MoneyDataType(precision, scale) |> Some
         | SqlDataTypeNames.nchar ->
-            UnicodeTextFixedDataType(c.MaxLength)
+            UnicodeTextFixedDataType(maxlen) |> Some
         | SqlDataTypeNames.ntext ->
-            UnicodeTextMaxDataType
+            UnicodeTextMaxDataType |> Some
         | SqlDataTypeNames.numeric ->
-            DecimalDataType(c.Precision, c.Scale)
+            DecimalDataType(precision, scale) |> Some
         | SqlDataTypeNames.nvarchar ->
-            match c.MaxLength with
-            | -1 -> UnicodeTextMaxDataType
-            | _ -> UnicodeTextVariableDataType(c.MaxLength)
+            match maxlen with
+            | -1 -> UnicodeTextMaxDataType 
+            | _ -> UnicodeTextVariableDataType(maxlen)
+            |> Some
+        | SqlDataTypeNames.varchar ->
+            match maxlen with
+            | -1 -> AnsiTextMaxDataType 
+            | _ -> AnsiTextVariableDataType(maxlen)
+            |> Some
         | SqlDataTypeNames.real ->
-            Float32DataType
+            Float32DataType|> Some
         | SqlDataTypeNames.smallint ->
-            Int16DataType
+            Int16DataType|> Some
         | SqlDataTypeNames.sql_variant ->
-            VariantDataType
+            VariantDataType|> Some
         | SqlDataTypeNames.sysname ->
             //This should be 128; metadata reports as 256
-            UnicodeTextVariableDataType(128)
+            UnicodeTextVariableDataType(128) |> Some
         | SqlDataTypeNames.text ->
-            AnsiTextMaxDataType
+            AnsiTextMaxDataType |> Some
         | SqlDataTypeNames.time ->
-            TimeOfDayDataType(c.Precision, c.Scale)
+            TimeOfDayDataType(precision, scale) |> Some
         | SqlDataTypeNames.timestamp | SqlDataTypeNames.rowversion ->
-            RowversionDataType
+            RowversionDataType |> Some
         | SqlDataTypeNames.tinyint ->
-            UInt8DataType
+            UInt8DataType |> Some
         | SqlDataTypeNames.uniqueidentifier ->
-            GuidDataType
+            GuidDataType |> Some
         | SqlDataTypeNames.varbinary ->
-            BinaryVariableDataType(c.MaxLength)
+            BinaryVariableDataType(maxlen) |> Some
         | SqlDataTypeNames.xml ->
-            XmlDataType("TODO")
+            XmlDataType("TODO") |> Some
         | _ ->
-            nosupport()
+            None
             
-        
+    member private this.GetColumnDataType(c : vColumn) =
+        let dataTypeName = DataObjectName(c.DataTypeSchemaName, c.DataTypeName)
+        let reference = 
+            this.GetIntrinsicTypeReference(dataTypeName, c.MaxLength, c.Precision, c.Scale)
+        match reference with
+        | Some x  -> x
+        | None ->            
+            let dataType = dataTypes.[dataTypeName]
+            if dataType.IsUserDefined then
+                let baseTypeName = 
+                    if dataType.BaseTypeName |> Option.isNone then
+                        nosupport()
+                    else
+                        dataType.BaseTypeName |> Option.get
+                
+                let baseType = dataTypes.[baseTypeName]
+                let reference = 
+                    this.GetIntrinsicTypeReference(baseTypeName, baseType.MaxLength |> int, baseType.Precision, baseType.Scale)
+                match reference with
+                | Some x ->
+                    CustomPrimitiveDataType(baseTypeName, x)
+                | None ->
+                    nosupport()
+            else
+                nosupport()
             
+    member private this.IndexColumns() =
+        for column in this.GetMetadataView<vColumn>()  do
+            let description = {
+                ColumnDescription.Name = column.ColumnName
+                Position = column.Position
+                StorageType = this.GetColumnDataType(column)
+                Documentation = column.Description
+                Nullable = column.IsNullable
+                AutoValue = if column.IsComputed then
+                                    AutoValueKind.Computed 
+                                else if column.IsIdentity then
+                                    AutoValueKind.Identity 
+                                else 
+                                    AutoValueKind.None
+                
+            
+            }
+            let parentName = DataObjectName(column.ParentSchemaName, column.ParentName)
+            if columns.ContainsKey(parentName) then 
+                columns.[parentName].Add(description)
+            else
+                columns.Add(parentName, ResizeArray([description]))
+                                 
 
+    member private this.IndexTables() =
+        for table in this.GetMetadataView<vTable>() do
+            let tableName  = DataObjectName(table.SchemaName, table.TableName)
+            let description = {
+                TabularDescription.Name = tableName
+                Documentation = table.Description
+                Columns = columns.[tableName] |> List.ofSeq
+            }        
+            if tables.ContainsKey(table.SchemaName) then 
+                tables.[table.SchemaName].Add(description)
+            else
+                tables.Add(table.SchemaName, ResizeArray([description]))
+            
+    member private this.IndexViews() =
+        for view in this.GetMetadataView<vView>() do
+            let tableName  = DataObjectName(view.SchemaName, view.ViewName)
+            let description = {
+                TabularDescription.Name = tableName
+                Documentation = view.Description
+                Columns = columns.[tableName] |> List.ofSeq
+            }        
+            if views.ContainsKey(view.SchemaName) then 
+                views.[view.SchemaName].Add(description)
+            else
+                views.Add(view.SchemaName, ResizeArray([description]))
 
+    member private this.IndexSchemas() =
+        this.IndexColumns()
+        this.IndexTables()
+        this.IndexViews()
+
+        for schema in this.GetMetadataView<vSchema>() do
+            
+            let allObjects = ResizeArray<DataObjectDescription>()
+            if tables.ContainsKey(schema.SchemaName) then
+                tables.[schema.SchemaName] |> Seq.map(TableDescription) |> allObjects.AddRange
+            if views.ContainsKey(schema.SchemaName) then
+                views.[schema.SchemaName] |> Seq.map(ViewDescription) |> allObjects.AddRange
+            schemas.Add(schema.SchemaName,
+                {
+                   SchemaDescription.Name = schema.SchemaName
+                   Objects =  allObjects |> List.ofSeq
+                   Documentation = schema.Description
+                    
+                }
+            )
+
+    member this.DefinedSchemas = schemas.Values.ToList() :> IReadOnlyList<_>

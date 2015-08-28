@@ -211,7 +211,9 @@ module DataAttributes =
             | DataKind.CustomTable -> 
                 TableDataType(attrib.CustomTypeName |> Option.get)
             | DataKind.CustomPrimitive -> 
-                CustomPrimitiveDataType(attrib.CustomTypeName |> Option.get)
+                //TODO: This cannot be calculated unless additional metadata is attached or we have access
+                //to database metadata (!)
+                CustomPrimitiveDataType(attrib.CustomTypeName |> Option.get, DataType.Int32DataType)
             | DataKind.CustomObject | DataKind.Geography | DataKind.Geometry | DataKind.Hierarchy ->          
                 ObjectDataType(attrib.CustomTypeName |> Option.get, (attrib.ClrType |> Option.get).FullName)
             | _ ->

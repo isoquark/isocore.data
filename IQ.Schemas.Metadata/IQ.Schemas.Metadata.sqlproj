@@ -112,7 +112,6 @@
     </ArtifactReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="eXa003.publish.xml" />
     <None Include="deploy.bat">
       <CopyToOutputDirectory>DoNotCopy</CopyToOutputDirectory>
     </None>

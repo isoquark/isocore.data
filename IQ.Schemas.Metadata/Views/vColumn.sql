@@ -17,6 +17,7 @@
 		x.precision as Precision,
 		x.scale as Scale,
 		x.user_type_id as DataTypeId,
+		t.SchemaName as DataTypeSchemaName,
 		t.DataTypeName,
 		o.IsUserDefined
 	from 
