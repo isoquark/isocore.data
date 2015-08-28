@@ -36,20 +36,20 @@ module DataObjectDescription =
         | ProcedureDescription(x) -> 
             x.Parameters
         | TableDescription(x) ->
-            []
+            RoList.empty
         | ViewDescription(x) ->
-            []
+            RoList.empty
         | SequenceDescription(x) ->
-            []
+            RoList.empty
         | DataTypeDescription(x) ->
-            []
+            RoList.empty
     
     let tryFindParameter name (subject : DataObjectDescription) =
         match subject with
         | TableFunctionDescription(x) -> 
-            x.Parameters |> List.tryFind(fun p -> p.Name = name)
+            x.Parameters |> Seq.tryFind(fun p -> p.Name = name)
         | ProcedureDescription(x) -> 
-            x.Parameters |> List.tryFind(fun p -> p.Name = name)
+            x.Parameters |> Seq.tryFind(fun p -> p.Name = name)
         | TableDescription(x) ->
             None
         | ViewDescription(x) ->
@@ -91,14 +91,14 @@ module DataMetamodelExtensions =
         /// </summary>
         /// <param name="name">The name of the column</param>
         member this.Item(name) = 
-            this.Columns |> List.find(fun column -> column.Name = name)
+            this.Columns |> Seq.find(fun column -> column.Name = name)
 
         /// <summary>
         /// Finds a column identified by its position
         /// </summary>
         /// <param name="position">The position of the column</param>
         member this.Item(position) = 
-            this.Columns |> List.find(fun column -> column.Position = position)
+            this.Columns |> Seq.find(fun column -> column.Position = position)
     
 
     /// <summary>

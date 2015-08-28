@@ -51,7 +51,7 @@ module DataTable =
     /// <param name="d">The tabular description</param>
     let fromTabularDescription(d : TabularDescription) =
         let table = new DataTable(d.Name.ToSemanticString())
-        d.Columns |> List.iter(fun c -> table.Columns.Add(c.Name, c.StorageType |> DataTypeConverter.toBclTransportType) |> ignore)
+        d.Columns |> Seq.iter(fun c -> table.Columns.Add(c.Name, c.StorageType |> DataTypeConverter.toBclTransportType) |> ignore)
         table
 
     /// <summary>

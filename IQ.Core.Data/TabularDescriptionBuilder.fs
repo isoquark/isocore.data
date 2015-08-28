@@ -44,6 +44,6 @@ type TabularDescriptionBuilder(schemaName, localName, doc) =
             {
                 TabularDescription.Name = DataObjectName(schemaName, localName)
                 Documentation = doc
-                Columns = columns |> List.ofSeq
+                Columns = columns 
             }
         

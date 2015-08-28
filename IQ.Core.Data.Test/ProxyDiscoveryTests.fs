@@ -98,10 +98,14 @@ module DataProxyMetadata =
                       Nullable = true
                       AutoValue = AutoValueKind.None  
                     }
-                ]
+                ] |> List.asReadOnlyList
             }
             let tableActual = proxy.DataElement
-            tableActual |> Claim.equal tableExpect
+            //tableActual |> Claim.equal tableExpect
+            tableActual.Columns.Count |> Claim.equal tableExpect.Columns.Count
+            tableActual.Columns.[0] |> Claim.equal  tableExpect.Columns.[0]
+            tableActual.Columns.[1] |> Claim.equal  tableExpect.Columns.[1]
+            tableActual.Columns.[2] |> Claim.equal  tableExpect.Columns.[2]
         
             let recordActual = proxy.ProxyElement
             let recordExpect = typeinfo<RecordA>
@@ -143,7 +147,7 @@ module DataProxyMetadata =
             let proc = proxy.DataElement
 
             proc.Name |> Claim.equal procName
-            proc.Parameters.Length |> Claim.equal 3
+            proc.Parameters.Count |> Claim.equal 3
 
             let param01 = proc.FindParameter "col01"
             param01.Direction |> Claim.equal RoutineParameterDirection.Output

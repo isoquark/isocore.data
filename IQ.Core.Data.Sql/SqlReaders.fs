@@ -22,7 +22,7 @@ module internal SqlTabularReader =
         let description = {
             TabularDescription.Name = q.TabularName
             Documentation = String.Empty
-            Columns = []                       
+            Columns = RoList.empty                    
         }
         TabularData(description, rowValues)
 
@@ -30,7 +30,7 @@ module internal SqlTabularReader =
         use connection = cs |> SqlConnection.create
         use command = new SqlCommand(sql, connection)
         command.CommandType <- CommandType.Text
-        command |> SqlCommand.executeQuery (d.Columns |> List.map(fun c -> c.Name) |> List.asReadOnlyList)
+        command |> SqlCommand.executeQuery (d.Columns |> RoList.map(fun c -> c.Name) )
             
     let selectAll cs (d : TabularDescription) =
         let sql = d |> SqlFormatter.formatTabularSelect

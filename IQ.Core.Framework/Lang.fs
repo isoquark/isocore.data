@@ -16,7 +16,7 @@ open Microsoft.FSharp.Quotations.Patterns
 
 
 type ReadOnlyList<'T>(l : list<'T>) =
-    static member Empty() = List<'T>() 
+    static member Empty() = List<'T>() :> rolist<'T> 
 
     override this.GetHashCode() = (l:>obj).GetHashCode()
     override this.Equals(other) = (l:>obj).Equals(other)
@@ -88,6 +88,11 @@ module Lang =
 
         let toList (l : 'T rolist) =
             [for item in l -> item]
+
+        let ofSeq (l : 'T rolist) =
+            l |> Array.ofSeq :> rolist<_>
+        
+        let empty<'T> = ReadOnlyList<'T>.Empty()
 
     module Map =
         let ofReadOnlyList (items : ('K*'V) rolist) =

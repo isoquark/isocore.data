@@ -26,5 +26,5 @@ module SqlMetadataProvider =
                     ConnectionString = ctx.ConnectionString
                     IgnoreSystemObjects = true
                 } |> SqlMetadataReader
-            let schemas = reader.DefinedSchemas;
+            let catalog = reader.ReadCatalog()
             ()

@@ -31,7 +31,7 @@ module internal Routine =
         use command = new SqlCommand(proc.Name |> SqlFormatter.formatObjectName, connection)
         command.CommandType <- CommandType.StoredProcedure
         
-        proc.Parameters |> List.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
+        proc.Parameters |> Seq.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
         command.ExecuteNonQuery() |> ignore
         
         // See https://msdn.microsoft.com/en-us/library/haa3afyz(v=vs.110).aspx for how to deal with multiple result sets
@@ -55,8 +55,8 @@ module internal Routine =
         use connection = cs |> SqlConnection.create
         let sql = f |> SqlFormatter.formatTableFunctionSelect
         use command = new SqlCommand(sql, connection)
-        f.Parameters |> List.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
-        command |> SqlCommand.executeQuery (f.Columns |> List.map(fun c -> c.Name) |> List.asReadOnlyList)
+        f.Parameters |> Seq.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
+        command |> SqlCommand.executeQuery (f.Columns |> RoList.map(fun c -> c.Name))
                    
 
     /// <summary>
@@ -69,7 +69,7 @@ module internal Routine =
         use connection = cs |> SqlConnection.create
         let sql = f |> SqlFormatter.formatTableFunctionSelect
         use command = new SqlCommand(sql, connection)
-        f.Parameters |> List.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
+        f.Parameters |> Seq.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
         
         use adapter = new SqlDataAdapter(command)
         let table = new DataTable()

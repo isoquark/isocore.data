@@ -27,55 +27,12 @@ with
 module SqlDataStore =    
      
         
-    type private MetadataProvider(config : SqlDataStoreConfig) =
-        let cs = config.ConnectionString
-        interface ISqlMetadataProvider with
-            member this.Describe q = 
-                match q with
-                | FindTables(q) ->
-                    match q  with
-                    | FindAllTables ->
-                        let vTables = cs |> SqlProxyReader.selectAll<Metadata.vTable>  
-                        [for vTable in vTables ->
-                            {TabularDescription.Name = DataObjectName(vTable.SchemaName, vTable.TableName)
-                             Documentation = vTable.Description
-                             Columns = []
-                            } |> TableDescription
-                        ]
-                    | FindUserTables ->
-                        nosupport()
-                    | FindTablesBySchema(schemaName) ->
-                        nosupport()
-                | FindSchemas(q) -> 
-                    match q with
-                    | FindAllSchemas ->
-                        nosupport() 
-                | FindViews(q) -> 
-                    match q with
-                    | FindAllViews -> 
-                        nosupport()
-                    | FindUserViews ->
-                        nosupport()
-                    | FindViewsBySchema(schemaName) ->
-                        nosupport()
-                | FindProcedures(q) -> 
-                    match q with
-                    | FindAllProcedures -> 
-                        nosupport()
-                    | FindProceduresBySchema(schemaName) ->
-                        nosupport()
-                | FindSequences(q) -> 
-                    match q with
-                    | FindAllSequences -> 
-                        nosupport()
-                    | FindSequencesBySchema(schemaName) ->
-                        nosupport()
 
                 
 
     type internal Realization(config : SqlDataStoreConfig) =
         let cs = config.ConnectionString
-        let mp = config |> MetadataProvider :> ISqlMetadataProvider
+        let mp = lazy({ConnectionString = cs; IgnoreSystemObjects = true} |> SqlMetadataProvider.get)
         interface ISqlProxyDataStore with
             member this.Get q  = 
                 match q with
@@ -118,7 +75,7 @@ module SqlDataStore =
 
             member this.ConnectionString = cs
             
-            member this.MetadataProvider = mp    
+            member this.MetadataProvider = mp.Value    
                                              
     /// <summary>
     /// Provides access to an identified data store

@@ -250,7 +250,7 @@ module Contracts =
         /// The tabular's documentation
         Documentation : string 
         /// The columns in the table
-        Columns : ColumnDescription list
+        Columns : ColumnDescription rolist
     }
 
     /// <summary>
@@ -285,7 +285,7 @@ module Contracts =
         /// The name of the procedure
         Name : DataObjectName
         /// The parameters
-        Parameters : RoutineParameterDescription list
+        Parameters : RoutineParameterDescription rolist
         /// The procedures's documentation
         Documentation : string 
     }
@@ -297,11 +297,11 @@ module Contracts =
         /// The name of the procedure
         Name : DataObjectName    
         /// The parameters
-        Parameters : RoutineParameterDescription list
+        Parameters : RoutineParameterDescription rolist
         /// The function's documentation
         Documentation : string 
         /// The columns in the result set
-        Columns : ColumnDescription list
+        Columns : ColumnDescription rolist
     }
 
     /// <summary>
@@ -349,7 +349,7 @@ module Contracts =
 
     type SqlMetadataCatalog = {
         CatalogName : string
-        Schemas : SchemaDescription list
+        Schemas : SchemaDescription rolist
     }
 
     /// <summary>
@@ -398,6 +398,12 @@ module Contracts =
     type ISqlMetadataProvider =
         abstract Describe:SqlMetadataQuery->DataObjectDescription list
 
+        abstract DescribeSchemas:unit-> SchemaDescription rolist
+        abstract DescribeAllTables:unit-> TabularDescription rolist
+        abstract DescribeSchemaTables:string->TabularDescription rolist
+        abstract DescribeAllViews:unit -> TabularDescription rolist
+        abstract DescribeSchemaViews:string->TabularDescription
+    
 
     type IQueryableObjectStore =
         abstract Select:obj->obj IReadOnlyList

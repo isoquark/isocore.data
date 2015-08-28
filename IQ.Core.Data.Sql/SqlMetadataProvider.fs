@@ -11,7 +11,7 @@ open IQ.Core.Data
 open System.Data
 open System.Data.SqlClient
 
-type internal SqlMetadataReaderConfig = {
+type SqlMetadataProviderConfig = {
     ConnectionString : string
     IgnoreSystemObjects : bool
 }
@@ -103,14 +103,14 @@ module internal Metadata =
             member this.IsUserDefined = this.IsUserDefined
             member this.Documentation = this.Description
 
-    let getMetadataView<'T when 'T :> IMetadataView> (config : SqlMetadataReaderConfig) =
+    let getMetadataView<'T when 'T :> IMetadataView> (config : SqlMetadataProviderConfig) =
         if config.IgnoreSystemObjects then
             SqlProxyReader.selectSome<'T> config.ConnectionString ("IsUserDefined=1")
         else
             SqlProxyReader.selectAll<'T> config.ConnectionString
             
           
-    let private getColumns(config : SqlMetadataReaderConfig) =
+    let private getColumns(config : SqlMetadataProviderConfig) =
         [for item in config |> getMetadataView<vColumn> ->
             {
                 ColumnDescription.Name = item.ColumnName
@@ -130,37 +130,32 @@ module internal Metadata =
         
         ]
     
-    let private getTables(config : SqlMetadataReaderConfig) =
-        [for item in config |> getMetadataView<vTable> ->
-            {
-               TabularDescription.Name = DataObjectName(item.SchemaName, item.TableName)
-               Documentation = item.Description
-               Columns = []               
-            } |> TableDescription
-        ]
-            
-
-    let getCatalog(config : SqlMetadataReaderConfig)  =         
-        {
-            CatalogName = SqlConnectionStringBuilder(config.ConnectionString).InitialCatalog
-            SqlMetadataCatalog.Schemas = []
-        }
 
 open Metadata
 
-type internal SqlMetadataReader(config : SqlMetadataReaderConfig) as this =
+type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
             
-    let describeDataTypes() =
-        
+    
+    let dataTypes = Dictionary<DataObjectName, DataTypeDescription>()        
+    let columns = Dictionary<DataObjectName, ColumnDescription ResizeArray>()
+    let tables = Dictionary<string, TabularDescription ResizeArray>()
+    let views = Dictionary<string, TabularDescription ResizeArray>()
+    let schemas = Dictionary<string, SchemaDescription>()
+
+   
+    member private this.GetMetadataView<'T when 'T :> IMetadataView>() =
+        config |> getMetadataView<'T>
+
+    member private this.IndexDataTypes() =
         let index = (SqlProxyReader.selectAll<vDataType> config.ConnectionString).ToDictionary(fun x -> x.DataTypeId)
         
         let getName id =
             let item = index.[id]
             DataObjectName(item.SchemaName, item.DataTypeName)
 
-        [for id in index.Keys do
+        for id in index.Keys do
             let item = index.[id]
-            yield {
+            let description ={
                 DataTypeDescription.Name = getName(id)
                 MaxLength = item.MaxLength
                 Precision = item.Precision
@@ -174,24 +169,10 @@ type internal SqlMetadataReader(config : SqlMetadataReaderConfig) as this =
                                 else 
                                 None  
                 DefaultBclTypeName = item.MappedBclType                                  
-            }                
-        ]
-
-
-    let dataTypes = describeDataTypes().ToDictionary(fun x -> x.Name)
+            }  
+            dataTypes.Add(description.Name, description)              
         
-    let columns = Dictionary<DataObjectName, ColumnDescription ResizeArray>()
-    let tables = Dictionary<string, TabularDescription ResizeArray>()
-    let views = Dictionary<string, TabularDescription ResizeArray>()
-    let schemas = Dictionary<string, SchemaDescription>()
-    do
-        this.IndexSchemas();
-        ()
-
-
-    member private this.GetMetadataView<'T when 'T :> IMetadataView>() =
-        config |> getMetadataView<'T>
-    
+            
 
     member private this.GetIntrinsicTypeReference(dataTypeName : DataObjectName, maxlen, precision, scale) =
        match dataTypeName.LocalName with
@@ -322,7 +303,7 @@ type internal SqlMetadataReader(config : SqlMetadataReaderConfig) as this =
             let description = {
                 TabularDescription.Name = tableName
                 Documentation = table.Description
-                Columns = columns.[tableName] |> List.ofSeq
+                Columns = columns.[tableName] 
             }        
             if tables.ContainsKey(table.SchemaName) then 
                 tables.[table.SchemaName].Add(description)
@@ -335,7 +316,7 @@ type internal SqlMetadataReader(config : SqlMetadataReaderConfig) as this =
             let description = {
                 TabularDescription.Name = tableName
                 Documentation = view.Description
-                Columns = columns.[tableName] |> List.ofSeq
+                Columns = columns.[tableName] 
             }        
             if views.ContainsKey(view.SchemaName) then 
                 views.[view.SchemaName].Add(description)
@@ -343,9 +324,6 @@ type internal SqlMetadataReader(config : SqlMetadataReaderConfig) as this =
                 views.Add(view.SchemaName, ResizeArray([description]))
 
     member private this.IndexSchemas() =
-        this.IndexColumns()
-        this.IndexTables()
-        this.IndexViews()
 
         for schema in this.GetMetadataView<vSchema>() do
             
@@ -354,6 +332,7 @@ type internal SqlMetadataReader(config : SqlMetadataReaderConfig) as this =
                 tables.[schema.SchemaName] |> Seq.map(TableDescription) |> allObjects.AddRange
             if views.ContainsKey(schema.SchemaName) then
                 views.[schema.SchemaName] |> Seq.map(ViewDescription) |> allObjects.AddRange
+            
             schemas.Add(schema.SchemaName,
                 {
                    SchemaDescription.Name = schema.SchemaName
@@ -363,4 +342,102 @@ type internal SqlMetadataReader(config : SqlMetadataReaderConfig) as this =
                 }
             )
 
-    member this.DefinedSchemas = schemas.Values.ToList() :> IReadOnlyList<_>
+    member this.ReadCatalog() =
+        this.IndexDataTypes()
+        this.IndexSchemas()
+        this.IndexColumns()
+        this.IndexTables()
+        this.IndexViews()
+        {
+            SqlMetadataCatalog.CatalogName = (SqlConnectionStringBuilder(config.ConnectionString).InitialCatalog)
+            Schemas = schemas.Values |> Array.ofSeq :> rolist<_>
+        }
+
+    
+
+
+
+
+module SqlMetadataProvider =
+    type private Realization(config : SqlMetadataProviderConfig) =
+        let reader = SqlMetadataReader(config)
+        let catalog = reader.ReadCatalog()
+        let tables  = Dictionary<string, TabularDescription>()        
+        let views = Dictionary<string, TabularDescription>()
+        let procedures = Dictionary<string, ProcedureDescription>()
+        let sequences = Dictionary<string, SequenceDescription>()
+        let tableFunctions = Dictionary<string, TableFunctionDescription>()
+        let dataTypes = Dictionary<string, DataTypeDescription>()
+        do
+            for schema in catalog.Schemas do
+                let schemaName = schema.Name
+                for o in schema.Objects do
+                    match o with
+                    | TableDescription(x) -> tables.Add(schemaName, x)
+                    | ViewDescription(x) -> views.Add(schemaName, x)
+                    | ProcedureDescription(x) -> procedures.Add(schemaName, x)
+                    | DataTypeDescription(x) -> dataTypes.Add(schemaName, x)
+                    | SequenceDescription(x) -> sequences.Add(schemaName, x)
+                    | TableFunctionDescription(x) -> tableFunctions.Add(schemaName, x)
+
+        
+        interface ISqlMetadataProvider with
+            member x.DescribeAllTables(): rolist<TabularDescription> = 
+                failwith "Not implemented yet"
+            
+            member x.DescribeAllViews(): rolist<TabularDescription> = 
+                failwith "Not implemented yet"
+            
+            member x.DescribeSchemaTables(arg1: string): rolist<TabularDescription> = 
+                failwith "Not implemented yet"
+            
+            member x.DescribeSchemaViews(arg1: string): TabularDescription = 
+                failwith "Not implemented yet"
+            
+            member x.DescribeSchemas(): rolist<SchemaDescription> = 
+                failwith "Not implemented yet"
+            
+            member this.Describe q = 
+                match q with
+                | FindTables(q) ->
+                    match q  with
+                    | FindAllTables ->
+                        [for s in catalog.Schemas do
+                            for o in s.Objects do
+                                match o with
+                                | TableDescription(t) -> yield o
+                                |_ ->
+                                    ()
+                        ] 
+                    | FindUserTables ->
+                        nosupport()
+                    | FindTablesBySchema(schemaName) ->
+                        nosupport()
+                | FindSchemas(q) -> 
+                    match q with
+                    | FindAllSchemas ->
+                        nosupport() 
+                | FindViews(q) -> 
+                    match q with
+                    | FindAllViews -> 
+                        nosupport()
+                    | FindUserViews ->
+                        nosupport()
+                    | FindViewsBySchema(schemaName) ->
+                        nosupport()
+                | FindProcedures(q) -> 
+                    match q with
+                    | FindAllProcedures -> 
+                        nosupport()
+                    | FindProceduresBySchema(schemaName) ->
+                        nosupport()
+                | FindSequences(q) -> 
+                    match q with
+                    | FindAllSequences -> 
+                        nosupport()
+                    | FindSequencesBySchema(schemaName) ->
+                        nosupport()
+
+        
+    let get(config : SqlMetadataProviderConfig) =
+        config |> Realization :> ISqlMetadataProvider

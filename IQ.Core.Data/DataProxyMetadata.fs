@@ -260,10 +260,10 @@ module DataProxyMetadata =
         | MemberElement(m) -> 
             match m with
             | MethodMember(m) ->
-                let parameters = m.Parameters |> List.map(fun x -> x |> describeParameterProxy m)
+                let parameters = m.Parameters |> List.map(fun x -> x |> describeParameterProxy m) 
                 let procedure = {
                     ProcedureDescription.Name = objectName
-                    Parameters = parameters |> List.map(fun p -> p.DataElement)
+                    Parameters = parameters |> List.map(fun p -> p.DataElement) |> List.asReadOnlyList
                     Documentation = String.Empty
                 }            
                 ProcedureCallProxyDescription(m, procedure, parameters) |> ProcedureProxy
@@ -277,11 +277,11 @@ module DataProxyMetadata =
     /// <param name="proxyType">The type of proxy</param>
     let describeTablularProxy(description : ClrType) =
         let objectName = description |> TypeElement |> inferDataObjectName
-        let columnProxies = description |> describeColumnProxies
+        let columnProxies = description |> describeColumnProxies 
         let table = {
             TabularDescription.Name = objectName
             Documentation = description.ReflectedElement.Value|> getMemberDescription
-            Columns = columnProxies |> List.map(fun p -> p.DataElement)
+            Columns = columnProxies |> List.map(fun p -> p.DataElement) |> List.asReadOnlyList
         }
         TablularProxyDescription(description, table, columnProxies) 
     
@@ -304,8 +304,8 @@ module DataProxyMetadata =
                 nosupport()
         let tableFunction = {
             TableFunctionDescription.Name = objectName   
-            Parameters = parameterProxies|> List.map(fun p -> p.DataElement)
-            Columns = columnProxies |> List.map(fun c -> c.DataElement)
+            Parameters = parameterProxies|> List.map(fun p -> p.DataElement) |> List.asReadOnlyList
+            Columns = columnProxies |> List.map(fun c -> c.DataElement) |> List.asReadOnlyList
             Documentation = String.Empty
         }
         let callProxy = TableFunctionCallProxyDescription(clrMethod, tableFunction, parameterProxies)
