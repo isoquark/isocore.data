@@ -5,7 +5,7 @@ namespace IQ.Core.Etl.Test
 open System
 
 
-open IQ.Core.Etl
+
 open IQ.Core.Framework.Test
 
 

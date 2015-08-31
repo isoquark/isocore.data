@@ -16,10 +16,6 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
     <Name>IQ.Core.Data.Sql</Name>
-    <SccProjectName>SAK</SccProjectName>
-    <SccProvider>SAK</SccProvider>
-    <SccAuxPath>SAK</SccAuxPath>
-    <SccLocalPath>SAK</SccLocalPath>
     <TargetFrameworkProfile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -29,6 +25,10 @@
   </PropertyGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
   </PropertyGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '11.0'">
@@ -56,7 +56,8 @@
     <Compile Include="Routine.fs" />
     <Compile Include="SqlMetadataProvider.fs" />
     <Compile Include="SqlStoreCommand.fs" />
-    <Compile Include="SqlDataStore.fs" />
+    <Compile Include="SqlDataStoreProvider.fs" />
+    <Compile Include="SqlExtensions.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

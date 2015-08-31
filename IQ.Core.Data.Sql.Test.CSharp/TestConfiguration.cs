@@ -9,8 +9,8 @@ using IQ.Core.TestFramework;
 using IQ.Core.Data;
 using IQ.Core.Data.Sql;
 
-using static IQ.Core.Framework.Contracts;
-using static IQ.Core.Data.Contracts;
+using IQ.Core.Framework.Contracts;
+using IQ.Core.Data.Contracts;
 using static IQ.Core.TestFramework.TestVocabulary;
 using Assembly = System.Reflection.Assembly;
 
@@ -31,7 +31,7 @@ namespace IQ.Core.Data.Sql.Test.CSharp
 
         private static void RegisterDependencies(ICompositionRegistry registry)
         {
-            registry.RegisterFactoryDelegate<SqlDataStoreConfig, ISqlDataStore>(config => SqlDataStore.get(config));
+            registry.RegisterFactoryDelegate<SqlDataStoreConfig, ISqlDataStore>(config => SqlDataStoreProvider.get(config));
         }
 
         private readonly ICompositionRoot root;

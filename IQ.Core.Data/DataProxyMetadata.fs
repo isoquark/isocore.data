@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data
+namespace IQ.Core.Data.Behavior
 
 open System
 open System.Reflection
@@ -10,7 +10,7 @@ open System.Text.RegularExpressions
 open FSharp.Data
 
 open IQ.Core.Framework
-
+open IQ.Core.Data.Contracts
 
 type DescriptionAttribute = System.ComponentModel.DescriptionAttribute
 
@@ -140,7 +140,7 @@ module DataProxyMetadata =
     /// Infers a <see cref"ColumnDescription"/>  from a CLR element
     /// </summary>
     /// <param name="clrElement">The CLR element from which the column description will be inferred</param>
-    let describeColumn(description: ClrProperty) =
+    let describeColumn (parentName : DataObjectName) (description: ClrProperty) =
         let gDescription = description |> PropertyMember |> MemberElement
         let storageType = gDescription |> inferStorageType
         match gDescription |> ClrElement.tryGetAttributeT<ColumnAttribute> with
@@ -152,9 +152,11 @@ module DataProxyMetadata =
                     | None -> description.Name.Text
                 Position = description.Position |> defaultArg attrib.Position 
                 Documentation = String.Empty
-                StorageType = storageType
+                DataType = storageType
                 Nullable = description.IsOptional 
                 AutoValue = AutoValueKind.None
+                ParentName = parentName
+                Properties = []
             }
 
         | None ->
@@ -162,23 +164,25 @@ module DataProxyMetadata =
                 ColumnDescription.Name = description.Name.Text
                 Position = description.Position
                 Documentation = String.Empty
-                StorageType = storageType
+                DataType = storageType
                 Nullable = description.IsOptional 
                 AutoValue = AutoValueKind.None
+                ParentName = parentName
+                Properties = []
             }
 
-    let private describeColumnProxy(description : ClrProperty) =
-        let column = description |> describeColumn
+    let private describeColumnProxy (parentName : DataObjectName) (description : ClrProperty) =
+        let column = description |> describeColumn parentName
         ColumnProxyDescription(description, column)
 
     /// <summary>
     /// Infers a collection of <see cref="ClrColumnProxyDescription"/> instances from a CLR type element
     /// </summary>
     /// <param name="clrElement">The CLR element from which the column descriptions will be inferred</param>
-    let  private describeColumnProxies(description : ClrType) =
+    let  private describeColumnProxies(parentName : DataObjectName) (description : ClrType) =
         if description.Properties.Length = 0 then
             NotSupportedException(sprintf "No columns were able to be inferred from the type %O" description) |> raise
-        description.Properties |> List.map describeColumnProxy
+        description.Properties |> List.map (fun x -> x |> describeColumnProxy parentName)
 
 
     /// <summary>
@@ -203,7 +207,8 @@ module DataProxyMetadata =
             Position = position
             Direction = direction
             Documentation = String.Empty
-            StorageType = description |> ParameterElement|> inferStorageType 
+            DataType = description |> ParameterElement|> inferStorageType 
+            Properties = []
         }
     
     
@@ -226,9 +231,10 @@ module DataProxyMetadata =
             {
                 RoutineParameterDescription.Name = attrib.Name |> Option.get                   
                 Direction = RoutineParameterDirection.Output //Must always be output so value in attribute can be ignored
-                StorageType = storageType
+                DataType = storageType
                 Position = position
                 Documentation = String.Empty
+                Properties = []
             }
         | None ->
             //No attribute, so assume stored procedure return value
@@ -236,8 +242,9 @@ module DataProxyMetadata =
                 RoutineParameterDescription.Name = "Return"
                 Position = -1
                 Direction = RoutineParameterDirection.ReturnValue
-                StorageType = storageType
+                DataType = storageType
                 Documentation = String.Empty
+                Properties = []
             }
                                                                  
     /// <summary>
@@ -265,6 +272,7 @@ module DataProxyMetadata =
                     ProcedureDescription.Name = objectName
                     Parameters = parameters |> List.map(fun p -> p.DataElement) |> List.asReadOnlyList
                     Documentation = String.Empty
+                    Properties = []
                 }            
                 ProcedureCallProxyDescription(m, procedure, parameters) |> ProcedureProxy
             | _ -> nosupport()
@@ -274,17 +282,34 @@ module DataProxyMetadata =
     /// <summary>
     /// Infers a Table Proxy Description
     /// </summary>
-    /// <param name="proxyType">The type of proxy</param>
-    let describeTablularProxy(description : ClrType) =
-        let objectName = description |> TypeElement |> inferDataObjectName
-        let columnProxies = description |> describeColumnProxies 
+    /// <param name="t">The type of proxy</param>
+    let describeTableProxy(t : ClrType) =
+        let objectName = t |> TypeElement |> inferDataObjectName
+        let columnProxies = t |> describeColumnProxies objectName
         let table = {
-            TabularDescription.Name = objectName
-            Documentation = description.ReflectedElement.Value|> getMemberDescription
-            Columns = columnProxies |> List.map(fun p -> p.DataElement) |> List.asReadOnlyList
+            TableDescription.Name = objectName
+            Documentation = t.ReflectedElement.Value|> getMemberDescription
+            Columns = columnProxies |> List.map(fun p -> p.DataElement) 
+            Properties = []
         }
-        TablularProxyDescription(description, table, columnProxies) 
+        TableProxyDescription(t, table, columnProxies) 
     
+    /// <summary>
+    /// Infers a View Proxy Description
+    /// </summary>
+    /// <param name="t">The type of proxy</param>
+    let describeViewProxy(t : ClrType) =
+        let objectName = t |> TypeElement |> inferDataObjectName
+        let columnProxies = t |> describeColumnProxies objectName
+        let view = {
+            ViewDescription.Name = objectName
+            Documentation = t.ReflectedElement.Value|> getMemberDescription
+            Columns = columnProxies |> List.map(fun p -> p.DataElement)
+            Properties = []
+        }
+        ViewProxyDescription(t, view, columnProxies) 
+
+
     let describeTableFunctionProxy(description : ClrElement) =
         let objectName = description |> inferDataObjectName
         let parameterProxies, columnProxies, clrMethod, returnType =
@@ -293,7 +318,7 @@ module DataProxyMetadata =
                 match m with
                 | MethodMember(m) ->
                     let itemType = m.ReflectedElement.Value.ReturnType.ItemValueType.TypeName  |> describeType
-                    let itemTypeProxies = itemType |> describeColumnProxies                                        
+                    let itemTypeProxies = itemType |> describeColumnProxies objectName                                       
                     m.InputParameters |> List.mapi (fun i x ->  x |> describeParameterProxy m ), 
                     itemTypeProxies,
                     m,
@@ -307,6 +332,7 @@ module DataProxyMetadata =
             Parameters = parameterProxies|> List.map(fun p -> p.DataElement) |> List.asReadOnlyList
             Columns = columnProxies |> List.map(fun c -> c.DataElement) |> List.asReadOnlyList
             Documentation = String.Empty
+            Properties = []
         }
         let callProxy = TableFunctionCallProxyDescription(clrMethod, tableFunction, parameterProxies)
         let resultProxy = TabularResultProxyDescription(returnType, tableFunction, columnProxies)
@@ -367,10 +393,16 @@ module DataProxyMetadataProvider =
                 
             | _ ->
                  nosupport()           
-        | SqlElementKind.Table | SqlElementKind.View ->
+        | SqlElementKind.Table ->
             match clrElement with
             | TypeElement(x) ->
-                x |> DataProxyMetadata.describeTablularProxy |> TabularProxy |> List.singleton
+                x |> DataProxyMetadata.describeTableProxy |> TableProxy |> List.singleton
+            | _ ->
+                 nosupport()           
+        | SqlElementKind.View ->
+            match clrElement with
+            | TypeElement(x) ->
+                x |> DataProxyMetadata.describeViewProxy |> ViewProxy |> List.singleton
             | _ ->
                  nosupport()           
             
@@ -398,15 +430,17 @@ module TableFunctionProxy =
 /// </summary>
 [<AutoOpen>]
 module DataProxyOperators =    
-    let tabularproxy<'T> =
-        typeinfo<'T> |> DataProxyMetadata.describeTablularProxy
+    let tableproxy<'T> =
+        typeinfo<'T> |> DataProxyMetadata.describeTableProxy
 
+    let viewproxy<'T> =
+        typeinfo<'T> |> DataProxyMetadata.describeViewProxy
 
     let routineproxies<'T> =
         typeinfo<'T> |> TypeElement |> DataProxyMetadata.describeRoutineProxies
             
-    let fromProxyType<'T> =
-        tabularproxy<'T> |> TabularProxy
+//    let fromProxyType<'T> =
+//        tabularproxy<'T> |> TabularProxy
 
            
 

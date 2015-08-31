@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RoutineTest.cs" />
+    <Compile Include="SqlMetadataProviderTestcs.cs" />
     <Compile Include="TestConfiguration.cs" />
   </ItemGroup>
   <ItemGroup>

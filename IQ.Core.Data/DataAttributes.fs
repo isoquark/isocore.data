@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data
+namespace IQ.Core.Data.Behavior
 
 open System
 //open System.Data
@@ -9,6 +9,7 @@ open System.Collections.Generic
 open FSharp.Data
 
 open IQ.Core.Framework
+open IQ.Core.Data.Contracts
 
 /// <summary>
 /// Defines attributes that are intended to be applied to proxy elements to specify 
@@ -213,7 +214,7 @@ module DataAttributes =
             | DataKind.CustomPrimitive -> 
                 //TODO: This cannot be calculated unless additional metadata is attached or we have access
                 //to database metadata (!)
-                CustomPrimitiveDataType(attrib.CustomTypeName |> Option.get, DataType.Int32DataType)
+                CustomPrimitiveDataType(attrib.CustomTypeName |> Option.get, Int32DataType)
             | DataKind.CustomObject | DataKind.Geography | DataKind.Geometry | DataKind.Hierarchy ->          
                 ObjectDataType(attrib.CustomTypeName |> Option.get, (attrib.ClrType |> Option.get).FullName)
             | _ ->

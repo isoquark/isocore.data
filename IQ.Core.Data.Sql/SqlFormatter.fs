@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data.Sql
+namespace IQ.Core.Data.Sql.Behavior
 
 open System
 open System.Data
@@ -13,10 +13,43 @@ open IQ.Core.Contracts
 open IQ.Core.Framework
 open IQ.Core.Data
 
+module internal StringBuilder =
+    let appendFormat1 format (arg1 : obj) (sb : StringBuilder) =
+        sb.AppendFormat(format, arg1) |> ignore
+
+    let appendFormat2 format (arg1 : obj) (arg2 : obj) (sb : StringBuilder) =
+        sb.AppendFormat(format, arg1, arg2) |> ignore
+
+    let appendFormat3 format (arg1 : obj) (arg2 : obj) (arg3 : obj) (sb : StringBuilder) =
+        sb.AppendFormat(format, arg1, arg2, arg3) |> ignore
+
+    let appendLine text (sb : StringBuilder) =
+        sb.AppendLine(text) |> ignore
+
+    let appendLine1 format arg1 (sb : StringBuilder) =
+        sb |> appendFormat1 format arg1
+        sb.AppendLine() |> ignore
+
+    let appendLine2 format arg1 arg2  (sb : StringBuilder) =
+        sb |> appendFormat2 format arg1 arg2
+        sb.AppendLine() |> ignore
+
+    let appendLine3 format arg1 arg2 arg3 (sb : StringBuilder) =
+        sb |> appendFormat3 format arg1 arg2 arg3
+        sb.AppendLine() |> ignore
+
+    let create() = StringBuilder()
+
+        
+       
+
 /// <summary>
 /// Provides rudimentary SQL generation capabilities
 /// </summary>
 module SqlFormatter =    
+    
+    module SB = StringBuilder
+    
     /// <summary>
     /// Formats a given value in a form suitable for inclusion in a SQL script
     /// </summary>
@@ -79,7 +112,7 @@ module SqlFormatter =
     /// <summary>
     /// Formats a select statement for a tabular element
     /// </summary>
-    let formatTabularSelect(t : TabularDescription) =
+    let formatTabularSelect(t : ITabularDescription) =
         let columns = t.Columns 
                     |> RoList.map(fun c -> c.Name |> formatElementName) 
                     |> Txt.delimit ","
@@ -90,9 +123,10 @@ module SqlFormatter =
     /// Formats a select statement for a tabular proxy
     /// </summary>
     let formatTabularSelectT<'T>() =
-        let ptype = tabularproxy<'T>
+        let ptype = tableproxy<'T>
         ptype.DataElement |> formatTabularSelect
 
+    
     let private formatColumnName name =
         sprintf "[%s]" name
     
@@ -185,8 +219,103 @@ module SqlFormatter =
             if pageInfo |> Option.isSome then
                 sb.AppendFormat("{0}", paging) |> ignore
             sb.ToString()
-                        
+
+    
+    
+    let formatDataTypeReference(t : DataTypeReference) =
+        match t with
+        | BitDataType -> 
+            SqlDataTypeNames.bit
+        | UInt8DataType -> 
+            SqlDataTypeNames.tinyint
+        | Int16DataType -> 
+            SqlDataTypeNames.smallint
+        | Int32DataType -> 
+            SqlDataTypeNames.int
+        | Int64DataType -> 
+            SqlDataTypeNames.bigint
+        | BinaryFixedDataType(len) -> 
+            sprintf "%s(%i)" SqlDataTypeNames.binary len
+        | BinaryVariableDataType(maxlen) -> 
+            sprintf "%s(%i)" SqlDataTypeNames.varbinary maxlen
+        | BinaryMaxDataType -> 
+            sprintf "%s(MAX)" SqlDataTypeNames.varbinary            
+        | AnsiTextFixedDataType(len) -> 
+            sprintf "%s(%i)" SqlDataTypeNames.char len
+        | AnsiTextVariableDataType(maxlen) -> 
+            sprintf "%s(%i)" SqlDataTypeNames.varchar maxlen
+        | AnsiTextMaxDataType -> 
+            sprintf "%s(MAX)" SqlDataTypeNames.varchar
+        | UnicodeTextFixedDataType(len) -> 
+            sprintf "%s(%i)" SqlDataTypeNames.nchar len
+        | UnicodeTextVariableDataType(maxlen) ->
+            sprintf "%s(%i)" SqlDataTypeNames.nvarchar maxlen
+        | UnicodeTextMaxDataType -> 
+            sprintf "%s(MAX)" SqlDataTypeNames.nvarchar        
+        | DateTimeDataType(precision, scale) -> 
+            //Although precision is meaningful for datetime2 data type, it is handled by SQL Server; 
+            //it can't be specified in user scripts. See
+            //https://msdn.microsoft.com/en-us/library/bb677335.aspx
+            sprintf "%s(%i)" SqlDataTypeNames.datetime2 scale
+        | DateTimeOffsetDataType -> 
+            SqlDataTypeNames.datetimeoffset
+        | TimeOfDayDataType(_, scale) -> 
+            //Although precision is meaningful for time data type, it is handled by SQL Server; 
+            //it can't be specified in user scripts. See
+            //https://msdn.microsoft.com/en-us/library/Bb677243.aspx
+            sprintf "%s(%i)" SqlDataTypeNames.time scale
+        | TimespanDataType -> 
+            SqlDataTypeNames.bigint
+        | RowversionDataType -> 
+            SqlDataTypeNames.rowversion            
+        | DateDataType -> 
+            SqlDataTypeNames.date
+        | Float32DataType -> 
+            SqlDataTypeNames.real
+        | Float64DataType -> 
+            SqlDataTypeNames.float
+        | DecimalDataType(precision, scale) ->
+            sprintf "%s(%i,%i)" SqlDataTypeNames.decimal precision scale
+        | MoneyDataType(precision, scale) -> 
+            SqlDataTypeNames.money            
+        | GuidDataType -> 
+            SqlDataTypeNames.uniqueidentifier
+        | VariantDataType -> 
+            SqlDataTypeNames.sql_variant
+        | CustomPrimitiveDataType(name,_)  ->
+            name |> formatObjectName
+        | TableDataType(name) ->
+            name |> formatObjectName
+        | XmlDataType(schema) ->
+            SqlDataTypeNames.xml
+        | ObjectDataType(name, _) -> 
+            name |> formatObjectName
+
+        | UInt16DataType 
+        | UInt32DataType
+        | UInt64DataType
+        | Int8DataType 
+        | JsonDataType -> nosupport()
+        | TypedDocumentDataType(doctype) -> nosupport()
         
+    
+    let formatTableCreate(d : TableDescription) =
+        let tableName = d.Name |> formatObjectName
+        let sb = StringBuilder.create()
+        sb |> SB.appendLine1 "create table {0}(" tableName 
+        let colcount = d.Columns.Length
+        d.Columns |> Seq.iter(fun c ->
+           sb |> SB.appendFormat3 "{0} {1} {2}"  c.Name (formatDataTypeReference(c.DataType)) (if c.Nullable then "null" else "not null")
+           let isLast = c.Position = d.Columns.Length - 1
+           if isLast then
+                sb |> SB.appendLine ");"
+            else
+                sb |> SB.appendLine ","
+        )
+        sb.ToString()
+
+    let formatTableDrop(name : DataObjectName) =
+        sprintf "drop table %s" (name |> formatObjectName)
 
 module internal SqlParameter =
     let create (paramValues : RoutineParameterValue list) (d : RoutineParameterDescription) =
@@ -199,5 +328,5 @@ module internal SqlParameter =
                 else
                     NotSupportedException() |> raise
         p.Direction <- enum<System.Data.ParameterDirection>(int d.Direction)
-        p.SqlDbType <- d.StorageType |> DataType.toSqlDbType   
+        p.SqlDbType <- d.DataType |> DataType.toSqlDbType   
         p     

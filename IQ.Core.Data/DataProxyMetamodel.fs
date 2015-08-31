@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data
+namespace IQ.Core.Data.Behavior
 
 open System
 open System.Data
@@ -8,7 +8,7 @@ open System.Reflection
 open System.Diagnostics
 
 open IQ.Core.Framework
-
+open IQ.Core.Data.Contracts
 
 /// <summary>
 /// Defines <see cref="DataObjectProxy"/> helpers
@@ -16,7 +16,9 @@ open IQ.Core.Framework
 module DataObjectProxy =
     let getColumns (subject : DataObjectProxy)  =
         match subject with
-        | TabularProxy(proxy) -> 
+        | TableProxy(proxy) -> 
+            proxy.Columns
+        | ViewProxy(proxy) -> 
             proxy.Columns
         | ProcedureProxy(proxy) -> 
             []
@@ -25,7 +27,9 @@ module DataObjectProxy =
 
     let getParameters (subject : DataObjectProxy) =
         match subject with
-        | TabularProxy(proxy) -> 
+        | TableProxy(proxy) -> 
+            []
+        | ViewProxy(proxy) -> 
             []
         | ProcedureProxy(proxy) -> 
             proxy.Parameters
@@ -34,7 +38,9 @@ module DataObjectProxy =
     
     let getProxyElement (subject : DataObjectProxy) =
         match subject with
-        | TabularProxy(proxy) -> 
+        | TableProxy(proxy) -> 
+            proxy.ProxyElement |> TypeElement
+        | ViewProxy(proxy) -> 
             proxy.ProxyElement |> TypeElement
         | ProcedureProxy(proxy) -> 
             proxy.ProxyElement |> MethodMember |> MemberElement
@@ -43,8 +49,10 @@ module DataObjectProxy =
 
     let getDataElement (subject : DataObjectProxy) =
         match subject with
-        | TabularProxy(proxy) -> 
+        | TableProxy(proxy) -> 
             proxy.DataElement |> TableDescription
+        | ViewProxy(proxy) -> 
+            proxy.DataElement |> ViewDescription
         | ProcedureProxy(proxy) -> 
             proxy.DataElement |> ProcedureDescription
         | TableFunctionProxy(proxy) ->
@@ -58,10 +66,17 @@ module DataObjectProxy =
         
     let unwrapTableProxy (subject : DataObjectProxy) =
         match subject with
-        | TabularProxy(proxy) -> proxy
+        | TableProxy(proxy) -> proxy
         | _ ->
             ArgumentException() |> raise
     
+    let unwrapViewProxy (subject : DataObjectProxy) =
+        match subject with
+        | ViewProxy(proxy) -> proxy
+        | _ ->
+            ArgumentException() |> raise
+
+
     let unwrapProcedureProxy (subject : DataObjectProxy) =
         match subject with
         | ProcedureProxy(proxy) -> proxy
@@ -83,7 +98,23 @@ module DataProxyExtensions =
     /// <summary>
     /// Defines augmentations for the TableProxyDescription type
     /// </summary>
-    type TabularProxyDescription
+    type TableProxyDescription
+    with
+        /// <summary>
+        /// Gets the proxy column description at a supplied ordinal position
+        /// </summary>
+        /// <param name="i">The column's ordinal position</param>
+        member this.Item(i) = this.Columns.[i]
+
+        /// <summary>
+        /// Gets the name of the table represented by the proxy
+        /// </summary>
+        member this.TableName = this.DataElement.Name
+
+    /// <summary>
+    /// Defines augmentations for the ViewProxyDescription type
+    /// </summary>
+    type ViewProxyDescription
     with
         /// <summary>
         /// Gets the proxy column description at a supplied ordinal position

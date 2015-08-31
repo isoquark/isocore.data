@@ -4,21 +4,26 @@ open System
 open System.Linq
 open System.Collections.Generic;
 
+open System.Data
+open System.Data.SqlClient
+
+
 open IQ.Core.Contracts
 open IQ.Core.Framework
 open IQ.Core.Data
+open IQ.Core.Data.Sql.Behavior
 
-open System.Data
-open System.Data.SqlClient
+
+
+type internal IMetadataView =
+    abstract IsUserDefined : bool
+    abstract Documentation : string 
 
 type SqlMetadataProviderConfig = {
     ConnectionString : string
     IgnoreSystemObjects : bool
 }
 
-type internal IMetadataView =
-    abstract IsUserDefined : bool
-    abstract Documentation : string 
 
 //These proxies align with (a subset of) the columns returned by the views in the Metadata schema
 module internal Metadata =
@@ -114,8 +119,9 @@ module internal Metadata =
         [for item in config |> getMetadataView<vColumn> ->
             {
                 ColumnDescription.Name = item.ColumnName
+                ParentName = DataObjectName(item.ParentSchemaName, item.ParentName)
                 Position = item.Position
-                StorageType = DataType.AnsiTextFixedDataType(5)
+                DataType = DataTypeReference.AnsiTextFixedDataType(5)
                 Documentation = item.Description
                 Nullable = item.IsNullable
                 AutoValue = if item.IsComputed then
@@ -124,6 +130,7 @@ module internal Metadata =
                                     AutoValueKind.Identity 
                                 else 
                                     AutoValueKind.None
+                Properties = []
                 
             
             }
@@ -138,8 +145,8 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
     
     let dataTypes = Dictionary<DataObjectName, DataTypeDescription>()        
     let columns = Dictionary<DataObjectName, ColumnDescription ResizeArray>()
-    let tables = Dictionary<string, TabularDescription ResizeArray>()
-    let views = Dictionary<string, TabularDescription ResizeArray>()
+    let tables = Dictionary<string, TableDescription ResizeArray>()
+    let views = Dictionary<string, ViewDescription ResizeArray>()
     let schemas = Dictionary<string, SchemaDescription>()
 
    
@@ -168,7 +175,8 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
                                     getName(item.BaseTypeId.Value |> int) |> Some 
                                 else 
                                 None  
-                DefaultBclTypeName = item.MappedBclType                                  
+                DefaultBclTypeName = item.MappedBclType      
+                Properties = []
             }  
             dataTypes.Add(description.Name, description)              
         
@@ -264,10 +272,10 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
                 
                 let baseType = dataTypes.[baseTypeName]
                 let reference = 
-                    this.GetIntrinsicTypeReference(baseTypeName, baseType.MaxLength |> int, baseType.Precision, baseType.Scale)
+                    this.GetIntrinsicTypeReference(baseTypeName, dataType.MaxLength |> int, dataType.Precision, dataType.Scale)
                 match reference with
                 | Some x ->
-                    CustomPrimitiveDataType(baseTypeName, x)
+                    CustomPrimitiveDataType(dataTypeName, x)
                 | None ->
                     nosupport()
             else
@@ -277,8 +285,9 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
         for column in this.GetMetadataView<vColumn>()  do
             let description = {
                 ColumnDescription.Name = column.ColumnName
+                ParentName = DataObjectName(column.ParentSchemaName, column.ParentName)
                 Position = column.Position
-                StorageType = this.GetColumnDataType(column)
+                DataType = this.GetColumnDataType(column)
                 Documentation = column.Description
                 Nullable = column.IsNullable
                 AutoValue = if column.IsComputed then
@@ -287,7 +296,7 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
                                     AutoValueKind.Identity 
                                 else 
                                     AutoValueKind.None
-                
+                Properties = []
             
             }
             let parentName = DataObjectName(column.ParentSchemaName, column.ParentName)
@@ -301,9 +310,10 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
         for table in this.GetMetadataView<vTable>() do
             let tableName  = DataObjectName(table.SchemaName, table.TableName)
             let description = {
-                TabularDescription.Name = tableName
+                TableDescription.Name = tableName
                 Documentation = table.Description
-                Columns = columns.[tableName] 
+                Columns = columns.[tableName] |> List.ofSeq
+                Properties = []
             }        
             if tables.ContainsKey(table.SchemaName) then 
                 tables.[table.SchemaName].Add(description)
@@ -314,9 +324,10 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
         for view in this.GetMetadataView<vView>() do
             let tableName  = DataObjectName(view.SchemaName, view.ViewName)
             let description = {
-                TabularDescription.Name = tableName
+                ViewDescription.Name = tableName
                 Documentation = view.Description
-                Columns = columns.[tableName] 
+                Columns = columns.[tableName] |> List.ofSeq
+                Properties = []
             }        
             if views.ContainsKey(view.SchemaName) then 
                 views.[view.SchemaName].Add(description)
@@ -338,16 +349,16 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
                    SchemaDescription.Name = schema.SchemaName
                    Objects =  allObjects |> List.ofSeq
                    Documentation = schema.Description
-                    
+                   Properties = []
                 }
             )
 
     member this.ReadCatalog() =
         this.IndexDataTypes()
-        this.IndexSchemas()
         this.IndexColumns()
         this.IndexTables()
         this.IndexViews()
+        this.IndexSchemas()
         {
             SqlMetadataCatalog.CatalogName = (SqlConnectionStringBuilder(config.ConnectionString).InitialCatalog)
             Schemas = schemas.Values |> Array.ofSeq :> rolist<_>
@@ -357,58 +368,85 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
 
 
 
-
 module SqlMetadataProvider =
     type private Realization(config : SqlMetadataProviderConfig) =
-        let reader = SqlMetadataReader(config)
-        let catalog = reader.ReadCatalog()
-        let tables  = Dictionary<string, TabularDescription>()        
-        let views = Dictionary<string, TabularDescription>()
+        let tables  = Dictionary<string, ResizeArray<TableDescription>>()        
+        let views = Dictionary<string, ResizeArray<ViewDescription>>()
         let procedures = Dictionary<string, ProcedureDescription>()
         let sequences = Dictionary<string, SequenceDescription>()
         let tableFunctions = Dictionary<string, TableFunctionDescription>()
         let dataTypes = Dictionary<string, DataTypeDescription>()
-        do
+        let allObjects = Dictionary<DataObjectName, DataObjectDescription>()
+        
+        let refresh() =
+            tables.Clear()
+            views.Clear()
+            procedures.Clear()
+            sequences.Clear()
+            tableFunctions.Clear()
+            dataTypes.Clear()
+            allObjects.Clear()        
+            let reader = SqlMetadataReader(config)
+            let catalog = reader.ReadCatalog()
             for schema in catalog.Schemas do
                 let schemaName = schema.Name
                 for o in schema.Objects do
+                    allObjects.Add(o.Name, o)
                     match o with
-                    | TableDescription(x) -> tables.Add(schemaName, x)
-                    | ViewDescription(x) -> views.Add(schemaName, x)
-                    | ProcedureDescription(x) -> procedures.Add(schemaName, x)
+                    | TableDescription(x) -> 
+                        if tables.ContainsKey(schemaName) then
+                            tables.[schemaName].Add(x)
+                        else
+                            tables.[schemaName] <- ResizeArray[x]
+                    | ViewDescription(x) -> 
+                        if views.ContainsKey(schemaName) then
+                            views.[schemaName].Add(x)
+                        else
+                            views.[schemaName] <- ResizeArray[x]
+                    | ProcedureDescription(x) -> 
+                        procedures.Add(schemaName, x)
                     | DataTypeDescription(x) -> dataTypes.Add(schemaName, x)
                     | SequenceDescription(x) -> sequences.Add(schemaName, x)
                     | TableFunctionDescription(x) -> tableFunctions.Add(schemaName, x)
 
+        do
+            refresh()
         
         interface ISqlMetadataProvider with
-            member x.DescribeAllTables(): rolist<TabularDescription> = 
-                failwith "Not implemented yet"
+            member x.RefreshCache() =
+                refresh()
+            member x.DescribeTables(): rolist<TableDescription> = 
+                [for t in tables.Values do yield! t] |> RoList.ofSeq
             
-            member x.DescribeAllViews(): rolist<TabularDescription> = 
-                failwith "Not implemented yet"
+            member x.DescribeViews(): rolist<ViewDescription> = 
+                [for t in views.Values do yield! t] |> RoList.ofSeq
             
-            member x.DescribeSchemaTables(arg1: string): rolist<TabularDescription> = 
-                failwith "Not implemented yet"
+            member x.DescribeTablesInSchema(schemaName: string): rolist<TableDescription> = 
+                tables.[schemaName] |> RoList.ofSeq
             
-            member x.DescribeSchemaViews(arg1: string): TabularDescription = 
-                failwith "Not implemented yet"
+            member x.DescribeViewsInSchema(schemaName: string) = 
+                views.[schemaName] |> RoList.ofSeq
             
             member x.DescribeSchemas(): rolist<SchemaDescription> = 
                 failwith "Not implemented yet"
             
+            member x.DescribeTable(tableName) =
+                tables.[tableName.SchemaName]  |> Seq.find(fun x -> x.Name = tableName)
+
+            member x.ObjectExists(objectName) =
+                allObjects.ContainsKey(objectName)
+                
             member this.Describe q = 
                 match q with
                 | FindTables(q) ->
                     match q  with
                     | FindAllTables ->
-                        [for s in catalog.Schemas do
-                            for o in s.Objects do
-                                match o with
-                                | TableDescription(t) -> yield o
-                                |_ ->
-                                    ()
-                        ] 
+                        [
+                            for tableList in tables.Values do
+                                for t in tableList do
+                                    yield t |> TableDescription
+                               
+                        ]
                     | FindUserTables ->
                         nosupport()
                     | FindTablesBySchema(schemaName) ->
@@ -441,3 +479,4 @@ module SqlMetadataProvider =
         
     let get(config : SqlMetadataProviderConfig) =
         config |> Realization :> ISqlMetadataProvider
+

@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data
+namespace IQ.Core.Data.Behavior
 
 open IQ.Core.Contracts
 open IQ.Core.Framework
@@ -12,6 +12,7 @@ open System.Data
 open System.Diagnostics
 open System.Text.RegularExpressions
 
+open IQ.Core.Data.Contracts
 
 module DataObjectName =    
     /// <summary>
@@ -29,3 +30,18 @@ module DataObjectName =
         let text = text |> Txt.betweenMarkers "[" "]" true 
         let m = QualifiedDataObjectNameRegex().Match(text)
         DataObjectName(m.Schema.Value, m.Name.Value)
+
+
+[<AutoOpen>]
+module DataObjectNameExtensions =
+    type DataObjectName with
+        /// <summary>
+        /// Specifies the name of the schema (or namescope such as a package or namespace)
+        /// </summary>
+        member this.SchemaName = match this with DataObjectName(SchemaName=x) -> x
+        
+        /// <summary>
+        /// Specifies the name of the object relative to the schema
+        /// </summary>
+        member this.LocalName = match this with DataObjectName(LocalName=x) -> x
+    

@@ -15,7 +15,7 @@ open IQ.Core.Data.Sql
 module TestConfiguration =
 
     let private registerDependencies(registry : ICompositionRegistry) =
-            registry.RegisterFactory(fun config -> config |> SqlDataStore.get)
+            registry.RegisterFactory(fun config -> config |> SqlDataStoreProvider.get)
                                 
     //This is instantiated/cleaned-up once per collection
     type ProjectTestContext() as this = 

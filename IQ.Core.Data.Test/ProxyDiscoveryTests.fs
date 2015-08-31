@@ -45,15 +45,6 @@ module DataProxyMetadata =
         }
 
 
-//    type private RecordB = {
-//        [<DataTypeAttribute(DataKind.DateTime, 5uy); Column("BField_1")>]
-//        BField1 : BclDateTime
-//        [<DataTypeAttribute(DataKind.DateTime, 4uy)>]
-//        BField2 : BclDateTime option
-//        [<DataTypeAttribute(DataKind.DateTime); Column("BField_3")>]
-//        BField3 : BclDateTime
-//        BField4 : BclDateTime
-//    }
 
     module ModuleC =
         type RecordC = {
@@ -67,42 +58,50 @@ module DataProxyMetadata =
 
         [<Fact>]
         let ``Read table proxy description - no attribution``() =
-            let proxy = tabularproxy<RecordA> 
+            let proxy = tableproxy<RecordA> 
         
+            let tableName = DataObjectName("Proxies", typeof<RecordA>.Name)
             let tableExpect = {
-                TabularDescription.Name = DataObjectName("Proxies", typeof<RecordA>.Name)
+                TableDescription.Name = tableName
                 Documentation = String.Empty
+                Properties = []
                 Columns = 
                 [
                     { 
                       Name = (propname<@ fun (x : RecordA) -> x.AField1 @>).Text
                       Position = 0
                       Documentation = String.Empty
-                      StorageType = Int32DataType
+                      DataType = Int32DataType
                       Nullable = false  
                       AutoValue = AutoValueKind.None
+                      ParentName = tableName
+                      Properties = []
                     }
                     { 
                       Name = (propname<@ fun (x : RecordA) -> x.AField2 @>).Text
                       Position = 1
                       Documentation = String.Empty
-                      StorageType = BitDataType
+                      DataType = BitDataType
                       Nullable = false                
                       AutoValue = AutoValueKind.None
+                      ParentName = tableName
+                      Properties = []
                     }
                     { 
                       Name = (propname<@ fun (x : RecordA) -> x.AField3 @>).Text
                       Position = 2
                       Documentation = String.Empty
-                      StorageType = Int64DataType
+                      DataType = Int64DataType
                       Nullable = true
                       AutoValue = AutoValueKind.None  
+                      ParentName = tableName
+                      Properties = []
                     }
-                ] |> List.asReadOnlyList
+                ] 
             }
             let tableActual = proxy.DataElement
             //tableActual |> Claim.equal tableExpect
-            tableActual.Columns.Count |> Claim.equal tableExpect.Columns.Count
+            tableActual.Columns.Length |> Claim.equal tableExpect.Columns.Length
             tableActual.Columns.[0] |> Claim.equal  tableExpect.Columns.[0]
             tableActual.Columns.[1] |> Claim.equal  tableExpect.Columns.[1]
             tableActual.Columns.[2] |> Claim.equal  tableExpect.Columns.[2]
@@ -117,27 +116,6 @@ module DataProxyMetadata =
             proxyColumsActual |> Claim.equal proxyColumsActual
         
     
-//        [<Fact>]
-//        let ``Read DateTimeStorage from table proxy metadata - attribute overrides``() =
-//            let proxy = tabularproxy<RecordB> 
-//            proxy.Columns.Length |> Claim.equal 4
-//
-//            proxy.[0].DataElement.StorageType |> Claim.equal (DateTimeDataType(5uy))
-//            proxy.[1].DataElement.StorageType |> Claim.equal (DateTimeDataType(4uy))
-//            proxy.[2].DataElement.StorageType |> Claim.equal (DateTimeDataType(DataKind.DateTime.DefaultPrecision))
-//            proxy.[3].DataElement.StorageType |> Claim.equal (DateTimeDataType(DataKind.DateTime.DefaultPrecision))
-//
-//
-//        [<Fact>]
-//        let ``Read Column names from table proxy metadata - attribute overrides``() =
-//            let proxy = tabularproxy<RecordB> 
-//            proxy.Columns.Length |> Claim.equal 4
-//        
-//            proxy.[0].DataElement.Name |> Claim.equal "BField_1"
-//            proxy.[1].DataElement.Name |> Claim.equal "BField2"
-//            proxy.[2].DataElement.Name |> Claim.equal "BField_3"
-//            proxy.[3].DataElement.Name |> Claim.equal "BField4"
-    
         [<Fact>]
         let ``Described [SqlTest].[pTable02Insert] procedure from proxy``() =
             
@@ -151,15 +129,15 @@ module DataProxyMetadata =
 
             let param01 = proc.FindParameter "col01"
             param01.Direction |> Claim.equal RoutineParameterDirection.Output
-            param01.StorageType |> Claim.equal Int32DataType
+            param01.DataType |> Claim.equal Int32DataType
         
             let param02 = proc.FindParameter "col02"
             param02.Direction |> Claim.equal RoutineParameterDirection.Input
-            param02.StorageType |> Claim.equal (DateTimeDataType(27uy,7uy))
+            param02.DataType |> Claim.equal (DateTimeDataType(27uy,7uy))
 
             let param03 = proc.FindParameter "col03"
             param03.Direction |> Claim.equal RoutineParameterDirection.Input
-            param03.StorageType |> Claim.equal Int64DataType       
+            param03.DataType |> Claim.equal Int64DataType       
 
 
 
@@ -192,7 +170,7 @@ module DataProxyMetadata =
             let param1 = proxy.CallProxy.Parameters.[0]
             param1.DataElement.Name |> Claim.equal "startDate"
             param1.DataElement.Position |> Claim.equal 0
-            param1.DataElement.StorageType |> Claim.equal (DateTimeDataType(27uy,7uy))
+            param1.DataElement.DataType |> Claim.equal (DateTimeDataType(27uy,7uy))
 
             let resultProxy = proxy.ResultProxy
             resultProxy.Columns.Length |> Claim.equal 4

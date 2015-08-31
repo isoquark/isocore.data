@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data
+namespace IQ.Core.Data.Behavior
 
 open System
 open System.Data
@@ -15,6 +15,7 @@ open FSharp.Data
 open IQ.Core.Contracts
 open IQ.Core.Framework
 
+open IQ.Core.Data.Contracts
     
 module DataKind =
     type private DataTypeKindAspects = | DataTypeKindAspects of length : int option * precision : uint8 option * scale : uint8 option
@@ -230,7 +231,7 @@ module DataType =
     /// Renders the DataTypeType as a semantic string
     /// </summary>
     /// <param name="t">The DataType type</param>
-    let toSemanticString (t : DataType) =
+    let toSemanticString (t : DataTypeReference) =
         match t with
         | BitDataType -> BitDataTypeName
         | UInt8DataType -> UInt8DataTypeName
@@ -273,7 +274,7 @@ module DataType =
     /// Gets the kind of DataType required by the data type
     /// </summary>
     /// <param name="DataTypeType">The DataType type</param>
-    let toKind (t : DataType) =
+    let toKind (t : DataTypeReference) =
         match t with
         | BitDataType -> DataKind.Bit
         | UInt8DataType -> DataKind.UInt8

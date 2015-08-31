@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data.Sql
+namespace IQ.Core.Data.Sql.Behavior
 
 open System
 open System.Data
@@ -12,7 +12,7 @@ open IQ.Core.Framework
 open IQ.Core.Data
 
 module DataType = 
-    let toSqlDbType (t : DataType) =
+    let toSqlDbType (t : DataTypeReference) =
         match t with
         | BitDataType -> SqlDbType.Bit
         | UInt8DataType -> SqlDbType.TinyInt
@@ -40,6 +40,7 @@ module DataType =
         | DateTimeOffsetDataType -> SqlDbType.DateTimeOffset
         | TimeOfDayDataType(_) -> SqlDbType.Time
         | DateDataType -> SqlDbType.Date
+        //Timespan will always be interpreted as the number of ticks since T0
         | TimespanDataType -> SqlDbType.BigInt
 
         | Float32DataType -> SqlDbType.Real

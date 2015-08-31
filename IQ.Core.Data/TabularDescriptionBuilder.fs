@@ -1,16 +1,19 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data
+namespace IQ.Core.Data.Behavior
 
 open System
 open System.Threading
+
+open IQ.Core.Data.Contracts
+
 
 /// <summary>
 /// Implements a builder pattern for <see cref="TabularDescription"/> values
 /// </summary>
 type TabularDescriptionBuilder(schemaName, localName, doc) =
     let columns = ResizeArray<ColumnDescription>()
-
+    let parentName = DataObjectName(schemaName, localName)
     let mutable colidx = -1
 
     let nextidx() =
@@ -26,10 +29,14 @@ type TabularDescriptionBuilder(schemaName, localName, doc) =
         columns.Add({
                         Name = colname
                         Position = position
-                        StorageType = dataTypeName |> DataType.parse |> Option.get
+                        DataType = dataTypeName |> DataType.parse |> Option.get
                         Documentation = doc
                         Nullable = nullable
-                        AutoValue = autoKind})
+                        AutoValue = autoKind
+                        ParentName = parentName
+                        Properties = []
+
+                        })
         this
     member this.AddColumn(colname, dataTypeName) = 
         this.AddColumn(nextidx(), colname, dataTypeName, false, String.Empty, AutoValueKind.None)
@@ -42,8 +49,9 @@ type TabularDescriptionBuilder(schemaName, localName, doc) =
 
     member this.Finish() =
             {
-                TabularDescription.Name = DataObjectName(schemaName, localName)
+                TableDescription.Name = DataObjectName(schemaName, localName)
                 Documentation = doc
-                Columns = columns 
+                Columns = columns |> List.ofSeq
+                Properties = []
             }
         

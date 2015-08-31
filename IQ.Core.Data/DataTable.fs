@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data
+namespace IQ.Core.Data.Behavior
 
 
 open IQ.Core.Framework
@@ -12,14 +12,15 @@ open System.Diagnostics
 open System.Collections
 open System.Collections.Generic
 
+open IQ.Core.Data.Contracts
 
 
 type IDataTableConverter =
-    abstract FromProxyValues: TabularProxyDescription->values : obj seq -> DataTable
+    abstract FromProxyValues: TableProxyDescription->values : obj seq -> DataTable
     abstract ToProxyValues: Type-> DataTable->IEnumerable
 
 type IDataTableConverter<'T> =
-    abstract FromProxyValues: TabularProxyDescription->values : 'T seq -> DataTable
+    abstract FromProxyValues: TableProxyDescription->values : 'T seq -> DataTable
     abstract ToProxyValues: DataTable->'T seq
 
 
@@ -49,9 +50,9 @@ module DataTable =
     /// Creates a data table based on a tabular description
     /// </summary>
     /// <param name="d">The tabular description</param>
-    let fromTabularDescription(d : TabularDescription) =
+    let fromTabularDescription(d : ITabularDescription) =
         let table = new DataTable(d.Name.ToSemanticString())
-        d.Columns |> Seq.iter(fun c -> table.Columns.Add(c.Name, c.StorageType |> DataTypeConverter.toBclTransportType) |> ignore)
+        d.Columns |> Seq.iter(fun c -> table.Columns.Add(c.Name, c.DataType |> DataTypeConverter.toBclTransportType) |> ignore)
         table
 
     /// <summary>
@@ -59,7 +60,7 @@ module DataTable =
     /// </summary>
     /// <param name="proxyDescription">Description of the proxy</param>
     /// <param name="values">The record values that will be transformed into table rows</param>
-    let fromProxyValues (d : TabularProxyDescription) (values : obj seq) =
+    let fromProxyValues (d : TableProxyDescription) (values : obj seq) =
         let excludeDefaults = true
         let excludeIdentity = false
         let columns = [for c in d.Columns do 
@@ -83,7 +84,7 @@ module DataTable =
         for value in values do
             let valueidx = value |> pocoConverter.ToValueIndex
             [|for column in columns do 
-                yield valueidx.[column.ProxyElement.Name.Text] |> DataTypeConverter.toBclTransportValue column.DataElement.StorageType
+                yield valueidx.[column.ProxyElement.Name.Text] |> DataTypeConverter.toBclTransportValue column.DataElement.DataType
             |] |> table.Rows.Add |> ignore
         table                
                 
@@ -126,7 +127,7 @@ module DataTable =
     /// </summary>
     /// <param name="values">The record values that will be transformed into table rows</param>
     let fromProxyValuesT (values : 'T seq) =
-         values |> Seq.map(fun x -> x :> obj) |> fromProxyValues (tabularproxy<'T> )
+         values |> Seq.map(fun x -> x :> obj) |> fromProxyValues (tableproxy<'T> )
 
 
     let getUntypedConverter() =
@@ -144,5 +145,5 @@ module DataTable =
             member this.ToProxyValues dataTable =
                 dataTable |> toProxyValuesT<'T>
             member this.FromProxyValues d values =
-                values |> Seq.map(fun x -> x :> obj) |> fromProxyValues (tabularproxy<'T> )    
+                values |> Seq.map(fun x -> x :> obj) |> fromProxyValues (tableproxy<'T> )    
         }

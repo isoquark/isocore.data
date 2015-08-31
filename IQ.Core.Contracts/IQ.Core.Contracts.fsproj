@@ -40,10 +40,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="FrameworkContracts.fs" />
-    <Compile Include="DataContracts.fs" />
-    <Compile Include="MathContracts.fs" />
-    <Compile Include="SyntheticsContracts.fs" />
+    <Compile Include="Common.fs" />
+    <Compile Include="DataMetadata.fs" />
+    <Compile Include="DataStore.fs" />
+    <Compile Include="DataProxy.fs" />
+    <Compile Include="Math.fs" />
+    <Compile Include="Synthetics.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

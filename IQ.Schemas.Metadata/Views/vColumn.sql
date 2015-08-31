@@ -9,7 +9,7 @@
 		o.ObjectType as ParentType,
 		x.name as ColumnName,
 		d.Value as Description,
-		x.column_id as Position,
+		x.column_id - 1 as Position,
 		x.is_computed as IsComputed,
 		x.is_identity as IsIdentity,
 		x.is_nullable as IsNullable,

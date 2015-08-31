@@ -10,7 +10,6 @@ using IQ.Core.Data;
 using IQ.Core.Data.Sql;
 using IQ.Core.Framework;
 
-using static IQ.Core.Data.DataAttributes;
 using static IQ.Core.Data.Test.TestProxies;
 using Xunit;
 

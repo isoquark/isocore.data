@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data
+namespace IQ.Core.Data.Behavior
 
 open System
 open System.IO
@@ -12,6 +12,7 @@ open FSharp.Data
 open CsvHelper
 
 open IQ.Core.Framework
+open IQ.Core.Data.Contracts
 
 /// <summary>
 /// Defines domain vocabulary for working with CSV data/files
@@ -65,7 +66,7 @@ module CsvReader =
     /// <param name="file">Representation of the CSV file</param>
     let private read<'T> (file : FSharp.Data.Runtime.CsvFile<CsvRow>) = 
 
-        let proxy = tabularproxy<'T> |> TabularProxy
+        let proxy = tableproxy<'T> |> TableProxy
 
         let getColumnProxy colName = 
             proxy |> DataObjectProxy.getColumns |> List.find(fun x -> x.DataElement.Name = colName)
@@ -178,7 +179,7 @@ module CsvWriter =
     /// Writes a sequence of records to a file in CSV format
     /// </summary>
     let writeFile<'T> (format : CsvFormat) (path : string) (items : 'T seq) =        
-        let proxy = tabularproxy<'T> |> TabularProxy
+        let proxy = tableproxy<'T> |> TableProxy
         let headerRow = 
             proxy.Columns |> List.map(fun c -> c.DataElement.Name) |> List.asReadOnlyList |> Txt.delimit format.Separator
 

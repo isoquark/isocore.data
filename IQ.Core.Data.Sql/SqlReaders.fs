@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data.Sql
+namespace IQ.Core.Data.Sql.Behavior
 
 open System
 open System.Data
@@ -20,19 +20,20 @@ module internal SqlTabularReader =
         command.CommandType <- CommandType.Text
         let rowValues = command |> SqlCommand.executeQuery (q.ColumnNames) 
         let description = {
-            TabularDescription.Name = q.TabularName
+            TableDescription.Name = q.TabularName
             Documentation = String.Empty
-            Columns = RoList.empty                    
+            Columns = []
+            Properties = []
         }
         TabularData(description, rowValues)
 
-    let selectFromSql cs (d : TabularDescription) sql =
+    let selectFromSql cs (d : ITabularDescription) sql =
         use connection = cs |> SqlConnection.create
         use command = new SqlCommand(sql, connection)
         command.CommandType <- CommandType.Text
         command |> SqlCommand.executeQuery (d.Columns |> RoList.map(fun c -> c.Name) )
             
-    let selectAll cs (d : TabularDescription) =
+    let selectAll cs (d : ITabularDescription) =
         let sql = d |> SqlFormatter.formatTabularSelect
         sql |> selectFromSql cs d 
     
@@ -49,12 +50,12 @@ module internal SqlProxyReader =
             
     let selectAll<'T> cs  =
         let t = typeinfo<'T>
-        let description = t |> DataProxyMetadata.describeTablularProxy
+        let description = t |> DataProxyMetadata.describeTableProxy
         description.DataElement |> SqlTabularReader.selectAll cs |> toPocos<'T>
 
     let selectSome<'T> cs (where : string) =
         let t = typeinfo<'T>
-        let description = t |> DataProxyMetadata.describeTablularProxy
+        let description = t |> DataProxyMetadata.describeTableProxy
         let sql = sprintf "%s where %s" (SqlFormatter.formatTabularSelectT<'T>()) where
         sql |> SqlTabularReader.selectFromSql cs description.DataElement  |> toPocos<'T>
               

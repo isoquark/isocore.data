@@ -13,6 +13,17 @@ module TestProxies =
         EndDate : BclDateTime        
     }
         
+    module SchemaNames =
+        [<Literal>]
+        let SqlTest = "SqlTest"
+
+    module TableNames =
+        [<Literal>]
+        let Table01 = "Table01"
+        [<Literal>]
+        let Table02 = "Table01"
+        [<Literal>]
+        let Table03 = "Table01"
 
     [<Schema("SqlTest")>]
     type ISqlTestRoutines =

@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data
+namespace IQ.Core.Data.Behavior
 
 open System
 open System.Data
@@ -9,7 +9,7 @@ open System.Text
 
 
 open IQ.Core.Framework
-
+open IQ.Core.Data.Contracts
 
 
 
@@ -74,8 +74,8 @@ module DataObjectDescription =
 
     let unwrapTabular (subject : DataObjectDescription) =
         match subject with
-        | TableDescription(x) -> x
-        | ViewDescription(x) -> x
+        | TableDescription(x) -> x :> ITabularDescription
+        | ViewDescription(x) -> x :> ITabularDescription
         | _ -> ArgumentException() |> raise
 
 [<AutoOpen>]
@@ -84,7 +84,7 @@ module DataMetamodelExtensions =
     /// <summary>
     /// Defines augmentations for the TableDescription type
     /// </summary>
-    type TabularDescription 
+    type ITabularDescription
     with
         /// <summary>
         /// Finds a column identified by its name

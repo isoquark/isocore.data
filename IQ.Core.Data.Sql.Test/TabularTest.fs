@@ -22,7 +22,7 @@ open TestProxies
 module Tabular =
     
     let private verifyBulkInsert<'T>(input : 'T list) (sortBy: 'T->IComparable) (store : ISqlProxyDataStore)=
-        let count = tabularproxy<'T>.DataElement.Name |> TruncateTable |> store.ExecuteCommand 
+        let count = tableproxy<'T>.DataElement.Name |> TruncateTable |> store.ExecuteCommand 
         store.Get<'T>() |> Claim.seqIsEmpty
         input |> store.Insert
         let output = store.Get<'T>() |> RoList.sortBy sortBy |> RoList.toList
@@ -33,7 +33,7 @@ module Tabular =
         
         let store = ctx.Store
 
-        [<FactAttribute>]
+        [<Fact>]
         let ``Queried vDataType metadata - Partial column set A``() =
             let items = store.Get<Metadata.vDataTypeA>() 
                      |> RoList.map(fun item -> item.DataTypeName, item) 
@@ -43,7 +43,7 @@ module Tabular =
             money.IsNullable |> Claim.isTrue
             money.SchemaName |> Claim.equal "sys"
 
-        [<FactAttribute>]
+        [<Fact>]
         let ``Queried vDataType metadata - Partial column set B``() =
             let items = store.Get<Metadata.vDataTypeB>() 
                      |> RoList.map(fun item -> item.DataTypeName, item) 
@@ -56,7 +56,7 @@ module Tabular =
             money.IsNullable |> Claim.isTrue 
             money.IsUserDefined |> Claim.isFalse      
         
-        [<FactAttribute>]
+        [<Fact>]
         let ``Bulk inserted data into Table05``() =
             let input = [
                 {Table05.Col01 = 1; Col02 = 2uy; Col03 = 3s; Col04=5L}
@@ -66,7 +66,7 @@ module Tabular =
             store |> verifyBulkInsert input (fun x -> x.Col01 :> IComparable)
    
 
-        [<FactAttribute>]
+        [<Fact>]
         let ``Bulk inserted data into Table06``() =
             let input = [
                 {Table06.Col01 = 1; Col02 = Some 2uy; Col03 = Some 3s; Col04=5L}
@@ -76,7 +76,7 @@ module Tabular =
             store |> verifyBulkInsert input (fun x -> x.Col01 :> IComparable)
 
 
-        [<FactAttribute>]
+        [<Fact>]
         let ``Bulk inserted data into Table07``() =
             let input = [
                 {Table07.Col01 = Some(1); Col02 = "ABC"; Col03 = "DEF"}
@@ -114,7 +114,7 @@ module Tabular =
                     |] :> rolist<_>
             let data = {                                
                 new ITabularData with
-                    member this.Description = description
+                    member this.Description = description :> ITabularDescription
                     member this.RowValues =  rowValues
             }
             store.Insert(data)
@@ -124,6 +124,6 @@ module Tabular =
             let q = TabularDataQuery(tabularName, colnames, ReadOnlyList.Empty(), sort, Some(page)) |> TabularQuery
             let result = store.GetTabular(q);
             ()
-            
+
             
 

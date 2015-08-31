@@ -8,7 +8,7 @@
 		tt.name as TableName,
 		c.name as ColumnName,
 		d.Value as ColumnDescription,
-		c.column_id as Position,
+		c.column_id - 1 as Position,
 		c.user_type_id as DataTypeId,
 		t.DataTypeName,
 		c.is_computed as IsComputed,

@@ -15,27 +15,6 @@ open Microsoft.FSharp.Reflection
 open Microsoft.FSharp.Quotations.Patterns
 
 
-type ReadOnlyList<'T>(l : list<'T>) =
-    static member Empty() = List<'T>() :> rolist<'T> 
-
-    override this.GetHashCode() = (l:>obj).GetHashCode()
-    override this.Equals(other) = (l:>obj).Equals(other)
-
-
-    interface IReadOnlyList<'T> with
-            member this.Count: int = 
-                l.Length
-              
-            member this.GetEnumerator(): Collections.IEnumerator = 
-                (l :> IEnumerable).GetEnumerator()
-              
-            member this.GetEnumerator(): IEnumerator<'T> = 
-                (l :> IEnumerable<'T>).GetEnumerator()
-              
-            member this.Item
-                with get (index: int): 'T = 
-                    l.[index]                                                         
-
 /// <summary>
 /// Defines core global operations and types
 /// </summary>
@@ -68,7 +47,7 @@ module Lang =
         /// </remarks>
         let count (items : seq<'T>) = items.Count()
     
-        let asReadOnlyList (s : seq<_>) = ReadOnlyList(s |> List.ofSeq) :> IReadOnlyList<_>
+        let asReadOnlyList (s : seq<_>) = ReadOnlyList.Create(s |> List.ofSeq)
     
     /// <summary>
     /// Defines custom Array module operations
@@ -84,15 +63,19 @@ module Lang =
             [|for item in l -> f(item) |] :> rolist<_>                
         
         let sortBy f l =
-            l |> Seq.sortBy f |> Seq.asReadOnlyList
+            l |> Seq.sortBy f |> ReadOnlyList.Create
 
         let toList (l : 'T rolist) =
             [for item in l -> item]
 
-        let ofSeq (l : 'T rolist) =
-            l |> Array.ofSeq :> rolist<_>
-        
-        let empty<'T> = ReadOnlyList<'T>.Empty()
+        let ofSeq (s : 'T seq) =
+            s |> ReadOnlyList.Create 
+                
+        let empty<'T> = 
+            ReadOnlyList<'T>.Empty()
+
+        let fromList (l : list<_>) =
+            l |> ReadOnlyList.Create
 
     module Map =
         let ofReadOnlyList (items : ('K*'V) rolist) =
@@ -109,7 +92,7 @@ module Lang =
         let chain3 f1 f2 f3 l =
             l |> chain2 f1 f2 |> f3
 
-        let asReadOnlyList (l : list<_>) = ReadOnlyList(l) :> IReadOnlyList<_>
+        let asReadOnlyList (l : list<_>) = l |> RoList.fromList
 
 
     /// <summary>

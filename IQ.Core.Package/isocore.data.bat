@@ -1,1 +1,0 @@
-ilrepack /ver:1.0.25 /out:Isocore.Data.dll IQ.Core.Contracts.dll IQ.Core.Framework.dll IQ.Core.Data.dll IQ.Core.Data.Excel.dll IQ.Core.Data.Sql.dll IQ.Core.Math.dll IQ.Core.Synthetics.dll AutoFac.dll Castle.Core.dll CsvHelper.dll EPPlus.dll FSharp.Compiler.Service.dll FSharp.Core.dll FSharp.Data.dll FSharp.Text.RegexProvider.dll MathNet.Numerics.dll 

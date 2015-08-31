@@ -18,4 +18,8 @@ open System.Runtime.InteropServices
 [<assembly: AssemblyFileVersion("1.0.*")>]
 
 [<assembly: InternalsVisibleTo("IQ.Core.Data.Sql.Test")>]
-()
+
+[<assembly: AutoOpen("IQ.Core.Data.Sql.Behavior")>]
+
+do
+    ()

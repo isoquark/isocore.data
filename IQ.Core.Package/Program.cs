@@ -7,30 +7,11 @@ using System.Reflection;
 using System.Collections.Concurrent;
 using System.Runtime.Versioning;
 using System.IO;
-using NuGet;
+using System.Diagnostics;
 
-//using IQ.Core.Data;
-//using IQ.Core.Data.Sql;
-//using IQ.Core.Framework;
-
-//using static IQ.Core.Data.DataAttributes;
 
 namespace IQ.Core.Package
 {
-
-    //[Schema("SqlTest")]
-    //public interface ISqlTestRoutines
-    //{
-    //    [Procedure]
-    //    int pTable03Insert(Byte Col01, Int16 Col02, Int32 Col03, Int64 Col04);
-
-    //}
-
-
-    static class NugetUtil
-    {
-
-    }
 
 
     static class Packaging
@@ -43,7 +24,8 @@ namespace IQ.Core.Package
                 OutputFile = outfileName,
                 Version = version,
                 SearchDirectories = new List<string>(),
-                XmlDocumentation = false
+                XmlDocumentation = false,
+                DebugInfo = true
             });
             repack.Repack();
         }
@@ -51,45 +33,13 @@ namespace IQ.Core.Package
 
     class Program
     {
-        //private static void TestSqlData()
-        //{
-        //    var cs = "Initial Catalog=isocore;Data Source=eXaCore03;Integrated Security=SSPI";
-        //    var config = SqlDataStoreConfig.NewSqlDataStoreConfig(cs, ClrMetadataProvider.getDefault());
-        //    var store = SqlDataStore.get(config);
-        //    var routines = store.GetContract<ISqlTestRoutines>();
-        //    var result = routines.pTable03Insert(5, 10, 15, 20);
-        //}
-
-        private static IReadOnlyList<string> GetSimpleAssemblyNames(string configName)
-        {
-            return new string[]
-            {
-                "IQ.Core.Contracts.dll",
-                "IQ.Core.Framework.dll",
-                "IQ.Core.Data.dll",
-                "IQ.Core.Data.Excel.dll",
-                "IQ.Core.Data.Sql.dll",
-                "IQ.Core.Math.dll",
-                "IQ.Core.Synthetics.dll",
-                "AutoFac.dll",
-                "Castle.Core.dll",
-                "CsvHelper.dll",
-                "EPPlus.dll",
-                "FSharp.Compiler.Service.dll",
-                "FSharp.Core.dll",
-                "FSharp.Data.dll",
-                "FSharp.Text.RegexProvider.dll",
-                "MathNet.Numerics.dll",
-            };
-
-        }
 
         private static string GetSourceDirectory()
         {
             return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\";
         }
 
-        static void Main(string[] args)
+        private static void ObserveResolutions()
         {
             var hostAssembly = System.Reflection.Assembly.GetExecutingAssembly();
             var loadedNames = new Dictionary<string, System.Reflection.Assembly>();
@@ -99,7 +49,7 @@ namespace IQ.Core.Package
                     if (loadedNames.ContainsKey(assname.FullName))
                         return loadedNames[assname.FullName];
 
-                    
+
                     var resname = $"IQ.Core.Package.Assemblies.{eventArgs.Name}";
                     using (var stream = hostAssembly.GetManifestResourceStream(resname))
                     {
@@ -118,32 +68,94 @@ namespace IQ.Core.Package
                     }
 
                 };
+        }
 
-            var configName = "isocore.data.dll";
-            var assemblyFiles = new List<string>();
-            foreach(var simpleName in GetSimpleAssemblyNames(configName))
+
+        private static string GetResourceText(string partialName)
+        {
+            var ass = Assembly.GetExecutingAssembly();
+            var resname = ass.GetManifestResourceNames().First(x => x.Contains(partialName));
+            using (var reader = new StreamReader(ass.GetManifestResourceStream(resname)))
             {
-                var assembly = Assembly.LoadFrom(simpleName);
-                assemblyFiles.Add(assembly.CodeBase.Replace("file:///", String.Empty));
-
+                return reader.ReadToEnd();
             }
 
-            var version = new Version(1, 0, 26);
-            var outdll = @"C:\Work\Lib\dll\isocore.data.dll";
-            Packaging.MergeAssemblies(outdll, version, assemblyFiles.ToArray());
+        }
 
-            //var outpkg = Path.ChangeExtension(outdll, $".{version.Major}.{version.Minor}.{version.Build}.nupkg");
-            //var packageMetadata = new ManifestMetadata
-            //{
-            //    Authors = "Chris Moore",
-            //    Version = version.ToString(),
-            //    Id = "isocore.data",
-            //    Description = "Data development"
-            //};
-            //var packageBuilder = new PackageBuilder();
+        private static readonly string WorkingDirectory = @"C:\Temp\isocore.data";
+        private static readonly Version PackageVersion = Assembly.GetExecutingAssembly().GetName().Version;
+        private static readonly string TargetDirectory = @"C:\Work\lib\packages";
+
+        private static void CreateIsocoreData()
+        {
+
+            var libdir = Path.Combine(WorkingDirectory, @"lib\net45\");
+            Directory.CreateDirectory(libdir);
+
+            var outputAssemblyName = "isocore.data.dll";
+            var outputAssemblyPath = Path.Combine(libdir, outputAssemblyName);
+            //The simple names of the assemblies to be packaged
+            var assNames = new []
+                {
+                    "IQ.Core.Contracts.dll",
+                    "IQ.Core.Framework.dll",
+                    "IQ.Core.Data.dll",
+                    "IQ.Core.Data.Excel.dll",
+                    "IQ.Core.Data.Sql.dll",
+                    "IQ.Core.Math.dll",
+                    "IQ.Core.Synthetics.dll",
+                    "AutoFac.dll",
+                    "Castle.Core.dll",
+                    "CsvHelper.dll",
+                    "EPPlus.dll",
+                    "FSharp.Compiler.Service.dll",
+                    "FSharp.Core.dll",
+                    "FSharp.Data.dll",
+                    "FSharp.Text.RegexProvider.dll",
+                    "MathNet.Numerics.dll",
+                };
+
+            var nuspec = GetResourceText("isocore.data.nuspec");
+            var assFiles = new List<string>();
+            foreach(var assName in assNames)
+            {
+                var assembly = Assembly.LoadFrom(assName);
+                assFiles.Add(assembly.CodeBase.Replace("file:///", String.Empty));
+            }
+            Packaging.MergeAssemblies(outputAssemblyPath, PackageVersion, assFiles.ToArray());
+
+        }
+
+        private static void NupackIsocoreData()
+        {
+            var outputNuspecName = "isocore.data.nuspec";
+            var outputNuspecPath = Path.Combine(WorkingDirectory, outputNuspecName);
+            var versionText = String.Format($"{PackageVersion.Major}.{PackageVersion.Minor}.{PackageVersion.Build}");
+            var nuspec = GetResourceText(outputNuspecName).Replace("$VERSION$", versionText);
+            File.WriteAllText(outputNuspecPath, nuspec);
 
 
-            Console.WriteLine("Done");
+
+            var p = new Process();
+            p.StartInfo.UseShellExecute = false;
+            //p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.FileName = "nuget.exe";
+            p.StartInfo.Arguments = $"pack \"{outputNuspecPath}\" -Verbosity detailed -OutputDirectory \"{TargetDirectory}\"";
+            p.Start();
+            p.WaitForExit();
+        }
+
+        static void Main(string[] args)
+        {
+            if (Directory.Exists(WorkingDirectory))
+                Directory.Delete(WorkingDirectory, true);
+
+            Directory.CreateDirectory(WorkingDirectory);
+
+            CreateIsocoreData();
+            NupackIsocoreData();
+
+            
         }
     }
 }
