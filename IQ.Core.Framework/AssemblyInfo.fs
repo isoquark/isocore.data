@@ -4,9 +4,8 @@ open System.Reflection
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
 
-type AssemblyDescriptor() =
-    static member Assembly = System.Reflection.Assembly.GetExecutingAssembly()
-    static member AssemblyName = ClrAssemblyName(AssemblyDescriptor.Assembly.GetName().Name, Some(AssemblyDescriptor.Assembly.FullName))
+open IQ.Core.Contracts
+
 
 
 // General Information about an assembly is controlled through the following 
@@ -36,3 +35,7 @@ type AssemblyDescriptor() =
 
 do
     ()
+
+
+type FrameworkAssemblyDescriptor() =
+    inherit AssemblyDescriptor<FrameworkAssemblyDescriptor>()

@@ -22,7 +22,9 @@ module SqlCommandTest =
             (seq , count) 
             |> AllocateSequenceRange 
             |> store.ExecuteCommand
-            |> fun x -> match x with | AllocateSequenceRangeResult i -> i :?> int |_ -> nosupport()
+            |> fun x -> 
+                match x with 
+                | AllocateSequenceRangeResult i -> i :?> int 
             
 
         [<Fact>]

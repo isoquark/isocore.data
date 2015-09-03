@@ -1,8 +1,11 @@
-﻿namespace IQ.Core.Data.Excel.AssemblyInfo
+﻿namespace IQ.Core.Data.Excel
+
 
 open System.Reflection
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
+
+open IQ.Core.Contracts
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -39,3 +42,6 @@ open System.Runtime.InteropServices
 
 do
     ()
+
+type ExcelAssemblyDescriptor() =
+    inherit AssemblyDescriptor<ExcelAssemblyDescriptor>()

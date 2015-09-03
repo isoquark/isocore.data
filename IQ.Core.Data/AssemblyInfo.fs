@@ -1,8 +1,11 @@
-﻿namespace IQ.Core.Data.AssemblyInfo
+﻿namespace IQ.Core.Data
+
 
 open System.Reflection
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
+
+open IQ.Core.Contracts
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
@@ -40,3 +43,6 @@ open System.Runtime.InteropServices
 [<assembly: AutoOpen("IQ.Core.Data.Behavior")>]
 do
     ()
+
+type DataAssemblyDescriptor() =
+    inherit AssemblyDescriptor<DataAssemblyDescriptor>()

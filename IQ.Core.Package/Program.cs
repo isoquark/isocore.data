@@ -97,29 +97,29 @@ namespace IQ.Core.Package
             //The simple names of the assemblies to be packaged
             var assNames = new []
                 {
-                    "IQ.Core.Contracts.dll",
-                    "IQ.Core.Framework.dll",
-                    "IQ.Core.Data.dll",
-                    "IQ.Core.Data.Excel.dll",
-                    "IQ.Core.Data.Sql.dll",
-                    "IQ.Core.Math.dll",
-                    "IQ.Core.Synthetics.dll",
-                    "AutoFac.dll",
-                    "Castle.Core.dll",
-                    "CsvHelper.dll",
-                    "EPPlus.dll",
-                    "FSharp.Compiler.Service.dll",
-                    "FSharp.Core.dll",
-                    "FSharp.Data.dll",
-                    "FSharp.Text.RegexProvider.dll",
-                    "MathNet.Numerics.dll",
+                    Contracts.ContractAssemblyDescriptor.SimpleName,
+                    Framework.FrameworkAssemblyDescriptor.SimpleName,
+                    Data.DataAssemblyDescriptor.SimpleName,
+                    Data.Excel.ExcelAssemblyDescriptor.SimpleName,
+                    Data.Sql.SqlAssemblyDescriptor.SimpleName,
+                    Math.MathAssemblyDescriptor.SimpleName,
+                    Synthetics.SyntheticsAssemblyDescriptor.SimpleName,
+                    "AutoFac",
+                    "Castle.Core",
+                    "CsvHelper",
+                    "EPPlus",
+                    "FSharp.Compiler.Service",
+                    "FSharp.Core",
+                    "FSharp.Data",
+                    "FSharp.Text.RegexProvider",
+                    "MathNet.Numerics",
                 };
 
             var nuspec = GetResourceText("isocore.data.nuspec");
             var assFiles = new List<string>();
             foreach(var assName in assNames)
             {
-                var assembly = Assembly.LoadFrom(assName);
+                var assembly = Assembly.LoadFrom($"{assName}.dll");
                 assFiles.Add(assembly.CodeBase.Replace("file:///", String.Empty));
             }
             Packaging.MergeAssemblies(outputAssemblyPath, PackageVersion, assFiles.ToArray());

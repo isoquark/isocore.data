@@ -1,6 +1,8 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Synthetics.AssemblyInfo
+namespace IQ.Core.Synthetics
+
+open IQ.Core.Contracts
 
 open System.Reflection
 open System.Runtime.CompilerServices
@@ -26,18 +28,11 @@ open System.Runtime.InteropServices
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [<assembly: Guid("206d0ddc-b382-41fa-ae8e-ce82724648c9")>]
 
-// Version information for an assembly consists of the following four values:
-// 
-//       Major Version
-//       Minor Version 
-//       Build Number
-//       Revision
-// 
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [<assembly: AssemblyVersion("1.0.*")>]
-[<assembly: AssemblyVersion("1.0.0.0")>]
-[<assembly: AssemblyFileVersion("1.0.0.0")>]
+[<assembly: AssemblyVersion("1.0.*")>]
+[<assembly: AssemblyFileVersion("1.0.*")>]
 
 do
     ()
+
+type SyntheticsAssemblyDescriptor() =
+    inherit AssemblyDescriptor<SyntheticsAssemblyDescriptor>()

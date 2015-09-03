@@ -238,7 +238,7 @@ module Transformer =
         Realization(config) :> ITransformer
 
     let getDefault() =
-        let assemblyQuery = IQ.Core.Framework.AssemblyDescriptor.AssemblyName |> FindAssemblyByName  |> FindAssemblyElement |> List.singleton
+        let assemblyQuery = FrameworkAssemblyDescriptor.Assembly.AssemblyName |> FindAssemblyByName  |> FindAssemblyElement |> List.singleton
         let transconfig = TransformerConfig(assemblyQuery, None, ClrMetadataProvider.getDefault())
         transconfig |> get
         

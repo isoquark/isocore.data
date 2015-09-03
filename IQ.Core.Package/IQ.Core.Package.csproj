@@ -104,10 +104,6 @@
       <Project>{d01a6d75-53f1-4814-be92-5f69113ad1b9}</Project>
       <Name>IQ.Core.Math</Name>
     </ProjectReference>
-    <ProjectReference Include="..\IQ.Core.MetaCode\IQ.Core.MetaCode.fsproj">
-      <Project>{1b4f1280-e097-4a56-8181-fb9668e2c618}</Project>
-      <Name>IQ.Core.MetaCode</Name>
-    </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Synthetics\IQ.Core.Synthetics.fsproj">
       <Project>{206d0ddc-b382-41fa-ae8e-ce82724648c9}</Project>
       <Name>IQ.Core.Synthetics</Name>
