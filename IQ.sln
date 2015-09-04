@@ -27,10 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		build.props = build.props
 		indexcode.bat = indexcode.bat
-		isocore.nuspec = isocore.nuspec
 		License.txt = License.txt
-		Notes.txt = Notes.txt
-		package.fsx = package.fsx
 		runtests.bat = runtests.bat
 	EndProjectSection
 EndProject

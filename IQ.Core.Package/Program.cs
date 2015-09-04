@@ -13,6 +13,16 @@ using System.Diagnostics;
 namespace IQ.Core.Package
 {
 
+    /*
+
+        <dependency id="Castle.Core" version="3.3.3" />
+        <dependency id="FSharp.Core" version="4.0.0.1" />
+        <dependency id="FSharp.Data" version="2.2.5" />
+        <dependency id="FSharp.Text.RegexProvider" version="0.0.7" />
+        <dependency id="MathNet.Numerics" version="3.7.0" />
+        <dependency id="MathNet.Numerics.FSharp" version="3.7.0" />
+        <dependency id="NodaTime" version="1.3.1" />
+*/
 
     static class Packaging
     {
@@ -83,7 +93,7 @@ namespace IQ.Core.Package
         }
 
         private static readonly string WorkingDirectory = @"C:\Temp\isocore.data";
-        private static readonly Version PackageVersion = Assembly.GetExecutingAssembly().GetName().Version;
+        private static readonly Version PackageVersion = Version.Parse("1.0.9");
         private static readonly string TargetDirectory = @"C:\Work\lib\packages";
 
         private static void CreateIsocoreData()
@@ -104,11 +114,11 @@ namespace IQ.Core.Package
                     Data.Sql.SqlAssemblyDescriptor.SimpleName,
                     Math.MathAssemblyDescriptor.SimpleName,
                     Synthetics.SyntheticsAssemblyDescriptor.SimpleName,
-                    "AutoFac",
+                    //"AutoFac",
                     "Castle.Core",
                     "CsvHelper",
                     "EPPlus",
-                    "FSharp.Compiler.Service",
+                    //"FSharp.Compiler.Service",
                     "FSharp.Core",
                     "FSharp.Data",
                     "FSharp.Text.RegexProvider",

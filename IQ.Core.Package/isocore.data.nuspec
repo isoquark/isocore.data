@@ -5,10 +5,16 @@
     <version>$VERSION$</version>
     <authors>Chris Moore</authors>
     <owners>Chris Moore</owners>
-    <licenseUrl>https://github.com/isoquark/isocore/blob/master/License.txt</licenseUrl>
-    <projectUrl>https://github.com/isoquark/isocore</projectUrl>
+    <licenseUrl>https://github.com/isoquark/isocore.data/blob/master/License.txt</licenseUrl>
+    <projectUrl>https://github.com/isoquark/isocore.data</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Supporting infrastructure for data-oriented and metadata-driven development</description>      
-    <tags>SQL F# data metadata </tags>   
+    <tags>SQL F# data metadata </tags>
+    <dependencies>
+      <group targetFramework=".NETFramework4.5">
+        <dependency id="Autofac" version="3.5.2" />
+      </group>
+    </dependencies>
+
   </metadata>
 </package>
