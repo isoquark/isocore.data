@@ -6,13 +6,13 @@ open IQ.Core.Data.Contracts
 
 
 /// <summary>
-/// A builder that assists in the construction of dynamic SQL
+/// A builder that provides a fluent API for constructing DynamicQuery values
 /// </summary>
 type DynamicQueryBuilder(schemaName, localName) =
     
-    let mutable columnNames : string list = List.empty
-    let mutable filters : ColumnFilterCriterion list = List.empty
-    let mutable sortCriteria : ColumnSortCriterion list = List.empty
+    let columnNames : string ResizeArray = ResizeArray<string>()
+    let filters : ColumnFilterCriterion ResizeArray = ResizeArray<ColumnFilterCriterion>()
+    let sortCriteria : ColumnSortCriterion ResizeArray = ResizeArray<ColumnSortCriterion>()
     let mutable pageNumber : int option = None
     let mutable pageSize : int option = None
 
@@ -24,63 +24,133 @@ type DynamicQueryBuilder(schemaName, localName) =
         DynamicQueryBuilder(schemaName, tabularName)
 
     member this.Columns([<ParamArray>]names : string[]) =
-        columnNames <- names |> List.ofSeq
+        columnNames.AddRange(names)
         this
 
     member this.Columns(names : string seq) =
-        columnNames <- names |> List.ofSeq
+        columnNames.AddRange(names)
         this        
 
-    member this.Filter([<ParamArray>]criteria : ColumnFilterCriterion[]) =
-        filters <- criteria |> List.ofSeq
-        this
-
-    member this.Filter(criteria : ColumnFilterCriterion seq) =
-        filters <- criteria |> List.ofSeq
+    member this.Sort([<ParamArray>]criteria : ColumnSortCriterion[]) =
+        sortCriteria.AddRange(criteria)
         this
     
-    member this.Sort([<ParamArray>]criteria : ColumnSortCriterion[]) =
-        sortCriteria  <- criteria |> List.ofSeq
-        this
-
     member this.Sort(criteria : ColumnSortCriterion seq) =
-        sortCriteria <- criteria |> List.ofSeq
+        sortCriteria.AddRange(criteria)
         this
-        
-
+            
     member this.Page(number : int, size : int) =
         pageNumber <- Some(number)
         pageSize <- Some(size)
         this
 
-    member this.Finish() =
-            DynamicQuery(
-                            DataObjectName(schemaName, localName), 
-                            columnNames,  
-                            filters,
-                            sortCriteria,
-                            pageNumber,
-                            pageSize
-                        ) |> DynamicStoreQuery
+    member this.Filter([<ParamArray>]criteria : ColumnFilterCriterion[]) =
+        filters.AddRange(criteria)
+        this
 
+    member this.Filter(criteria : ColumnFilterCriterion seq) =
+        filters.AddRange(criteria)
+        this
+
+    member this.AndEqual(colname, value) = 
+        filters.Add(AndFilter(Equal(colname,value)))
+        this
     
+    member this.OrEqual(colname, value) =
+        filters.Add(OrFilter(Equal(colname,value)))
+        value
     
-    static member internal WithDefaults(mdp : ISqlMetadataProvider, q ) =
+    member this.AndNotEqual(colname, value) = 
+        filters.Add(AndFilter(NotEqual(colname,value)))
+        this
+    
+    member this.OrNotEqual(colname, value) =
+        filters.Add(OrFilter(NotEqual(colname,value)))
+        value
+
+    member this.AndGreaterThan(colname, value) = 
+        filters.Add(AndFilter(GreaterThan(colname,value)))
+        this
+    
+    member this.OrGreaterThan(colname, value) =
+        filters.Add(OrFilter(GreaterThan(colname,value)))
+        value
+
+    member this.AndGreaterThanOrEqual(colname, value) = 
+        filters.Add(AndFilter(GreaterThanOrEqual(colname,value)))
+        this
+    
+    member this.OrGreaterThanOrEqual(colname, value) =
+        filters.Add(OrFilter(GreaterThanOrEqual(colname,value)))
+        value
+
+    member this.AndLessThan(colname, value) = 
+        filters.Add(AndFilter(LessThan(colname,value)))
+        this
+    
+    member this.OrLessThan(colname, value) =
+        filters.Add(OrFilter(LessThan(colname,value)))
+        value
+
+    member this.AndLessThanOrEqual(colname, value) = 
+        filters.Add(AndFilter(LessThanOrEqual(colname,value)))
+        this
+    
+    member this.OrLessThanOrEqual(colname, value) =
+        filters.Add(OrFilter(LessThanOrEqual(colname,value)))
+        value
+
+    member this.AndStartsWith(colname, value) = 
+        filters.Add(AndFilter(StartsWith(colname,value)))
+        this
+    
+    member this.OrStartsWith(colname, value) =
+        filters.Add(OrFilter(StartsWith(colname,value)))
+        value
+
+    member this.AndContains(colname, value) = 
+        filters.Add(AndFilter(Contains(colname,value)))
+        this
+    
+    member this.OrContains(colname, value) =
+        filters.Add(OrFilter(Contains(colname,value)))
+        value
+
+    member this.AndEndsWith(colname, value) = 
+        filters.Add(AndFilter(EndsWith(colname,value)))
+        this
+    
+    member this.OrEndsWith(colname, value) =
+        filters.Add(OrFilter(EndsWith(colname,value)))
+        value
+    
+    member this.Build() =
+            DynamicQuery( DataObjectName(schemaName, localName), 
+                          columnNames |> List.ofSeq,  
+                          filters |> List.ofSeq,
+                          sortCriteria |> List.ofSeq,
+                          pageNumber,
+                          pageSize
+                        ) |> DynamicStoreQuery
+    
+    static member internal WithDefaults(mdp : ISqlMetadataProvider, q) =
             match q with 
             | DynamicQuery(tableName, columns, filter, sort, pageNumber, pageSize) ->
-                let _columns =   if columns.Length = 0 then
-                                    let kind = tableName |> mdp.GetObjectKind
-                                    if kind.HasValue |> not then
-                                        ArgumentException("Database object doesn't exist") |> raise
-                                    else
-                                        match kind.Value with
-                                        | DataElementKind.Table -> mdp.DescribeTable(tableName).Columns 
-                                        | DataElementKind.View -> mdp.DescribeView(tableName).Columns 
-                                        | _ ->
-                                            nosupport()
-                                        |> List.map(fun x -> x.Name)
-                                 else
-                                    columns
+                let _columns = 
+                  if columns.Length = 0 then
+                        let kind = tableName |> mdp.GetObjectKind
+                        if kind.HasValue |> not then
+                            ArgumentException("Database object doesn't exist") |> raise
+                        else
+                            match kind.Value with
+                            | DataElementKind.Table -> mdp.DescribeTable(tableName).Columns 
+                            | DataElementKind.View -> mdp.DescribeView(tableName).Columns 
+                            | _ ->
+                                nosupport()
+                            |> List.map(fun x -> x.Name)
+                  else
+                     columns
+                
                 let _sort = if sort.Length = 0 then
                                 _columns.[0] |> AscendingSort |> List.singleton
                             else
@@ -90,14 +160,14 @@ type DynamicQueryBuilder(schemaName, localName) =
                     match pageNumber with
                     | None -> None, None
                     | Some(x) -> x |> Some, (defaultArg pageSize 50) |> Some
-
                                                     
 
                 let builder = DynamicQueryBuilder(tableName).Columns(_columns).Sort(_sort)
+                
                 if _pageNumber |> Option.isSome then
-                    builder.Page(_pageNumber.Value, _pageSize.Value).Filter(filter).Finish()
+                    builder.Page(_pageNumber.Value, _pageSize.Value).Filter(filter).Build()
                 else
-                    builder.Filter(filter).Finish()
+                    builder.Filter(filter).Build()
                        
                                            
                 

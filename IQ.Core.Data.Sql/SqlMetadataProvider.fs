@@ -24,9 +24,9 @@ open Metadata
 module internal MetadataUtil =
     let getMetadataView<'T when 'T :> IMetadataView> (config : SqlMetadataProviderConfig) =
         if config.IgnoreSystemObjects then
-            TypedReader.selectSome<'T> config.ConnectionString ("IsUserDefined=1")
+            SqlDataReader.selectSome<'T> config.ConnectionString ("IsUserDefined=1")
         else
-            TypedReader.selectAll<'T> config.ConnectionString
+            SqlDataReader.selectAll<'T> config.ConnectionString
             
           
 type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =            
@@ -41,7 +41,7 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
         config |> MetadataUtil.getMetadataView<'T>
 
     member private this.IndexDataTypes() =
-        let index = (TypedReader.selectAll<vDataType> config.ConnectionString).ToDictionary(fun x -> x.DataTypeId)
+        let index = (SqlDataReader.selectAll<vDataType> config.ConnectionString).ToDictionary(fun x -> x.DataTypeId)
         
         let getName id =
             let item = index.[id]

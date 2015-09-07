@@ -26,11 +26,11 @@ with
             
 
 
+
 type internal SqlDataStoreRealization(config : SqlDataStoreConfig) =
     let cs = config.ConnectionString
     let mdp = lazy({ConnectionString = cs; IgnoreSystemObjects = true} |> SqlMetadataProvider.get)
             
-
     let readTable (q : SqlDataStoreQuery) =
         match q with
         | DynamicStoreQuery(q) ->
@@ -38,7 +38,7 @@ type internal SqlDataStoreRealization(config : SqlDataStoreConfig) =
             use connection = cs |> SqlConnection.create
             use command = new SqlCommand(sql, connection)
             command.CommandType <- CommandType.Text
-            let rowValues = command |> SqlCommand.executeQuery (q.ColumnNames) 
+            let rowValues = command |> SqlCommand.executeQuery
             let description = {
                 TableDescription.Name = q.TabularName
                 Documentation = String.Empty
@@ -70,43 +70,38 @@ type internal SqlDataStoreRealization(config : SqlDataStoreConfig) =
             nosupport()
         :> IDataTable
 
-    
-    interface ITypedSqlDataStore with
-        member this.Get q  = 
-            match q with
-            | DirectStoreQuery(sql) ->
-                sql |> TypedReader.selectSome cs 
-            | DynamicStoreQuery(x) ->
-                cs |> TypedReader.selectAll<'T> 
-            | TableFunctionQuery(routine) ->
-                nosupport()
-            | ProcedureQuery(routine) ->
-                nosupport()
+    let selectFiltered cs (d : ITabularDescription) sql =
+        use connection = cs |> SqlConnection.create
+        use command = new SqlCommand(sql, connection)
+        command.CommandType <- CommandType.Text
+        command |> SqlCommand.executeQuery
 
-        member this.Get q = 
+    static member toPocos<'T>(data : obj[] rolist) =
+        let t = typeinfo<'T>
+        let itemType = t.ReflectedElement.Value
+        let pocoConverter =  PocoConverter.getDefault()
+        [for row in data -> 
+            pocoConverter.FromValueArray(row, itemType)
+        ] 
+        |> Collection.create ClrCollectionKind.Array itemType :?> rolist<'T> 
+
+
+    
+    interface ISqlDataStore with
+        member this.GetTable q = 
             let q = match q with
                     | DynamicStoreQuery(x) -> DynamicQueryBuilder.WithDefaults(mdp.Value, x)
                     | _ -> q
             q |> readTable
-                    
-        member this.Get()  =
-            cs |> TypedReader.selectAll<'T>
-                
-            
-        member this.Merge items = 
-            items |> SqlProxyWriter.bulkInsert cs
-            
+
         member this.Delete q = ()
 
-        member this.Insert (items : 'T seq) =
-            items |> SqlProxyWriter.bulkInsert cs
-            
-        member this.Insert (data : IDataTable) =
+        member this.InsertTable (data : IDataTable) =
             data |> SqlTableWriter.bulkInsert cs
 
         member this.ExecuteCommand c =
             c |> SqlStoreCommand.execute cs 
-            
+
         member this.GetContract() =
             Routine.getContract<'TContract> cs
 
@@ -114,16 +109,48 @@ type internal SqlDataStoreRealization(config : SqlDataStoreConfig) =
             
         member this.MetadataProvider = mdp.Value    
 
+        member this.Get q  = 
+            match q with
+            | DirectStoreQuery(sql) ->
+                let t = typeinfo<'T>
+                let description = t |> DataProxyMetadata.describeTableProxy
+                use connection = cs |> SqlConnection.create
+                use command = new SqlCommand(sql, connection)
+                command.CommandType <- CommandType.Text
+                command |> SqlCommand.executeQuery 
+                        |> SqlDataReader.toPocos<'T>
+            
+            | DynamicStoreQuery(x) ->
+                cs |> SqlDataReader.selectAll<'T> 
+            | TableFunctionQuery(routine) ->
+                nosupport()
+            | ProcedureQuery(routine) ->
+                nosupport()
+                    
+        member this.Get()  =
+            cs |> SqlDataReader.selectAll<'T>
+                
+            
+        member this.Merge items = 
+            items |> SqlProxyWriter.bulkInsert cs
+            
+
+        member this.Insert (items : 'T seq) =
+            items |> SqlProxyWriter.bulkInsert cs
+            
+
+            
+
 
 /// <summary>
 /// Factory that delivers realization of ISqlDataStore
 /// </summary>
-type TypedSqlDataStore() =                               
+type SqlDataStore() =                               
     static member Get(config)  =
-        SqlDataStoreRealization(config) :> ITypedSqlDataStore
+        SqlDataStoreRealization(config) :> ISqlDataStore
     
     static member Get(cs) =
-        SqlDataStoreRealization(SqlDataStoreConfig(cs)) :> ITypedSqlDataStore
+        SqlDataStoreRealization(SqlDataStoreConfig(cs)) :> ISqlDataStore
 
 
 

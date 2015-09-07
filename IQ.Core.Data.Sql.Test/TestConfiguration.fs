@@ -15,14 +15,14 @@ open IQ.Core.Data.Sql
 module TestConfiguration =
 
     let private registerDependencies(registry : ICompositionRegistry) =
-            registry.RegisterFactory(fun (config : obj) -> (config :?> SqlDataStoreConfig) |> TypedSqlDataStore.Get)
+            registry.RegisterFactory(fun (config : obj) -> (config :?> SqlDataStoreConfig) |> SqlDataStore.Get)
                                 
     //This is instantiated/cleaned-up once per collection
     type ProjectTestContext() as this = 
         inherit TestContext(registerDependencies |> CoreRegistration.compose (thisAssembly()))
 
         let cs = "csSqlDataStore" |> this.ConfigurationManager.GetValue 
-        let store : ITypedSqlDataStore = SqlDataStoreConfig(cs) |> this.AppContext.Resolve
+        let store : ISqlDataStore = SqlDataStoreConfig(cs) |> this.AppContext.Resolve
 
         member this.Store = store
         member this.ConnectionString = cs

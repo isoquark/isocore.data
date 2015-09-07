@@ -17,7 +17,7 @@ module Main =
         use context = new ShellContext()
         let cs = "csSqlDataStore" |> context.ConfigurationManager.GetValue 
         let storeConfig = SqlDataStoreConfig(cs)
-        let store : ITypedSqlDataStore = storeConfig |> context.AppContext.Resolve
+        let store : ISqlDataStore = storeConfig |> context.AppContext.Resolve
 
     
         let prop = {

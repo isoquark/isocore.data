@@ -21,7 +21,7 @@ open TestProxies
 
 module Tabular =
     
-    let private verifyBulkInsert<'T>(input : 'T list) (sortBy: 'T->IComparable) (store : ITypedSqlDataStore)=
+    let private verifyBulkInsert<'T>(input : 'T list) (sortBy: 'T->IComparable) (store : ISqlDataStore)=
         let count = tableproxy<'T>.DataElement.Name |> TruncateTable |> store.ExecuteCommand 
         store.Get<'T>() |> Claim.seqIsEmpty
         input |> store.Insert
@@ -105,15 +105,15 @@ module Tabular =
             let description = mdp.DescribeTable(tabularName)
             let rowValues =  [| for i in [1..rowcount] ->i |> createRow |] :> rolist<_>
             let data = TabularData(description :> ITabularDescription, rowValues)
-            store.Insert(data)
+            store.InsertTable(data)
 
             let q1 = DynamicQueryBuilder(tabularName)
                         .Columns(description.Columns |> Seq.map(fun x -> x.Name) |> Array.ofSeq)
                         .Sort([|AscendingSort(description.Columns.[0].Name)|])
                         .Page(1, 10)
-                        .Finish() 
+                        .Build() 
                         
-            let result = store.Get(q1);
+            let result = store.GetTable(q1);
             result.RowValues.Count |> Claim.equal 10
             for rowidx in 0..result.RowValues.Count-1 do
                 let row = result.RowValues.[rowidx]
@@ -126,9 +126,9 @@ module Tabular =
         let csaw = "Initial Catalog=AdventureWorksLT2012;Data Source=eXaCore03;Integrated Security=SSPI"
         [<Fact>]
         let ``Inferred dynamic query defaults``() =
-            let store = TypedSqlDataStore.Get(csaw);
-            let query = DynamicQueryBuilder("SalesLT", "Customer").Finish()
-            let data1 =  query |> store.Get;
+            let store = SqlDataStore.Get(csaw);
+            let query = DynamicQueryBuilder("SalesLT", "Customer").Build()
+            let data1 =  query |> store.GetTable;
             ()
 
             

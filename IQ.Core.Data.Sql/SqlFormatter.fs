@@ -141,12 +141,8 @@ module SqlFormatter =
             sprintf "[%s] <> %s" c <| formatValue(v)
         | GreaterThan(c, v) -> 
             sprintf "[%s] > %s" c <| formatValue(v)
-        | NotGreaterThan(c, v) -> 
-            sprintf "[%s] !> %s" c <| formatValue(v)
         | LessThan(c, v) -> 
             sprintf "[%s] < %s" c <| formatValue(v)
-        | NotLessThan(c, v) -> 
-            sprintf "[%s] !< %s" c <| formatValue(v)
         | GreaterThanOrEqual(c, v) -> 
             sprintf "[%s] >= %s" c <| formatValue(v)            
         | LessThanOrEqual(c, v) -> 
@@ -166,13 +162,13 @@ module SqlFormatter =
             [0..filters.Length-1] |> Seq.iter(fun i ->
                 let f = filters.[i]
                 let connector = 
-                    if i <> 1 then
+                    if i <> 0 then
                         match f with
                         | AndFilter(_) -> " and "
                         | OrFilter(f) ->  " or "
                     else
                         String.Empty
-                sb.AppendFormat("{0}{1}", f.Filter |> formatFilter) |> ignore
+                sb.AppendFormat("{0}{1}", connector, f.Filter |> formatFilter) |> ignore
             )
             sb.ToString()
 

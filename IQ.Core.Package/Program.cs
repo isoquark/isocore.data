@@ -98,7 +98,7 @@ namespace IQ.Core.Package
 
         private static readonly string WorkingDirectory = @"C:\Temp\isocore.data";
         private static readonly string TargetDirectory = @"C:\Work\lib\packages";
-        private static Version PackageVersion = Version.Parse("1.0.26");
+        private static Version PackageVersion = Version.Parse("1.0.31");
 
         private static void CreateIsocoreData()
         {

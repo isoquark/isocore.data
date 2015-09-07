@@ -187,10 +187,8 @@ type ColumnFilter =
     | Equal of columnName : string * value : obj
     | NotEqual of columnName : string * value : obj
     | GreaterThan of columnName : string * value : obj
-    | NotGreaterThan of columnName : string * value : obj
-    | LessThan of columnName : string * value : obj
-    | NotLessThan of columnName : string * value : obj
     | GreaterThanOrEqual of columnName : string * value : obj
+    | LessThan of columnName : string * value : obj
     | LessThanOrEqual of columnName : string * value : obj
     | StartsWith of columnName : string * value : obj
     | EndsWith of columnName : string * value : obj
@@ -309,20 +307,15 @@ type AllocateSequenceRange = AllocateSequenceRange of SequenceName : DataObjectN
 /// </summary>
 type AllocateSequenceRangeResult = AllocateSequenceRangeResult of FirstNumber : obj
 
-
-
+       
 /// <summary>
-/// Defines the contract for a SQL Server Data Store
+/// Defines the contract for a SQL Server Data Store that can persist and hydrate data via proxy types
 /// </summary>
 type ISqlDataStore =
     /// <summary>
     /// Deletes and identified collection of data entities from the store
     /// </summary>
     abstract Delete:SqlDataStoreQuery -> unit
-    /// <summary>
-    /// Inserts the specified tabular data
-    /// </summary>
-    abstract Insert:IDataTable->unit
     /// <summary>
     /// Gets the connection string that identifies the represented store
     /// </summary>
@@ -340,35 +333,29 @@ type ISqlDataStore =
     /// </summary>
     abstract ExecuteCommand:command : 'TCommand -> 'TResult
     /// <summary>
-    /// Retrieves an identified set of tabular data from the store
-    /// </summary>
-    abstract Get:SqlDataStoreQuery -> IDataTable
-        
-
-/// <summary>
-/// Defines the contract for a SQL Server Data Store that can persist and hydrate data via proxy types
-/// </summary>
-type ITypedSqlDataStore =
-    inherit ISqlDataStore
-    /// <summary>
     /// Retrieves an identified collection of data entities from the store
     /// </summary>
     abstract Get:SqlDataStoreQuery -> 'T rolist
-
     /// <summary>
     /// Retrieves all entities of a given type from the store
     /// </summary>
     abstract Get:unit -> 'T rolist
-
+    /// <summary>
+    /// Retrieves an identified set of tabular data from the store
+    /// </summary>
+    abstract GetTable:SqlDataStoreQuery -> IDataTable
     /// <summary>
     /// Persists a collection of data entities to the store, inserting or updating as appropriate
     /// </summary>
     abstract Merge:'T seq -> unit
-
     /// <summary>
     /// Inserts an arbitrary number of entities into the store, eliding existence checks
     /// </summary>
     abstract Insert:'T seq ->unit
+    /// <summary>
+    /// Inserts specified tabular data into the store
+    /// </summary>
+    abstract InsertTable:IDataTable->unit
    
 /// <summary>
 /// Represents the intent to retrieve data from an Excel data store

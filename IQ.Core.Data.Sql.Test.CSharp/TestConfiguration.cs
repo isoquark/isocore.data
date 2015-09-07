@@ -31,7 +31,7 @@ namespace IQ.Core.Data.Sql.Test.CSharp
 
         private static void RegisterDependencies(ICompositionRegistry registry)
         {
-            registry.RegisterFactoryDelegate<SqlDataStoreConfig, ISqlDataStore>(config => TypedSqlDataStore.Get(config));
+            registry.RegisterFactoryDelegate<SqlDataStoreConfig, ISqlDataStore>(config => SqlDataStore.Get(config));
         }
 
         private readonly ICompositionRoot root;

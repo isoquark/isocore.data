@@ -17,11 +17,9 @@ open IQ.Core.Data
 
 
 module internal SqlCommand =
-    let executeQuery (colnames : string seq) (command : SqlCommand) =
-        let count = colnames |> Seq.count
-        if count = 0 then
-            ArgumentException("Column names must be specified") |> raise
+    let executeQuery (command : SqlCommand) =
         use reader = command.ExecuteReader()
+        let count = reader.FieldCount
         if reader.HasRows then
             [|while reader.Read() do
                 let buffer = Array.zeroCreate<obj>(count)
