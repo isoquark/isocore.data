@@ -21,17 +21,24 @@ open TestProxies
 
 module Tabular =
     
-    let private verifyBulkInsert<'T>(input : 'T list) (sortBy: 'T->IComparable) (store : ISqlProxyDataStore)=
+    let private verifyBulkInsert<'T>(input : 'T list) (sortBy: 'T->IComparable) (store : ITypedSqlDataStore)=
         let count = tableproxy<'T>.DataElement.Name |> TruncateTable |> store.ExecuteCommand 
         store.Get<'T>() |> Claim.seqIsEmpty
         input |> store.Insert
         let output = store.Get<'T>() |> RoList.sortBy sortBy |> RoList.toList
         output |> Claim.equal input
 
+    type Customer1() =
+        member val Id = 0 with get, set
+        member val Title = String.Empty with get, set
+        member val FirstName = String.Empty with get, set
+        member val LastName = String.Empty with get, set
+    
     type Tests(ctx, log) = 
         inherit ProjectTestContainer(ctx,log)
         
         let store = ctx.Store
+        let mdp = ctx.Store.MetadataProvider
 
         [<Fact>]
         let ``Queried vDataType metadata - Partial column set A``() =
@@ -88,41 +95,40 @@ module Tabular =
         [<Fact>]
         let ``Retrieved paged tabular data``() =
             
-            let rowidx = ref(0)
-            
-            let createNextRow() =                
-                let nextid() =
-                    Interlocked.Increment(rowidx)
-
-                let id = nextid()
-                [| id:> obj; (sprintf "Row%i Description" id) :> obj; (id * 5 |> int16) :> obj|]
+            let rowcount = 100
+            let col2Values = [for rowid in 1..rowcount -> rowid, (sprintf "Row%i Description" rowid) :> obj] |> Map.ofList
+            let createRow(rowid) =                
+                [| rowid:> obj; col2Values.[rowid]; (rowid * 5 |> int16) :> obj|]
                             
-            let colnames = [|"Col01"; "Col02"; "Col03"|] :> rolist<_>
             let tabularName = DataObjectName("SqlTest", "Table08")
-            tabularName |> TruncateTable |> store.ExecuteCommand |> ignore
-            let builder = TabularDescriptionBuilder(tabularName)
-            let description = 
-                builder.AddColumn(colnames.[0], "Int32")
-                       .AddColumn(colnames.[1], "UnicodeTextVariable(50)")
-                       .AddColumn(colnames.[2], "Int16")
-                       .Finish()
-            
-            let rowValues = 
-                    [|
-                        for i in [1..100] ->
-                            createNextRow()
-                    |] :> rolist<_>
-            let data = {                                
-                new ITabularData with
-                    member this.Description = description :> ITabularDescription
-                    member this.RowValues =  rowValues
-            }
+            tabularName |> TruncateTable |> store.ExecuteCommand |> ignore            
+            let description = mdp.DescribeTable(tabularName)
+            let rowValues =  [| for i in [1..rowcount] ->i |> createRow |] :> rolist<_>
+            let data = TabularData(description :> ITabularDescription, rowValues)
             store.Insert(data)
 
-            let sort = [|AscendingSort(colnames.[0])|] :> rolist<_>
-            let page = TabularPageInfo(Some(1), Some(10))
-            let q = TabularDataQuery(tabularName, colnames, ReadOnlyList.Empty(), sort, Some(page)) |> TabularQuery
-            let result = store.GetTabular(q);
+            let q1 = DynamicQueryBuilder(tabularName)
+                        .Columns(description.Columns |> Seq.map(fun x -> x.Name) |> Array.ofSeq)
+                        .Sort([|AscendingSort(description.Columns.[0].Name)|])
+                        .Page(1, 10)
+                        .Finish() 
+                        
+            let result = store.Get(q1);
+            result.RowValues.Count |> Claim.equal 10
+            for rowidx in 0..result.RowValues.Count-1 do
+                let row = result.RowValues.[rowidx]
+                let rowid = row.[0] :?> int
+                let actual = row.[1]
+                let expect = col2Values.[rowid]
+                Claim.equal expect actual
+            ()
+
+        let csaw = "Initial Catalog=AdventureWorksLT2012;Data Source=eXaCore03;Integrated Security=SSPI"
+        [<Fact>]
+        let ``Inferred dynamic query defaults``() =
+            let store = TypedSqlDataStore.Get(csaw);
+            let query = DynamicQueryBuilder("SalesLT", "Customer").Finish()
+            let data1 =  query |> store.Get;
             ()
 
             

@@ -42,7 +42,7 @@ module DataTable =
     /// </summary>
     /// <param name="description">The proxy description</param>
     let fromProxyDescription (description : DataObjectProxy) =        
-        let table = new DataTable(description.DataElement.Name.ToSemanticString())
+        let table = new DataTable(description.DataElement.Name.Text)
         description.Columns |> List.iter(fun c -> table.Columns.Add(c.DataElement.Name, c.ProxyElement.ReflectedElement.Value.PropertyType) |> ignore)
         table
 
@@ -51,7 +51,7 @@ module DataTable =
     /// </summary>
     /// <param name="d">The tabular description</param>
     let fromTabularDescription(d : ITabularDescription) =
-        let table = new DataTable(d.Name.ToSemanticString())
+        let table = new DataTable(d.ObjectName.Text)
         d.Columns |> Seq.iter(fun c -> table.Columns.Add(c.Name, c.DataType |> DataTypeConverter.toBclTransportType) |> ignore)
         table
 

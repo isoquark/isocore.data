@@ -55,3 +55,4 @@ type TabularDescriptionBuilder(schemaName, localName, doc) =
                 Properties = []
             }
         
+

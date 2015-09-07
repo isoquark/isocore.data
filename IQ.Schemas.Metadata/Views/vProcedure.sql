@@ -14,7 +14,7 @@ create view Metadata.vProcedure as
 		d.Value as Description
 	from 
 		Metadata.vObject x 
-		left join Metadata.vDescription d on d.MajorId = x.ObjectId and d.MinorId = 0
+		left join Metadata.vDescription d on d.MajorId = x.ObjectId and d.MinorId = 0 and d.ClassName = 'OBJECT_OR_COLUMN'
 	where
 		x.ObjectType = 'SQL_STORED_PROCEDURE'
 

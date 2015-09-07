@@ -154,11 +154,12 @@ module Txt =
     /// </summary>
     /// <param name="delimiter">The delimiter use to demarcate the components</param>
     /// <param name="components">The components</param>
-    let delimit (delimiter : string) (components : string rolist) =
+    let delimit (delimiter : string) (components : string seq) =
+        let components = components |> List.ofSeq
         let sb = new StringBuilder()
-        for i in 0..components.Count-1 do
+        for i in 0..components.Length-1 do
             components.[i] |> sb.Append |> ignore
-            if i <> components.Count - 1 then
+            if i <> components.Length - 1 then
                 delimiter |> sb.Append |> ignore         
         sb.ToString()               
 

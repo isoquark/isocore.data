@@ -4,5 +4,5 @@
 	from 
 		Metadata.vObject x
 	where 
-		IsUserDefined = 1
+		x.IsUserDefined = 1
 	

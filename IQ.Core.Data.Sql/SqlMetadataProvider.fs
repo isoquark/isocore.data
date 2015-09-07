@@ -14,147 +14,34 @@ open IQ.Core.Data
 open IQ.Core.Data.Sql.Behavior
 
 
-
-type internal IMetadataView =
-    abstract IsUserDefined : bool
-    abstract Documentation : string 
-
 type SqlMetadataProviderConfig = {
     ConnectionString : string
     IgnoreSystemObjects : bool
 }
 
-
-//These proxies align with (a subset of) the columns returned by the views in the Metadata schema
-module internal Metadata =
-    
-    let private toOptionalString s =
-        if s |> System.String.IsNullOrEmpty then None else s |> Some
-    
-    
-    
-    type AdoTypeMap() =
-        member val SqlTypeName = String.Empty with get, set
-        member val BclTypeName = String.Empty with get, set
-        member val SqlDbTypeEnum = String.Empty with get, set
-    
-    type vDataType() = 
-        member val DataTypeId = 0 with get, set
-        member val DataTypeName = String.Empty with get, set
-        member val SchemaName = String.Empty with get, set
-        member val Description = String.Empty  with get, set    
-        member val MappedBclType = String.Empty with get, set
-        member val MappedSqlDbTypeEnum = String.Empty with get, set
-        member val MaxLength = 0s with get, set
-        member val Precision = 0uy with get, set
-        member val Scale = 0uy with get, set
-        member val IsNullable = false with get, set
-        member val IsTableType = false with get, set
-        member val IsAssemblyType = false with get, set
-        member val IsUserDefined = false with get, set
-        member val BaseTypeId : Nullable<uint8> = Nullable<uint8>() with get, set
-    with
-        interface IMetadataView with
-            member this.IsUserDefined = this.IsUserDefined
-            member this.Documentation = String.Empty
-
-    type vSchema() =
-        member val SchemaName = String.Empty  with get, set     
-        member val Description = String.Empty  with get, set     
-        member val IsUserDefined = false with get, set
-    with
-        interface IMetadataView with
-            member this.IsUserDefined = this.IsUserDefined
-            member this.Documentation = this.Description 
-
-    type vColumn() = 
-        member val CatalogName = String.Empty  with get, set     
-        member val ParentSchemaName = String.Empty  with get, set    
-        member val ParentName = String.Empty  with get, set    
-        member val ColumnName = String.Empty  with get, set    
-        member val Description = String.Empty  with get, set    
-        member val Position = 0  with get, set    
-        member val IsComputed = false with get, set
-        member val IsIdentity = false with get, set
-        member val IsUserDefined = false with get, set
-        member val IsNullable = false with get, set
-        member val DataTypeSchemaName = String.Empty with get,set
-        member val DataTypeName = String.Empty with get,set
-        member val MaxLength = 0 with get, set
-        member val Precision = 0uy with get, set
-        member val Scale = 0uy with get, set
-    with
-        interface IMetadataView with
-            member this.IsUserDefined = this.IsUserDefined
-            member this.Documentation = this.Description
-    
-    type vTable() = 
-        member val SchemaName = String.Empty  with get, set    
-        member val TableName = String.Empty  with get, set    
-        member val Description = String.Empty  with get, set    
-        member val IsUserDefined = false with get, set
-    with
-        interface IMetadataView with
-            member this.IsUserDefined = this.IsUserDefined
-            member this.Documentation = this.Description
-
-    type vView() = 
-        member val SchemaName = String.Empty  with get, set    
-        member val ViewName = String.Empty  with get, set    
-        member val Description = String.Empty  with get, set    
-        member val IsUserDefined = false with get, set
-    with
-        interface IMetadataView with
-            member this.IsUserDefined = this.IsUserDefined
-            member this.Documentation = this.Description
-
-    let getMetadataView<'T when 'T :> IMetadataView> (config : SqlMetadataProviderConfig) =
-        if config.IgnoreSystemObjects then
-            SqlProxyReader.selectSome<'T> config.ConnectionString ("IsUserDefined=1")
-        else
-            SqlProxyReader.selectAll<'T> config.ConnectionString
-            
-          
-    let private getColumns(config : SqlMetadataProviderConfig) =
-        [for item in config |> getMetadataView<vColumn> ->
-            {
-                ColumnDescription.Name = item.ColumnName
-                ParentName = DataObjectName(item.ParentSchemaName, item.ParentName)
-                Position = item.Position
-                DataType = DataTypeReference.AnsiTextFixedDataType(5)
-                Documentation = item.Description
-                Nullable = item.IsNullable
-                AutoValue = if item.IsComputed then
-                                    AutoValueKind.Computed 
-                                else if item.IsIdentity then
-                                    AutoValueKind.Identity 
-                                else 
-                                    AutoValueKind.None
-                Properties = []
-                
-            
-            }
-        
-        ]
-    
-
 open Metadata
 
-type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
+module internal MetadataUtil =
+    let getMetadataView<'T when 'T :> IMetadataView> (config : SqlMetadataProviderConfig) =
+        if config.IgnoreSystemObjects then
+            TypedReader.selectSome<'T> config.ConnectionString ("IsUserDefined=1")
+        else
+            TypedReader.selectAll<'T> config.ConnectionString
             
+          
+type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =            
     
     let dataTypes = Dictionary<DataObjectName, DataTypeDescription>()        
     let columns = Dictionary<DataObjectName, ColumnDescription ResizeArray>()
     let tables = Dictionary<string, TableDescription ResizeArray>()
     let views = Dictionary<string, ViewDescription ResizeArray>()
     let schemas = Dictionary<string, SchemaDescription>()
-
    
     member private this.GetMetadataView<'T when 'T :> IMetadataView>() =
-        config |> getMetadataView<'T>
+        config |> MetadataUtil.getMetadataView<'T>
 
     member private this.IndexDataTypes() =
-        let index = (SqlProxyReader.selectAll<vDataType> config.ConnectionString).ToDictionary(fun x -> x.DataTypeId)
+        let index = (TypedReader.selectAll<vDataType> config.ConnectionString).ToDictionary(fun x -> x.DataTypeId)
         
         let getName id =
             let item = index.[id]
@@ -177,6 +64,7 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
                                 None  
                 DefaultBclTypeName = item.MappedBclType      
                 Properties = []
+                Documentation = item.Description
             }  
             dataTypes.Add(description.Name, description)              
         
@@ -376,7 +264,7 @@ module SqlMetadataProvider =
         let sequences = Dictionary<string, SequenceDescription>()
         let tableFunctions = Dictionary<string, TableFunctionDescription>()
         let dataTypes = Dictionary<string, DataTypeDescription>()
-        let allObjects = Dictionary<DataObjectName, DataObjectDescription>()
+        let allObjects = Dictionary<DataObjectName, IDataObjectDescription>()
         
         let refresh() =
             tables.Clear()
@@ -405,9 +293,12 @@ module SqlMetadataProvider =
                             views.[schemaName] <- ResizeArray[x]
                     | ProcedureDescription(x) -> 
                         procedures.Add(schemaName, x)
-                    | DataTypeDescription(x) -> dataTypes.Add(schemaName, x)
-                    | SequenceDescription(x) -> sequences.Add(schemaName, x)
-                    | TableFunctionDescription(x) -> tableFunctions.Add(schemaName, x)
+                    | DataTypeDescription(x) ->
+                         dataTypes.Add(schemaName, x)
+                    | SequenceDescription(x) -> 
+                        sequences.Add(schemaName, x)
+                    | TableFunctionDescription(x) -> 
+                        tableFunctions.Add(schemaName, x)
 
         do
             refresh()
@@ -433,8 +324,17 @@ module SqlMetadataProvider =
             member x.DescribeTable(tableName) =
                 tables.[tableName.SchemaName]  |> Seq.find(fun x -> x.Name = tableName)
 
+            member x.DescribeView(viewName) =
+                views.[viewName.SchemaName] |> Seq.find(fun x -> x.Name = viewName)
+
             member x.ObjectExists(objectName) =
                 allObjects.ContainsKey(objectName)
+
+            member x.GetObjectKind(objectName) =
+                if (allObjects.ContainsKey(objectName)) then
+                    Nullable<DataElementKind>(allObjects.[objectName].ElementKind)
+                else
+                    Nullable<DataElementKind>();
                 
             member this.Describe q = 
                 match q with

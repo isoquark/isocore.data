@@ -17,15 +17,16 @@ open IQ.Core.Framework.Contracts
 type DataObjectName = DataObjectName of SchemaName : string * LocalName : string            
 with
     /// <summary>
-    /// Renders a faithful representation of an instance as text
+    /// Provides a textual representation of the element
     /// </summary>
-    member this.ToSemanticString() =
+    member this.Text = 
         match this with DataObjectName(s,l) -> sprintf "[%s].[%s]" s l
-
+    
     /// <summary>
-    /// Renders a representation of an instance as text
+    /// Provides a textual representation of the element suitable for diagnostic purposes
     /// </summary>
-    override this.ToString() = this.ToSemanticString()
+    override  this.ToString() = this.Text
+
 
 /// <summary>
 /// Specifies the available DataType classifications
@@ -36,65 +37,72 @@ with
 /// a corresponding value
 /// </remarks>
 type DataKind =
-    | Unspecified = 0uy
-        
-    //Integer types
-    //-------------------------------------------------------------------------
-    | Bit = 10uy //bit
-    | UInt8 = 20uy //tinyint
-    | UInt16 = 21uy //no direct map, use int
-    | UInt32 = 22uy // no direct map, use bigint
-    | UInt64 = 23uy // no direct map, use varbinary(8)
-    | Int8 = 30uy //no direct map, use smallint
-    | Int16 = 31uy //smallint
-    | Int32 = 32uy //int
-    | Int64 = 33uy //bigint
-        
-    //Binary types
-    //-------------------------------------------------------------------------
-    | BinaryFixed = 40uy //binary 
-    | BinaryVariable = 41uy //varbinary
-    | BinaryMax = 42uy
-        
-    //ANSI text types
-    //-------------------------------------------------------------------------
-    | AnsiTextFixed = 50uy //char
-    | AnsiTextVariable = 51uy //varchar
-    | AnsiTextMax = 52uy
-        
-    ///Unicode text types
-    //-------------------------------------------------------------------------
-    | UnicodeTextFixed = 53uy //nchar
-    | UnicodeTextVariable = 54uy //nvarchar
+    /// Data type is unknown
+    | Unspecified = 0uy        
+    ///Identifies a bit type (map to bit in SQL Server)
+    | Bit = 10uy     
+    ///Identifies an unsigned 8-bit integer type (map to tinyint in SQL Server)
+    | UInt8 = 20uy     
+    ///Identifies an unsigned 16-bit integer type (map to int in SQL Server)
+    | UInt16 = 21uy     
+    ///Identifies an unsigned 32-bit integer type (map to bigint in SQL Server)
+    | UInt32 = 22uy     
+    ///Identifies an unsigned 64-bit integer type (map to varbinary(8) in SQL Server)
+    | UInt64 = 23uy     
+    ///Identifies a signed 8-bit integer type (map to smallint in SQL Server)
+    | Int8 = 30uy     
+    ///Identifies a signed 16-bit integer type (map to smallint in SQL Server)
+    | Int16 = 31uy     
+    ///Identifies a signed 32-bit integer type (map to int in SQL Server)
+    | Int32 = 32uy //int    
+    ///Identifies a signed 64-bit integer type (map to bigint in SQL Server)
+    | Int64 = 33uy         
+    
+    ///Identifies a fixed-length array of bytes (map to binary(n) in SQL Server)
+    | BinaryFixed = 40uy 
+    /// Identifies a variable-length array of bytes with an explicit value given for 
+    /// the upper bound of the array's length (map to varbinary(n) in SQL Server)
+    | BinaryVariable = 41uy 
+    /// Identifies a variable-length array of bytes with no explicit value given for 
+    /// the upper bound of the array's length (map to varbinary(MAX) in SQL Server)
+    | BinaryMax = 42uy        
+   
+    ///Identifies a fixed-length array of ansi characters (map to char(n) in SQL Server)
+    | AnsiTextFixed = 50uy
+    /// Identifies a variable-length array of ansi characters with an explicit value give for
+    /// the upper bound of the array's length (map to varchar(n) in SQL Server)
+    | AnsiTextVariable = 51uy 
+    /// Identifies a variable-length array of ansi characters with no explicit value given for 
+    /// the upper bound of the array's length (map to varchar(MAX) in SQL Server)
+    | AnsiTextMax = 52uy        
+    ///Identifies a fixed-length array of unicode characters (map to nchar(n) in SQL Server)
+    
+    | UnicodeTextFixed = 53uy 
+    /// Identifies a variable-length array of unicode characters with an explicit value give for
+    /// the upper bound of the array's length (map to nvarchar(n) in SQL Server)
+    | UnicodeTextVariable = 54uy 
+    /// Identifies a variable-length array of unicode characters with no explicit value given for 
+    /// the upper bound of the array's length (map to nvarchar(MAX) in SQL Server)
     | UnicodeTextMax = 55uy
-        
-    ///Time-related types
-    //-------------------------------------------------------------------------
-    | DateTime = 62uy //corresponds to datetime2
+    
+    /// Identifies a type representing a date and time (map to datetime2 in SQL Servver)
+    | DateTime = 62uy 
     | DateTimeOffset = 63uy
     | TimeOfDay = 64uy //corresponds to time
     | Date = 65uy //corresponds to date        
     | Duration = 66uy //no direct map, use bigint to store number of ticks
         
-    //Approximate real types
-    //-------------------------------------------------------------------------
     | Float32 = 70uy //corresponds to real
     | Float64 = 71uy //corresponds to float
         
-    //Exact real types
-    //-------------------------------------------------------------------------
     | Decimal = 80uy
     | Money = 81uy
         
-    //Other types
-    //-------------------------------------------------------------------------
     | Guid = 90uy //corresponds to uniqueidentifier
     | Xml = 100uy
     | Json = 101uy
     | Flexible = 110uy //corresponds to sql_variant
                       
-    ///Intrinsic SQL CLR types
-    //-------------------------------------------------------------------------
     | Geography = 150uy
     | Geometry = 151uy
     | Hierarchy = 152uy
@@ -108,8 +116,10 @@ type DataKind =
 
     /// A non-intrinsic table data type in sql; probably data DataTable or similar in CLR
     | CustomTable = 170uy 
+    
     /// A non-intrinsic CLR type
     | CustomObject = 171uy 
+    
     /// A non-intrinsic primitive based on an intrinsic primitive; a custom type in code,
     /// e.g. a specialized struct, DU, etc.
     | CustomPrimitive = 172uy 
@@ -177,6 +187,31 @@ type NumericValue =
     | DecimalValue of decimal
                    
 /// <summary>
+/// Enumerates recognized data element classifications
+/// </summary>
+type DataElementKind =
+    /// Classifies an element as a table
+    | Table = 1uy    
+    /// Classifies an element as a view
+    | View = 2uy    
+    /// Classifies an element as a column
+    | Column = 3uy    
+    /// Classifies an element as a schema
+    | Schema = 4uy    
+    /// Classifies an element as a sequence
+    | Sequence = 5uy    
+    /// Classifies an element as a table-valued function
+    | TableFunction = 6uy    
+    /// Classifies an element as a stored procedure
+    | Procedure = 7uy    
+    /// Classifies an element as a data type (definition)
+    | DataType = 8uy
+    /// Classifies an element as primary key
+    | PrimaryKey = 9uy
+    /// Classifies an element as a routine parameter
+    | Parameter = 10uy
+
+/// <summary>
 /// Enumerates the available means that lead to a column being automatically populated
 /// with a valid value
 /// </summary>
@@ -198,11 +233,45 @@ type AutoValueKind =
 type DataElementProperty = | DataElementProperty of ProperyName : string * PropertyValue : obj
       
 /// <summary>
+/// Defines common contract that all description elements are required to support
+/// </summary>
+/// <remarks>
+/// The use of the word "Element" here is deliberate to explicitly distinguish a database
+/// element from a database object. All database objects are considered elements but
+/// not all elements, e.g., columns, are considered objects. This is motivated, more-or-less,
+/// by the distinction made in SQL Sever between database objects (which appear in the
+/// sys.objects table) and those elements that do not (such as columns)
+/// </remarks>
+type IDataElementDescription =
+    /// <summary>
+    /// Gets the kind of element being described
+    /// </summary>
+    abstract ElementKind : DataElementKind
+    /// <summary>
+    /// Gets the textual representation of an element's name
+    /// </summary>
+    abstract Name : string
+    /// <summary>
+    /// Gets the element's documentation
+    /// </summary>
+    abstract Documentation : string
+
+/// <summary>
+/// Defines common contract for data object descriptions
+/// </summary>
+type IDataObjectDescription =
+    inherit IDataElementDescription
+    abstract ObjectName : DataObjectName
+
+
+/// <summary>
 /// Describes a data type definition
 /// </summary>
 type DataTypeDescription = {
     /// The name of the data type
     Name : DataObjectName
+    /// The data type's documentation
+    Documentation : string
     /// The maximum length of the data type, if applicable
     MaxLength : int16
     /// The precision of the data type, if applicable 
@@ -225,7 +294,13 @@ type DataTypeDescription = {
     Properties : DataElementProperty list
 }
 with
-    override this.ToString() = this.Name.ToString()
+    override this.ToString() = this.Name.Text
+
+    interface IDataObjectDescription with
+        member this.ElementKind = DataElementKind.DataType
+        member this.ObjectName = this.Name
+        member this.Name = this.Name.Text
+        member this.Documentation = this.Documentation
 
 /// <summary>
 /// Describes a column in a table or view
@@ -249,6 +324,22 @@ type ColumnDescription = {
     /// The attached properties
     Properties : DataElementProperty list
 }
+with
+    override this.ToString() = this.Name
+
+    interface IDataElementDescription with
+        member this.ElementKind = DataElementKind.Column
+        member this.Name = this.Name
+        member this.Documentation = this.Documentation
+
+
+/// <summary>
+/// Defines common contract for data elements that own/parent a collection of columns
+/// </summary>
+type ITabularDescription =
+    inherit IDataObjectDescription
+    abstract Columns : ColumnDescription rolist
+
 
 /// <summary>
 /// Describes a primary key constraint
@@ -258,14 +349,21 @@ type PrimaryKeyDescription = {
     ParentName : DataObjectName
     /// The name of the primary kay
     PrimaryKeyName : DataObjectName
+    /// The primary key's documentation
+    Documentation : string
     /// The columns included in the primary key
     Columns : ColumnDescription list
 }
+with
+    override this.ToString() = this.PrimaryKeyName.Text
 
-type ITabularDescription =
-    abstract Name : DataObjectName
-    abstract Documentation: string
-    abstract Columns : ColumnDescription rolist
+    interface IDataObjectDescription with
+        member this.ElementKind = DataElementKind.PrimaryKey
+        member this.Name = this.PrimaryKeyName.Text
+        member this.ObjectName = this.PrimaryKeyName
+        member this.Documentation = this.Documentation
+
+
 
 /// <summary>
 /// Describes a table
@@ -282,7 +380,9 @@ type TableDescription = {
 }
 with
     interface ITabularDescription  with
-        member this.Name = this.Name
+        member this.Name = this.Name.Text
+        member this.ElementKind = DataElementKind.Table
+        member this.ObjectName = this.Name
         member this.Documentation = this.Documentation
         member this.Columns = this.Columns |> ReadOnlyList.Create
 
@@ -307,7 +407,9 @@ type ViewDescription = {
 }
 with
     interface ITabularDescription  with
-        member this.Name = this.Name
+        member this.Name = this.Name.Text
+        member this.ElementKind = DataElementKind.View
+        member this.ObjectName = this.Name
         member this.Documentation = this.Documentation
         member this.Columns = this.Columns |> ReadOnlyList.Create
 
@@ -339,6 +441,12 @@ type RoutineParameterDescription = {
     /// The attached properties
     Properties : DataElementProperty list
 }
+with
+    interface IDataElementDescription with
+        member this.ElementKind = DataElementKind.Parameter
+        member this.Name = this.Name
+        member this.Documentation = this.Documentation
+
 
 /// <summary>
 /// Describes a stored procedure
@@ -353,6 +461,13 @@ type ProcedureDescription = {
     /// The attached properties
     Properties : DataElementProperty list
 }
+with 
+    interface IDataObjectDescription with
+        member this.Name = this.Name.Text
+        member this.ElementKind = DataElementKind.Procedure
+        member this.ObjectName = this.Name
+        member this.Documentation = this.Documentation
+        
    
 /// <summary>
 /// Describes a table-valued function
@@ -369,6 +484,12 @@ type TableFunctionDescription = {
     /// The attached properties
     Properties : DataElementProperty list
 }
+with 
+    interface IDataObjectDescription with
+        member this.Name = this.Name.Text
+        member this.ElementKind = DataElementKind.TableFunction
+        member this.ObjectName = this.Name
+        member this.Documentation = this.Documentation
 
 /// <summary>
 /// Describes a sequence 
@@ -376,6 +497,8 @@ type TableFunctionDescription = {
 type SequenceDescription = {
     /// The name of the sequence
     Name : DataObjectName 
+    /// The documentation for the sequence
+    Documentation : string 
     /// The start value fo the sequence
     StartValue : NumericValue
     /// The distance between each sequence element
@@ -391,12 +514,19 @@ type SequenceDescription = {
     IsCycling : bool
     /// Indicates whether the sequence can yield any more elements
     IsExhaused : bool
+    /// Indicates whether caching is enabled for the sequence
     IsCached : bool
+    /// If caching is enabled for the sequence, indicates the size of the cache
     CacheSize : int
     /// The attached properties
     Properties : DataElementProperty list
 }
-
+with 
+    interface IDataObjectDescription with
+        member this.Name = this.Name.Text
+        member this.ElementKind = DataElementKind.Sequence
+        member this.ObjectName = this.Name
+        member this.Documentation = this.Documentation
 
 /// <summary>
 /// Unifies data object types
@@ -408,6 +538,43 @@ type DataObjectDescription =
 | ViewDescription of ViewDescription
 | SequenceDescription of SequenceDescription
 | DataTypeDescription of DataTypeDescription
+with         
+    interface IDataObjectDescription with
+        member this.ObjectName =
+            match this with
+                | TableFunctionDescription x -> x.Name
+                | ProcedureDescription x -> x.Name
+                | TableDescription x -> x.Name
+                | ViewDescription x -> x.Name
+                | SequenceDescription x -> x.Name
+                | DataTypeDescription x -> x.Name
+        
+        member this.ElementKind =
+            match this with
+                | TableFunctionDescription(_) -> DataElementKind.TableFunction
+                | ProcedureDescription(_) -> DataElementKind.Procedure
+                | TableDescription(_) -> DataElementKind.Table
+                | ViewDescription(_) -> DataElementKind.View
+                | SequenceDescription(_) -> DataElementKind.Sequence
+                | DataTypeDescription(_) -> DataElementKind.DataType
+        
+        member this.Documentation =     
+                match this with
+                | TableFunctionDescription x -> x.Documentation
+                | ProcedureDescription x -> x.Documentation
+                | TableDescription x -> x.Documentation
+                | ViewDescription x -> x.Documentation
+                | SequenceDescription x -> x.Documentation
+                | DataTypeDescription x -> x.Documentation
+
+        member this.Name =
+            match this with
+                | TableFunctionDescription x -> x.Name.Text
+                | ProcedureDescription x -> x.Name.Text
+                | TableDescription x -> x.Name.Text
+                | ViewDescription x -> x.Name.Text
+                | SequenceDescription x -> x.Name.Text
+                | DataTypeDescription x -> x.Name.Text
 
 type SchemaDescription = {
     /// The name of the schema
@@ -419,6 +586,11 @@ type SchemaDescription = {
     /// The attached properties
     Properties : DataElementProperty list
 }
+with
+    interface IDataElementDescription with
+        member this.ElementKind = DataElementKind.Schema
+        member this.Name = this.Name
+        member this.Documentation = this.Documentation
 
 
 type SqlMetadataCatalog = {
@@ -504,6 +676,11 @@ type ISqlMetadataProvider =
     abstract DescribeViews:unit -> ViewDescription rolist
     
     /// <summary>
+    /// Describes an identified view
+    /// </summary>
+    abstract DescribeView:DataObjectName ->ViewDescription
+
+    /// <summary>
     /// Describes the views in an identified schema
     /// </summary>
     abstract DescribeViewsInSchema:string->ViewDescription rolist
@@ -512,5 +689,14 @@ type ISqlMetadataProvider =
     /// Determines whether an identified object exists 
     /// </summary>
     abstract ObjectExists: DataObjectName -> bool
+    
+    /// <summary>
+    /// Determines the kind of identified data object if one can be found
+    /// </summary>
+    abstract GetObjectKind: DataObjectName -> Nullable<DataElementKind>
+    
+    /// <summary>
+    /// Forces the metadata provider to refetch metadta from the server
+    /// </summary>
     abstract RefreshCache:unit->unit
 

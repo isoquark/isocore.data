@@ -153,7 +153,7 @@ type IDataStore<'T,'Q> =
 /// <summary>
 /// Defines contract for a tabular data source
 /// </summary>
-type ITabularData =
+type IDataTable =
     /// <summary>
     /// Describes the encapsulated data
     /// </summary>
@@ -162,20 +162,25 @@ type ITabularData =
     /// The encapsulared data
     /// </summary>
     abstract RowValues : IReadOnlyList<obj[]>
+    /// <summary>
+    /// Gets the value at the intersection fo the specified (0-based) row and column
+    /// </summary>
+    abstract Item : row : int * col : int -> obj
 
 type TabularData = TabularData of description : ITabularDescription * rowValues : rolist<obj[]>
 with
     member this.RowValues = match this with TabularData(rowValues=x) -> x
     member this.Description = match this with TabularData(description=x) -> x
-    interface ITabularData with
+    interface IDataTable with
         member this.RowValues = this.RowValues
         member this.Description = this.Description
+        member this.Item(row,col) = this.RowValues.[row].[col]
     
 type ITabularStore =
-    abstract Merge:ITabularData->unit
+    abstract Merge:IDataTable->unit
     abstract Delete:'Q->unit
-    abstract Select: 'Q->ITabularData
-    abstract Insert:ITabularData->unit
+    abstract Select: 'Q->IDataTable
+    abstract Insert:IDataTable->unit
 
 
 type ColumnFilter = 
@@ -197,22 +202,25 @@ type ColumnSortCriterion =
 
 type TabularPageInfo = TabularPageInfo of pageNumber : int option * pageSize : int option
 
-type ColumnFilterJoin =
+type ColumnFilterCriterion =
     | AndFilter of ColumnFilter
     | OrFilter of ColumnFilter
 with
     member this.Filter = match this with |AndFilter(x)|OrFilter(x) -> x
 
-type TabularDataQuery = 
-        TabularDataQuery of 
-            tabularName : DataObjectName * 
-            columnNames : string rolist *
-            filters : ColumnFilterJoin rolist*
-            sortCriteria : ColumnSortCriterion rolist*
-            pageInfo : TabularPageInfo option
-with
-    member this.ColumnNames = match this with TabularDataQuery(columnNames=x) -> x
-    member this.TabularName = match this with TabularDataQuery(tabularName=x) -> x
+/// <summary>
+/// Represents a runtime-configurable query that supports pagination along with 
+//  adjustable column selection, sorting criteria and fiter criteria
+/// </summary>
+type DynamicQuery = 
+        DynamicQuery of 
+            TabularName : DataObjectName * 
+            ColumnNames : string list *
+            Filters : ColumnFilterCriterion list*
+            SortCriteria : ColumnSortCriterion list*
+            PageNumber : int option *
+            PageSize : int option
+       
        
 [<AutoOpen; Extension>]
 module DataStoreExtensions =
@@ -224,16 +232,18 @@ module DataStoreExtensions =
 /// <summary>
 /// Represents a query pameter
 /// </summary>
-type SqlQueryParameter = SqlQueryParameter of name : string * value : obj    
+type QueryParameter = QueryParameter of name : string * value : obj    
 
+type RoutineQuery = RoutineQuery of routineName : string * parameters : QueryParameter list
 
 /// <summary>
 /// Represents the intent to retrieve data from a SQL data store
 /// </summary>
 type SqlDataStoreQuery =
-    | TabularQuery of tabularQuery : TabularDataQuery
-    | TableFunctionQuery of  functionName : string * parameters : SqlQueryParameter list
-    | ProcedureQuery of procedureName : string * parameters : SqlQueryParameter list
+    | DirectStoreQuery of string
+    | DynamicStoreQuery of  DynamicQuery
+    | TableFunctionQuery of  RoutineQuery
+    | ProcedureQuery of RoutineQuery
 
 /// <summary>
 /// Classifies supported data object/element types
@@ -312,7 +322,7 @@ type ISqlDataStore =
     /// <summary>
     /// Inserts the specified tabular data
     /// </summary>
-    abstract Insert:ITabularData->unit
+    abstract Insert:IDataTable->unit
     /// <summary>
     /// Gets the connection string that identifies the represented store
     /// </summary>
@@ -332,13 +342,13 @@ type ISqlDataStore =
     /// <summary>
     /// Retrieves an identified set of tabular data from the store
     /// </summary>
-    abstract GetTabular:SqlDataStoreQuery -> ITabularData
+    abstract Get:SqlDataStoreQuery -> IDataTable
         
 
 /// <summary>
-/// Defines the contract for a SQL Server Data Store that can persist and hydrate data via proxies
+/// Defines the contract for a SQL Server Data Store that can persist and hydrate data via proxy types
 /// </summary>
-type ISqlProxyDataStore =
+type ITypedSqlDataStore =
     inherit ISqlDataStore
     /// <summary>
     /// Retrieves an identified collection of data entities from the store

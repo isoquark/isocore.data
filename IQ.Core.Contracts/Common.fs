@@ -686,7 +686,7 @@ type ClrElement =
     | UnionCaseElement of description : ClrUnionCase
                       
 /// <summary>
-/// Represents the intent to select a set of <see cref="ClrType"/> representations
+/// Represents the intent to select a set of ClrType representations
 /// </summary>
 type ClrTypeQuery =
     /// Find a type by its name
@@ -695,24 +695,27 @@ type ClrTypeQuery =
     | FindTypesByKind of kind : ClrTypeKind
 
 /// <summary>
-/// Represents the intent to select a set of <see cref="ClrProperty"/> representations
+/// Represents the intent to select a set of ClrProperty representations
 /// </summary>
 type ClrPropertyQuery = 
     | FindPropertyByName of name : ClrMemberName * typeQuery : ClrTypeQuery
     | FindPropertiesByType of typeQuery : ClrTypeQuery
          
 /// <summary>
-/// Represents the intent to select a set of <see cref="ClrAssembly"/> representations
+/// Represents the intent to select a set of ClrAssembly representations
 /// </summary>
 type ClrAssemblyQuery =
     | FindAssemblyByName of name : ClrAssemblyName
 
 /// <summary>
-/// Represents the intent to select a set of <see cref="ClrElement"/> representations
+/// Represents the intent to select a set of ClrElement representations
 /// </summary>
 type ClrElementQuery =
+    ///Find assembly elements
     | FindAssemblyElement of query : ClrAssemblyQuery
+    ///Find property elements
     | FindPropertyElement of query : ClrPropertyQuery
+    ///Find type elements
     | FindTypeElement of query : ClrTypeQuery
 
 /// <summary>
@@ -739,7 +742,7 @@ type IClrMetadataProvider =
 /// <summary>
 /// Indentifies a data conversion operation
 /// </summary>
-type TransformationIdentifier = TransformationIdentifier of category : String * srcType : ClrTypeName * dstType : ClrTypeName
+type TransformationIdentifier = TransformationIdentifier of category : string * srcType : ClrTypeName * dstType : ClrTypeName
 with
     member this.Category = match this with TransformationIdentifier(category=x) ->x
     member this.SrcType = match this with TransformationIdentifier(srcType=x) -> x
@@ -834,7 +837,7 @@ and
 /// </summary>
 type IPocoConverter =
     /// <summary>
-    /// Creates a <see cref="ValueIndex"/> from a record value
+    /// Creates a ValueIndex from a record value
     /// </summary>
     /// <param name="record">The record whose values will be indexed</param>
     abstract ToValueIndex:record : obj->ValueIndex
@@ -850,7 +853,7 @@ type IPocoConverter =
     /// <param name="t">The record type</param>
     abstract FromValueArray:valueArray : obj[] * t : Type->obj
     /// <summary>
-    /// Creates a record from data supplied in a <see cref="ValueIndex"/>
+    /// Creates a record from data supplied in a ValueIndex
     /// </summary>
     /// <param name="idx">The value index</param>
     /// <param name="t">The record type</param>
@@ -858,7 +861,7 @@ type IPocoConverter =
 
 
 /// <summary>
-/// Defines the configuration contract for <see cref="IPocoConverter"/> realizations
+/// Defines the configuration contract for IPocoConverter realizations
 /// </summary>
 type PocoConverterConfig = PocoConverterConfig of clrMetadataProvider : IClrMetadataProvider * transformer : ITransformer
 with

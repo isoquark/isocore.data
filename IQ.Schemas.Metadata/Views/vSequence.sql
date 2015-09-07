@@ -22,4 +22,4 @@
 	from sys.sequences x
 	inner join Metadata.vObject o  on o.ObjectId = x.object_id
 	inner join Metadata.vDataType t on t.DataTypeId = x.system_type_id
-	left join Metadata.vDescription d on d.MajorId = x.object_id and d.MinorId = 0
+	left join Metadata.vDescription d on d.MajorId = x.object_id and d.MinorId = 0 and d.ClassName = 'OBJECT_OR_COLUMN'

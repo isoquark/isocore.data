@@ -82,6 +82,9 @@ module SqlFormatter =
     let formatElementName name =
         name |> Txt.enclose "[" "]"         
 
+    let formatElementNames names =
+        names |> List.map formatElementName
+
     /// <summary>
     /// Formats a parameter name using the @-convention
     /// </summary>
@@ -116,7 +119,7 @@ module SqlFormatter =
         let columns = t.Columns 
                     |> RoList.map(fun c -> c.Name |> formatElementName) 
                     |> Txt.delimit ","
-        let tableName = t.Name |> formatObjectName
+        let tableName = t.ObjectName |> formatObjectName
         sprintf "select %s from %s" columns tableName
 
     /// <summary>
@@ -155,12 +158,12 @@ module SqlFormatter =
         | Contains(c, v) -> 
             String.Format("[{0}] like '%{1}%'", c, v) 
     
-    let private formatFilters(filters : ColumnFilterJoin rolist) =        
-        if filters.Count = 0 then
+    let private formatFilters(filters : ColumnFilterCriterion list) =        
+        if filters.Length = 0 then
             String.Empty
         else
             let sb = StringBuilder()
-            [0..filters.Count-1] |> Seq.iter(fun i ->
+            [0..filters.Length-1] |> Seq.iter(fun i ->
                 let f = filters.[i]
                 let connector = 
                     if i <> 1 then
@@ -173,12 +176,12 @@ module SqlFormatter =
             )
             sb.ToString()
 
-    let private formatSortCriteria(criteria : ColumnSortCriterion rolist) =
-        if criteria.Count = 0 then
+    let private formatSortCriteria(criteria : ColumnSortCriterion list) =
+        if criteria.Length = 0 then
             String.Empty
         else
             let sb = StringBuilder()
-            let count = criteria.Count
+            let count = criteria.Length
             [0..count-1] |> Seq.iter(fun i ->
                 match criteria.[i] with
                 | AscendingSort(name) ->
@@ -202,22 +205,30 @@ module SqlFormatter =
                     let pageSize = defaultArg pageSize 100
                     sprintf "offset %i rows fetch next %i rows only" ((pageNumber - 1)*pageSize) pageSize
 
-    let formatTabularQuery(q : TabularDataQuery) =
+    let formatTabularQuery(q : DynamicQuery) =
         match q with
-        |TabularDataQuery(tabularName, columnNames, filters, sortCriteria, pageInfo) -> 
-            let columns = if columnNames.Count = 0 then "*" else (columnNames |> Txt.delimit ",")
+        |DynamicQuery(tabularName, columnNames, filters, sortCriteria, pageNumber,pageSize) -> 
+            let columns = 
+                if columnNames.Length = 0 then 
+                    "*" 
+                else 
+                    (columnNames |> formatElementNames |> Txt.delimit ",")
+
             let from = tabularName |> formatObjectName
             let where = filters |> formatFilters
             let order = sortCriteria |> formatSortCriteria
-            let paging = pageInfo |> formatPageInfo
+            let paging = if pageNumber |> Option.isSome || pageSize |> Option.isSome then
+                                TabularPageInfo(pageNumber,pageSize) |> Some |> formatPageInfo
+                         else
+                            None |> formatPageInfo
+
             let sb = StringBuilder()
             sb.AppendFormat("select {0} from {1}\r\n", columns, from) |> ignore
             if where <> String.Empty then
                 sb.AppendFormat("where {0}\r\n", where) |> ignore
             if order <> String.Empty then
                 sb.AppendFormat("order by {0}\r\n", order) |> ignore
-            if pageInfo |> Option.isSome then
-                sb.AppendFormat("{0}", paging) |> ignore
+            sb.AppendFormat("{0}", paging) |> ignore
             sb.ToString()
 
     

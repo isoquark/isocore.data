@@ -13,6 +13,13 @@
     <dependencies>
       <group targetFramework=".NETFramework4.5">
         <dependency id="Autofac" version="3.5.2" />
+        <dependency id="Castle.Core" version="3.3.3" />
+        <dependency id="EPPlus" version="4.0.4"/>
+        <dependency id="CsvHelper" version="2.13.2.0"/>
+        <dependency id="MathNet.Numerics" version="3.7.0" />
+        <dependency id="FSharp.Core" version="4.0.0.1" />
+        <dependency id="FSharp.Data" version="2.2.5" />
+        <dependency id="FSharp.Text.RegexProvider" version="0.0.7" />
       </group>
     </dependencies>
 

@@ -15,8 +15,7 @@ open IQ.Core.Data.Sql
 module TestConfiguration =
 
     let private registerDependencies(registry : ICompositionRegistry) =
-            //ClrMetadataProvider.getDefault() |> registry.RegisterInstance
-            registry.RegisterFactory(fun config -> config |> SqlDataStoreProvider.get)
+            registry.RegisterFactory(fun (config : SqlDataStoreConfig) -> config |> TypedSqlDataStore.Get)
                                 
     //This is instantiated/cleaned-up once per collection
     type ProjectTestContext() as this = 
@@ -24,7 +23,7 @@ module TestConfiguration =
 
         let clrMetadataProvider : IClrMetadataProvider = this.AppContext.Resolve()
         let cs = "csSqlDataStore" |> this.ConfigurationManager.GetValue 
-        let store : ISqlProxyDataStore = SqlDataStoreConfig(cs) |> this.AppContext.Resolve
+        let store : ITypedSqlDataStore = SqlDataStoreConfig(cs) |> this.AppContext.Resolve
 
         member this.Store = store
         

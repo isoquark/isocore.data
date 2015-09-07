@@ -21,4 +21,4 @@
 		inner join Metadata.vObject o on o.ObjectId =x.object_id
 		inner join Metadata.vSchema s on s.SchemaId = o.SchemaId
 		inner join Metadata.vDataType t on t.DataTypeId = x.user_type_id
-		left join Metadata.vDescription d on d.MajorId = o.ObjectId and d.MinorId = x.parameter_id
+		left join Metadata.vDescription d on d.MajorId = o.ObjectId and d.MinorId = x.parameter_id and d.ClassName = 'PARAMETER'

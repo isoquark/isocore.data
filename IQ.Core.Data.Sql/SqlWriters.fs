@@ -31,11 +31,11 @@ module internal SqlProxyWriter =
         bcp.WriteToServer(table)
 
 module internal SqlTableWriter =
-    let bulkInsert cs (data : ITabularData) =
+    let bulkInsert cs (data : IDataTable) =
         use table = data.Description |> DataTable.fromTabularDescription
         data.RowValues |> Seq.iter(fun x ->table.LoadDataRow(x,true) |> ignore)
         use bcp = new SqlBulkCopy(cs, SqlBulkCopyOptions.CheckConstraints)
-        bcp.DestinationTableName <- data.Description.Name |> SqlFormatter.formatObjectName
+        bcp.DestinationTableName <- data.Description.ObjectName |> SqlFormatter.formatObjectName
         bcp.WriteToServer(table)    
 
 

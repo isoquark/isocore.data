@@ -11,7 +11,7 @@
 		end,0) as IsUserDefined
 	from 
 		sys.schemas x
-		left join Metadata.vDescription d on d.MajorId = x.schema_id 
+		left join Metadata.vDescription d on d.MajorId = x.schema_id and d.ClassName='SCHEMA'
 	where
 		x.name not in('db_owner',
 			'db_accessadmin',

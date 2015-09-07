@@ -48,15 +48,17 @@
     <EmbeddedResource Include="Resources\SqlSpecs.xlsx" />
     <EmbeddedResource Include="Resources\IntrinsicPrimitiveTypes.csv" />
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="DynamicQueryBuilder.fs" />
     <Compile Include="SqlHelpers.fs" />
     <Compile Include="SqlDataType.fs" />
     <Compile Include="SqlFormatter.fs" />
-    <Compile Include="SqlReaders.fs" />
+    <Compile Include="SqlDataReaders.fs" />
     <Compile Include="SqlWriters.fs" />
     <Compile Include="Routine.fs" />
+    <Compile Include="SqlMetadataProxies.fs" />
     <Compile Include="SqlMetadataProvider.fs" />
     <Compile Include="SqlStoreCommand.fs" />
-    <Compile Include="SqlDataStoreProvider.fs" />
+    <Compile Include="SqlDataStore.fs" />
     <Compile Include="SqlExtensions.fs" />
   </ItemGroup>
   <ItemGroup>

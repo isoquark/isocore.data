@@ -17,13 +17,16 @@ open IQ.Core.Data
 
 
 module internal SqlCommand =
-    let executeQuery (colnames : string rolist) (command : SqlCommand) =
+    let executeQuery (colnames : string seq) (command : SqlCommand) =
+        let count = colnames |> Seq.count
+        if count = 0 then
+            ArgumentException("Column names must be specified") |> raise
         use reader = command.ExecuteReader()
         if reader.HasRows then
             [|while reader.Read() do
-                let buffer = Array.zeroCreate<obj>(colnames.Count)
+                let buffer = Array.zeroCreate<obj>(count)
                 let valueCount = buffer |> reader.GetValues
-                Debug.Assert((valueCount = colnames.Count), "Column / Value count mismatch")
+                Debug.Assert((valueCount = count), "Column / Value count mismatch")
                 yield buffer 
             |] :> rolist<_>
         else
@@ -34,4 +37,5 @@ module internal SqlConnection =
         let connection = new SqlConnection(cs)
         connection.Open() 
         connection
+
 

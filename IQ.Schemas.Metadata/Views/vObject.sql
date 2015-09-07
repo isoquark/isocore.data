@@ -22,6 +22,10 @@ select
 	[o].[ObjectName], 
 	[o].[ParentObjectId], 
 	[o].[ObjectType], 
-	[o].[IsUserDefined] from
-Objects o 
+		isnull(
+			case 
+				when o.IsUserDefined = 1 and s.name ='Metadata' then 0
+				else o.IsUserDefined
+			end , 0)as IsUserDefined
+from Objects o 
 	left join sys.schemas s on s.schema_id = o.SchemaId
