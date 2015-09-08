@@ -206,6 +206,8 @@ type ColumnFilterCriterion =
 with
     member this.Filter = match this with |AndFilter(x)|OrFilter(x) -> x
 
+type QueryParameter = QueryParameter of Name : string * Value : obj
+
 /// <summary>
 /// Represents a runtime-configurable query that supports pagination along with 
 //  adjustable column selection, sorting criteria and fiter criteria
@@ -216,6 +218,7 @@ type DynamicQuery =
             ColumnNames : string list *
             Filters : ColumnFilterCriterion list*
             SortCriteria : ColumnSortCriterion list*
+            Parameters : QueryParameter list *
             PageNumber : int option *
             PageSize : int option
        
@@ -227,10 +230,6 @@ module DataStoreExtensions =
     with
         member this.SelectOne(q) = q |> this.Select |> fun x -> x.[0]
  
-/// <summary>
-/// Represents a query pameter
-/// </summary>
-type QueryParameter = QueryParameter of name : string * value : obj    
 
 type RoutineQuery = RoutineQuery of routineName : string * parameters : QueryParameter list
 

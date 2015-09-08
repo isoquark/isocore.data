@@ -13,12 +13,19 @@ type DynamicQueryBuilder(schemaName, localName) =
     let columnNames : string ResizeArray = ResizeArray<string>()
     let filters : ColumnFilterCriterion ResizeArray = ResizeArray<ColumnFilterCriterion>()
     let sortCriteria : ColumnSortCriterion ResizeArray = ResizeArray<ColumnSortCriterion>()
+    let parameters : QueryParameter ResizeArray = ResizeArray<QueryParameter>()
     let mutable pageNumber : int option = None
     let mutable pageSize : int option = None
 
     new(tabularName : DataObjectName) =
         DynamicQueryBuilder(tabularName.SchemaName, tabularName.LocalName)
     
+    new(tableName : string) =
+        let components = tableName.Split('.')
+        let objectName =
+            DataObjectName( components.[0].Replace("]", String.Empty).Replace("[", String.Empty),
+                            components.[1].Replace("]", String.Empty).Replace("[", String.Empty))
+        DynamicQueryBuilder(objectName)
     
     static member Build(schemaName, tabularName) =
         DynamicQueryBuilder(schemaName, tabularName)
@@ -31,6 +38,9 @@ type DynamicQueryBuilder(schemaName, localName) =
         columnNames.AddRange(names)
         this        
 
+    member this.Parameter(name, value) =
+        parameters.Add(QueryParameter(name,value))
+    
     member this.Sort([<ParamArray>]criteria : ColumnSortCriterion[]) =
         sortCriteria.AddRange(criteria)
         this
@@ -38,11 +48,23 @@ type DynamicQueryBuilder(schemaName, localName) =
     member this.Sort(criteria : ColumnSortCriterion seq) =
         sortCriteria.AddRange(criteria)
         this
+
+    member this.AscendingSort(colname) =
+        sortCriteria.Add(AscendingSort(colname))
+        this
+
+    member this.DescendingSort(colname) =
+        sortCriteria.Add(AscendingSort(colname))
+        this
             
     member this.Page(number : int, size : int) =
         pageNumber <- Some(number)
         pageSize <- Some(size)
         this
+
+    member this.Page(number : Nullable<int>, size : Nullable<int>) =
+        pageNumber <- if number.HasValue then number.Value |> Some else None
+        pageSize <- if size.HasValue then size.Value |> Some else None
 
     member this.Filter([<ParamArray>]criteria : ColumnFilterCriterion[]) =
         filters.AddRange(criteria)
@@ -129,13 +151,14 @@ type DynamicQueryBuilder(schemaName, localName) =
                           columnNames |> List.ofSeq,  
                           filters |> List.ofSeq,
                           sortCriteria |> List.ofSeq,
+                          parameters |> List.ofSeq,
                           pageNumber,
                           pageSize
                         ) |> DynamicStoreQuery
     
     static member internal WithDefaults(mdp : ISqlMetadataProvider, q) =
             match q with 
-            | DynamicQuery(tableName, columns, filter, sort, pageNumber, pageSize) ->
+            | DynamicQuery(tableName, columns, filter, sort, parameters, pageNumber, pageSize) ->
                 let _columns = 
                   if columns.Length = 0 then
                         let kind = tableName |> mdp.GetObjectKind

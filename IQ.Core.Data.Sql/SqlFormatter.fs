@@ -203,7 +203,7 @@ module SqlFormatter =
 
     let formatTabularQuery(q : DynamicQuery) =
         match q with
-        |DynamicQuery(tabularName, columnNames, filters, sortCriteria, pageNumber,pageSize) -> 
+        |DynamicQuery(tabularName, columnNames, filters, sortCriteria, parameters, pageNumber,pageSize) -> 
             let columns = 
                 if columnNames.Length = 0 then 
                     "*" 
