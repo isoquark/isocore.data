@@ -7,10 +7,10 @@
 		x.user_type_id as TableTypeId,
 		x.name as TableTypeName,
 		o.IsUserDefined,
-		d.Value as Description
+		d.PropertyValue as Description
 	from 
 		sys.table_types x 
 		inner join Metadata.vDataType o on o.DataTypeId = x.user_type_id
-		left join Metadata.vDescription d on d.MajorId = x.user_type_id and d.MinorId = 0
+		outer apply Metadata.fDescription(x.user_type_id, 0) d
 	where
 		o.IsUserDefined = 1

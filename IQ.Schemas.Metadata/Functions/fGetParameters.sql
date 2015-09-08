@@ -1,4 +1,4 @@
-﻿create function Metadata.fGetParameters(@ParentId int) returns table as return
+﻿create function Metadata.fParameters(@ParentId int) returns table as return
 	select 
 		x.*
 	from 

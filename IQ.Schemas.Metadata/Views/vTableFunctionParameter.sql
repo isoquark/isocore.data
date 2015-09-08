@@ -3,7 +3,7 @@ select
 	p.*
 from 
 	Metadata.vTableFunction x 
-	cross apply Metadata.fGetParameters(x.FunctionId) p 
+	cross apply Metadata.fParameters(x.FunctionId) p 
 
 
 

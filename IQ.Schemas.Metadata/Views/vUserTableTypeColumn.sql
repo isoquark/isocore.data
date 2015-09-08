@@ -7,7 +7,7 @@
 		o.ObjectId as TableId,
 		tt.name as TableName,
 		c.name as ColumnName,
-		d.Value as ColumnDescription,
+		d.PropertyValue  as ColumnDescription,
 		c.column_id - 1 as Position,
 		c.user_type_id as DataTypeId,
 		t.DataTypeName,
@@ -24,6 +24,7 @@
 		inner join Metadata.vObject o on o.ObjectId = tt.type_table_object_id
 		inner join Metadata.vSchema s on s.SchemaId = tt.schema_id
 		inner join Metadata.vDataType t on t.DataTypeId = c.user_type_id
-		left join Metadata.vDescription d on d.MajorId = tt.user_type_id and d.MinorId = c.column_id
+		--left join Metadata.vDescription d on d.MajorId = tt.user_type_id and d.MinorId = c.column_id
+		cross apply Metadata.fColumnDescription(tt.user_type_id, c.column_id) d
 
 	

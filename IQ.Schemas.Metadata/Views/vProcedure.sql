@@ -11,10 +11,10 @@ create view Metadata.vProcedure as
 		x.ObjectId as ProcedureId,
 		x.ObjectName as ProcedureName,
 		x.IsUserDefined,
-		d.Value as Description
+		d.PropertyValue as Description
 	from 
 		Metadata.vObject x 
-		left join Metadata.vDescription d on d.MajorId = x.ObjectId and d.MinorId = 0 and d.ClassName = 'OBJECT_OR_COLUMN'
+		outer apply Metadata.fDescription(x.ObjectId, 0) d
 	where
 		x.ObjectType = 'SQL_STORED_PROCEDURE'
 

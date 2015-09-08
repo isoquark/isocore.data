@@ -2,7 +2,7 @@
 	select 
 		t.user_type_id as DataTypeId,
 		t.name as DataTypeName,
-		d.Value as Description,
+		d.PropertyValue as Description,
 		t.schema_id as SchemaId,
 		s.SchemaName,
 		m.BclTypeName as MappedBclType,
@@ -21,4 +21,5 @@
 		sys.types t 
 		inner join Metadata.vSchema s on s.SchemaId = t.schema_id
 		left join Metadata.AdoTypeMap m on m.SqlTypeName = t.name
-		left join Metadata.vDescription d on d.MajorId = t.user_type_id and d.MinorId = 0
+		--left join Metadata.vDescription d on d.MajorId = t.user_type_id and d.MinorId = 0
+		outer apply Metadata.fDescription(t.user_type_id, 0) d

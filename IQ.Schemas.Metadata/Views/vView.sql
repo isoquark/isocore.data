@@ -7,11 +7,11 @@
 		x.object_id as ViewId,
 		x.name as ViewName,
 		o.IsUserDefined,
-		d.Value as Description
+		d.PropertyValue as Description
 	from 
 		sys.views x 
 		inner join Metadata.vObject o on o.ObjectId = x.object_id
-		left join Metadata.vDescription d on d.MajorId = x.object_id and d.MinorId = 0 and d.ClassName = 'OBJECT_OR_COLUMN'
+		outer apply Metadata.fDescription(x.object_id, 0) d
 	union
 		select 
 			DB_ID() as CatalogId,

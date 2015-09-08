@@ -7,9 +7,9 @@
 		x.object_id as TableId,
 		x.name as TableName,
 		o.IsUserDefined,
-		d.Value as Description
+		d.PropertyValue as Description
 	from 
 		sys.tables x 
 		inner join Metadata.vObject o on o.ObjectId = x.object_id
-		left join Metadata.vDescription d on d.MajorId = x.object_id and d.MinorId = 0 and d.ClassName = 'OBJECT_OR_COLUMN'
+		outer apply Metadata.fDescription(x.object_id, 0) d
 		

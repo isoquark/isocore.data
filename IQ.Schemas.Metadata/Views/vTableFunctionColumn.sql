@@ -3,6 +3,6 @@ select
 	c.*
 from 
 	Metadata.vTableFunction x 
-	cross apply Metadata.fGetColumns(x.FunctionId) c 
+	cross apply Metadata.fColumn(x.FunctionId) c 
 
 

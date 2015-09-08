@@ -28,4 +28,25 @@
     <Property Name="ParentElementType" Value="SqlSchema" />
     <Property Name="NewName" Value="AdoTypeMap" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="94bf96c3-60f2-48cd-9287-b94f11f94fc0" ChangeDateTime="09/08/2015 08:40:23">
+    <Property Name="ElementName" Value="[Metadata].[vMetadataProperty]" />
+    <Property Name="ElementType" Value="SqlView" />
+    <Property Name="ParentElementName" Value="[Metadata]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="vProperty" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1f947507-6fdf-4c91-bcde-24dbf6c4f4c6" ChangeDateTime="09/08/2015 09:24:01">
+    <Property Name="ElementName" Value="[Metadata].[fGetParameters]" />
+    <Property Name="ElementType" Value="SqlInlineTableValuedFunction" />
+    <Property Name="ParentElementName" Value="[Metadata]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="fParameters" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="e6e8f85c-588c-4314-bda5-a89b88a991cd" ChangeDateTime="09/08/2015 09:24:28">
+    <Property Name="ElementName" Value="[Metadata].[fGetColumns]" />
+    <Property Name="ElementType" Value="SqlInlineTableValuedFunction" />
+    <Property Name="ParentElementName" Value="[Metadata]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="fColumn" />
+  </Operation>
 </Operations>

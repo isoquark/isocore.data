@@ -8,7 +8,7 @@
 		o.ObjectName as ParentName,
 		o.ObjectType as ParentType,
 		x.name as ColumnName,
-		d.Value as Description,
+		d.PropertyValue as Description,
 		x.column_id - 1 as Position,
 		x.is_computed as IsComputed,
 		x.is_identity as IsIdentity,
@@ -25,5 +25,4 @@
 		inner join Metadata.vObject o on o.ObjectId =x.object_id
 		inner join Metadata.vSchema s on s.SchemaId = o.SchemaId
 		inner join Metadata.vDataType t on t.DataTypeId = x.user_type_id
-		--We use the fact that non-column objects, such as contraints, have a minor id of 0 
-		left join Metadata.vDescription d on d.MajorId = o.ObjectId and d.MinorId = x.column_id and d.ClassName = 'OBJECT_OR_COLUMN' and d.MinorId <> 0
+		outer apply Metadata.fColumnDescription(o.ObjectId, x.column_id) d

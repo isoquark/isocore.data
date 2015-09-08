@@ -3,7 +3,7 @@ select
 	c.*
 from 
 	Metadata.vView x 
-	cross apply Metadata.fGetColumns(x.ViewId) c 
+	cross apply Metadata.fColumn(x.ViewId) c 
 
 
 

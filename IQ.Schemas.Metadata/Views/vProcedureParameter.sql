@@ -18,4 +18,4 @@
 		p.Scale		
 	from 
 		Metadata.vProcedure x
-	cross apply Metadata.fGetParameters(x.ProcedureId) p
+	cross apply Metadata.fParameters(x.ProcedureId) p

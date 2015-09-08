@@ -3,7 +3,7 @@ select
 	c.*
 from 
 	Metadata.vTable x 
-	cross apply Metadata.fGetColumns(x.TableId) c 
+	cross apply Metadata.fColumn(x.TableId) c 
 
 
 

@@ -7,7 +7,7 @@
 		x.schema_id as SchemaId,
 		o.SchemaName,
 		o.IsUserDefined,
-		d.Value as Description,
+		d.PropertyValue as Description,
 		x.start_value as StartValue,
 		x.increment as Increment,
 		x.minimum_value as MinimumValue,
@@ -22,4 +22,5 @@
 	from sys.sequences x
 	inner join Metadata.vObject o  on o.ObjectId = x.object_id
 	inner join Metadata.vDataType t on t.DataTypeId = x.system_type_id
-	left join Metadata.vDescription d on d.MajorId = x.object_id and d.MinorId = 0 and d.ClassName = 'OBJECT_OR_COLUMN'
+	outer apply Metadata.fDescription(x.object_id, 0) d
+

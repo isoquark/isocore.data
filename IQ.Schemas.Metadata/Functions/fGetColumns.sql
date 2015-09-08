@@ -1,4 +1,4 @@
-﻿create function Metadata.fGetColumns(@ParentId int) returns table as return
+﻿create function Metadata.fColumn(@ParentId int) returns table as return
 	select 
 		c.*
 	from 
