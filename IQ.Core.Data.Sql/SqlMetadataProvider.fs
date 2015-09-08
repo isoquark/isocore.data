@@ -257,6 +257,10 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
 
 
 module SqlMetadataProvider =
+    let private unbracket name =
+        name |> Txt.removeChar '[' |> Txt.removeChar ']'
+
+    
     type private Realization(config : SqlMetadataProviderConfig) =
         let tables  = Dictionary<string, ResizeArray<TableDescription>>()        
         let views = Dictionary<string, ResizeArray<ViewDescription>>()
@@ -313,19 +317,19 @@ module SqlMetadataProvider =
                 [for t in views.Values do yield! t] |> RoList.ofSeq
             
             member x.DescribeTablesInSchema(schemaName: string): rolist<TableDescription> = 
-                tables.[schemaName] |> RoList.ofSeq
+                tables.[schemaName |> unbracket] |> RoList.ofSeq
             
             member x.DescribeViewsInSchema(schemaName: string) = 
-                views.[schemaName] |> RoList.ofSeq
+                views.[schemaName |> unbracket] |> RoList.ofSeq
             
             member x.DescribeSchemas(): rolist<SchemaDescription> = 
                 failwith "Not implemented yet"
             
             member x.DescribeTable(tableName) =
-                tables.[tableName.SchemaName]  |> Seq.find(fun x -> x.Name = tableName)
+                tables.[tableName.SchemaName |> unbracket]  |> Seq.find(fun x -> x.Name = tableName)
 
             member x.DescribeView(viewName) =
-                views.[viewName.SchemaName] |> Seq.find(fun x -> x.Name = viewName)
+                views.[viewName.SchemaName |> unbracket] |> Seq.find(fun x -> x.Name = viewName)
 
             member x.ObjectExists(objectName) =
                 allObjects.ContainsKey(objectName)

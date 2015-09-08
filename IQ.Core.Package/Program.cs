@@ -15,16 +15,16 @@ using System.Diagnostics;
 namespace IQ.Core.Package
 {
 
-    public class PackageConfig
-    {
-        public Version Version { get; set; }
-
-        public List<string> AssemblyNames { get; set; }
-    }
 
     public class PackageToolConfig
     {
-
+        public string WorkingDirectory { get; set; }
+        public string OutputDirectory { get; set; }
+        public Version Version { get; set; }
+        public List<string> InputAssemblyNames { get; set; }
+        public string OutputNuspecName { get; set; }       
+        public string CondensedAssemblyName { get; set; }
+        public string NuspecTemplateName { get; set; }
     }
 
 
@@ -48,41 +48,66 @@ namespace IQ.Core.Package
     class Program
     {
 
-        private static string GetSourceDirectory()
+        private static PackageToolConfig CreateConfig(string version)
         {
-            return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\";
-        }
-
-        private static void ObserveResolutions()
-        {
-            var hostAssembly = System.Reflection.Assembly.GetExecutingAssembly();
-            var loadedNames = new Dictionary<string, System.Reflection.Assembly>();
-            System.AppDomain.CurrentDomain.AssemblyResolve += (s, eventArgs) =>
+            return new PackageToolConfig
+            {
+                InputAssemblyNames = new List<string>
                 {
-                    var assname = new AssemblyName(eventArgs.Name);
-                    if (loadedNames.ContainsKey(assname.FullName))
-                        return loadedNames[assname.FullName];
+                    Contracts.ContractAssemblyDescriptor.SimpleName,
+                    Framework.FrameworkAssemblyDescriptor.SimpleName,
+                    Data.DataAssemblyDescriptor.SimpleName,
+                    Data.Excel.ExcelAssemblyDescriptor.SimpleName,
+                    Data.Sql.SqlAssemblyDescriptor.SimpleName,
+                    Math.MathAssemblyDescriptor.SimpleName,
+                    Synthetics.SyntheticsAssemblyDescriptor.SimpleName,
 
+                },
+                CondensedAssemblyName = "isocore.data.dll",
+                OutputNuspecName = "isocore.data.nuspec",
+                NuspecTemplateName = "isocore.data.nuspec",
+                OutputDirectory = @"C:\dev\packages",
+                Version = Version.Parse(version),
+                WorkingDirectory = @"C:\Temp\isocore.data"
 
-                    var resname = $"IQ.Core.Package.Assemblies.{eventArgs.Name}";
-                    using (var stream = hostAssembly.GetManifestResourceStream(resname))
-                    {
-                        if (stream != null)
-                        {
-                            var data = new Byte[stream.Length];
-                            stream.Read(data, 0, data.Length);
-                            var a = System.Reflection.Assembly.Load(data);
-                            loadedNames[a.GetName().FullName] = a;
-                            return a;
-                        }
-                        else
-                        {
-                            return null;
-                        }
-                    }
-
-                };
+            };
         }
+
+        //private static string GetSourceDirectory()
+        //{
+        //    return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\";
+        //}
+
+        //private static void ObserveResolutions()
+        //{
+        //    var hostAssembly = System.Reflection.Assembly.GetExecutingAssembly();
+        //    var loadedNames = new Dictionary<string, System.Reflection.Assembly>();
+        //    System.AppDomain.CurrentDomain.AssemblyResolve += (s, eventArgs) =>
+        //        {
+        //            var assname = new AssemblyName(eventArgs.Name);
+        //            if (loadedNames.ContainsKey(assname.FullName))
+        //                return loadedNames[assname.FullName];
+
+
+        //            var resname = $"IQ.Core.Package.Assemblies.{eventArgs.Name}";
+        //            using (var stream = hostAssembly.GetManifestResourceStream(resname))
+        //            {
+        //                if (stream != null)
+        //                {
+        //                    var data = new Byte[stream.Length];
+        //                    stream.Read(data, 0, data.Length);
+        //                    var a = System.Reflection.Assembly.Load(data);
+        //                    loadedNames[a.GetName().FullName] = a;
+        //                    return a;
+        //                }
+        //                else
+        //                {
+        //                    return null;
+        //                }
+        //            }
+
+        //        };
+        //}
 
 
         private static string GetResourceText(string partialName)
@@ -96,18 +121,18 @@ namespace IQ.Core.Package
 
         }
 
-        private static readonly string WorkingDirectory = @"C:\Temp\isocore.data";
-        private static readonly string TargetDirectory = @"C:\Work\lib\packages";
-        private static Version PackageVersion = Version.Parse("1.0.31");
+        //private static readonly string WorkingDirectory = @"C:\Temp\isocore.data";
+        //private static readonly string TargetDirectory = @"C:\Work\lib\packages";
+        //private static Version PackageVersion = Version.Parse("1.0.31");
 
-        private static void CreateIsocoreData()
+        private static void CreateIsocoreData(PackageToolConfig config)
         {
 
-            var libdir = Path.Combine(WorkingDirectory, @"lib\net45\");
+            var libdir = Path.Combine(config.WorkingDirectory, @"lib\net45\");
             Directory.CreateDirectory(libdir);
 
-            var outputAssemblyName = "isocore.data.dll";
-            var outputAssemblyPath = Path.Combine(libdir, outputAssemblyName);
+            //var outputAssemblyName = "isocore.data.dll";
+            var outputAssemblyPath = Path.Combine(libdir, config.CondensedAssemblyName);
             //The simple names of the assemblies to be packaged
             var assNames = new []
                 {
@@ -120,23 +145,23 @@ namespace IQ.Core.Package
                     Synthetics.SyntheticsAssemblyDescriptor.SimpleName,
                 };
 
-            var nuspec = GetResourceText("isocore.data.nuspec");
+            var nuspec = GetResourceText(config.NuspecTemplateName);
             var assFiles = new List<string>();
             foreach(var assName in assNames)
             {
                 var assembly = Assembly.LoadFrom($"{assName}.dll");
                 assFiles.Add(assembly.CodeBase.Replace("file:///", String.Empty));
             }
-            Packaging.MergeAssemblies(outputAssemblyPath, PackageVersion, assFiles.ToArray());
+            Packaging.MergeAssemblies(outputAssemblyPath, config.Version, assFiles.ToArray());
 
         }
 
-        private static void NupackIsocoreData()
+        private static void NupackIsocoreData(PackageToolConfig config)
         {
-            var outputNuspecName = "isocore.data.nuspec";
-            var outputNuspecPath = Path.Combine(WorkingDirectory, outputNuspecName);
-            var versionText = String.Format($"{PackageVersion.Major}.{PackageVersion.Minor}.{PackageVersion.Build}");
-            var nuspec = GetResourceText(outputNuspecName).Replace("$VERSION$", versionText);
+            //var outputNuspecName = "isocore.data.nuspec";
+            var outputNuspecPath = Path.Combine(config.WorkingDirectory, config.OutputNuspecName);
+            var versionText = String.Format($"{config.Version.Major}.{config.Version.Minor}.{config.Version.Build}");
+            var nuspec = GetResourceText(config.OutputNuspecName).Replace("$VERSION$", versionText);
             File.WriteAllText(outputNuspecPath, nuspec);
 
 
@@ -145,7 +170,7 @@ namespace IQ.Core.Package
             p.StartInfo.UseShellExecute = false;
             //p.StartInfo.RedirectStandardOutput = true;
             p.StartInfo.FileName = "nuget.exe";
-            p.StartInfo.Arguments = $"pack \"{outputNuspecPath}\" -Verbosity detailed -OutputDirectory \"{TargetDirectory}\"";
+            p.StartInfo.Arguments = $"pack \"{outputNuspecPath}\" -Verbosity detailed -OutputDirectory \"{config.OutputDirectory}\"";
             p.Start();
             p.WaitForExit();
         }
@@ -153,13 +178,15 @@ namespace IQ.Core.Package
 
         static void Main(string[] args)
         {
-            if (Directory.Exists(WorkingDirectory))
-                Directory.Delete(WorkingDirectory, true);
+            var config = CreateConfig("1.0.34");
 
-            Directory.CreateDirectory(WorkingDirectory);
+            if (Directory.Exists(config.WorkingDirectory))
+                Directory.Delete(config.WorkingDirectory, true);
 
-            CreateIsocoreData();
-            NupackIsocoreData();
+            Directory.CreateDirectory(config.WorkingDirectory);
+
+            CreateIsocoreData(config);
+            NupackIsocoreData(config);
 
             
         }
