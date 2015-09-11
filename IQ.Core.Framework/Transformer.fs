@@ -24,42 +24,40 @@ module Transformer =
     /// Converts a value to specified type
     /// </summary>
     /// <param name="value">The value to convert</param>
-    let convert (dstType : Type) (value : obj) =
-        if value = null then
+    let convert (dstType : Type) (srcValue : obj) =
+        if srcValue = null then
             null                   
-        else if value.GetType() = dstType then
-            value
+        else if srcValue.GetType() = dstType then
+            srcValue
         else
-            let valueType = dstType.ItemValueType
+            let srcValueType = srcValue.GetType()
+            let dstValueType = dstType.ItemValueType
             if dstType |> Option.isOptionType then
-                if value |> Option.isOptionValue then
+                if srcValue |> Option.isOptionValue then
                     //Convert an option value to an option type
-                    Convert.ChangeType(value |> Option.unwrapValue |> Option.get, valueType) |> Option.makeSome
+                    Convert.ChangeType(srcValue |> Option.unwrapValue |> Option.get, dstValueType) |> Option.makeSome
                 else
                     //Convert an non-option value to an option type; note though, special
                     //handling is required for DBNull
-                    if value.GetType() = typeof<DBNull> then
+                    if srcValueType = typeof<DBNull> then
                         dstType |> Option.makeNone
                     else
-                        Convert.ChangeType(value, valueType) |> Option.makeSome
+                        Convert.ChangeType(srcValue, dstValueType) |> Option.makeSome
             else
-                if value |> Option.isOptionValue then
+                if srcValue |> Option.isOptionValue then
                     //Convert an option value to a non-option type
-                    Convert.ChangeType(value |> Option.unwrapValue |> Option.get, valueType)
-                else 
-                   //Convert a non-option value to a non-option type
-                   
-                   //If nullable...
-                    let nt = Nullable.GetUnderlyingType(valueType)                        
-                    if nt <> null then
-                        if value.GetType() = typeof<DBNull> then
+                    Convert.ChangeType(srcValue |> Option.unwrapValue |> Option.get, dstValueType)
+                else  
+                    //Convert a non-option value to a non-option type
+                    if dstType |> Type.isNullableType then
+                        if srcValueType = typeof<DBNull> then
                             //Should create the right type of nullable type instance but have no value
-                            Activator.CreateInstance(valueType);
+                            Activator.CreateInstance(dstType);
                         else
                             //Should create the right type of nullable type instance but with a value
-                            Activator.CreateInstance(valueType, Convert.ChangeType(value, nt))
-                    else   
-                        Convert.ChangeType(value, valueType)
+                            Activator.CreateInstance(dstType, Convert.ChangeType(srcValue, dstValueType))
+                    else
+                        Convert.ChangeType(srcValue, dstValueType)                                                
 
     /// <summary>
     /// Converts a value to generically-specified type

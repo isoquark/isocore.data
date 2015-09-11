@@ -169,8 +169,12 @@ type IDataTable =
 
 type TabularData = TabularData of description : ITabularDescription * rowValues : rolist<obj[]>
 with
-    member this.RowValues = match this with TabularData(rowValues=x) -> x
-    member this.Description = match this with TabularData(description=x) -> x
+    member this.RowValues = 
+        match this with TabularData(rowValues=x) -> x
+    
+    member this.Description = 
+        match this with TabularData(description=x) -> x
+    
     interface IDataTable with
         member this.RowValues = this.RowValues
         member this.Description = this.Description
@@ -206,6 +210,9 @@ type ColumnFilterCriterion =
 with
     member this.Filter = match this with |AndFilter(x)|OrFilter(x) -> x
 
+/// <summary>
+/// Represents a parameter supplied to a query
+/// </summary>
 type QueryParameter = QueryParameter of Name : string * Value : obj
 
 /// <summary>

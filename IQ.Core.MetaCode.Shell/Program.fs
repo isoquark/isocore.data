@@ -30,6 +30,7 @@ module Main =
             DeclaringType = ClrTypeName("MyClass1", None, None)
             ValueType = ClrTypeName("Int32", Some("System.Int32"), None)
             IsOptional = false
+            IsNullable = false
             CanRead = true
             ReadAccess = ClrAccessKind.Public |> Some
             CanWrite = true

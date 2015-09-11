@@ -294,6 +294,9 @@ type DataTypeDescription = {
     Properties : DataElementProperty list
 }
 with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
     override this.ToString() = this.Name.Text
 
     interface IDataObjectDescription with
@@ -325,6 +328,9 @@ type ColumnDescription = {
     Properties : DataElementProperty list
 }
 with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
     override this.ToString() = this.Name
 
     interface IDataElementDescription with
@@ -332,6 +338,45 @@ with
         member this.Name = this.Name
         member this.Documentation = this.Documentation
 
+
+
+/// <summary>
+/// Specifies the direction of a routine parameter
+/// </summary>
+type RoutineParameterDirection = 
+    | Input       = 1 
+    | Output      = 2 
+    | InputOutput = 3 
+    | ReturnValue = 6
+
+/// <summary>
+/// Describes a routine in a function or procedure
+/// </summary>
+type RoutineParameterDescription = {
+    /// The parameter's name
+    Name : string
+    /// The parameter's position relative to the other columns
+    Position : int
+    /// The parameter's documentation
+    Documentation : string 
+    /// The column's data type
+    DataType : DataTypeReference
+    /// The direction of the parameter
+    Direction : RoutineParameterDirection
+    /// The attached properties
+    Properties : DataElementProperty list
+}
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = 
+        sprintf "%O : %O" this.Name this.DataType
+
+    interface IDataElementDescription with
+        member this.ElementKind = DataElementKind.Parameter
+        member this.Name = this.Name
+        member this.Documentation = this.Documentation
 
 /// <summary>
 /// Defines common contract for data elements that own/parent a collection of columns
@@ -355,6 +400,9 @@ type PrimaryKeyDescription = {
     Columns : ColumnDescription list
 }
 with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
     override this.ToString() = this.PrimaryKeyName.Text
 
     interface IDataObjectDescription with
@@ -415,37 +463,6 @@ with
 
 
 
-/// <summary>
-/// Specifies the direction of a routine parameter
-/// </summary>
-type RoutineParameterDirection = 
-    | Input       = 1 
-    | Output      = 2 
-    | InputOutput = 3 
-    | ReturnValue = 6
-
-/// <summary>
-/// Describes a routine in a function or procedure
-/// </summary>
-type RoutineParameterDescription = {
-    /// The parameter's name
-    Name : string
-    /// The parameter's position relative to the other columns
-    Position : int
-    /// The parameter's documentation
-    Documentation : string 
-    /// The column's data type
-    DataType : DataTypeReference
-    /// The direction of the parameter
-    Direction : RoutineParameterDirection
-    /// The attached properties
-    Properties : DataElementProperty list
-}
-with
-    interface IDataElementDescription with
-        member this.ElementKind = DataElementKind.Parameter
-        member this.Name = this.Name
-        member this.Documentation = this.Documentation
 
 
 /// <summary>

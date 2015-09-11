@@ -77,6 +77,7 @@ module internal ClrProperty =
             DeclaringType  = p.DeclaringType.TypeName
             ValueType = p.PropertyType.TypeName
             IsOptional = p.PropertyType |> Option.isOptionType
+            IsNullable = p.PropertyType |> Type.isNullableType
             CanRead = p.CanRead
             ReadAccess = if p.CanRead then p.GetMethod.Access |> Some else None
             CanWrite = p.CanWrite
@@ -293,6 +294,7 @@ module ClrTypeExtensions =
         /// Gets the access modifier specified for the element
         /// </summary>
         member this.Access = this.Info.Access
+
 
     /// <summary>
     /// Defines augmentations for the <see cref="ClrEnum"/> type

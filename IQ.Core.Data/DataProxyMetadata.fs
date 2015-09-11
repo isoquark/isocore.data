@@ -153,7 +153,7 @@ module DataProxyMetadata =
                 Position = description.Position |> defaultArg attrib.Position 
                 Documentation = String.Empty
                 DataType = storageType
-                Nullable = description.IsOptional 
+                Nullable = description.IsOptional || description.IsNullable 
                 AutoValue = AutoValueKind.None
                 ParentName = parentName
                 Properties = []
@@ -165,7 +165,7 @@ module DataProxyMetadata =
                 Position = description.Position
                 Documentation = String.Empty
                 DataType = storageType
-                Nullable = description.IsOptional 
+                Nullable = description.IsOptional || description.IsNullable 
                 AutoValue = AutoValueKind.None
                 ParentName = parentName
                 Properties = []
@@ -180,9 +180,10 @@ module DataProxyMetadata =
     /// </summary>
     /// <param name="clrElement">The CLR element from which the column descriptions will be inferred</param>
     let  private describeColumnProxies(parentName : DataObjectName) (description : ClrType) =
-        if description.Properties.Length = 0 then
+        let properties = description.Properties
+        if properties.Length = 0 then
             NotSupportedException(sprintf "No columns were able to be inferred from the type %O" description) |> raise
-        description.Properties |> List.map (fun x -> x |> describeColumnProxy parentName)
+        properties |> List.map (fun x -> x |> describeColumnProxy parentName)
 
 
     /// <summary>
@@ -261,9 +262,13 @@ module DataProxyMetadata =
         ParameterProxyDescription(description, pos, parameter)
 
                 
-    let describeProcedureProxy(description : ClrElement) =
-        let objectName = description |> inferDataObjectName
-        match description with
+    /// <summary>
+    /// Describes a procedure proxy
+    /// </summary>
+    /// <param name="element">The CLR representation of the proxy</param>
+    let describeProcedureProxy(element : ClrElement) =
+        let objectName = element |> inferDataObjectName
+        match element with
         | MemberElement(m) -> 
             match m with
             | MethodMember(m) ->
@@ -280,7 +285,7 @@ module DataProxyMetadata =
         | _ -> nosupport()
                                                                                                         
     /// <summary>
-    /// Infers a Table Proxy Description
+    /// Describes a table proxy
     /// </summary>
     /// <param name="t">The type of proxy</param>
     let describeTableProxy(t : ClrType) =
@@ -295,7 +300,7 @@ module DataProxyMetadata =
         TableProxyDescription(t, table, columnProxies) 
     
     /// <summary>
-    /// Infers a View Proxy Description
+    /// Describes a view proxy
     /// </summary>
     /// <param name="t">The type of proxy</param>
     let describeViewProxy(t : ClrType) =
@@ -309,11 +314,14 @@ module DataProxyMetadata =
         }
         ViewProxyDescription(t, view, columnProxies) 
 
-
-    let describeTableFunctionProxy(description : ClrElement) =
-        let objectName = description |> inferDataObjectName
+    /// <summary>
+    /// Describes a table function proxy
+    /// </summary>
+    /// <param name="element">The CLR representation of the proxy</param>
+    let describeTableFunctionProxy(element : ClrElement) =
+        let objectName = element |> inferDataObjectName
         let parameterProxies, columnProxies, clrMethod, returnType =
-            match description with
+            match element with
             | MemberElement(m) -> 
                 match m with
                 | MethodMember(m) ->
@@ -364,9 +372,16 @@ module DataProxyMetadata =
         | _ ->
              nosupport()           
 
-
-
 module DataProxyMetadataProvider =        
+    
+    let private describeTableProxy (clrElement : ClrElement) =
+            match clrElement with
+            | TypeElement(x) ->
+                x |> DataProxyMetadata.describeTableProxy 
+            | _ ->
+                 nosupport()           
+
+    
     let private describeProxies (dek : SqlElementKind) (clrElement : ClrElement) =
         match dek with
         | SqlElementKind.Procedure ->
@@ -394,11 +409,7 @@ module DataProxyMetadataProvider =
             | _ ->
                  nosupport()           
         | SqlElementKind.Table ->
-            match clrElement with
-            | TypeElement(x) ->
-                x |> DataProxyMetadata.describeTableProxy |> TableProxy |> List.singleton
-            | _ ->
-                 nosupport()           
+            clrElement |> describeTableProxy |> TableProxy |> List.singleton
         | SqlElementKind.View ->
             match clrElement with
             | TypeElement(x) ->
@@ -411,7 +422,10 @@ module DataProxyMetadataProvider =
     let get() =
         { new IDataProxyMetadataProvider with
             member this.DescribeProxies dek clrElement =
-                describeProxies dek clrElement        
+                describeProxies dek clrElement
+            member this.DescribeTableProxy<'T>() =  
+                typeinfo<'T> |> TypeElement |> describeTableProxy
+                
         }
                                    
 module TypeProxy =
@@ -423,7 +437,9 @@ module TypeProxy =
 
 module TableFunctionProxy =    
     let describe (m : ClrMethod) =
-        m |> MethodMember |> MemberElement  |> DataProxyMetadata.describeTableFunctionProxy |> DataObjectProxy.unwrapTableFunctionProxy
+        m |> MethodMember |> MemberElement  
+                          |> DataProxyMetadata.describeTableFunctionProxy 
+                          |> DataObjectProxy.unwrapTableFunctionProxy
 
 /// <summary>
 /// Convenience methods/operators intended to minimize syntactic clutter
@@ -439,8 +455,6 @@ module DataProxyOperators =
     let routineproxies<'T> =
         typeinfo<'T> |> TypeElement |> DataProxyMetadata.describeRoutineProxies
             
-//    let fromProxyType<'T> =
-//        tabularproxy<'T> |> TabularProxy
 
            
 

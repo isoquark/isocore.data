@@ -34,4 +34,102 @@
     <Property Name="NewSchema" Value="SqlTest" />
     <Property Name="IsNewSchemaExternal" Value="False" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="cabc0bf9-78c1-4b3e-bb0d-e9b527de8c05" ChangeDateTime="09/11/2015 02:15:54">
+    <Property Name="ElementName" Value="[SqlTest].[Table10].[Col15]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[SqlTest].[Table10]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Col13" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="7e7302ac-abd4-4535-98c3-3347da051b0e" ChangeDateTime="09/11/2015 02:16:01">
+    <Property Name="ElementName" Value="[SqlTest].[Table10].[Col16]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[SqlTest].[Table10]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Col14" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="e024faf6-1261-4a7a-bf1c-001e65a97f75" ChangeDateTime="09/11/2015 02:16:07">
+    <Property Name="ElementName" Value="[SqlTest].[Table10].[Col17]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[SqlTest].[Table10]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Col15" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="bc61ae39-24c1-42bd-80aa-4098f25aa58c" ChangeDateTime="09/11/2015 02:16:14">
+    <Property Name="ElementName" Value="[SqlTest].[Table10].[Col19]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[SqlTest].[Table10]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Col16" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="0ed195a3-0ffc-4e20-9823-0f6d12de52c1" ChangeDateTime="09/11/2015 02:16:20">
+    <Property Name="ElementName" Value="[SqlTest].[Table10].[Col20]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[SqlTest].[Table10]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Col17" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f5a9034b-8a70-4430-b09b-dde8b624e486" ChangeDateTime="09/11/2015 02:16:24">
+    <Property Name="ElementName" Value="[SqlTest].[Table10].[Col21]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[SqlTest].[Table10]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Col18" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="26e90280-764c-4f6c-895b-aa885bd54a20" ChangeDateTime="09/11/2015 02:16:28">
+    <Property Name="ElementName" Value="[SqlTest].[Table10].[Col22]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[SqlTest].[Table10]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Col19" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2cb60bf8-cc6c-41c8-ae41-a4736b525647" ChangeDateTime="09/11/2015 02:16:33">
+    <Property Name="ElementName" Value="[SqlTest].[Table10].[Col26]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[SqlTest].[Table10]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Col20" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="7727040e-104c-4d14-adee-deaf7e54bcfd" ChangeDateTime="09/11/2015 02:16:37">
+    <Property Name="ElementName" Value="[SqlTest].[Table10].[Col27]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[SqlTest].[Table10]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Col21" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f15fd5fe-e017-4e32-9ec5-caca92007d83" ChangeDateTime="09/11/2015 02:16:44">
+    <Property Name="ElementName" Value="[SqlTest].[Table10].[Col28]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[SqlTest].[Table10]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Col22" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a22fd105-7354-4696-8e8e-5dd10b447856" ChangeDateTime="09/11/2015 02:16:48">
+    <Property Name="ElementName" Value="[SqlTest].[Table10].[Col29]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[SqlTest].[Table10]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Col23" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="110ec4cf-9ece-4cbe-a6aa-50add81b3719" ChangeDateTime="09/11/2015 02:16:52">
+    <Property Name="ElementName" Value="[SqlTest].[Table10].[Col33]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[SqlTest].[Table10]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Col24" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a16a0ec6-5c56-4c03-88f5-28123e9ed2f2" ChangeDateTime="09/11/2015 02:16:56">
+    <Property Name="ElementName" Value="[SqlTest].[Table10].[Col34]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[SqlTest].[Table10]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Col25" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="25203923-7bee-426a-aafd-092c431244b0" ChangeDateTime="09/11/2015 02:17:00">
+    <Property Name="ElementName" Value="[SqlTest].[Table10].[Col35]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[SqlTest].[Table10]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Col26" />
+  </Operation>
 </Operations>

@@ -54,6 +54,7 @@ module ClrMetadataProvider =
             with get() = p2Val
             and  set(value) = p2Val <-value
         member this.Prop3 with get() = p3Val
+        member val Prop4 = Nullable<int>() with get,set
 
     type private ClassB() =
         member this.Method01(p1 : int, ?p2 : int) = 0L
@@ -189,6 +190,7 @@ module ClrMetadataProvider =
                     DeclaringType = typeof<ClassA>.TypeName
                     ValueType = typeof<BclDateTime>.TypeName
                     IsOptional = false
+                    IsNullable = false
                     CanWrite = false
                     WriteAccess = None
                     CanRead = true
@@ -209,6 +211,7 @@ module ClrMetadataProvider =
                 DeclaringType = typeof<ClassA>.TypeName
                 ValueType = typeof<int>.TypeName
                 IsOptional = false
+                IsNullable = false
                 CanWrite = true
                 WriteAccess = ClrAccessKind.Public |> Some
                 CanRead = true
@@ -229,6 +232,7 @@ module ClrMetadataProvider =
                     DeclaringType = typeof<ClassA>.TypeName
                     ValueType = typeof<option<int64>>.TypeName
                     IsOptional = true
+                    IsNullable = false
                     CanWrite = false
                     WriteAccess = None
                     CanRead = true
@@ -254,6 +258,12 @@ module ClrMetadataProvider =
             p3Actual.Attributes |> Claim.seqIsEmpty
             p3Actual.GetMethodAttributes |> Claim.seqIsEmpty
             p3Actual.SetMethodAttributes |> Claim.seqIsEmpty
+
+            let p4Info = propinfo<@ fun (x : ClassA) -> x.Prop4 @>
+            let p4Actual = infomap.[p4Info.Name |> ClrMemberName]
+            p4Actual.IsNullable |> Claim.isTrue
+            p4Actual.IsOptional |> Claim.isFalse
+
                                        
         [<Fact>]
         let ``Described union``() =

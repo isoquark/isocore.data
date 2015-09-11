@@ -342,35 +342,52 @@ type ClrAccessKind =
 /// <summary>
 /// Represents a type name
 /// </summary>
+[<DebuggerDisplay("{ToString(),nq}")>]
 type ClrTypeName = ClrTypeName of simpleName : string * fullName : string option * assemblyQualifiedName : string option
 with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
     override this.ToString() = match this with ClrTypeName(simpleName=x) -> x
                     
 
 /// <summary>
 /// Represents an assembly name
 /// </summary>
+[<DebuggerDisplay("{ToString(),nq}")>]
 type ClrAssemblyName = ClrAssemblyName of simpleName : string * fullName : string option
 with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
     override this.ToString() = match this with ClrAssemblyName(simpleName=x) -> x
 
 /// <summary>
 /// Represents the name of a member
 /// </summary>    
+[<DebuggerDisplay("{ToString(),nq}")>]
 type ClrMemberName = ClrMemberName of string
 with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
     override this.ToString() = match this with ClrMemberName(x) -> x
     
 /// <summary>
 /// Represents the name of a parameter
 /// </summary>    
+[<DebuggerDisplay("{ToString(),nq}")>]
 type ClrParameterName = ClrParameterName of string
 with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
     override this.ToString() = match this with ClrParameterName(x) -> x
 
 /// <summary>
 /// Represents the name of a CLR element
 /// </summary>
+[<DebuggerDisplay("{ToString(),nq}")>]
 type ClrElementName =
     ///Specifies the name of an assembly 
     | AssemblyElementName of ClrAssemblyName
@@ -380,7 +397,16 @@ type ClrElementName =
     | MemberElementName of ClrMemberName
     ///Specifies the name of a parameter
     | ParameterElementName of ClrParameterName
-
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() =
+        match this with
+        | AssemblyElementName(x) -> x.ToString()
+        | TypeElementName(x) -> x.ToString()
+        | MemberElementName(x) -> x.ToString()
+        | ParameterElementName(x) -> x.ToString()
 
 /// <summary>
 /// Represents an association between an attribute and the element to which it applies
@@ -392,8 +418,8 @@ type ClrAttribution = {
     AttributeName : ClrTypeName
     /// The values applied by the attribute
     AppliedValues : ValueIndex
-    AttributeInstance : Attribute option
     /// The attribute instance if applicable
+    AttributeInstance : Attribute option
 }
 
     
@@ -419,6 +445,8 @@ type ClrProperty = {
     ValueType : ClrTypeName
     /// Specifies whether the property is of option<> type
     IsOptional : bool
+    /// Specifies whether the property is of Nullable<> type
+    IsNullable : bool
     /// Specifies whether the property has a get accessor
     CanRead : bool
     /// The access specifier of the get accessor if one exists
@@ -430,6 +458,12 @@ type ClrProperty = {
     /// Specifies whether the property is static
     IsStatic : bool
 }
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = 
+        sprintf "%O : %O" this.Name this.ValueType
 
 /// <summary>
 /// Represents a field
@@ -456,6 +490,12 @@ type ClrField = {
     /// The value of the literal
     LiteralValue : obj option        
 }
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = 
+        sprintf "%O : %O" this.Name this.FieldType
 
 /// <summary>
 /// Represents a method parameter
@@ -478,6 +518,13 @@ type ClrMethodParameter = {
     /// Specifies whether the parameter represents a return
     IsReturn : bool
 }
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = 
+        sprintf "%O : %O" this.Name this.ParameterType
+
 
 /// <summary>
 /// Represents a method
@@ -504,8 +551,14 @@ type ClrMethod = {
     ReturnAttributes : ClrAttribution list
     /// The name of the type that declares the method
     DeclaringType : ClrTypeName           
-
 }
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = 
+        this.Name.ToString()
+
 
 /// <summary>
 /// Represents a constructor
@@ -607,46 +660,103 @@ type ClrTypeInfo = {
 /// <summary>
 /// Represents a CLR class
 /// </summary>
+[<DebuggerDisplay("{ToString(),nq}")>]
 type ClrClass = ClrClass of info : ClrTypeInfo
-
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = 
+        match this with ClrClass(info=x) -> x.Name.ToString()
+    
 /// <summary>
 /// Represents a CLR Enum
 /// </summary>
+[<DebuggerDisplay("{ToString(),nq}")>]
 type ClrEnum = ClrEnum of numericType : ClrTypeName * info : ClrTypeInfo
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = 
+        match this with ClrEnum(info=x) -> x.Name.ToString()
 
 /// <summary>
 /// Represents an F# module
 /// </summary>
+[<DebuggerDisplay("{ToString(),nq}")>]
 type ClrModule = ClrModule of info : ClrTypeInfo
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = 
+        match this with ClrModule(info=x) -> x.Name.ToString()
 
 /// <summary>
 /// Represents a collection type
 /// </summary>
+[<DebuggerDisplay("{ToString(),nq}")>]
 type ClrCollection =  ClrCollection of kind : ClrCollectionKind * info : ClrTypeInfo
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = 
+        match this with ClrCollection(info=x) -> sprintf "%O seq" x.Name
 
 /// <summary>
 /// Represents a struct
 /// </summary>
+[<DebuggerDisplay("{ToString(),nq}")>]
 type ClrStruct = ClrStruct of isNullable : bool * info : ClrTypeInfo
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = 
+        match this with ClrStruct(info=x) -> x.Name.ToString()
 
 /// <summary>
 /// Represents an F# union
 /// </summary>
+[<DebuggerDisplay("{ToString(),nq}")>]
 type ClrUnion = ClrUnion of cases : ClrUnionCase list * info : ClrTypeInfo
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = 
+        match this with ClrUnion(info=x) -> x.Name.ToString()
 
 /// <summary>
 /// Represents an F# record
 /// </summary>
+[<DebuggerDisplay("{ToString(),nq}")>]
 type ClrRecord = ClrRecord of info : ClrTypeInfo
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = 
+        match this with ClrRecord(info=x) -> x.Name.ToString()
 
 /// <summary>
 /// Represents an interface
 /// </summary>
+[<DebuggerDisplay("{ToString(),nq}")>]
 type ClrInterface = ClrInterface of info : ClrTypeInfo
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = 
+        match this with ClrInterface(info=x) -> x.Name.ToString()
 
 /// <summary>
 /// Represents some sort of type
 /// </summary>
+[<DebuggerDisplay("{ToString(),nq}")>]
 type ClrType =
     | ClassType of ClrClass
     | EnumType of ClrEnum
@@ -656,6 +766,20 @@ type ClrType =
     | UnionType of ClrUnion
     | RecordType of ClrRecord
     | InterfaceType of ClrInterface
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = 
+        match this with 
+        | ClassType(x) -> x.ToString()
+        | EnumType(x) -> x.ToString()
+        | ModuleType(x) -> x.ToString()
+        | CollectionType(x) -> x.ToString()
+        | StructType(x) -> x.ToString()
+        | UnionType(x) -> x.ToString()
+        | RecordType(x) -> x.ToString()
+        | InterfaceType(x) -> x.ToString()
           
 /// <summary>
 /// Represents an assembly

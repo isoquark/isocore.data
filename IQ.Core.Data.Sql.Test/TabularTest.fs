@@ -38,7 +38,9 @@ module Tabular =
         inherit ProjectTestContainer(ctx,log)
         
         let store = ctx.Store
-        let mdp = ctx.Store.MetadataProvider
+        let sqlMetadata = ctx.Store.MetadataProvider
+        let proxyMetadata = DataProxyMetadataProvider.get()
+
 
         [<Fact>]
         let ``Queried vDataType metadata - Partial column set A``() =
@@ -102,7 +104,7 @@ module Tabular =
                             
             let tabularName = DataObjectName("SqlTest", "Table08")
             tabularName |> TruncateTable |> store.ExecuteCommand |> ignore            
-            let description = mdp.DescribeTable(tabularName)
+            let description = sqlMetadata.DescribeTable(tabularName)
             let rowValues =  [| for i in [1..rowcount] ->i |> createRow |] :> rolist<_>
             let data = TabularData(description :> ITabularDescription, rowValues)
             store.InsertTable(data)
@@ -132,4 +134,10 @@ module Tabular =
             ()
 
             
+        [<Fact>]
+        let ``Executed parametrized dynamic query``() =
+            let info = proxyMetadata.DescribeTableProxy<Table10>()            
+            //TODO: 1.Try to use autofixture to populate proxies and insert them into the table
+            //2. Writ a TVF that brings back the data and verify the results
+            ()
 

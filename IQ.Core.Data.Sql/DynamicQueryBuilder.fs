@@ -13,7 +13,7 @@ type DynamicQueryBuilder(schemaName, localName) =
     let columnNames : string ResizeArray = ResizeArray<string>()
     let filters : ColumnFilterCriterion ResizeArray = ResizeArray<ColumnFilterCriterion>()
     let sortCriteria : ColumnSortCriterion ResizeArray = ResizeArray<ColumnSortCriterion>()
-    let parameters : QueryParameter ResizeArray = ResizeArray<QueryParameter>()
+    let queryParameters : QueryParameter ResizeArray = ResizeArray<QueryParameter>()
     let mutable pageNumber : int option = None
     let mutable pageSize : int option = None
 
@@ -39,8 +39,17 @@ type DynamicQueryBuilder(schemaName, localName) =
         this        
 
     member this.Parameter(name, value) =
-        parameters.Add(QueryParameter(name,value))
+        queryParameters.Add(QueryParameter(name,value))
+        this
+
+    member this.Parameters([<ParamArray>] parameters : QueryParameter[]) =
+        queryParameters.AddRange(parameters)
+        this
     
+    member this.Parameters(parameters : QueryParameter seq) =
+        queryParameters.AddRange(parameters)
+        this
+
     member this.Sort([<ParamArray>]criteria : ColumnSortCriterion[]) =
         sortCriteria.AddRange(criteria)
         this
@@ -151,7 +160,7 @@ type DynamicQueryBuilder(schemaName, localName) =
                           columnNames |> List.ofSeq,  
                           filters |> List.ofSeq,
                           sortCriteria |> List.ofSeq,
-                          parameters |> List.ofSeq,
+                          queryParameters |> List.ofSeq,
                           pageNumber,
                           pageSize
                         ) |> DynamicStoreQuery
@@ -184,13 +193,16 @@ type DynamicQueryBuilder(schemaName, localName) =
                     | None -> None, None
                     | Some(x) -> x |> Some, (defaultArg pageSize 50) |> Some
                                                     
-
-                let builder = DynamicQueryBuilder(tableName).Columns(_columns).Sort(_sort)
-                
+                let builder = DynamicQueryBuilder(tableName)
+                                .Columns(_columns)
+                                .Sort(_sort)
+                                .Parameters(parameters)
+                                .Filter(filter)
+                                                
                 if _pageNumber |> Option.isSome then
-                    builder.Page(_pageNumber.Value, _pageSize.Value).Filter(filter).Build()
-                else
-                    builder.Filter(filter).Build()
+                    builder.Page(_pageNumber.Value, _pageSize.Value) |> ignore
+
+                builder.Build()
                        
                                            
                 

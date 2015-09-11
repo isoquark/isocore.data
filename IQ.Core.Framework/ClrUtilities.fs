@@ -85,6 +85,7 @@ module ClrNameExtensions =
         /// Gets the assembly-qualified type name of the type
         /// </summary>
         member this.AssemblyQualifiedName = match this with ClrTypeName(assemblyQualifiedName=x) -> x
+
         
     /// <summary>
     /// Defines augmentations for the <see cref="ClrAssemblyName"/> type
@@ -370,6 +371,18 @@ module Type =
         | None ->
             None
                 
+    /// <summary>
+    /// Determines whether a type is a nullable type
+    /// </summary>
+    /// <param name="t">The type to examine</param>
+    let isNullableType (t : Type) =
+        t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<Nullable<_>>
+
+    /// <summary>
+    /// If encapsulated within a recognized "container", e.g., an optional value, a nullable value or a collection,
+    /// returns the encapsulated type; otherwise, returns the passed type
+    /// </summary>
+    /// <param name="t"></param>
     let getItemValueType (t : Type)  =
         match t |> getCollectionValueType with
         | Some(t) -> t
@@ -377,14 +390,11 @@ module Type =
             match t |> Option.getOptionValueType with
             | Some(t) -> t
             | None ->
-                t
+                if t |> isNullableType then
+                    t.GetGenericArguments().[0]
+                else
+                    t
 
-    /// <summary>
-    /// Determines whether a type is a nullable type
-    /// </summary>
-    /// <param name="t">The type to examine</param>
-    let isNullableType (t : Type) =
-        t.IsGenericType && t.GetGenericTypeDefinition() = typedefof<Nullable<_>>
 
     /// <summary>
     /// Determines whether the type icorresponds to an F# module
