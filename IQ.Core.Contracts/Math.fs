@@ -18,6 +18,8 @@ type ICalculator =
     abstract Zero:unit->'T
     abstract LessThan:'T*'T->bool
     abstract GreaterThan: 'T*'T->bool
+    abstract LessThanOrEqual:'T*'T->bool
+    abstract GreaterThanOrEqual: 'T*'T->bool
 
 type ICalculator<'T> =
     abstract Add: 'T*'T->'T

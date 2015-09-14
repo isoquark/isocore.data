@@ -29,6 +29,8 @@ module DateGeneration =
                 yield DateTime(y, m, d)            
             |]
         
+        new(min, max) =
+            DateGenerator(Range(min, max))
         
         new () =
             DateGenerator(Range(BclDateTime(2013, 1, 1), BclDateTime(2016, 12, 31)))

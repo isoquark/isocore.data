@@ -112,7 +112,7 @@ module ArithmeticEnumerator =
     /// <param name="max">The maximum value that can potentially be emitted</param>
     /// <param name="cycle">Whether the sequence cycles back to the minimum value when the maximum is reached</param>
     let createGeneric (initial : 'T) (min : 'T) (inc : 'T) (max : 'T) cycle =
-        let calc = Calculator.get<'T>()
+        let calc = Calculator.specific<'T>()
         let s = seq{ 
                let mutable cur =  initial
                while (calc.LessThan(cur, max)) do

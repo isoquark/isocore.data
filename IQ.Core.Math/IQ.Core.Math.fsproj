@@ -39,6 +39,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Content Include="app.config" />
     <Compile Include="ExpressionBuilder.fs" />
+    <Compile Include="CalcOps.fs" />
     <Compile Include="Calculator.fs" />
     <Content Include="packages.config" />
     <Compile Include="Extensions.fs" />

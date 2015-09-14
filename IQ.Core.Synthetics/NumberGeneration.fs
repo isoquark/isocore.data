@@ -41,6 +41,9 @@ module internal NumberGeneration =
         let nextValue() = distribution.Sample<int8>()
         let nextValues(count) = [| for i in 1..count -> nextValue()|] |> Seq.ofArray
 
+        new(min, max) =
+            Int8Generator(Range(min, max))
+
         new() =
             Int8Generator(Range(SByte.MinValue, SByte.MaxValue))
             
@@ -57,6 +60,9 @@ module internal NumberGeneration =
         let distribution = range |> du
         let nextValue() = distribution.Sample<uint8>()
         let nextValues(count) = [| for i in 1..count -> nextValue()|] |> Seq.ofArray
+
+        new(min, max) =
+            UInt8Generator(Range(min, max))
 
         new() =
             UInt8Generator(Range(Byte.MinValue, Byte.MaxValue))
@@ -76,6 +82,9 @@ module internal NumberGeneration =
         let nextValue() = distribution.Sample<int16>()
         let nextValues(count) = [| for i in 1..count -> nextValue()|] |> Seq.ofArray
                 
+        new(min, max) =
+            Int16Generator(Range(min, max))
+
         new () =
             Int16Generator(Range(Int16.MinValue, Int16.MaxValue))
         
@@ -94,6 +103,9 @@ module internal NumberGeneration =
         let nextValue() = distribution.Sample<uint16>()
         let nextValues(count) = [| for i in 1..count -> nextValue()|] |> Seq.ofArray
                 
+        new(min, max) =
+            UInt16Generator(Range(min, max))
+
         new () =
             UInt16Generator(Range(UInt16.MinValue,UInt16.MaxValue))
 
@@ -113,6 +125,9 @@ module internal NumberGeneration =
         let nextValue() = distribution.Sample()
         let nextValues(count) = [| for i in 1..count -> nextValue()|] |> Seq.ofArray
                 
+        new(min, max) =
+            Int32Generator(Range(min, max))
+        
         new () =
             Int32Generator(Range(-1000000,1000000))
         
@@ -130,6 +145,9 @@ module internal NumberGeneration =
         let nextValue() = distribution.Sample<uint32>()
         let nextValues(count) = [| for i in 1..count -> nextValue()|] |> Seq.ofArray
                     
+        new(min, max) =
+            UInt32Generator(Range(min, max))
+        
         new () =
             UInt32Generator(Range(0u,1000000u))
         
@@ -150,6 +168,10 @@ module internal NumberGeneration =
         new () =
             Int64Generator(Range(-1000000L,1000000L))
         
+        new(min, max) =
+            Int64Generator(Range(min, max))
+
+
         interface IValueGenerator<int64> with
             member this.NextValue() = nextValue()
             member this.NextValue() = nextValue() :> obj       
@@ -167,6 +189,9 @@ module internal NumberGeneration =
         new () =
             UInt64Generator(Range(0UL,1000000UL))
 
+        new(min, max) =
+            UInt64Generator(Range(min, max))
+        
         interface IValueGenerator<uint64> with
             member this.NextValue() = nextValue()
             member this.NextValue() = nextValue() :> obj       
@@ -182,9 +207,13 @@ module internal NumberGeneration =
         let nextValue() = distribution.Sample<float32>()
         let nextValues(count) = [| for i in 1..count -> nextValue()|] |> Seq.ofArray
 
+        new(min, max) =
+            Float32Generator(Range(min, max))
+
         new() =
             Float32Generator(Range(-1000000.0f,1000000.0f))            
             
+
         interface IValueGenerator<float32> with
             member this.NextValue() = nextValue()
             member this.NextValue() = nextValue() :> obj       
@@ -198,6 +227,9 @@ module internal NumberGeneration =
         let distribution = range |> cu
         let nextValue() = distribution.Sample()
         let nextValues(count) = [| for i in 1..count -> nextValue()|] |> Seq.ofArray
+
+        new(min, max) =
+            Float64Generator(Range(min, max))
 
         new() =
             Float64Generator(Range(-1000000.0,1000000.0))
@@ -215,6 +247,9 @@ module internal NumberGeneration =
         let distribution = range |> cu
         let nextValue() = distribution.Sample<decimal>()
         let nextValues(count) = [| for i in 1..count -> nextValue()|] |> Seq.ofArray
+        
+        new(min, max) =
+            DecimalGenerator(Range(min, max))
 
         new() =
             DecimalGenerator(Range(-1000000m,1000000m))
