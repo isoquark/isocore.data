@@ -76,10 +76,10 @@ module internal DataTypeConverter =
             DBNull.Value :> obj
         else
             let clrType = dataType |> toBclTransportType
-            value |> Transformer.convert clrType
+            value |> SmartConvert.convert clrType
     
 
     let fromBclTransportValue dstType (value : obj) =
-        value |> Transformer.convert dstType
+        value |> SmartConvert.convert dstType
 
 

@@ -13,7 +13,7 @@ type ValueGenerators private (search : Assembly[]) =
 
     let indexGenerators() =
         [for a in search do
-            for t in Assembly.GetExecutingAssembly().GetTypes() do
+            for t in a.GetTypes() do
                 for i in t.GetInterfaces() do
                     if 
                         i.IsGenericType && 
@@ -39,6 +39,7 @@ type ValueGenerators private (search : Assembly[]) =
     static member InitFactory([<ParamArray>] search : Assembly[]) =
         if factory |> Option.isNone then
             factory <- ValueGenerators(search)  :> IValueGeneratorProvider |> Some
+            factory.Value
         else
             failwith "Alread initialized"
 

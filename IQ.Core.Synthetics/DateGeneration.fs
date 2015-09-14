@@ -11,14 +11,15 @@ open IQ.Core.Math
 module DateGeneration =
    
 
+    /// <summary>
+    /// Generates Date values
+    /// </summary>       
     type DateGenerator(range: Range<BclDateTime>) =
         static let Calendar = GregorianCalendar.ReadOnly((GregorianCalendar()))
 
         let yGen = NumberGenerator.get<int32>(range.MinValue.Year, range.MaxValue.Year)
         let mGen = NumberGenerator.get<int32>(range.MinValue.Month, range.MaxValue.Month)
-
-        
-
+       
         let getNextValues(count, range : Range<BclDateTime>) =            
             [|for i in 1..count do
                 let y = yGen.NextValue()
@@ -31,8 +32,8 @@ module DateGeneration =
         
         new () =
             DateGenerator(Range(BclDateTime(2013, 1, 1), BclDateTime(2016, 12, 31)))
-        
         interface IValueGenerator<BclDateTime> with
+        
             member this.NextValue() = getNextValues(1, range) |> Seq.exactlyOne
             member this.NextValue() = getNextValues(1, range) |> Seq.exactlyOne :> obj
             member this.NextValues(count) = getNextValues(count, range) |> Seq.ofArray

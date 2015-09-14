@@ -7,17 +7,6 @@ open MathNet.Numerics.Distributions
 
 open IQ.Core.Math
 
-module internal Conversion =
-    let inline cast<'TDst> (src : obj) = 
-        src :?> 'TDst
-    
-    let inline convert<'TDst> (src : obj) = 
-        Convert.ChangeType(src, typeof<'TDst>) |> cast<'TDst>
-    
-    let inline convertAll(items : 'TSrc seq) =
-        seq {for item in items -> item |> convert<'TDst>}
-    
-
 
 /// <summary>
 /// Implements basic random number generation capabilites
@@ -35,14 +24,14 @@ module internal NumberGeneration =
     /// </summary>
     /// <param name="range">The range of the distribution</param>
     let cu(range :Range<'T>) =
-        new ContinuousUniform( Conversion.convert(range.MinValue), Conversion.convert(range.MaxValue))
+        new ContinuousUniform( SmartConvert.convertT(range.MinValue), SmartConvert.convertT(range.MaxValue))
     
     /// <summary>
     /// Helper to create a discrete uniform distribution that is characterized by a supplied range
     /// </summary>
     /// <param name="range">The range of the distribution</param>
     let du(range : Range<'T>) =
-        new DiscreteUniform( Conversion.convert(range.MinValue), Conversion.convert(range.MaxValue))
+        new DiscreteUniform( SmartConvert.convertT(range.MinValue), SmartConvert.convertT(range.MaxValue))
 
     /// <summary>
     /// Generates 8-bit signed integer values

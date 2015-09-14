@@ -77,7 +77,7 @@ module CsvReader =
                 headers |> Array.map(fun header -> 
                     let colproxy = header |> getColumnProxy
                     colproxy.DataElement.Name, fun (value : string) -> 
-                        value |> Transformer.convert colproxy.ProxyElement.ReflectedElement.Value.PropertyType
+                        value |> SmartConvert.convert colproxy.ProxyElement.ReflectedElement.Value.PropertyType
                 ) |> Map.ofArray
             | None -> nosupport()
 

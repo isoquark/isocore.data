@@ -8,7 +8,7 @@ open System.Reflection
 open IQ.Core.Framework
 open IQ.Core.TestFramework
 open IQ.Core.Data
-
+open IQ.Core.Synthetics
 
 
 
@@ -17,8 +17,8 @@ open IQ.Core.Data
 module TestConfiguration =
     
     let private register (registry : ICompositionRegistry) =
-        //ClrMetadataProvider.getDefault() |> registry.RegisterInstance
         registry.RegisterFactory(fun config -> config |> Transformer.get)
+        ValueGenerators.InitFactory(SyntheticsAssemblyDescriptor.Assembly) |> registry.RegisterInstance
 
     //This is instantiated/cleaned-up once per collection
     type ProjectTestContext()= 

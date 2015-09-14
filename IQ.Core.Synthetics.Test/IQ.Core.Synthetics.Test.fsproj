@@ -54,6 +54,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="TestConfiguration.fs" />
     <Compile Include="OrderedSequenceTests.fs" />
+    <Compile Include="NumberGenerationTests.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IQ.Core.Data\IQ.Core.Data.fsproj">

@@ -46,12 +46,12 @@ module Transformer =
     
         [<Fact>]
         let ``Converted optional and non-optional values``() =
-            Some(3) |> Transformer.convert (typeof<int>) |> Claim.equal (3 :> obj)
-            Some(3) |> Transformer.convert (typeof<option<int>>) |> Claim.equal (Some(3) :> obj)
-            3 |> Transformer.convert (typeof<option<int>>) |> Claim.equal (Some(3) :> obj)
-            3 |> Transformer.convert (typeof<int>) |> Claim.equal (3 :> obj)
-            Some(3L) |> Transformer.convert (typeof<int>) |> Claim.equal (3 :> obj)
-            option<int>.None |> Transformer.convert typeof<int> |> Claim.isNull
+            Some(3) |> SmartConvert.convert (typeof<int>) |> Claim.equal (3 :> obj)
+            Some(3) |> SmartConvert.convert (typeof<option<int>>) |> Claim.equal (Some(3) :> obj)
+            3 |> SmartConvert.convert (typeof<option<int>>) |> Claim.equal (Some(3) :> obj)
+            3 |> SmartConvert.convert (typeof<int>) |> Claim.equal (3 :> obj)
+            Some(3L) |> SmartConvert.convert (typeof<int>) |> Claim.equal (3 :> obj)
+            option<int>.None |> SmartConvert.convert typeof<int> |> Claim.isNull
             
         [<Fact>]
         let ``Discovered transformations``() =

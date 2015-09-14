@@ -15,11 +15,7 @@ open FSharp.Text.RegexProvider
 
 
 
-/// <summary>
-/// Defines generally-applicable conversion utilities
-/// </summary>
-module Transformer =
-        
+module SmartConvert =    
     /// <summary>
     /// Converts a value to specified type
     /// </summary>
@@ -58,14 +54,25 @@ module Transformer =
                             Activator.CreateInstance(dstType, Convert.ChangeType(srcValue, dstValueType))
                     else
                         Convert.ChangeType(srcValue, dstValueType)                                                
+        
+    let inline cast<'TDst> (src : obj) = 
+        src :?> 'TDst
 
     /// <summary>
     /// Converts a value to generically-specified type
     /// </summary>
     /// <param name="value">The value to convert</param>
-    let convertT<'T> (value : obj) =
-        value |> convert typeof<'T> :?> 'T
+    let convertT<'TDst> (value : obj) =
+        value |> convert typeof<'TDst> |> cast<'TDst>
 
+    let inline convertAll(items : 'TSrc seq) =
+        seq {for item in items -> item |> convertT<'TDst>}
+
+/// <summary>
+/// Defines generally-applicable conversion utilities
+/// </summary>
+module Transformer =
+       
     /// <summary>
     /// Converts an array of values
     /// </summary>
@@ -75,7 +82,7 @@ module Transformer =
         if values.Length <> dstTypes.Length then
             raise <| ArgumentException(
                 sprintf "Value array (length = %i) and type array (length = %i) must be of the same length" values.Length dstTypes.Length)
-        values |> Array.mapi (fun i value -> value |> convert dstTypes.[i])
+        values |> Array.mapi (fun i value -> value |> SmartConvert.convert dstTypes.[i])
 
     
     let private createDelegate1(m : MethodInfo) =
@@ -185,7 +192,7 @@ module Transformer =
                     let transformation = getTransformation srcType dstType delegates
                     transformation.Invoke(srcValue)
                 else
-                    srcValue |> convert dstType
+                    srcValue |> SmartConvert.convert dstType
             else
                 null
                                                             
