@@ -617,13 +617,25 @@ type ClrUnionCase = {
 /// <summary>
 /// Represents a member
 /// </summary>
+[<DebuggerDisplay("{ToString(),nq}")>]
 type ClrMember =
 | PropertyMember of ClrProperty
 | FieldMember of ClrField
 | MethodMember of ClrMethod
 | EventMember of ClrEvent
 | ConstructorMember of ClrConstructor
-                                                        
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = 
+        match this with
+        | PropertyMember(m) -> m.ToString()
+        | FieldMember(m) -> m.ToString()
+        | MethodMember(m) -> m.ToString()
+        | EventMember(m) -> m.ToString()
+        | ConstructorMember(m) -> m.ToString()
+                                                            
 
 type ClrTypeInfo = {
     /// The name of the type
@@ -656,6 +668,11 @@ type ClrTypeInfo = {
     Namespace :string
 
 }
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = this.Name.ToString()
 
 /// <summary>
 /// Represents a CLR class
@@ -798,16 +815,34 @@ type ClrAssembly = {
     /// The assemblies referenced by the subject
     References : ClrAssemblyName list
 }
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = this.Name.ToString()
+    
 
 /// <summary>
 /// Represents any CLR element
 /// </summary>
+[<DebuggerDisplay("{ToString(),nq}")>]
 type ClrElement =
     | MemberElement of description : ClrMember
     | TypeElement of description : ClrType
     | AssemblyElement of description : ClrAssembly
     | ParameterElement of description : ClrMethodParameter
     | UnionCaseElement of description : ClrUnionCase
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() =
+        match this with
+        | MemberElement(e) -> sprintf "Member: %O" e
+        | TypeElement(e) -> sprintf "Type: %O" e
+        | AssemblyElement(e) -> sprintf "Assembly: %O" e
+        | ParameterElement(e) -> sprintf "Parameter: %O" e
+        | UnionCaseElement(e) -> sprintf "Union Case: %O" e
                       
 /// <summary>
 /// Represents the intent to select a set of ClrType representations

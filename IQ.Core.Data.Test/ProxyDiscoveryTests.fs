@@ -55,6 +55,7 @@ module DataProxyMetadata =
 
     type Tests(ctx, log) =
         inherit ProjectTestContainer(ctx,log)
+        let pmp = DataProxyMetadataProvider.get()
 
         [<Fact>]
         let ``Read table proxy description - no attribution``() =
@@ -100,7 +101,6 @@ module DataProxyMetadata =
                 ] 
             }
             let tableActual = proxy.DataElement
-            //tableActual |> Claim.equal tableExpect
             tableActual.Columns.Length |> Claim.equal tableExpect.Columns.Length
             tableActual.Columns.[0] |> Claim.equal  tableExpect.Columns.[0]
             tableActual.Columns.[1] |> Claim.equal  tableExpect.Columns.[1]
@@ -190,3 +190,49 @@ module DataProxyMetadata =
             (fun () -> "SomeObject," |> DataObjectName.parse |> ignore ) |> Claim.failWith<ArgumentException>
             (fun () -> "(SomeSchema,)" |> DataObjectName.parse |> ignore ) |> Claim.failWith<ArgumentException>
 
+        [<Fact>]
+        let ``Inferred column characteristics from proxy type``() =
+            let description = pmp.DescribeTableProxy<Table10>()
+            
+            //The inferred types should match what is specified in the typeMap value of the DataProxyMetadata module
+            let col= description.Columns.[0].DataElement
+            col.DataType |> Claim.equal Int32DataType
+            col.Nullable |> Claim.isFalse
+            col.Position |> Claim.equal 0
+
+            let col = description.Columns.[1].DataElement
+            col.DataType |> Claim.equal Int64DataType
+            col.Nullable |> Claim.isTrue
+            col.Position |> Claim.equal 1
+
+            let col = description.Columns.[2].DataElement
+            col.DataType |> Claim.equal BinaryMaxDataType
+            //col.Nullable |> Claim.isTrue
+            col.Position |> Claim.equal 2
+
+            let col = description.Columns.[3].DataElement
+            col.DataType |> Claim.equal BitDataType
+            col.Nullable |> Claim.isTrue
+            col.Position |> Claim.equal 3
+
+            let col = description.Columns.[4].DataElement
+            col.DataType |> Claim.equal (UnicodeTextVariableDataType(250))
+            //col.Nullable |> Claim.isTrue
+            col.Position |> Claim.equal 4
+
+            let col = description.Columns.[5].DataElement
+            col.DataType |> Claim.equal (DateTimeDataType(27uy,7uy))
+            //col.Nullable |> Claim.isTrue
+            col.Position |> Claim.equal 5
+            
+            let col = description.Columns.[6].DataElement
+            col.DataType |> Claim.equal (DateTimeDataType(27uy,7uy))
+            //col.Nullable |> Claim.isTrue
+            col.Position |> Claim.equal 6
+
+            let col = description.Columns.[7].DataElement
+            col.DataType |> Claim.equal (DateTimeDataType(27uy,7uy))
+            //col.Nullable |> Claim.isTrue
+            col.Position |> Claim.equal 7
+
+            ()

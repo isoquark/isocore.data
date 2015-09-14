@@ -4,7 +4,7 @@
 	Col02 bigint null,
 	Col03 binary(50) null,
 	Col04 bit null,
-	Col05 char(12) null,
+	Col05 char(50) null,
 	Col06 date null,
 	Col07 datetime null,
 	Col08 datetime2 null,

@@ -48,6 +48,9 @@ module DataAttributes =
     type DataElementAttribute(name) =
         inherit DataAttribute()
 
+        new () =
+            DataElementAttribute(UnspecifiedName)
+        
         /// <summary>
         /// Gets the local name of the element, if specified
         /// </summary>
@@ -154,71 +157,6 @@ module DataAttributes =
             else
                 DataObjectName(customTypeSchemaName, customTypeName) |> Some
 
-        /// <summary>
-        /// Infers the storage type from a supplied attribute
-        /// </summary>
-        /// <param name="attrib">The attribute that describes the type of storage</param>
-        member this.DataType =
-            let attrib = this
-            match this.DataKind with
-            | DataKind.Bit ->BitDataType
-            | DataKind.UInt8 -> UInt8DataType
-            | DataKind.UInt16 -> UInt16DataType
-            | DataKind.UInt32 -> UInt32DataType
-            | DataKind.UInt64 -> UInt64DataType
-            | DataKind.Int8 -> Int8DataType
-            | DataKind.Int16 -> Int16DataType
-            | DataKind.Int32 -> Int32DataType
-            | DataKind.Int64 -> Int64DataType
-            | DataKind.Float32 -> Float32DataType
-            | DataKind.Float64 -> Float64DataType
-            | DataKind.Money -> 
-                MoneyDataType(
-                    defaultArg attrib.Precision DataKind.Money.DefaultPrecision, 
-                    defaultArg attrib.Scale DataKind.Money.DefaultScale)
-            | DataKind.Guid -> GuidDataType
-            | DataKind.AnsiTextMax -> AnsiTextMaxDataType
-            | DataKind.DateTimeOffset -> DateTimeOffsetDataType
-            | DataKind.TimeOfDay -> 
-                TimeOfDayDataType(
-                    defaultArg attrib.Precision DataKind.TimeOfDay.DefaultPrecision,
-                    defaultArg attrib.Scale DataKind.TimeOfDay.DefaultScale
-                    )
-            | DataKind.Flexible -> VariantDataType
-            | DataKind.UnicodeTextMax -> UnicodeTextMaxDataType
-            | DataKind.BinaryFixed -> 
-                BinaryFixedDataType( defaultArg attrib.Length DataKind.BinaryFixed.DefaultLength)
-            | DataKind.BinaryVariable -> 
-                BinaryVariableDataType (defaultArg attrib.Length DataKind.BinaryVariable.DefaultLength)
-            | DataKind.BinaryMax -> BinaryMaxDataType
-            | DataKind.AnsiTextFixed -> 
-                AnsiTextFixedDataType(defaultArg attrib.Length DataKind.AnsiTextFixed.DefaultLength)
-            | DataKind.AnsiTextVariable -> 
-                AnsiTextVariableDataType(defaultArg attrib.Length DataKind.AnsiTextVariable.DefaultLength)
-            | DataKind.UnicodeTextFixed -> 
-                UnicodeTextFixedDataType(defaultArg attrib.Length DataKind.UnicodeTextFixed.DefaultLength)
-            | DataKind.UnicodeTextVariable -> 
-                UnicodeTextVariableDataType(defaultArg attrib.Length DataKind.UnicodeTextVariable.DefaultLength)
-            | DataKind.DateTime -> 
-                DateTimeDataType(
-                    defaultArg attrib.Precision DataKind.DateTime.DefaultPrecision, 
-                    defaultArg attrib.Scale DataKind.DateTime.DefaultScale)  
-            | DataKind.Date -> DateDataType
-            | DataKind.Decimal -> 
-                DecimalDataType(
-                    defaultArg attrib.Precision DataKind.Decimal.DefaultPrecision, 
-                    defaultArg attrib.Scale DataKind.Decimal.DefaultScale)
-            | DataKind.Xml -> XmlDataType("")
-            | DataKind.CustomTable -> 
-                TableDataType(attrib.CustomTypeName |> Option.get)
-            | DataKind.CustomPrimitive -> 
-                //TODO: This cannot be calculated unless additional metadata is attached or we have access
-                //to database metadata (!)
-                CustomPrimitiveDataType(attrib.CustomTypeName |> Option.get, Int32DataType)
-            | DataKind.CustomObject | DataKind.Geography | DataKind.Geometry | DataKind.Hierarchy ->          
-                ObjectDataType(attrib.CustomTypeName |> Option.get, (attrib.ClrType |> Option.get).FullName)
-            | _ ->
-                NotSupportedException(sprintf "The data type %A is not recognized" attrib.DataKind) |> raise
             
 
     /// <summary>
@@ -244,8 +182,54 @@ module DataAttributes =
 
         /// Indicates the means by which the column is automatically populated if specified
         member this.AutoValue = if autoValueKind = UnspecifiedAutoValue then None else Some(autoValueKind)
-                
+               
+    /// <summary>
+    /// Applied to an element, such as a column or parameter proxy, to indicate that null values are allowed
+    /// </summary>
+    type NullableAttribute() =
+        inherit DataElementAttribute()
     
+    /// <summary>
+    /// Applied to an element, such as a column or parameter proxy, to indicate its position relative to other elements
+    /// </summary>
+    type PositionAttribute(position) =
+        inherit DataElementAttribute()
+        
+        member this.Position : int = position
+
+    type DataKindAttribute(kind, customTypeSchema, customTypeName) =
+        inherit DataElementAttribute()
+        
+        new(kind) =
+            DataKindAttribute(kind, UnspecifiedName, UnspecifiedName)
+
+        member this.Kind : DataKind = kind
+
+        member this.CustomTypeSchema = customTypeSchema
+
+        member this.CustomTypeName = customTypeName
+    
+    type LengthAttribute(len) =
+        inherit DataElementAttribute()
+        
+        member this.Length : int = len
+
+    type MaxLengthAttribute(len) =
+        inherit DataElementAttribute()
+        
+        member this.Length : int = len
+    
+    
+    type PrecisionAttribute(precision) =
+        inherit DataElementAttribute()
+        
+        member this.Precision : uint8 = precision
+
+    type ScaleAttribute(scale) =
+        inherit DataElementAttribute()
+        
+        member this.Scale : uint8 = scale
+
     /// <summary>
     /// Identifies a stored procedure
     /// </summary>

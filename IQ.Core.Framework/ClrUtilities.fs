@@ -322,12 +322,6 @@ module Type =
     let internal isOptionalCollectionType (t : Type) =
         t |> Option.isOptionType && t |> Option.getOptionValueType |> Option.get |> (fun x -> x |> isNonOptionalCollectionType)
 
-    /// <summary>
-    /// Determines whether a type represents a collection (optional or not)
-    /// </summary>
-    /// <param name="t">The type to examine</param>
-    let internal isCollectionType (t : Type) =
-        t |> isNonOptionalCollectionType || t |> isOptionalCollectionType
                 
     /// <summary>
     /// Determines whether a supplied type is a record type
@@ -355,6 +349,13 @@ module Type =
     let internal isUnion<'T>() =
         typeof<'T> |> isUnionType
     
+    /// <summary>
+    /// Determines whether a type represents a collection (optional or not)
+    /// </summary>
+    /// <param name="t">The type to examine</param>
+    let isCollectionType (t : Type) =
+        t |> isNonOptionalCollectionType || t |> isOptionalCollectionType
+
     let getCollectionValueType (t : Type) =
         //This is far from bullet-proof
         let colltype =

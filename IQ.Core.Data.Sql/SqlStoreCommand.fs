@@ -77,7 +77,11 @@ module internal SqlStoreCommand =
     )
     let execute cs (spec : 'TCommand) : 'TResult =
         let m = commandHandlers.Value.[spec.GetType()]
-        m.Invoke(null, [|cs; spec|]) :?> 'TResult
+        let result = m.Invoke(null, [|cs; spec|]) 
+        if typeof<'TResult> = typeof<Unit>  then
+            null :> obj :?> 'TResult
+        else
+            result :?> 'TResult
        
                 
 

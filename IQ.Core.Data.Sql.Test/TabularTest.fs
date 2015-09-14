@@ -10,6 +10,8 @@ open System.Reflection
 open System.Threading
 open System.Collections.Generic
 
+open Ploeh.AutoFixture
+
 open IQ.Core.TestFramework
 open IQ.Core.Data
 open IQ.Core.Data.Test
@@ -136,8 +138,20 @@ module Tabular =
             
         [<Fact>]
         let ``Executed parametrized dynamic query``() =
-            let info = proxyMetadata.DescribeTableProxy<Table10>()            
-            //TODO: 1.Try to use autofixture to populate proxies and insert them into the table
-            //2. Writ a TVF that brings back the data and verify the results
+            let proxyInfo = proxyMetadata.DescribeTableProxy<Table10>()   
+            proxyInfo.DataElement.Name |> TruncateTable |> store.ExecuteCommand
+            
+            let fixture = Fixture();
+            let proxies = [for i in 1..2000 do
+                                let proxy =  fixture.Create<Table10>()
+                                proxy.Col19 <- i
+                                yield proxy
+                          ]
+            
+            //proxies |> store.Insert
+                     
+            //TODO: 
+            //1. Generate date
+            //2. Write a TVF that brings back the data and verify the results
             ()
 

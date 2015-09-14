@@ -106,6 +106,7 @@ module DataProxyExtensions =
         /// <param name="i">The column's ordinal position</param>
         member this.Item(i) = this.Columns.[i]
 
+
         /// <summary>
         /// Gets the name of the table represented by the proxy
         /// </summary>

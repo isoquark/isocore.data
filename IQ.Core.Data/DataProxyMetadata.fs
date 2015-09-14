@@ -41,28 +41,167 @@ module DataProxyMetadata =
         ] |> dict
     
        
+    /// <summary>
+    /// Infers the dat type from a supplied attribute
+    /// </summary>
+    /// <param name="attrib">The attribute that describes the type of storage</param>
+    let private inferDataTypeFromAttribute (attrib : DataTypeAttribute) =
+        match attrib.DataKind with
+        | DataKind.Bit ->BitDataType
+        | DataKind.UInt8 -> UInt8DataType
+        | DataKind.UInt16 -> UInt16DataType
+        | DataKind.UInt32 -> UInt32DataType
+        | DataKind.UInt64 -> UInt64DataType
+        | DataKind.Int8 -> Int8DataType
+        | DataKind.Int16 -> Int16DataType
+        | DataKind.Int32 -> Int32DataType
+        | DataKind.Int64 -> Int64DataType
+        | DataKind.Float32 -> Float32DataType
+        | DataKind.Float64 -> Float64DataType
+        | DataKind.Money -> 
+            MoneyDataType(
+                defaultArg attrib.Precision DataKind.Money.DefaultPrecision, 
+                defaultArg attrib.Scale DataKind.Money.DefaultScale)
+        | DataKind.Guid -> GuidDataType
+        | DataKind.AnsiTextMax -> AnsiTextMaxDataType
+        | DataKind.DateTimeOffset -> DateTimeOffsetDataType
+        | DataKind.TimeOfDay -> 
+            TimeOfDayDataType(
+                defaultArg attrib.Precision DataKind.TimeOfDay.DefaultPrecision,
+                defaultArg attrib.Scale DataKind.TimeOfDay.DefaultScale
+                )
+        | DataKind.Flexible -> VariantDataType
+        | DataKind.UnicodeTextMax -> UnicodeTextMaxDataType
+        | DataKind.BinaryFixed -> 
+            BinaryFixedDataType( defaultArg attrib.Length DataKind.BinaryFixed.DefaultLength)
+        | DataKind.BinaryVariable -> 
+            BinaryVariableDataType (defaultArg attrib.Length DataKind.BinaryVariable.DefaultLength)
+        | DataKind.BinaryMax -> BinaryMaxDataType
+        | DataKind.AnsiTextFixed -> 
+            AnsiTextFixedDataType(defaultArg attrib.Length DataKind.AnsiTextFixed.DefaultLength)
+        | DataKind.AnsiTextVariable -> 
+            AnsiTextVariableDataType(defaultArg attrib.Length DataKind.AnsiTextVariable.DefaultLength)
+        | DataKind.UnicodeTextFixed -> 
+            UnicodeTextFixedDataType(defaultArg attrib.Length DataKind.UnicodeTextFixed.DefaultLength)
+        | DataKind.UnicodeTextVariable -> 
+            UnicodeTextVariableDataType(defaultArg attrib.Length DataKind.UnicodeTextVariable.DefaultLength)
+        | DataKind.DateTime -> 
+            DateTimeDataType(
+                defaultArg attrib.Precision DataKind.DateTime.DefaultPrecision, 
+                defaultArg attrib.Scale DataKind.DateTime.DefaultScale)  
+        | DataKind.Date -> DateDataType
+        | DataKind.Decimal -> 
+            DecimalDataType(
+                defaultArg attrib.Precision DataKind.Decimal.DefaultPrecision, 
+                defaultArg attrib.Scale DataKind.Decimal.DefaultScale)
+        | DataKind.Xml -> XmlDataType("")
+        | DataKind.CustomTable -> 
+            TableDataType(attrib.CustomTypeName |> Option.get)
+        | DataKind.CustomPrimitive -> 
+            //TODO: This cannot be calculated unless additional metadata is attached or we have access
+            //to database metadata (!)
+            CustomPrimitiveDataType(attrib.CustomTypeName |> Option.get, Int32DataType)
+        | DataKind.CustomObject | DataKind.Geography | DataKind.Geometry | DataKind.Hierarchy ->          
+            ObjectDataType(attrib.CustomTypeName |> Option.get, (attrib.ClrType |> Option.get).FullName)
+        | _ ->
+            NotSupportedException(sprintf "The data type %A is not recognized" attrib.DataKind) |> raise
+
+
+//        member this.GetTypeReference(?length : int, ?precision : uint8, ?scale : uint8, ?objectName : DataObjectName) =
+//            match this with
+//            | DataKind.Bit -> BitDataType
+//            | DataKind.UInt8 -> UInt8DataType
+//            | DataKind.UInt16 -> UInt16DataType
+//            | DataKind.UInt32 -> UInt32DataType
+//            | DataKind.UInt64 -> UInt64DataType
+//            | DataKind.Int8 -> Int8DataType
+//            | DataKind.Int16-> Int16DataType
+//            | DataKind.Int32 -> Int32DataType  
+//            | DataKind.Int64 -> Int64DataType
+//            | DataKind.BinaryFixed -> BinaryFixedDataType(length.Value)
+//            | DataKind.BinaryVariable -> BinaryVariableDataType(length.Value)
+//            | DataKind.BinaryMax -> BinaryMaxDataType
+//            | DataKind.AnsiTextFixed -> AnsiTextFixedDataType(length.Value)
+//            | DataKind.AnsiTextVariable -> AnsiTextVariableDataType(length.Value)
+//            | DataKind.AnsiTextMax -> AnsiTextMaxDataType
+//            | DataKind.UnicodeTextFixed -> UnicodeTextFixedDataType(length.Value)
+//            | DataKind.UnicodeTextVariable -> UnicodeTextVariableDataType(length.Value)
+//            | DataKind.UnicodeTextMax -> UnicodeTextMaxDataType
+//            | DataKind.DateTime -> DateTimeDataType(precision.Value, scale.Value)
+//            | DataKind.DateTimeOffset -> DateTimeOffsetDataType
+//            | DataKind.TimeOfDay -> TimeOfDayDataType(precision.Value, scale.Value)
+//            | DataKind.Date -> DateDataType
+//            | DataKind.Duration -> TimespanDataType
+//            | DataKind.Float32 -> Float32DataType
+//            | DataKind.Float64 -> Float64DataType
+//            | DataKind.Decimal -> DecimalDataType(precision.Value, scale.Value)
+//            | DataKind.Money -> MoneyDataType(precision.Value, scale.Value)
+//            | DataKind.Guid -> GuidDataType
+//            | DataKind.Xml -> XmlDataType(objectName.Value.SchemaName)
+//            | DataKind.Json -> JsonDataType
+//            | DataKind.Flexible -> VariantDataType
+//            | DataKind.Geography -> ObjectDataType()
+//            | DataKind.Geometry -> nosupport()
+//            | DataKind.Hierarchy -> nosupport()  
+//            | DataKind.TypedDocument -> nosupport()
+//            | DataKind.CustomTable -> nosupport()
+//            | DataKind.CustomObject -> nosupport()
+//            | DataKind.CustomPrimitive -> nosupport()
+//            | _-> nosupport()
+
         
-    let inferStorageType(description : ClrElement) =
-        let fromClrType (t : Type) =
-            if typeMap.ContainsKey(t.ItemValueType) then
-                typeMap.[t.ItemValueType]
-            else
-                TypedDocumentDataType(t)
+    let private inferDataTypeFromClrType (t : Type) =            
+        if t |> Type.isCollectionType && typeMap.ContainsKey(t) then
+            typeMap.[t]
+        else if typeMap.ContainsKey(t.ItemValueType) then
+            typeMap.[t.ItemValueType]
+        else
+            TypedDocumentDataType(t)
+
+    let private inferDataType2(element : ClrElement) =
+        let dataKindAttrib = element |> ClrElement.tryGetAttributeT<DataKindAttribute>
+        let precisionAttrib = element |> ClrElement.tryGetAttributeT<PrecisionAttribute>
+        let scaleAttrib = element |> ClrElement.tryGetAttributeT<ScaleAttribute> 
+        match element with
+        | MemberElement(m) -> 
+            match m with
+            | PropertyMember(p) ->
+                match dataKindAttrib with
+                | Some(attrib) ->
+                    ()
+                | None ->
+                    ()
+                
+            | FieldMember(f) ->
+                nosupport()
+            | _ ->
+                nosupport()
+        | TypeElement(t) ->
+            nosupport()
+        | AssemblyElement(a) ->
+            nosupport()
+        | ParameterElement(p) ->
+            nosupport()
+        | UnionCaseElement(c) ->
+            nosupport()
+
+
+    let private inferDataType(description : ClrElement) =
 
         match description |> ClrElement.tryGetAttributeT<DataTypeAttribute>  with
         | Some(attrib) -> 
-            attrib.DataType
+            attrib |> inferDataTypeFromAttribute
         | None ->            
             match description with
             | MemberElement(d) ->
                 match d with
-                | PropertyMember(x) -> x.ReflectedElement.Value.PropertyType |> fromClrType
-                | FieldMember(x) -> x.ReflectedElement.Value.FieldType |> fromClrType
+                | PropertyMember(x) -> x.ReflectedElement.Value.PropertyType |> inferDataTypeFromClrType
+                | FieldMember(x) -> x.ReflectedElement.Value.FieldType |> inferDataTypeFromClrType
                 | _ -> nosupport()
             | ParameterElement(d) ->
-                d.ReflectedElement.Value.ParameterType |> fromClrType
+                d.ReflectedElement.Value.ParameterType |> inferDataTypeFromClrType
             | TypeElement(t) ->
-                t.ReflectedElement.Value |> fromClrType
+                t.ReflectedElement.Value |> inferDataTypeFromClrType
             | _ -> nosupport()
 
     let private describeType(name : ClrTypeName) =        
@@ -139,21 +278,22 @@ module DataProxyMetadata =
     /// <summary>
     /// Infers a <see cref"ColumnDescription"/>  from a CLR element
     /// </summary>
-    /// <param name="clrElement">The CLR element from which the column description will be inferred</param>
-    let describeColumn (parentName : DataObjectName) (description: ClrProperty) =
-        let gDescription = description |> PropertyMember |> MemberElement
-        let storageType = gDescription |> inferStorageType
+    /// <param name="proxy">The CLR element from which the column description will be inferred</param>
+    let describeColumn (parentName : DataObjectName) (proxy: ClrProperty) =
+        let gDescription = proxy |> PropertyMember |> MemberElement
+        let dataType = gDescription |> inferDataType
+        let isNullable = proxy.IsOptional || proxy.IsNullable || proxy.HasAttribute<NullableAttribute>()
         match gDescription |> ClrElement.tryGetAttributeT<ColumnAttribute> with
         | Some(attrib) ->
             {
                 ColumnDescription.Name = 
                     match attrib.Name with 
                     | Some(name) -> name
-                    | None -> description.Name.Text
-                Position = description.Position |> defaultArg attrib.Position 
+                    | None -> proxy.Name.Text
+                Position = proxy.Position |> defaultArg attrib.Position 
                 Documentation = String.Empty
-                DataType = storageType
-                Nullable = description.IsOptional || description.IsNullable 
+                DataType = dataType
+                Nullable = isNullable
                 AutoValue = AutoValueKind.None
                 ParentName = parentName
                 Properties = []
@@ -161,11 +301,11 @@ module DataProxyMetadata =
 
         | None ->
             {
-                ColumnDescription.Name = description.Name.Text
-                Position = description.Position
+                ColumnDescription.Name = proxy.Name.Text
+                Position = proxy.Position
                 Documentation = String.Empty
-                DataType = storageType
-                Nullable = description.IsOptional || description.IsNullable 
+                DataType = dataType
+                Nullable = isNullable
                 AutoValue = AutoValueKind.None
                 ParentName = parentName
                 Properties = []
@@ -208,7 +348,7 @@ module DataProxyMetadata =
             Position = position
             Direction = direction
             Documentation = String.Empty
-            DataType = description |> ParameterElement|> inferStorageType 
+            DataType = description |> ParameterElement|> inferDataType 
             Properties = []
         }
     
@@ -221,9 +361,9 @@ module DataProxyMetadata =
         let eDescription   = description |> MethodMember |> MemberElement 
         let storageType = match eDescription |> ClrElement.tryGetAttributeT<DataTypeAttribute> with
                                 | Some(attrib) -> 
-                                    attrib.DataType
+                                    attrib |> inferDataTypeFromAttribute
                                 | None -> 
-                                    description.ReturnType  |> Option.get |> describeType |> TypeElement |>   inferStorageType
+                                    description.ReturnType  |> Option.get |> describeType |> TypeElement |>   inferDataType
         
         match description.ReturnAttributes |> List.tryFind(fun x -> x.AttributeName = typeinfo<RoutineParameterAttribute>.Name) with
         |Some(attrib) ->

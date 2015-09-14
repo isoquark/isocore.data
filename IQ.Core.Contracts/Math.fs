@@ -5,7 +5,7 @@ namespace IQ.Core.Math.Contracts
 open System
 open System.Numerics
 
-type Vector<'T> = Vector of Components : 'T[]
+type Range<'T> = Range of MinValue : 'T * MaxValue : 'T    
 
 /// <summary>
 /// Defines contract for primtive, non-parametrized calculator
@@ -16,10 +16,8 @@ type ICalculator =
     abstract Multiply:'T*'T->'T
     abstract Divide:'T*'T->'T
     abstract Zero:unit->'T
-
-type IArrayCalculator =
-    abstract Multiply: 'T[]*'T[]->'T[]
-
+    abstract LessThan:'T*'T->bool
+    abstract GreaterThan: 'T*'T->bool
 
 type ICalculator<'T> =
     abstract Add: 'T*'T->'T
@@ -44,11 +42,14 @@ type ICalculator<'T> =
     abstract MinValue : 'T
     abstract MaxValue : 'T
 
-type IVectorCalculator =
-    abstract Dot:Vector<'T>*Vector<'T>->'T    
 
-type IVectorCalculator<'T> =
-    abstract Dot:Vector<'T>*Vector<'T>->'T
+type IArrayCalculator =
+    abstract Dot:'T[]*'T[]->'T    
+    abstract Multiply: 'T[]*'T[]->'T[]
+    abstract LessThan:('T seq)*'T->bool
+
+type IArrayCalculator<'T> =
+    abstract Dot:'T[]*'T[]->'T
 
 
 type IStats =

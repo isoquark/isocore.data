@@ -129,28 +129,57 @@ module TestProxies =
 
         type Table10() =
             member val Col01 = 0 with get, set
+            
             member val Col02 = Nullable<int64>() with get, set
+            
+            [<Nullable; Length(50)>]
             member val Col03 = Array.zeroCreate<uint8>(0) with get, set
+            
             member val Col04 = Nullable<bool>() with get, set
+            
+            [<Nullable; Length(50)>]
             member val Col05 = String.Empty with get, set
+            
+            [<DataKind(DataKind.Date)>]
             member val Col06 = Nullable<BclDateTime>() with get, set
+            
             member val Col07 = Nullable<BclDateTime>() with get, set
+            
             member val Col08 = Nullable<BclDateTime>() with get, set
+            
+            [<Precision(18uy); Scale(12uy)>]
             member val Col09 = Nullable<decimal>() with get, set
+            
             member val Col10 = Nullable<float>() with get, set
+            
             member val Col11 = Nullable<decimal>() with get,set
+            
+            [<Nullable; MaxLength(100)>]            
             member val Col12 = String.Empty with get, set
+            
+            [<Precision(15uy); Scale(5uy)>]
             member val Col13 = Nullable<decimal>() with get,set
+            
+            [<Nullable; MaxLength(73)>]            
             member val Col14 = String.Empty with get, set
+            
             member val Col15 = Nullable<float32>() with get, set
+            
             member val Col16 = Nullable<BclDateTime>() with get, set
+            
             member val Col17 = Nullable<int16>() with get,set
+            
             member val Col18 = Nullable<decimal>() with get,set
+            [<Nullable>]
             member val Col19 = Unchecked.defaultof<obj> with get, set
             member val Col20 = Nullable<uint8>() with get,set
             member val Col21 = Nullable<Guid>() with get,set
+            [<Nullable>]
             member val Col22 = Array.zeroCreate<uint8>(0) with get, set
+            [<Nullable; MaxLength(121)>]
             member val Col23 = String.Empty with get, set
             member val Col24 = Array.zeroCreate<uint8>(0) with get, set
+            [<Nullable>]
             member val Col25 = String.Empty with get, set
+            [<Nullable>]
             member val Col26 = String.Empty with get, set

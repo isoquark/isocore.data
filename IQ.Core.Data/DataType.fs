@@ -418,5 +418,6 @@ module DataTypeExtensions =
     with
         member this.DefaultLength = this |> DataKind.getDefaultLength
         member this.DefaultPrecision = this |> DataKind.getDefaultPrecision
-        member this.DefaultScale = this |> DataKind.getDefaultScale        
+        member this.DefaultScale = this |> DataKind.getDefaultScale   
+        
 

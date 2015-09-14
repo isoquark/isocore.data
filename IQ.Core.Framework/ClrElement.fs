@@ -487,17 +487,64 @@ module ClrTypeExtensions =
             | RecordType x -> x.Info
             | InterfaceType x -> x.Info
 
+        /// <summary>
+        /// The name of the type
+        /// </summary>
         member this.Name = this.Info.Name
+        
+        /// <summary>
+        /// The peer-relative position of the type 
+        /// </summary>
         member this.Position = this.Info.Position
+        
+        /// <summary>
+        /// The represented CLR type, if specified
+        /// </summary>
         member this.ReflectedElement = this.Info.ReflectedElement
+        
+        /// <summary>
+        /// The type that declares the type, if any
+        /// </summary>
         member this.DeclaringType = this.Info.DeclaringType
+        
+        /// <summary>
+        /// The types declared by the type, if any
+        /// </summary>
         member this.DeclaredTypes = this.Info.DeclaredTypes
+        
+        /// <summary>
+        /// Specifies the type's classification
+        /// </summary>
         member this.Kind = this.Info.Kind
+        
+        /// <summary>
+        /// Specifies whether the type is an F# opton
+        /// </summary>
         member this.IsOptionType = this.Info.IsOptionType
+        
+        /// <summary>
+        /// The type members
+        /// </summary>
         member this.Members = this.Info.Members
+
+        /// <summary>
+        /// Specifies the types accessiblity
+        /// </summary>
         member this.Access = this.Info.Access
+        
+        /// <summary>
+        /// Specifies whether the type is static
+        /// </summary>
         member this.IsStatic = this.Info.IsStatic
+        
+        /// <summary>
+        /// The attributes applied to the type
+        /// </summary>
         member this.Attributes = this.Info.Attributes
+        
+        /// <summary>
+        /// The name of the actual or encapsulated type
+        /// </summary>
         member this.ItemValueType = this.Info.ItemValueType
 
         /// <summary>
@@ -617,7 +664,18 @@ module ClrMethodExtensions =
         /// </summary>
         member this.InputParameters = this.Parameters |> List.filter(fun x -> x.IsReturn |> not)
 
-    
+
+[<AutoOpen>]
+module ClrPropertyExtensions =
+    type ClrProperty
+    with
+        member this.TryGetAttribute<'T when 'T :> Attribute>() =
+            let attribName = ClrTypeName(typeof<'T>.Name, typeof<'T>.FullName |> Some, typeof<'T>.AssemblyQualifiedName |> Some) 
+            this.Attributes |> List.tryFind(fun x -> x.AttributeName = attribName)
+        
+        member this.HasAttribute<'T when 'T:> Attribute>() = 
+            this.TryGetAttribute<'T>() |> Option.isSome
+           
 
 //TODO: This logic needs to be mooved to a non-extension module
 [<AutoOpen>]

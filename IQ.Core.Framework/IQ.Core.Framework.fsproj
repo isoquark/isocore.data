@@ -75,6 +75,7 @@
     <Compile Include="DataStructures.fs" />
     <Compile Include="CoreRegistration.fs" />
     <Compile Include="PocoConverter.fs" />
+    <Compile Include="ValueGenerators.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Autofac">

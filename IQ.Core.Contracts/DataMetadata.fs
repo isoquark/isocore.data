@@ -169,6 +169,50 @@ type DataTypeReference =
     | ObjectDataType of name : DataObjectName * clrTypeName : string
     | CustomPrimitiveDataType of name : DataObjectName * baseType : DataTypeReference
     | TypedDocumentDataType of doctype : Type
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() =
+        match this with
+        | BitDataType -> "bit"
+        | UInt8DataType -> "uint8"
+        | UInt16DataType -> "uint16"
+        | UInt32DataType -> "uint32"
+        | UInt64DataType -> "uint64"
+        | Int8DataType -> "int8"
+        | Int16DataType -> "int16"
+        | Int32DataType -> "int32"
+        | Int64DataType -> "int64"
+        | BinaryFixedDataType(len) -> sprintf "byte[%i]" len
+        | BinaryVariableDataType(len) -> sprintf "byte[1..%i]" len
+        | BinaryMaxDataType -> "byte[*]" 
+        | AnsiTextFixedDataType(len) -> sprintf "text[%i]" len
+        | AnsiTextVariableDataType(len) -> sprintf "text[1..%i]" len
+        | AnsiTextMaxDataType -> "text[*]"
+        | UnicodeTextFixedDataType(len) -> sprintf "ntext[%i]" len
+        | UnicodeTextVariableDataType(len) -> sprintf "ntext[1..%i]" len
+        | UnicodeTextMaxDataType -> "ntext[*]"
+        | DateTimeDataType(p,s) -> sprintf "datetime(%i,%i)" p s
+        | DateTimeOffsetDataType -> sprintf "datetimeoffset"
+        | TimeOfDayDataType(p,s) -> sprintf "timeofday(%i,%i)" p s
+        | TimespanDataType -> sprintf "timespan"
+        | RowversionDataType -> sprintf "rowversion"
+        | DateDataType -> "date"
+        | Float32DataType -> "float32"
+        | Float64DataType -> "float64"
+        | DecimalDataType(p,s) -> sprintf "decimal(%i,%i)" p s
+        | MoneyDataType(p,s) -> sprintf "money(%i,%i)" p s
+        | GuidDataType -> "guid"
+        | XmlDataType(schema) -> sprintf "xml(%s)" schema
+        | JsonDataType -> "json"
+        | VariantDataType -> "variant"
+        | TableDataType(name) -> sprintf "table : %O" name
+        | ObjectDataType(name,clrTypeName) -> sprintf "%O : %s" name clrTypeName
+        | CustomPrimitiveDataType(name, baseType) -> sprintf "%O : %O" name baseType
+        | TypedDocumentDataType(doctype) -> sprintf "document : %s" doctype.Name
+
+
 
 /// <summary>
 /// Represents a numeric value, duh.
@@ -308,7 +352,7 @@ with
 /// <summary>
 /// Describes a column in a table or view
 /// </summary>
-[<DebuggerDisplay("{Position} {Name,nq} {StorageType}")>]
+[<DebuggerDisplay("{ToString(),nq}")>]
 type ColumnDescription = {
     /// The name of parent data object
     ParentName : DataObjectName
@@ -331,7 +375,7 @@ with
     /// <summary>
     /// Renders a textual representation of the instance that is suitable for diagnostic purposes
     /// </summary>
-    override this.ToString() = this.Name
+    override this.ToString() = sprintf "%s : %O"  this.Name this.DataType
 
     interface IDataElementDescription with
         member this.ElementKind = DataElementKind.Column
