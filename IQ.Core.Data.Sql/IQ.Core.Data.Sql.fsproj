@@ -44,7 +44,6 @@
   </Choose>
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
-    <None Include="app.config" />
     <EmbeddedResource Include="Resources\SqlSpecs.xlsx" />
     <EmbeddedResource Include="Resources\IntrinsicPrimitiveTypes.csv" />
     <Compile Include="AssemblyInfo.fs" />
@@ -60,6 +59,7 @@
     <Compile Include="SqlStoreCommand.fs" />
     <Compile Include="SqlDataStore.fs" />
     <Compile Include="SqlExtensions.fs" />
+    <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

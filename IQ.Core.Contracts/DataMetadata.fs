@@ -85,18 +85,31 @@ type DataKind =
     /// the upper bound of the array's length (map to nvarchar(MAX) in SQL Server)
     | UnicodeTextMax = 55uy
     
-    /// Identifies a type representing a date and time (map to datetime2 in SQL Servver)
+    /// Identifies a type representing a date and time (map to datetime2(7) by default in sql server)
     | DateTime = 62uy 
+            
     | DateTimeOffset = 63uy
     | TimeOfDay = 64uy //corresponds to time
     | Date = 65uy //corresponds to date        
     | Duration = 66uy //no direct map, use bigint to store number of ticks
+    
+    /// Identifies a type representing a date and time (map to datetime in sql server)
+    /// DataTypeReference DateTime(23,3)
+    | LegacyDateTime = 67uy
+    /// This should never be used in new tables, its just here for the sake of compatibilty
+    /// DataTypeReference DateTime(16,0)
+    | LegacySmallDateTime = 68uy
+
         
+
     | Float32 = 70uy //corresponds to real
     | Float64 = 71uy //corresponds to float
         
     | Decimal = 80uy
+    /// DataTypeReference Money(10,4)
     | Money = 81uy
+    /// DataTypeReference Money(19,4)
+    | SmallMoney = 82uy
         
     | Guid = 90uy //corresponds to uniqueidentifier
     | Xml = 100uy
@@ -217,6 +230,10 @@ with
 /// <summary>
 /// Represents a numeric value, duh.
 /// </summary>
+/// <remarks>
+/// The intent is not to use this for calculations and such as it would be very slow; its
+/// intended use case is rather clarity of expression and/or type-safety when.
+/// </remarks>
 type NumericValue =
     | UInt8Value of uint8
     | UInt16Value of uint16

@@ -65,7 +65,6 @@ module TestProxies =
     type Table01 = {
         [<Description("Col01 Description Text")>]
             
-        [<DataTypeAttribute(DataKind.Int32)>]
         Col01 : uint16
         [<Description("Col02 Description Text")>]
         Col02 : int64 option
@@ -95,7 +94,6 @@ module TestProxies =
             DataTypeName : string
             SchemaId : int
             SchemaName : string   
-            [<DataTypeAttribute(DataKind.Int16)>]
             MaxLength : decimal
             Precision : uint8
             Scale : uint8
@@ -127,59 +125,99 @@ module TestProxies =
             Col03 : string
         }        
 
+        //Inferred object name: [SqlTest].[Table10]
         type Table10() =
+            //Inferred int not null
             member val Col01 = 0 with get, set
             
+            //Inferred: bigint null
             member val Col02 = Nullable<int64>() with get, set
             
-            [<Nullable; Length(50)>]
+            //Inferred: binary(50) null
+            [<Nullable; FixedLength(50)>]
             member val Col03 = Array.zeroCreate<uint8>(0) with get, set
             
+            //Inferred: bit null
             member val Col04 = Nullable<bool>() with get, set
             
-            [<Nullable; Length(50)>]
+            //Inferred: char(50) null
+            [<DataKind(DataKind.AnsiTextFixed); Nullable; FixedLength(50)>]
             member val Col05 = String.Empty with get, set
             
+            //Inferred: date null
             [<DataKind(DataKind.Date)>]
             member val Col06 = Nullable<BclDateTime>() with get, set
             
+            //Inferred: datetime null
+            [<DataKind(DataKind.LegacyDateTime)>]
             member val Col07 = Nullable<BclDateTime>() with get, set
             
+            //Inferred: datetime2(7) null
             member val Col08 = Nullable<BclDateTime>() with get, set
             
+            //Inferred: decimal(18,12) null
             [<Precision(18uy); Scale(12uy)>]
             member val Col09 = Nullable<decimal>() with get, set
             
+            //Inferred: float null
             member val Col10 = Nullable<float>() with get, set
             
+            //Inferred: money null
+            [<DataKind(DataKind.Money)>]
             member val Col11 = Nullable<decimal>() with get,set
             
-            [<Nullable; MaxLength(100)>]            
+            //Inferred varchar(100) null
+            [<Nullable; FixedLength(100)>]            
             member val Col12 = String.Empty with get, set
             
+            //Inferred: decimal(15, 5) null
             [<Precision(15uy); Scale(5uy)>]
             member val Col13 = Nullable<decimal>() with get,set
             
+            //Inferred: nvarchar(73) null
             [<Nullable; MaxLength(73)>]            
             member val Col14 = String.Empty with get, set
             
+            //Inferred: real null
             member val Col15 = Nullable<float32>() with get, set
             
+            //Inferred: smalldatetime null
+            [<DataKind(DataKind.LegacySmallDateTime)>]
             member val Col16 = Nullable<BclDateTime>() with get, set
             
+            //Inferred: smallint null
             member val Col17 = Nullable<int16>() with get,set
             
+            //Inferred: smallmoney null
+            [<DataKind(DataKind.SmallMoney)>]
             member val Col18 = Nullable<decimal>() with get,set
+            
+            //Inferred: sql_variant null
             [<Nullable>]
             member val Col19 = Unchecked.defaultof<obj> with get, set
+            
+            //Inferred: tinyint null
             member val Col20 = Nullable<uint8>() with get,set
+            
+            //Inferred: uniqueidentifier null
             member val Col21 = Nullable<Guid>() with get,set
-            [<Nullable>]
+            
+            //Inferred: varbinary(223)
+            [<Nullable; MaxLength(223)>]
             member val Col22 = Array.zeroCreate<uint8>(0) with get, set
+            
+            //Inferred: varchar(121)
             [<Nullable; MaxLength(121)>]
             member val Col23 = String.Empty with get, set
+            
+            //Inferred varbinary(MAX) null
+            [<Nullable>]
             member val Col24 = Array.zeroCreate<uint8>(0) with get, set
-            [<Nullable>]
+            
+            //Inferred varchar(MAX)
+            [<DataKind(DataKind.AnsiTextMax); Nullable>]
             member val Col25 = String.Empty with get, set
-            [<Nullable>]
+            
+            //Inferred nvarchar(MAX)
+            [<Nullable>]            
             member val Col26 = String.Empty with get, set
