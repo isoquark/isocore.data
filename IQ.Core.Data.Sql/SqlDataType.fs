@@ -41,7 +41,7 @@ module DataType =
         | TimeOfDayDataType(_) -> SqlDbType.Time
         | DateDataType -> SqlDbType.Date
         //Timespan will always be interpreted as the number of ticks since T0
-        | TimespanDataType -> SqlDbType.BigInt
+        | DurationDataType -> SqlDbType.BigInt
 
         | Float32DataType -> SqlDbType.Real
         | Float64DataType -> SqlDbType.Float

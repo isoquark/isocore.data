@@ -271,7 +271,7 @@ module SqlFormatter =
             //it can't be specified in user scripts. See
             //https://msdn.microsoft.com/en-us/library/Bb677243.aspx
             sprintf "%s(%i)" SqlDataTypeNames.time scale
-        | TimespanDataType -> 
+        | DurationDataType -> 
             SqlDataTypeNames.bigint
         | RowversionDataType -> 
             SqlDataTypeNames.rowversion            

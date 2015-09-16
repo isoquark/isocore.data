@@ -384,11 +384,6 @@ module DataAttributes =
     type MaxDateAttribute(value : string) =
         inherit ElementFacetAttribute<BclDateTime>(BclDateTime.Parse(value))
 
-        /// <summary>
-        /// The maximum value of the subject element
-        /// </summary>
-        member this.Value = DateTime.Parse(value)
-
 
     /// <summary>
     /// Specifies the inclusive lower and upper bounds of the date value of the element to which it applies
@@ -396,8 +391,21 @@ module DataAttributes =
     type DateRangeAttribute(minValue : string, maxValue : string) =
         inherit ElementFacetAttribute<Range<BclDateTime>>(Range(BclDateTime.Parse(minValue), BclDateTime.Parse(maxValue)))
 
+    type XmlSchemaAttribute(value : string) =
+        inherit ElementFacetAttribute<string>(value)
+
+
+    type RepresentationTypeAttribute(t : Type) =
+        inherit ElementFacetAttribute<Type>(t)
+
+    type DataObjectNameAttribute private (name : DataObjectName) =
+        inherit ElementFacetAttribute<DataObjectName>(name)
+
+        new(schemaName, localName) =
+            DataObjectNameAttribute(DataObjectName(schemaName, localName))
         
 
+               
     /// <summary>
     /// Defines the supported data facet names
     /// </summary>
@@ -407,7 +415,7 @@ module DataAttributes =
         [<Literal>]
         let Position = "Position"
         [<Literal>]
-        let IntrinsicDataKind = "DataKind"
+        let DataKind = "DataKind"
         [<Literal>]
         let CustomObjectName = "CustomDataKind"
         [<Literal>]
@@ -428,9 +436,14 @@ module DataAttributes =
         let MinDate = "MinDate"
         [<Literal>]
         let MaxDate = "MaxDate"
-    
+        [<Literal>]
+        let XmlSchema = "XmlSchema"
+        [<Literal>]
+        let RepresentationType = "RepresentationType"
+        [<Literal>]
+        let DataObjectName = "DataObjectName"
 
-module DataFacetAttributeReader = 
+module DataFacet = 
     
     let private cast<'T>(x : obj) = x :?> 'T
 
@@ -454,7 +467,7 @@ module DataFacetAttributeReader =
     /// </summary>
     /// <param name="facetName">The name of the facet</param>
     /// <param name="element">The element to which the facet may be attached/param>
-    let tryGetFacet<'T> facetName (element : ClrElement) =
+    let tryGetFacetValue<'T> facetName (element : ClrElement) =
         match facetName with
         | DataFacetNames.Nullable -> 
             element |> attrib<NullableAttribute, 'T>
@@ -462,7 +475,7 @@ module DataFacetAttributeReader =
         | DataFacetNames.Position -> 
             element |> attrib<PositionAttribute, 'T>
         
-        | DataFacetNames.IntrinsicDataKind -> 
+        | DataFacetNames.DataKind -> 
             element |> attrib<DataKindAttribute, 'T>
         
         | DataFacetNames.CustomObjectName -> 
@@ -525,5 +538,20 @@ module DataFacetAttributeReader =
                 | Some(x) -> x |> getRangeMin |> Some 
                 | None -> None
 
+        | DataFacetNames.XmlSchema ->
+            element |> attrib<XmlSchemaAttribute, 'T> 
+        
+        | DataFacetNames.RepresentationType ->
+            element |> attrib<RepresentationTypeAttribute, 'T>   
+
+        | DataFacetNames.DataObjectName ->
+            element |> attrib<DataObjectNameAttribute, 'T>
+
         | _ -> nosupport()    
     
+
+    let getFacetValue<'T> facetName (element : ClrElement) =
+        element |> tryGetFacetValue<'T> facetName |> Option.get
+
+    let hasFacet<'T> facetName (element : ClrElement) =
+        element |> tryGetFacetValue<'T> facetName |> Option.isSome

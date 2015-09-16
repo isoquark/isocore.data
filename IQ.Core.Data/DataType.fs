@@ -255,7 +255,7 @@ module DataType =
         | DateTimeOffsetDataType -> DateTimeOffsetDataTypeName
         | TimeOfDayDataType(p,s) -> sprintf "%s(%i,%i)" TimeOfDayDataTypeName p s
         | DateDataType -> DateDataTypeName
-        | TimespanDataType -> TimespanDataTypeName            
+        | DurationDataType -> TimespanDataTypeName            
         | Float32DataType -> Float32DataTypeName
         | Float64DataType -> Float64DataTypeName
         | DecimalDataType(precision,scale) -> sprintf "%s(%i,%i)" DecimalDataTypeName precision scale
@@ -303,7 +303,7 @@ module DataType =
         | DateTimeOffsetDataType -> DataKind.DateTimeOffset
         | TimeOfDayDataType(_) -> DataKind.TimeOfDay
         | DateDataType -> DataKind.Date
-        | TimespanDataType -> DataKind.Duration            
+        | DurationDataType -> DataKind.Duration            
         | Float32DataType -> DataKind.Float32
         | Float64DataType -> DataKind.Float64
         | DecimalDataType(precision,scale) -> DataKind.Decimal
@@ -311,7 +311,7 @@ module DataType =
         | GuidDataType -> DataKind.Guid
         | XmlDataType(_) -> DataKind.Xml
         | JsonDataType -> DataKind.Json
-        | VariantDataType -> DataKind.Flexible
+        | VariantDataType -> DataKind.Variant
         | TableDataType(_) -> DataKind.CustomTable
         | ObjectDataType(_) -> DataKind.CustomObject
         | CustomPrimitiveDataType(_) -> DataKind.CustomPrimitive

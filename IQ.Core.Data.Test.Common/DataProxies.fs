@@ -148,7 +148,7 @@ module TestProxies =
             [<DataKind(DataKind.Date)>]
             member val Col06 = Nullable<BclDateTime>() with get, set
             
-            //Inferred: datetime null
+            //Inferred: datetime(23,3) null
             [<DataKind(DataKind.LegacyDateTime)>]
             member val Col07 = Nullable<BclDateTime>() with get, set
             
@@ -206,7 +206,7 @@ module TestProxies =
             [<Nullable; MaxLength(223)>]
             member val Col22 = Array.zeroCreate<uint8>(0) with get, set
             
-            //Inferred: varchar(121)
+            //Inferred: nvarchar(121)
             [<Nullable; MaxLength(121)>]
             member val Col23 = String.Empty with get, set
             
@@ -218,6 +218,6 @@ module TestProxies =
             [<DataKind(DataKind.AnsiTextMax); Nullable>]
             member val Col25 = String.Empty with get, set
             
-            //Inferred nvarchar(MAX)
+            //Inferred nvarchar(50)
             [<Nullable>]            
             member val Col26 = String.Empty with get, set

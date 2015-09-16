@@ -60,9 +60,9 @@ module RecordValue =
         [<Fact>]
         let ``Created record from value map - No optional fields``() =
             let valueMap = 
-                [(FieldA1Name.Text, 0, 16 :> obj)
-                 (FieldA2Name.Text, 1, "Hello" :> obj)
-                 (FieldA3Name.Text, 2, 38.12m :> obj)
+                [(FieldA1Name, 0, 16 :> obj)
+                 (FieldA2Name, 1, "Hello" :> obj)
+                 (FieldA3Name, 2, 38.12m :> obj)
                 ]|> ValueIndex.create
         
             let expect = {
@@ -78,9 +78,9 @@ module RecordValue =
         [<Fact>]
         let ``Created record from value map - Optional fields``() =
             let valueMap1 = 
-                [(FieldB1Name.Text, 0, 16 :> obj)
-                 (FieldB2Name.Text, 1, 38.12m :> obj)
-                 (FieldB3Name.Text, 2, BclDateTime(2015, 5, 6) |> Some :> obj)
+                [(FieldB1Name, 0, 16 :> obj)
+                 (FieldB2Name, 1, 38.12m :> obj)
+                 (FieldB3Name, 2, BclDateTime(2015, 5, 6) |> Some :> obj)
                 ]|> ValueIndex.create
         
             let expect1 = {
@@ -92,9 +92,9 @@ module RecordValue =
             actual1 |> Claim.equal expect1
 
             let valueMap2 = 
-                [(FieldB1Name.Text, 0, 16 :> obj)
-                 (FieldB2Name.Text, 1, 38.12m :> obj)
-                 (FieldB3Name.Text, 2, option<BclDateTime>.None :> obj)
+                [(FieldB1Name, 0, 16 :> obj)
+                 (FieldB2Name, 1, 38.12m :> obj)
+                 (FieldB3Name, 2, option<BclDateTime>.None :> obj)
                 ]|> ValueIndex.create
         
             let expect2 = {
@@ -114,9 +114,9 @@ module RecordValue =
             }
             let expect1 = 
                 [
-                (FieldB1Name.Text, 0, value1.FieldB1 :> obj)
-                (FieldB2Name.Text, 1, value1.FieldB2 :> obj)
-                (FieldB3Name.Text, 2, value1.FieldB3:> obj)
+                (FieldB1Name, 0, value1.FieldB1 :> obj)
+                (FieldB2Name, 1, value1.FieldB2 :> obj)
+                (FieldB3Name, 2, value1.FieldB3:> obj)
                 ] |> ValueIndex.create
 
             let actual1 = value1 |> converter.ToValueIndex
@@ -129,9 +129,9 @@ module RecordValue =
             }
             let expect2 = 
                 [
-                (FieldB1Name.Text, 0, value1.FieldB1 :> obj)
-                (FieldB2Name.Text, 1, value1.FieldB2 :> obj)
-                (FieldB3Name.Text, 2, value1.FieldB3:> obj)
+                (FieldB1Name, 0, value1.FieldB1 :> obj)
+                (FieldB2Name, 1, value1.FieldB2 :> obj)
+                (FieldB3Name, 2, value1.FieldB3:> obj)
                 ] |> ValueIndex.create
 
             let actual2 = value1 |> converter.ToValueIndex

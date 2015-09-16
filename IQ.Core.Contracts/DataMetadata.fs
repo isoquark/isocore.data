@@ -114,7 +114,7 @@ type DataKind =
     | Guid = 90uy //corresponds to uniqueidentifier
     | Xml = 100uy
     | Json = 101uy
-    | Flexible = 110uy //corresponds to sql_variant
+    | Variant = 110uy //corresponds to sql_variant
                       
     | Geography = 150uy
     | Geometry = 151uy
@@ -167,7 +167,7 @@ type DataTypeReference =
     | DateTimeDataType of precision : uint8 * scale : uint8
     | DateTimeOffsetDataType
     | TimeOfDayDataType of precision : uint8 * scale : uint8
-    | TimespanDataType 
+    | DurationDataType 
     | RowversionDataType
     | DateDataType
     | Float32DataType
@@ -209,7 +209,7 @@ with
         | DateTimeDataType(p,s) -> sprintf "datetime(%i,%i)" p s
         | DateTimeOffsetDataType -> sprintf "datetimeoffset"
         | TimeOfDayDataType(p,s) -> sprintf "timeofday(%i,%i)" p s
-        | TimespanDataType -> sprintf "timespan"
+        | DurationDataType -> sprintf "timespan"
         | RowversionDataType -> sprintf "rowversion"
         | DateDataType -> "date"
         | Float32DataType -> "float32"

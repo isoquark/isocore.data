@@ -47,7 +47,7 @@ module internal DataTypeConverter =
         | DateTimeOffsetDataType -> typeof<BclDateTimeOffset>
         | TimeOfDayDataType(_) -> typeof<BclTimeSpan>
         | DateDataType -> typeof<BclDateTime>
-        | TimespanDataType -> typeof<int64>
+        | DurationDataType -> typeof<int64>
             
         | Float32DataType -> typeof<float32>
         | Float64DataType -> typeof<float>
