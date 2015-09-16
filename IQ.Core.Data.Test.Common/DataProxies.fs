@@ -126,7 +126,7 @@ module TestProxies =
         }        
 
         //Inferred object name: [SqlTest].[Table10]
-        type Table10() =
+        type Table0A() =
             //Inferred int not null
             member val Col01 = 0 with get, set
             
@@ -221,3 +221,19 @@ module TestProxies =
             //Inferred nvarchar(50)
             [<Nullable>]            
             member val Col26 = String.Empty with get, set
+
+    type Table0B = {
+        Col01 : int        
+        [<ScalarRange(15uy, 60uy)>]
+        Col02 : uint8
+        [<ScalarRange(-500s, 500s)>]
+        Col03 : int16
+        [<ScalarRange(25000, 30000)>]
+        Col04 : int
+        [<ScalarRange(0L, 100000L)>]
+        Col05 : int64    
+        Col06 : float
+        Col07 : float32
+        [<Precision(10uy); Scale(5uy)>]
+        Col08 : decimal
+    }

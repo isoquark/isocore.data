@@ -132,4 +132,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Col26" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="2ea68d22-6318-4029-989c-707b60fd84ef" ChangeDateTime="09/16/2015 01:32:00">
+    <Property Name="ElementName" Value="[SqlTest].[Table10]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[SqlTest]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="Table0A" />
+  </Operation>
 </Operations>

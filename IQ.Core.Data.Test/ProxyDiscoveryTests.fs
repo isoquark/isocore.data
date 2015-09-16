@@ -192,40 +192,40 @@ module DataProxyMetadata =
 
         [<Fact>]
         let ``Inferred column characteristics from proxy type``() =
-            let description = pmp.DescribeTableProxy<Table10>()
+            let description = pmp.DescribeTableProxy<Table0A>()
             
 
             //Col01
             let col= description.Columns.[0].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col01 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col01 @>)
             col.DataType |> Claim.equal Int32DataType
             col.Nullable |> Claim.isFalse
             col.Position |> Claim.equal 0
 
             //Col02
             let col = description.Columns.[1].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col02 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col02 @>)
             col.DataType |> Claim.equal Int64DataType
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal 1
 
             //Col03
             let col = description.Columns.[2].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col03 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col03 @>)
             col.DataType |> Claim.equal (BinaryFixedDataType(50))
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal 2
 
             //Col04
             let col = description.Columns.[3].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col04 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col04 @>)
             col.DataType |> Claim.equal BitDataType
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal 3
 
             //Col05
             let col = description.Columns.[4].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col05 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col05 @>)
             col.DataType |> Claim.equal (AnsiTextFixedDataType(50))
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal 4
@@ -233,7 +233,7 @@ module DataProxyMetadata =
             //Col06
             let idx = 5
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col06 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col06 @>)
             col.DataType |> Claim.equal DateDataType
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -241,7 +241,7 @@ module DataProxyMetadata =
             //Col07
             let idx = 6
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col07 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col07 @>)
             col.DataType |> Claim.equal (DateTimeDataType(23uy,3uy))
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -249,7 +249,7 @@ module DataProxyMetadata =
             //Col08
             let idx = 7
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col08 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col08 @>)
             col.DataType |> Claim.equal (DateTimeDataType(27uy,7uy))
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -257,7 +257,7 @@ module DataProxyMetadata =
             //Col09
             let idx = 8
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col09 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col09 @>)
             col.DataType |> Claim.equal (DecimalDataType(18uy,12uy))
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -265,7 +265,7 @@ module DataProxyMetadata =
             //Col10
             let idx = 9
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col10 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col10 @>)
             col.DataType |> Claim.equal Float64DataType
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -273,7 +273,7 @@ module DataProxyMetadata =
             //Col11
             let idx = 10
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col11 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col11 @>)
             col.DataType |> Claim.equal (MoneyDataType(19uy,4uy))
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -281,7 +281,7 @@ module DataProxyMetadata =
             //Col12
             let idx = 11
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col12 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col12 @>)
             col.DataType |> Claim.equal (UnicodeTextFixedDataType(100))
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -289,7 +289,7 @@ module DataProxyMetadata =
             //Col13
             let idx = 12
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col13 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col13 @>)
             col.DataType |> Claim.equal (DecimalDataType(15uy,5uy))
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -297,7 +297,7 @@ module DataProxyMetadata =
             //Col14
             let idx = 13
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col14 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col14 @>)
             col.DataType |> Claim.equal (UnicodeTextVariableDataType(73))
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -305,7 +305,7 @@ module DataProxyMetadata =
             //Col15
             let idx = 14
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col15 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col15 @>)
             col.DataType |> Claim.equal (Float32DataType)
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -313,7 +313,7 @@ module DataProxyMetadata =
             //Col16
             let idx = 15
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col16 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col16 @>)
             col.DataType |> Claim.equal (DateTimeDataType(16uy, 0uy))
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -321,7 +321,7 @@ module DataProxyMetadata =
             //Col17
             let idx = 16
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col17 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col17 @>)
             col.DataType |> Claim.equal Int16DataType
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -329,7 +329,7 @@ module DataProxyMetadata =
             //Col18
             let idx = 17
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col18 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col18 @>)
             col.DataType |> Claim.equal (MoneyDataType(10uy, 4uy))
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -337,7 +337,7 @@ module DataProxyMetadata =
             //Col19
             let idx = 18
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col19 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col19 @>)
             col.DataType |> Claim.equal VariantDataType
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -345,7 +345,7 @@ module DataProxyMetadata =
             //Col20
             let idx = 19
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col20 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col20 @>)
             col.DataType |> Claim.equal UInt8DataType
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -353,7 +353,7 @@ module DataProxyMetadata =
             //Col21
             let idx = 20
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col21 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col21 @>)
             col.DataType |> Claim.equal GuidDataType
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -361,7 +361,7 @@ module DataProxyMetadata =
             //Col22
             let idx = 21
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col22 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col22 @>)
             col.DataType |> Claim.equal (BinaryVariableDataType(223))
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -369,7 +369,7 @@ module DataProxyMetadata =
             //Col23
             let idx = 22
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col23 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col23 @>)
             col.DataType |> Claim.equal (UnicodeTextVariableDataType(121))
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -377,7 +377,7 @@ module DataProxyMetadata =
             //Col24
             let idx = 23
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col24 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col24 @>)
             col.DataType |> Claim.equal BinaryMaxDataType
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -385,7 +385,7 @@ module DataProxyMetadata =
             //Col25
             let idx = 24
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col25 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col25 @>)
             col.DataType |> Claim.equal AnsiTextMaxDataType
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx
@@ -393,7 +393,7 @@ module DataProxyMetadata =
             //Col26
             let idx = 25
             let col = description.Columns.[idx].DataElement
-            col.Name |> Claim.equal (propname<@ fun (x : Table10) -> x.Col26 @>)
+            col.Name |> Claim.equal (propname<@ fun (x : Table0A) -> x.Col26 @>)
             col.DataType |> Claim.equal (UnicodeTextVariableDataType(50))
             col.Nullable |> Claim.isTrue
             col.Position |> Claim.equal idx

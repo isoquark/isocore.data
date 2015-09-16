@@ -1,4 +1,4 @@
-﻿CREATE TABLE [SqlTest].[Table10]
+﻿CREATE TABLE [SqlTest].Table0A
 (
 	Col01 int NOT NULL PRIMARY KEY,
 	Col02 bigint null,
@@ -34,7 +34,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col01'
 GO
@@ -43,7 +43,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col02'
 GO
@@ -52,7 +52,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col03'
 GO
@@ -61,7 +61,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col04'
 GO
@@ -70,7 +70,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col05'
 GO
@@ -79,7 +79,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col06'
 GO
@@ -88,7 +88,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col07'
 GO
@@ -97,7 +97,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col08'
 GO
@@ -106,7 +106,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col09'
 GO
@@ -115,7 +115,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col10'
 GO
@@ -124,7 +124,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col11'
 GO
@@ -133,7 +133,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col12'
 GO
@@ -143,7 +143,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col13'
 GO
@@ -152,7 +152,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col14'
 GO
@@ -161,7 +161,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col15'
 GO
@@ -170,7 +170,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col16'
 GO
@@ -179,7 +179,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col17'
 GO
@@ -188,7 +188,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col18'
 GO
@@ -197,7 +197,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col19'
 GO
@@ -206,7 +206,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col20'
 GO
@@ -215,7 +215,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col21'
 GO
@@ -224,7 +224,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col22'
 GO
@@ -233,7 +233,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col23'
 GO
@@ -242,7 +242,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col24'
 GO
@@ -252,7 +252,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col25'
 GO
@@ -261,7 +261,7 @@ EXEC sp_addextendedproperty @name = N'MS_Description',
     @level0type = N'SCHEMA',
     @level0name = N'SqlTest',
     @level1type = N'TABLE',
-    @level1name = N'Table10',
+    @level1name = N'Table0A',
     @level2type = N'COLUMN',
     @level2name = N'Col26'
 GO

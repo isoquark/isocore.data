@@ -138,12 +138,12 @@ module Tabular =
             
         [<Fact>]
         let ``Executed parametrized dynamic query``() =
-            let proxyInfo = proxyMetadata.DescribeTableProxy<Table10>()   
+            let proxyInfo = proxyMetadata.DescribeTableProxy<Table0A>()   
             proxyInfo.DataElement.Name |> TruncateTable |> store.ExecuteCommand
             
             let fixture = Fixture();
             let proxies = [for i in 1..2000 do
-                                let proxy =  fixture.Create<Table10>()
+                                let proxy =  fixture.Create<Table0A>()
                                 proxy.Col19 <- i
                                 yield proxy
                           ]

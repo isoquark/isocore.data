@@ -270,52 +270,6 @@ module DataType =
         | TypedDocumentDataType(t) -> sprintf "%s%s" TypedDocumentDataTypeName t.AssemblyQualifiedName
         | RowversionDataType -> RowversionDataTypeName
         
-    /// <summary>
-    /// Gets the kind of DataType required by the data type
-    /// </summary>
-    /// <param name="DataTypeType">The DataType type</param>
-    let toKind (t : DataTypeReference) =
-        match t with
-        | BitDataType -> DataKind.Bit
-        | UInt8DataType -> DataKind.UInt8
-        | UInt16DataType -> DataKind.UInt64
-        | UInt32DataType -> DataKind.UInt32
-        | UInt64DataType -> DataKind.UInt64
-        | Int8DataType -> DataKind.Int8
-        | Int16DataType -> DataKind.Int16
-        | Int32DataType -> DataKind.Int32
-        | Int64DataType -> DataKind.Int64  
-        | RowversionDataType -> DataKind.BinaryFixed         
-            
-        | BinaryFixedDataType(_) -> DataKind.BinaryFixed
-        | BinaryVariableDataType(_) -> DataKind.BinaryVariable
-        | BinaryMaxDataType -> DataKind.BinaryMax
-            
-        | AnsiTextFixedDataType(length) -> DataKind.AnsiTextFixed
-        | AnsiTextVariableDataType(length) -> DataKind.AnsiTextVariable
-        | AnsiTextMaxDataType -> DataKind.AnsiTextMax
-            
-        | UnicodeTextFixedDataType(_) -> DataKind.UnicodeTextFixed
-        | UnicodeTextVariableDataType(_) -> DataKind.UnicodeTextVariable
-        | UnicodeTextMaxDataType -> DataKind.UnicodeTextMax
-            
-        | DateTimeDataType(_,_)-> DataKind.DateTime
-        | DateTimeOffsetDataType -> DataKind.DateTimeOffset
-        | TimeOfDayDataType(_) -> DataKind.TimeOfDay
-        | DateDataType -> DataKind.Date
-        | DurationDataType -> DataKind.Duration            
-        | Float32DataType -> DataKind.Float32
-        | Float64DataType -> DataKind.Float64
-        | DecimalDataType(precision,scale) -> DataKind.Decimal
-        | MoneyDataType(_,_) -> DataKind.Money
-        | GuidDataType -> DataKind.Guid
-        | XmlDataType(_) -> DataKind.Xml
-        | JsonDataType -> DataKind.Json
-        | VariantDataType -> DataKind.Variant
-        | TableDataType(_) -> DataKind.CustomTable
-        | ObjectDataType(_) -> DataKind.CustomObject
-        | CustomPrimitiveDataType(_) -> DataKind.CustomPrimitive
-        | TypedDocumentDataType(_) -> DataKind.TypedDocument
 
                                     
                     
@@ -409,15 +363,7 @@ module DataType =
         
         pattern0()
 
-        //Txt.matchRegexGroups 
             
 
-[<AutoOpen>]
-module DataTypeExtensions =
-    type DataKind
-    with
-        member this.DefaultLength = this |> DataKind.getDefaultLength
-        member this.DefaultPrecision = this |> DataKind.getDefaultPrecision
-        member this.DefaultScale = this |> DataKind.getDefaultScale   
         
 

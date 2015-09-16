@@ -44,6 +44,7 @@
     <Content Include="packages.config" />
     <Compile Include="Extensions.fs" />
     <Compile Include="Stats.fs" />
+    <Compile Include="ArithmeticEnumerator.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IQ.Core.Framework\IQ.Core.Framework.fsproj">

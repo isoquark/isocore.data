@@ -209,9 +209,6 @@ module DataAttributes =
         member this.Name = 
             if localName = UnspecifiedName then None else Some(localName)
             
-
-
-
     [<AbstractClass>]
     type ElementFacetAttribute<'T>(value : 'T) =
         inherit DataElementAttribute()
@@ -229,22 +226,18 @@ module DataAttributes =
 
         new() =
             NullableAttribute(true)
-
     
     /// <summary>
     /// Specifies the relative position of the element to which it is applied
     /// </summary>
     type PositionAttribute(position) =
-        inherit ElementFacetAttribute<int>(position)
-        
+        inherit ElementFacetAttribute<int>(position)        
 
     /// <summary>
     /// Specifies the (intrinsic) kind of data that is pxoxied by the element to which it is applied
     /// </summary>
     type DataKindAttribute(value) =
-        inherit ElementFacetAttribute<DataKind>(value)
-        
-    
+        inherit ElementFacetAttribute<DataKind>(value)            
 
     /// <summary>
     /// Specifies the (custom) kind of data that is pxoxied by the element to which it is applied
@@ -260,25 +253,18 @@ module DataAttributes =
     type FixedLengthAttribute(len) =
         inherit ElementFacetAttribute<int>(len)
         
-
     /// <summary>
     /// Specifies the maximum length of the element to which it is applied
     /// </summary>
     type MaxLengthAttribute(len) =
         inherit ElementFacetAttribute<int>(len)
         
-        /// <summary>
-        /// The maximum length of the subject element
-        /// </summary>
-        member this.Value : int = len
-
     /// <summary>
     /// Specifies the minimum length of the element to which it is applied
     /// </summary>
     type MinLengthAttribute(len) =
         inherit ElementFacetAttribute<int>(len)
     
-
     /// <summary>
     /// Specifies the inclusive lower and upper bounds of the length of the element to which it applies
     /// </summary>
@@ -287,7 +273,6 @@ module DataAttributes =
     /// </remarks>
     type LengthRangeAttribute(minLength, maxLength) =
         inherit ElementFacetAttribute<Range<int>>(Range(minLength,maxLength))
-
     
     /// <summary>
     /// Specifies the numeric precision of the element to which it is applied
@@ -295,14 +280,12 @@ module DataAttributes =
     type PrecisionAttribute(value) =
         inherit ElementFacetAttribute<uint8>(value)
         
-
     /// <summary>
     /// Specifies the numeric scale of the element to which it is applied
     /// </summary>
     type ScaleAttribute(value) =
         inherit ElementFacetAttribute<uint8>(value)
-        
-    
+            
     /// <summary>
     /// Specifies the minimum value of the element to which it is applied
     /// </summary>
@@ -321,10 +304,6 @@ module DataAttributes =
         new (value : float) = MinScalarAttribute(Float64Value(value))        
         new (value : decimal) = MinScalarAttribute(DecimalValue(value))
         
-        /// <summary>
-        /// The minimum value of the subject element
-        /// </summary>
-        member this.Value = value
 
 
     /// <summary>
@@ -345,10 +324,6 @@ module DataAttributes =
         new (value : float) = MaxScalarAttribute(Float64Value(value))
         new (value : decimal) = MaxScalarAttribute(DecimalValue(value))
 
-        /// <summary>
-        /// The maximum value of the subject element
-        /// </summary>
-        member this.Value = value
 
     /// <summary>
     /// Specifies the inclusive lower and upper bounds of the scalar value of the element to which it applies
@@ -403,9 +378,7 @@ module DataAttributes =
 
         new(schemaName, localName) =
             DataObjectNameAttribute(DataObjectName(schemaName, localName))
-        
-
-               
+                       
     /// <summary>
     /// Defines the supported data facet names
     /// </summary>

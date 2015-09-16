@@ -122,7 +122,8 @@
     <Build Include="SqlTest\Sequences\Seq01.sql" />
     <Build Include="SqlTest\Tables\Table08.sql" />
     <Build Include="SqlTest\Tables\Table09.sql" />
-    <Build Include="SqlTest\Tables\Table10.sql" />
+    <Build Include="SqlTest\Tables\Table0A.sql" />
+    <Build Include="SqlTest\Tables\Table0B.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="IQ.Schemas.Test.refactorlog" />
