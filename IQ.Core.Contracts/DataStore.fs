@@ -6,6 +6,7 @@ open System
 open System.Diagnostics
 open System.Collections.Generic
 open System.Runtime.CompilerServices
+open System.Linq
 
 open IQ.Core.Framework
 
@@ -15,7 +16,7 @@ open IQ.Core.Framework.Contracts
 /// Defines contract for unparameterized data stores that can be weakly queried
 /// </summary>
 type IQueryableObjectStore =
-    abstract Select:obj->obj IReadOnlyList
+    abstract Select:obj->obj seq
 
     /// <summary>
     /// Gets the connection string used to connect to the store
@@ -29,7 +30,7 @@ type IQueryableDataStore =
     /// <summary>
     /// Retrieves a query-identified collection of data entities from the store
     /// </summary>
-    abstract Select:'Q->'T IReadOnlyList
+    abstract Select:'Q->'T seq
     
     /// <summary>
     /// Gets the connection string used to connect to the store
@@ -44,7 +45,7 @@ type IQueryableDataStore<'Q> =
     /// <summary>
     /// Retrieves a query-identified collection of data entities from the store
     /// </summary>
-    abstract Select:'Q->'T IReadOnlyList
+    abstract Select:'Q->'T seq
     
     /// <summary>
     /// Gets the connection string used to connect to the store
@@ -59,7 +60,7 @@ type IQueryableDataStore<'T,'Q> =
     /// <summary>
     /// Retrieves a query-identified collection of data entities from the store
     /// </summary>
-    abstract Select:'Q->'T IReadOnlyList
+    abstract Select:'Q->'T seq
     
     /// <summary>
     /// Gets the connection string used to connect to the store
@@ -235,7 +236,7 @@ module DataStoreExtensions =
     [<Extension>]
     type IQueryableDataStore<'T,'Q> 
     with
-        member this.SelectOne(q) = q |> this.Select |> fun x -> x.[0]
+        member this.SelectOne(q) = q |> this.Select |> fun x -> x.First()
  
 
 type RoutineQuery = RoutineQuery of routineName : string * parameters : QueryParameter list

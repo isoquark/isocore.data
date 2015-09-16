@@ -101,11 +101,9 @@ module ExcelDataStore =
             new OfficeOpenXml.ExcelPackage(new FileInfo(cs))
         
         let readWorkbook() =        
-            let tables = ResizeArray<DataTable>()
             use workbook = openPackage()
-            for worksheet in workbook.Workbook.Worksheets do
-                tables.Add( worksheet  |> readWorksheet )                                        
-            tables :> IReadOnlyList<DataTable>
+            [for worksheet in workbook.Workbook.Worksheets ->
+                worksheet  |> readWorksheet ] |> Seq.ofList
 
 
         interface IExcelDataStore with
@@ -115,13 +113,13 @@ module ExcelDataStore =
                     use workbook = openPackage()
                     match workbook.Workbook.Worksheets |> Seq.tryFind(fun x -> x.Name = worksheetName) with
                     | Some(ws) ->
-                        ws |> readWorksheet |> List.singleton |> rolist
+                        ws |> readWorksheet |> Seq.singleton
                     | None ->
-                        [] |> rolist
+                        Seq.empty
                 | FindTableByName(tableName) ->
                     nosupport()
                 | FindAllWorksheets ->
-                     readWorkbook()
+                     readWorkbook() 
             member this.Delete(q) = 
                 nosupport()
 

@@ -270,7 +270,7 @@ module CsvDataStore  =
             member this.Select(q) =  
                 match q with
                 | FindCsvByFilename(filename) -> 
-                    Path.Combine(cs, filename) |> readTable |> List.singleton |> rolist
+                    Path.Combine(cs, filename) |> readTable |> Seq.singleton 
             member this.Delete(q) = 
                 nosupport()
 
