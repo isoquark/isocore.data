@@ -151,6 +151,10 @@ type IDataStore<'T,'Q> =
     abstract Insert:'T seq ->unit
 
 
+type ColumnDescriptor = | ColumnDescriptor of ColumnName : string * Position : int
+
+type DataTableDescriptor = | DataTableDescriptor of TableName : string * Columns : ColumnDescriptor list    
+
 /// <summary>
 /// Defines contract for a tabular data source
 /// </summary>
@@ -159,6 +163,10 @@ type IDataTable =
     /// Describes the encapsulated data
     /// </summary>
     abstract Description : ITabularDescription
+    /// <summary>
+    /// Provides minimal table metadata, primary for use when the full description is not available
+    /// </summary>
+    abstract Descriptor : DataTableDescriptor
     /// <summary>
     /// The encapsulared data
     /// </summary>
@@ -180,6 +188,9 @@ with
         member this.RowValues = this.RowValues
         member this.Description = this.Description
         member this.Item(row,col) = this.RowValues.[row].[col]
+        member this.Descriptor = 
+            DataTableDescriptor(this.Description.Name, 
+                this.Description.Columns |> List.map(fun c -> ColumnDescriptor(c.Name, c.Position)))
     
 type ITabularStore =
     abstract Merge:IDataTable->unit

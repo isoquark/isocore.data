@@ -27,6 +27,7 @@ type IValueGenerator<'T> =
     inherit IValueGenerator
     abstract member NextValue :unit->'T
     abstract member NextValues :count : int-> 'T seq
+    
 
 /// <summary>
 /// Defines contract value generator factory
@@ -35,4 +36,9 @@ type IValueGeneratorProvider =
     abstract member GetGenerator: [<ParamArray>]parms : obj[] -> IValueGenerator<'T>
 
 
+type INumberGeneratorProvider =
+    abstract member GetGenerator: unit -> IValueGenerator<'T>
+    abstract member GetGenerator: min : 'T * max : 'T -> IValueGenerator<'T>
+    abstract member GetGenerator: min : 'T * max : 'T * seed : int -> IValueGenerator<'T>
+    
 

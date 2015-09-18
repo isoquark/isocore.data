@@ -11,6 +11,7 @@ open System.Data
 open System.Diagnostics
 open System.Collections
 open System.Collections.Generic
+open System.Linq
 
 open IQ.Core.Data.Contracts
 
@@ -27,7 +28,7 @@ type IDataTableConverter<'T> =
 /// <summary>
 /// Defines operations for working with Data Tables
 /// </summary>
-module DataTable =            
+module BclDataTable =            
     /// <summary>
     /// Gets a value identified by a 0-based row/column indices
     /// </summary>
@@ -146,4 +147,29 @@ module DataTable =
                 dataTable |> toProxyValuesT<'T>
             member this.FromProxyValues d values =
                 values |> Seq.map(fun x -> x :> obj) |> fromProxyValues (tableproxy<'T> )    
+        }
+
+    /// <summary>
+    /// Adapts a BCL <see cref="DataTable"/> to <see cref="IDataTable"/>
+    /// </summary>
+    /// <param name="dataTable">The BCL data table to adapt</param>
+    let asDataTable (dataTable : DataTable) =
+        let descriptor = 
+            DataTableDescriptor(
+                dataTable.TableName, 
+                dataTable.Columns.Cast<DataColumn>() |> Seq.mapi (fun i c -> ColumnDescriptor(c.ColumnName, i)) |> List.ofSeq)
+        let rowValues = [|for row in dataTable.Rows -> row.ItemArray|] :> IReadOnlyList<obj[]>
+        {new IDataTable with
+            member this.Description = 
+                {
+                    TableDescription.Name = DataObjectName(String.Empty, dataTable.TableName)
+                    Documentation = String.Empty
+                    Columns = []
+                    Properties = []
+                
+                } :> ITabularDescription
+            member this.Item(row,col) = dataTable.Rows.[row].[col]
+            member this.Descriptor = descriptor
+            member this.RowValues = rowValues
+        
         }

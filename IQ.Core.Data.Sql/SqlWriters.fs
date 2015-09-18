@@ -27,12 +27,12 @@ module internal SqlProxyWriter =
         let proxy = tableproxy<'T>
         use bcp = new SqlBulkCopy(cs, SqlBulkCopyOptions.CheckConstraints)
         bcp.DestinationTableName <- proxy.DataElement.Name |> SqlFormatter.formatObjectName
-        use table = items |> DataTable.fromProxyValuesT 
+        use table = items |> BclDataTable.fromProxyValuesT 
         bcp.WriteToServer(table)
 
 module internal SqlTableWriter =
     let bulkInsert cs (data : IDataTable) =
-        use table = data.Description |> DataTable.fromTabularDescription
+        use table = data.Description |> BclDataTable.fromTabularDescription
         data.RowValues |> Seq.iter(fun x ->table.LoadDataRow(x,true) |> ignore)
         use bcp = new SqlBulkCopy(cs, SqlBulkCopyOptions.CheckConstraints)
         bcp.DestinationTableName <- data.Description.ObjectName |> SqlFormatter.formatObjectName

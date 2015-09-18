@@ -25,9 +25,9 @@ module ExcelDataStore =
             let csvpath = thisAssembly() |> Assembly.emitResource "WB01.WS01.csv" ctx.OutputDirectory
             let store = xlspath |> ExcelDataStore.get
             let xlsTable =  "WS01" |> FindWorksheetByName |> store.SelectOne 
-            let xlsProxies = xlsTable |> DataTable.toProxyValuesT<WB01.WS01> 
+            let xlsProxies = xlsTable |> BclDataTable.toProxyValuesT<WB01.WS01> 
             let csvTable = csvpath |> CsvReader.readTable (CsvReader.getDefaultFormat())
-            let csvProxies = csvTable |> DataTable.toProxyValuesT<WB01.WS01> 
+            let csvProxies = csvTable |> BclDataTable.toProxyValuesT<WB01.WS01> 
             Seq.zip xlsProxies csvProxies |> Seq.iter(fun (x,y) ->
                 Claim.equal x y
             )
@@ -35,7 +35,7 @@ module ExcelDataStore =
 
         [<Fact>]
         let ``Wrote data tables to Excel workbook - WB01``() =
-            let converter = DataTable.getTypedConverter<WB01.WS01>()
+            let converter = BclDataTable.getTypedConverter<WB01.WS01>()
             
             let t0_in = new DataTable("WS01")
             t0_in.Columns.Add("Col01", typeof<string>) |> ignore

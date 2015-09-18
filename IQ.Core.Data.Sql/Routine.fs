@@ -159,7 +159,7 @@ module internal Routine =
             | TableFunctionProxy proxy ->
                 if usedatatable then
                     let result = proxy.DataElement|> executeTableFunctionDataTable mii.ConnectionString routineArgs
-                    result |> DataTable.toProxyValues proxy.ResultProxy.ProxyElement :> obj |> Some
+                    result |> BclDataTable.toProxyValues proxy.ResultProxy.ProxyElement :> obj |> Some
                 else
                     let result = proxy.DataElement|> executeTableFunction mii.ConnectionString routineArgs
                     let typedesc = proxy.ResultProxy.ProxyElement

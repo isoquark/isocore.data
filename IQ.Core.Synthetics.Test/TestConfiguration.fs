@@ -19,6 +19,7 @@ module TestConfiguration =
     let private register (registry : ICompositionRegistry) =
         registry.RegisterFactory(fun config -> config |> Transformer.get)
         ValueGenerators.InitFactory(SyntheticsAssemblyDescriptor.Assembly) |> registry.RegisterInstance
+        registry.RegisterInstance(NumberGenerator.defaultProvider())
 
     //This is instantiated/cleaned-up once per collection
     type ProjectTestContext()= 
