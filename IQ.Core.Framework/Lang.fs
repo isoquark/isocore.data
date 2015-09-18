@@ -47,7 +47,6 @@ module Lang =
         /// </remarks>
         let count (items : seq<'T>) = items.Count()
     
-        let asReadOnlyList (s : seq<_>) = ReadOnlyList.Create(s |> List.ofSeq)
     
     /// <summary>
     /// Defines custom Array module operations
@@ -58,28 +57,6 @@ module Lang =
         /// </summary>
         let pmap = Array.Parallel.map
           
-    module RoList =
-        let map  (f:('T -> 'U))  (l :'T rolist) =
-            [|for item in l -> f(item) |] :> rolist<_>                
-        
-        let sortBy f l =
-            l |> Seq.sortBy f |> ReadOnlyList.Create
-
-        let toList (l : 'T rolist) =
-            [for item in l -> item]
-
-        let ofSeq (s : 'T seq) =
-            s |> ReadOnlyList.Create 
-                
-        let empty<'T> = 
-            ReadOnlyList<'T>.Empty()
-
-        let fromList (l : list<_>) =
-            l |> ReadOnlyList.Create
-
-    module Map =
-        let ofReadOnlyList (items : ('K*'V) rolist) =
-            items |> Map.ofSeq
 
     /// <summary>
     /// Defines custom List module operations
@@ -91,8 +68,6 @@ module Lang =
 
         let chain3 f1 f2 f3 l =
             l |> chain2 f1 f2 |> f3
-
-        let asReadOnlyList (l : list<_>) = l |> RoList.fromList
 
 
     /// <summary>

@@ -26,9 +26,9 @@ module internal SqlCommand =
                 let valueCount = buffer |> reader.GetValues
                 Debug.Assert((valueCount = count), "Column / Value count mismatch")
                 yield buffer 
-            |] :> rolist<_>
+            |] 
         else
-            [||] :> rolist<_>
+            [||] 
         
 module internal SqlConnection = 
     let create cs = 

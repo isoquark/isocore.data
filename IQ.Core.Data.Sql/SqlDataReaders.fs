@@ -38,8 +38,8 @@ module internal SqlDataReader =
         [for row in data -> 
             pocoConverter.FromValueArray(row, itemType)
         ] 
-        |> Collection.create ClrCollectionKind.Array itemType :?> rolist<'T> 
-
+        |> Collection.create ClrCollectionKind.Array itemType :?> 'T seq
+    
     let selectAll<'T> cs  =
         let t = typeinfo<'T>
         let description = t |> DataProxyMetadata.describeTableProxy

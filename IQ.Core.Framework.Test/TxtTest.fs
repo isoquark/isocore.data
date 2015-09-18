@@ -29,8 +29,8 @@ module Txt =
 
         [<Fact>]
         let ``Created delimited list``() =
-            ["1"; "2"; "3"] |> List.asReadOnlyList |> Txt.delimit "," |> Claim.equal "1,2,3"
-            ["1"; "2"; "3"] |> List.asReadOnlyList |> Txt.delimit "**" |> Claim.equal "1**2**3"
+            ["1"; "2"; "3"] |> Txt.delimit "," |> Claim.equal "1,2,3"
+            ["1"; "2"; "3"] |> Txt.delimit "**" |> Claim.equal "1**2**3"
 
         [<Fact>]
         let ``Found text beween two indices``() =

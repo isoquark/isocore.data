@@ -15,7 +15,7 @@ type IExcelDataStore =
     inherit IDataStore<DataTable,ExcelDataStoreQuery>
 
 module ExcelDataStore =
-    let private rolist(items : seq<_>) = List<_>(items) :> IReadOnlyList<_>
+    
 
     let private hasValue (range : ExcelRange) =
         range <> null &&

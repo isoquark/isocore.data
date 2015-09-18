@@ -105,13 +105,13 @@ module Txt =
     /// </summary>
     /// <param name="groupNames">The group names</param>
     /// <param name="m">The match</param>
-    let private attemptGroupMatches (groupNames : string list) (m : Match) =        
-        groupNames |> List.map( fun groupName -> 
+    let private attemptGroupMatches (groupNames : string seq) (m : Match) =        
+        groupNames |> Seq.map( fun groupName -> 
                         let group = m.Groups.[groupName]
                         if group.Success |> not then
                             ArgumentException() |> raise                
                         groupName, group.Value
-                     ) |> Map.ofList
+                     ) |> Map.ofSeq
     
     /// <summary>
     /// Matches on a list of group names using a supplied regular expression and correlates
@@ -121,7 +121,7 @@ module Txt =
     /// <param name="groupNames">The group names</param>
     /// <param name="expression">The regular expression</param>
     /// <param name="text">The text to be searched/matched</param>
-    let tryMatchGroups (groupNames : string list)  (expression : string) text =
+    let tryMatchGroups (groupNames : string seq)  (expression : string) text =
         let m = System.Text.RegularExpressions.Regex(expression).Match(text)
         if m.Success |> not then
             None
@@ -141,7 +141,7 @@ module Txt =
     /// <param name="groupNames">The group names</param>
     /// <param name="expression">The regular expression</param>
     /// <param name="text">The text to be searched/matched</param>
-    let matchRegexGroups (groupNames : string list)  (expression : string) text =
+    let matchRegexGroups (groupNames : string seq)  (expression : string) text =
         //TODO: The regular expression could be compiled/cached to improve performance
         let m = System.Text.RegularExpressions.Regex(expression).Match(text)
         if m.Success |> not then

@@ -181,7 +181,7 @@ module CsvWriter =
     let writeFile<'T> (format : CsvFormat) (path : string) (items : 'T seq) =        
         let proxy = tableproxy<'T> |> TableProxy
         let headerRow = 
-            proxy.Columns |> List.map(fun c -> c.DataElement.Name) |> List.asReadOnlyList |> Txt.delimit format.Separator
+            proxy.Columns |> List.map(fun c -> c.DataElement.Name)  |> Txt.delimit format.Separator
 
         //TODO: This is very crude; needs to escape quotes, for example
         let formatValue (v : obj) =
@@ -202,7 +202,6 @@ module CsvWriter =
         use writer = new StreamWriter(path)
         if format.HasHeaders then
                 proxy.Columns |> List.map(fun c -> c.DataElement.Name)
-                              |> List.asReadOnlyList 
                               |> Txt.delimit format.Separator 
                               |> writer.WriteLine
         
@@ -211,7 +210,6 @@ module CsvWriter =
              item |> pocoConverter.ToValueArray
                   |> List.ofArray
                   |> List.map formatValue 
-                  |> List.asReadOnlyList
                   |> Txt.delimit format.Separator 
                   |> writer.WriteLine
                
@@ -223,7 +221,6 @@ type ICsvDataStore =
     inherit IDataStore<DataTable,CsvDataStoreQuery>
 
 module CsvDataStore  =
-    let private rolist(items : seq<_>) = List<_>(items) :> IReadOnlyList<_>
 
     let private readTable (csvPath)=
         let table = new DataTable( csvPath |> Path.GetFileName)

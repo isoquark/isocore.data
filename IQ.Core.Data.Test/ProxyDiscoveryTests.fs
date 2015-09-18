@@ -6,6 +6,7 @@ open System
 open System.IO
 open System.Diagnostics
 open System.Data
+open System.Linq
 
 open IQ.Core.Framework
 open IQ.Core.TestFramework
@@ -125,7 +126,7 @@ module DataProxyMetadata =
             let proc = proxy.DataElement
 
             proc.Name |> Claim.equal procName
-            proc.Parameters.Count |> Claim.equal 3
+            proc.Parameters.Count() |> Claim.equal 3
 
             let param01 = proc.FindParameter "col01"
             param01.Direction |> Claim.equal RoutineParameterDirection.Output

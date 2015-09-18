@@ -168,7 +168,7 @@ type IDataTable =
     /// </summary>
     abstract Item : row : int * col : int -> obj
 
-type TabularData = TabularData of description : ITabularDescription * rowValues : rolist<obj[]>
+type TabularData = TabularData of description : ITabularDescription * rowValues : IReadOnlyList<obj[]>
 with
     member this.RowValues = 
         match this with TabularData(rowValues=x) -> x
@@ -342,11 +342,11 @@ type ISqlDataStore =
     /// <summary>
     /// Retrieves an identified collection of data entities from the store
     /// </summary>
-    abstract Get:SqlDataStoreQuery -> 'T rolist
+    abstract Get:SqlDataStoreQuery -> 'T seq
     /// <summary>
     /// Retrieves all entities of a given type from the store
     /// </summary>
-    abstract Get:unit -> 'T rolist
+    abstract Get:unit -> 'T seq
     /// <summary>
     /// Retrieves an identified set of tabular data from the store
     /// </summary>

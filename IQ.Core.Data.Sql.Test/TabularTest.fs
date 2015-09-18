@@ -27,7 +27,7 @@ module Tabular =
         let count = tableproxy<'T>.DataElement.Name |> TruncateTable |> store.ExecuteCommand 
         store.Get<'T>() |> Claim.seqIsEmpty
         input |> store.Insert
-        let output = store.Get<'T>() |> RoList.sortBy sortBy |> RoList.toList
+        let output = store.Get<'T>() |> Seq.sortBy sortBy |> List.ofSeq
         output |> Claim.equal input
 
     type Customer1() =
@@ -47,8 +47,8 @@ module Tabular =
         [<Fact>]
         let ``Queried vDataType metadata - Partial column set A``() =
             let items = store.Get<Metadata.vDataTypeA>() 
-                     |> RoList.map(fun item -> item.DataTypeName, item) 
-                     |> Map.ofReadOnlyList
+                     |> Seq.map(fun item -> item.DataTypeName, item) 
+                     |> Map.ofSeq
             let money = items.["money"]
             money.IsUserDefined |> Claim.isFalse
             money.IsNullable |> Claim.isTrue
@@ -57,8 +57,8 @@ module Tabular =
         [<Fact>]
         let ``Queried vDataType metadata - Partial column set B``() =
             let items = store.Get<Metadata.vDataTypeB>() 
-                     |> RoList.map(fun item -> item.DataTypeName, item) 
-                     |> Map.ofReadOnlyList
+                     |> Seq.map(fun item -> item.DataTypeName, item) 
+                     |> Map.ofSeq
             let money = items.["money"]
             money.SchemaName |> Claim.equal "sys"
             money.MaxLength |> Claim.equal 8m
@@ -107,7 +107,7 @@ module Tabular =
             let tabularName = DataObjectName("SqlTest", "Table08")
             tabularName |> TruncateTable |> store.ExecuteCommand |> ignore            
             let description = sqlMetadata.DescribeTable(tabularName)
-            let rowValues =  [| for i in [1..rowcount] ->i |> createRow |] :> rolist<_>
+            let rowValues =  [| for i in [1..rowcount] ->i |> createRow |] 
             let data = TabularData(description :> ITabularDescription, rowValues)
             store.InsertTable(data)
 

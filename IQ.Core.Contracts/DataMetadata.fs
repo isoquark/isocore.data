@@ -444,7 +444,7 @@ with
 /// </summary>
 type ITabularDescription =
     inherit IDataObjectDescription
-    abstract Columns : ColumnDescription rolist
+    abstract Columns : ColumnDescription list
 
 
 /// <summary>
@@ -493,7 +493,7 @@ with
         member this.ElementKind = DataElementKind.Table
         member this.ObjectName = this.Name
         member this.Documentation = this.Documentation
-        member this.Columns = this.Columns |> ReadOnlyList.Create
+        member this.Columns = this.Columns
 
     /// <summary>
     /// Renders a textual representation of the object that is suitable for diagnostic purposes
@@ -520,7 +520,7 @@ with
         member this.ElementKind = DataElementKind.View
         member this.ObjectName = this.Name
         member this.Documentation = this.Documentation
-        member this.Columns = this.Columns |> ReadOnlyList.Create
+        member this.Columns = this.Columns 
 
 
 
@@ -533,7 +533,7 @@ type ProcedureDescription = {
     /// The name of the procedure
     Name : DataObjectName
     /// The parameters
-    Parameters : RoutineParameterDescription rolist
+    Parameters : RoutineParameterDescription list
     /// The procedures's documentation
     Documentation : string 
     /// The attached properties
@@ -554,11 +554,11 @@ type TableFunctionDescription = {
     /// The name of the procedure
     Name : DataObjectName    
     /// The parameters
-    Parameters : RoutineParameterDescription rolist
+    Parameters : RoutineParameterDescription list
     /// The function's documentation
     Documentation : string 
     /// The columns in the result set
-    Columns : ColumnDescription rolist
+    Columns : ColumnDescription list
     /// The attached properties
     Properties : DataElementProperty list
 }
@@ -673,7 +673,7 @@ with
 
 type SqlMetadataCatalog = {
     CatalogName : string
-    Schemas : SchemaDescription rolist
+    Schemas : SchemaDescription list
 }
 
 /// <summary>
@@ -731,12 +731,12 @@ type ISqlMetadataProvider =
     /// <summary>
     /// Describes all schemas that are visible to the metadata provider
     /// </summary>
-    abstract DescribeSchemas:unit-> SchemaDescription rolist
+    abstract DescribeSchemas:unit-> SchemaDescription list
     
     /// <summary>
     /// Describes all tables that are visible to the metadata provider
     /// </summary>
-    abstract DescribeTables:unit-> TableDescription rolist
+    abstract DescribeTables:unit-> TableDescription list
     
     /// <summary>
     /// Describes an identified table
@@ -746,12 +746,12 @@ type ISqlMetadataProvider =
     /// <summary>
     /// Describes the tables in an identified schema
     /// </summary>
-    abstract DescribeTablesInSchema:string->TableDescription rolist
+    abstract DescribeTablesInSchema:string->TableDescription list
 
     /// <summary>
     /// Describes all views that are visible to the metadata provider
     /// </summary>
-    abstract DescribeViews:unit -> ViewDescription rolist
+    abstract DescribeViews:unit -> ViewDescription list
     
     /// <summary>
     /// Describes an identified view
@@ -761,7 +761,7 @@ type ISqlMetadataProvider =
     /// <summary>
     /// Describes the views in an identified schema
     /// </summary>
-    abstract DescribeViewsInSchema:string->ViewDescription rolist
+    abstract DescribeViewsInSchema:string->ViewDescription list
     
     /// <summary>
     /// Determines whether an identified object exists 

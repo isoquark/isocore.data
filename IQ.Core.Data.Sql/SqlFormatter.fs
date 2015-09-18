@@ -101,7 +101,7 @@ module SqlFormatter =
     /// <param name="f">The table-valued function</param>
     let formatTableFunctionSelect (f : TableFunctionDescription) =
         let parameters = f.Parameters 
-                         |> RoList.map (fun x -> x.Name |> formatParameterName)
+                         |> Seq.map (fun x -> x.Name |> formatParameterName)
                          |> Txt.delimit ","
         sprintf "select * from %s(%s)" (f.Name |> formatObjectName) parameters
 
@@ -117,7 +117,7 @@ module SqlFormatter =
     /// </summary>
     let formatTabularSelect(t : ITabularDescription) =
         let columns = t.Columns 
-                    |> RoList.map(fun c -> c.Name |> formatElementName) 
+                    |> Seq.map(fun c -> c.Name |> formatElementName) 
                     |> Txt.delimit ","
         let tableName = t.ObjectName |> formatObjectName
         sprintf "select %s from %s" columns tableName

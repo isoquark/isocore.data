@@ -249,7 +249,7 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
         this.IndexSchemas()
         {
             SqlMetadataCatalog.CatalogName = (SqlConnectionStringBuilder(config.ConnectionString).InitialCatalog)
-            Schemas = schemas.Values |> Array.ofSeq :> rolist<_>
+            Schemas = schemas.Values |> List.ofSeq
         }
 
     
@@ -310,19 +310,19 @@ module SqlMetadataProvider =
         interface ISqlMetadataProvider with
             member x.RefreshCache() =
                 refresh()
-            member x.DescribeTables(): rolist<TableDescription> = 
-                [for t in tables.Values do yield! t] |> RoList.ofSeq
+            member x.DescribeTables() = 
+                [for t in tables.Values do yield! t] 
             
-            member x.DescribeViews(): rolist<ViewDescription> = 
-                [for t in views.Values do yield! t] |> RoList.ofSeq
+            member x.DescribeViews() = 
+                [for t in views.Values do yield! t] 
             
-            member x.DescribeTablesInSchema(schemaName: string): rolist<TableDescription> = 
-                tables.[schemaName |> unbracket] |> RoList.ofSeq
+            member x.DescribeTablesInSchema(schemaName: string) = 
+                tables.[schemaName |> unbracket] |> List.ofSeq
             
             member x.DescribeViewsInSchema(schemaName: string) = 
-                views.[schemaName |> unbracket] |> RoList.ofSeq
+                views.[schemaName |> unbracket] |> List.ofSeq
             
-            member x.DescribeSchemas(): rolist<SchemaDescription> = 
+            member x.DescribeSchemas() = 
                 failwith "Not implemented yet"
             
             member x.DescribeTable(tableName) =

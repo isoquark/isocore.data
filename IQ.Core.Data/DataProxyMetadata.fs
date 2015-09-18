@@ -460,7 +460,7 @@ module DataProxyMetadata =
                 let parameters = m.Parameters |> List.map(fun x -> x |> describeParameterProxy m) 
                 let procedure = {
                     ProcedureDescription.Name = objectName
-                    Parameters = parameters |> List.map(fun p -> p.DataElement) |> List.asReadOnlyList
+                    Parameters = parameters |> List.map(fun p -> p.DataElement) 
                     Documentation = String.Empty
                     Properties = []
                 }            
@@ -522,8 +522,8 @@ module DataProxyMetadata =
                 nosupport()
         let tableFunction = {
             TableFunctionDescription.Name = objectName   
-            Parameters = parameterProxies|> List.map(fun p -> p.DataElement) |> List.asReadOnlyList
-            Columns = columnProxies |> List.map(fun c -> c.DataElement) |> List.asReadOnlyList
+            Parameters = parameterProxies|> List.map(fun p -> p.DataElement) 
+            Columns = columnProxies |> List.map(fun c -> c.DataElement) 
             Documentation = String.Empty
             Properties = []
         }

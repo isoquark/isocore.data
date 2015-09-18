@@ -36,13 +36,13 @@ module DataObjectDescription =
         | ProcedureDescription(x) -> 
             x.Parameters
         | TableDescription(x) ->
-            RoList.empty
+            List.empty
         | ViewDescription(x) ->
-            RoList.empty
+            List.empty
         | SequenceDescription(x) ->
-            RoList.empty
+            List.empty
         | DataTypeDescription(x) ->
-            RoList.empty
+            List.empty
     
     let tryFindParameter name (subject : DataObjectDescription) =
         match subject with

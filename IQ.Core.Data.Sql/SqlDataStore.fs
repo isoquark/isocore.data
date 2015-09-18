@@ -76,14 +76,13 @@ type internal SqlDataStoreRealization(config : SqlDataStoreConfig) =
         command.CommandType <- CommandType.Text
         command |> SqlCommand.executeQuery
 
-    static member toPocos<'T>(data : obj[] rolist) =
+    static member toPocos<'T>(data : obj[] seq) =
         let t = typeinfo<'T>
         let itemType = t.ReflectedElement.Value
         let pocoConverter =  PocoConverter.getDefault()
         [for row in data -> 
             pocoConverter.FromValueArray(row, itemType)
-        ] 
-        |> Collection.create ClrCollectionKind.Array itemType :?> rolist<'T> 
+        ] |> Collection.create ClrCollectionKind.Array itemType 
 
 
     

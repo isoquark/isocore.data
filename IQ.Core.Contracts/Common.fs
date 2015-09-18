@@ -23,58 +23,6 @@ with
 /// Represents a collection of name-indexed or position-indexed values
 /// </summary>
 type ValueIndex = ValueIndex of (ValueIndexKey*obj) list
-
-type rolist<'T> = IReadOnlyList<'T>
-
-/// <summary>
-/// Represents an immutable list
-/// </summary>
-type ReadOnlyList<'T> = {
-    /// The items in the list
-    Items : list<'T>
-}
-with
-    interface IReadOnlyList<'T> with
-            member this.Count: int = 
-                this.Items.Length
-              
-            member this.GetEnumerator(): Collections.IEnumerator = 
-                (this.Items :> IEnumerable).GetEnumerator()
-              
-            member this.GetEnumerator(): IEnumerator<'T> = 
-                (this.Items :> IEnumerable<'T>).GetEnumerator()
-              
-            member this.Item
-                with get (index: int): 'T = 
-                    this.Items.[index]                                                         
-    /// <summary>
-    /// Creates an empty list
-    /// </summary>
-    static member Empty<'T>() = {Items = []} :> rolist<'T>
-    
-    /// <summary>
-    /// Creates a read-only list from an F# list
-    /// </summary>
-    /// <param name="l">The F# list</param>
-    static member Create(l : list<'T>) = 
-        {Items = l} :> rolist<'T>
-    
-    /// <summary>
-    /// Creates a read-only list from a .Net BCL generic list
-    /// </summary>
-    /// <param name="l">The F# list</param>
-    static member Create(l : List<'T>) = 
-        {Items = l |> List.ofSeq} :> rolist<'T>
-    
-    /// <summary>
-    /// Creates a read-only list from an IEnumerable
-    /// </summary>
-    /// <param name="s"></param>
-    static member Create(s : seq<'T>) = 
-        {Items = s |> List.ofSeq} :> rolist<'T>
-
-
-
     
 type BinaryFunc<'T,'TResult> = Func<'T,'T,'TResult>
 type BinaryFunc<'T> = BinaryFunc<'T,'T>
