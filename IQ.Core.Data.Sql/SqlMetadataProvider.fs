@@ -3,6 +3,7 @@
 open System
 open System.Linq
 open System.Collections.Generic;
+open System.Collections.Concurrent;
 
 open System.Data
 open System.Data.SqlClient
@@ -171,17 +172,19 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
             
     member private this.IndexColumns() =
         for column in this.GetMetadataView<vColumn>()  do
+            let dataType = this.GetColumnDataType(column)
             let description = {
                 ColumnDescription.Name = column.ColumnName
                 ParentName = DataObjectName(column.ParentSchemaName, column.ParentName)
                 Position = column.Position
-                DataType = this.GetColumnDataType(column)
+                DataType = dataType
+                DataKind = dataType |> DataProxyMetadata.getKind
                 Documentation = column.Description
                 Nullable = column.IsNullable
                 AutoValue = if column.IsComputed then
                                     AutoValueKind.Computed 
                                 else if column.IsIdentity then
-                                    AutoValueKind.Identity 
+                                    AutoValueKind.AutoIncrement 
                                 else 
                                     AutoValueKind.None
                 Properties = []
@@ -264,9 +267,9 @@ module SqlMetadataProvider =
     type private Realization(config : SqlMetadataProviderConfig) =
         let tables  = Dictionary<string, ResizeArray<TableDescription>>()        
         let views = Dictionary<string, ResizeArray<ViewDescription>>()
-        let procedures = Dictionary<string, ProcedureDescription>()
+        let procedures = Dictionary<string, RoutineDescription>()
         let sequences = Dictionary<string, SequenceDescription>()
-        let tableFunctions = Dictionary<string, TableFunctionDescription>()
+        let tableFunctions = Dictionary<string, RoutineDescription>()
         let dataTypes = Dictionary<string, DataTypeDescription>()
         let allObjects = Dictionary<DataObjectName, IDataObjectDescription>()
         
@@ -295,50 +298,78 @@ module SqlMetadataProvider =
                             views.[schemaName].Add(x)
                         else
                             views.[schemaName] <- ResizeArray[x]
-                    | ProcedureDescription(x) -> 
-                        procedures.Add(schemaName, x)
+                    | RoutineDescription(x) -> 
+                        if x.RoutineKind = DataElementKind.Procedure then
+                            procedures.Add(schemaName, x)   
+                        else if x.RoutineKind = DataElementKind.TableFunction then
+                            tableFunctions.Add(schemaName, x)
+                        else
+                            nosupport()
+                            
                     | DataTypeDescription(x) ->
                          dataTypes.Add(schemaName, x)
                     | SequenceDescription(x) -> 
                         sequences.Add(schemaName, x)
-                    | TableFunctionDescription(x) -> 
-                        tableFunctions.Add(schemaName, x)
 
+        let getObjectKind objectName =
+            if (allObjects.ContainsKey(objectName)) then
+                Nullable<DataElementKind>(allObjects.[objectName].ElementKind)
+            else
+                Nullable<DataElementKind>();                    
         do
             refresh()
+
+        let describeTable (tableName : DataObjectName) = 
+            tables.[tableName.SchemaName |> unbracket]  |> Seq.find(fun x -> x.Name = tableName)
+
+        let describeView (viewName : DataObjectName) =
+            views.[viewName.SchemaName |> unbracket] |> Seq.find(fun x -> x.Name = viewName)            
         
         interface ISqlMetadataProvider with
-            member x.RefreshCache() =
+            member this.RefreshCache() =
                 refresh()
-            member x.DescribeTables() = 
+            member this.DescribeTables() = 
                 [for t in tables.Values do yield! t] 
             
-            member x.DescribeViews() = 
+            member this.DescribeViews() = 
                 [for t in views.Values do yield! t] 
             
-            member x.DescribeTablesInSchema(schemaName: string) = 
+            member this.DescribeTablesInSchema(schemaName: string) = 
                 tables.[schemaName |> unbracket] |> List.ofSeq
             
-            member x.DescribeViewsInSchema(schemaName: string) = 
+            member this.DescribeViewsInSchema(schemaName: string) = 
                 views.[schemaName |> unbracket] |> List.ofSeq
             
-            member x.DescribeSchemas() = 
+            member this.DescribeSchemas() = 
                 failwith "Not implemented yet"
             
-            member x.DescribeTable(tableName) =
-                tables.[tableName.SchemaName |> unbracket]  |> Seq.find(fun x -> x.Name = tableName)
+            member this.DescribeTable(tableName) =
+                tableName |> describeTable
 
-            member x.DescribeView(viewName) =
-                views.[viewName.SchemaName |> unbracket] |> Seq.find(fun x -> x.Name = viewName)
+            member this.DescribeView(viewName) =
+                viewName |> describeView
 
-            member x.ObjectExists(objectName) =
+            member this.DescribeDataMatrix(objectName) =
+                let kind = objectName |> getObjectKind 
+
+                if kind.HasValue then
+                    match kind.Value with
+                    | DataElementKind.Table -> 
+                        let dtable = objectName |> describeTable 
+                        DataMatrixDescription(dtable.Name, dtable.Columns)
+                    | DataElementKind.View -> 
+                        let dview = objectName |> describeView
+                        DataMatrixDescription(dview.Name, dview.Columns)
+                    | _ -> nosupport()
+                else
+                    nosupport()
+                    
+            
+            member this.ObjectExists(objectName) =
                 allObjects.ContainsKey(objectName)
 
-            member x.GetObjectKind(objectName) =
-                if (allObjects.ContainsKey(objectName)) then
-                    Nullable<DataElementKind>(allObjects.[objectName].ElementKind)
-                else
-                    Nullable<DataElementKind>();
+            member this.GetObjectKind(objectName) =
+                objectName |> getObjectKind
                 
             member this.Describe q = 
                 match q with
@@ -380,7 +411,8 @@ module SqlMetadataProvider =
                     | FindSequencesBySchema(schemaName) ->
                         nosupport()
 
+    let private providers = ConcurrentDictionary<SqlMetadataProviderConfig, ISqlMetadataProvider>()
         
     let get(config : SqlMetadataProviderConfig) =
-        config |> Realization :> ISqlMetadataProvider
+        providers.GetOrAdd(config, fun config -> config |> Realization :> ISqlMetadataProvider)
 

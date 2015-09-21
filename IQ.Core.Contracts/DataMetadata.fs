@@ -272,21 +272,22 @@ type DataElementKind =
     /// Classifies an element as a routine parameter
     | Parameter = 10uy
 
+
 /// <summary>
 /// Enumerates the available means that lead to a column being automatically populated
 /// with a valid value
 /// </summary>
 type AutoValueKind =
+    /// Unknown if the column has an automatically popuated value
+    | Unknown = 0
     /// Column is not automatically populated
     | None = 0
     /// Column is automatically populated with a default value
     | Default = 1
-    /// Column is automatically populated with an identity value
-    | Identity = 2
+    /// Column is automatically incremented (either via a sequence for legacy identity column)
+    | AutoIncrement = 2
     /// Column is automatically populated with a computed value
     | Computed = 3
-    /// Column is automatically populated with a value from a sequence
-    | Sequence = 4
 
 /// <summary>
 /// Encapsulates the value of property within the context of a data element
@@ -379,6 +380,8 @@ type ColumnDescription = {
     Position : int
     /// The column's data type
     DataType : DataTypeReference    
+    /// The column's data kind
+    DataKind : DataKind
     /// The column's documentation
     Documentation : string             
     /// Specifies whether the column allows null
@@ -399,6 +402,35 @@ with
         member this.Name = this.Name
         member this.Documentation = this.Documentation
 
+/// <summary>
+/// Describes a data matrix
+/// </summary>
+type DataMatrixDescription = DataMatrixDescription of Name : DataObjectName * Columns : ColumnDescription list
+
+/// <summary>
+/// Defines contract for a tabular data source
+/// </summary>
+type IDataMatrix =
+    /// <summary>
+    /// Describes the encapsulated data
+    /// </summary>
+    abstract Description : DataMatrixDescription
+    /// <summary>
+    /// The encapsulared data
+    /// </summary>
+    abstract RowValues : IReadOnlyList<obj[]>
+    /// <summary>
+    /// Gets the value at the intersection fo the specified (0-based) row and column
+    /// </summary>
+    abstract Item : row : int * col : int -> obj
+
+
+type DataMatrix =  DataMatrix of Description : DataMatrixDescription * Rows : obj[] IReadOnlyList
+with
+    interface IDataMatrix with
+        member this.RowValues = match this with DataMatrix(Rows=x) -> x
+        member this.Description = match this with DataMatrix(Description=x) -> x
+        member this.Item(row,col) = match this with DataMatrix(Rows=x) -> x.[row].[col]
 
 
 /// <summary>
@@ -527,48 +559,30 @@ with
 
 
 /// <summary>
-/// Describes a stored procedure
+/// Describes a routine of some sort
 /// </summary>
-type ProcedureDescription = {
+type RoutineDescription = {
     /// The name of the procedure
     Name : DataObjectName
     /// The parameters
     Parameters : RoutineParameterDescription list
     /// The procedures's documentation
     Documentation : string 
+    /// The columns in the (first) result set if applicable
+    Columns : ColumnDescription list
     /// The attached properties
     Properties : DataElementProperty list
+    /// The kind of routine being described (stored procedure, TVF, etc)
+    RoutineKind : DataElementKind
 }
 with 
     interface IDataObjectDescription with
         member this.Name = this.Name.Text
-        member this.ElementKind = DataElementKind.Procedure
+        member this.ElementKind = this.RoutineKind
         member this.ObjectName = this.Name
         member this.Documentation = this.Documentation
         
    
-/// <summary>
-/// Describes a table-valued function
-/// </summary>
-type TableFunctionDescription = {
-    /// The name of the procedure
-    Name : DataObjectName    
-    /// The parameters
-    Parameters : RoutineParameterDescription list
-    /// The function's documentation
-    Documentation : string 
-    /// The columns in the result set
-    Columns : ColumnDescription list
-    /// The attached properties
-    Properties : DataElementProperty list
-}
-with 
-    interface IDataObjectDescription with
-        member this.Name = this.Name.Text
-        member this.ElementKind = DataElementKind.TableFunction
-        member this.ObjectName = this.Name
-        member this.Documentation = this.Documentation
-
 /// <summary>
 /// Describes a sequence 
 /// </summary>
@@ -610,8 +624,7 @@ with
 /// Unifies data object types
 /// </summary>
 type DataObjectDescription =
-| TableFunctionDescription of TableFunctionDescription
-| ProcedureDescription of ProcedureDescription
+| RoutineDescription of RoutineDescription
 | TableDescription of TableDescription
 | ViewDescription of ViewDescription
 | SequenceDescription of SequenceDescription
@@ -620,8 +633,7 @@ with
     interface IDataObjectDescription with
         member this.ObjectName =
             match this with
-                | TableFunctionDescription x -> x.Name
-                | ProcedureDescription x -> x.Name
+                | RoutineDescription x -> x.Name
                 | TableDescription x -> x.Name
                 | ViewDescription x -> x.Name
                 | SequenceDescription x -> x.Name
@@ -629,8 +641,7 @@ with
         
         member this.ElementKind =
             match this with
-                | TableFunctionDescription(_) -> DataElementKind.TableFunction
-                | ProcedureDescription(_) -> DataElementKind.Procedure
+                | RoutineDescription(_) -> DataElementKind.TableFunction
                 | TableDescription(_) -> DataElementKind.Table
                 | ViewDescription(_) -> DataElementKind.View
                 | SequenceDescription(_) -> DataElementKind.Sequence
@@ -638,8 +649,7 @@ with
         
         member this.Documentation =     
                 match this with
-                | TableFunctionDescription x -> x.Documentation
-                | ProcedureDescription x -> x.Documentation
+                | RoutineDescription x -> x.Documentation
                 | TableDescription x -> x.Documentation
                 | ViewDescription x -> x.Documentation
                 | SequenceDescription x -> x.Documentation
@@ -647,8 +657,7 @@ with
 
         member this.Name =
             match this with
-                | TableFunctionDescription x -> x.Name.Text
-                | ProcedureDescription x -> x.Name.Text
+                | RoutineDescription x -> x.Name.Text
                 | TableDescription x -> x.Name.Text
                 | ViewDescription x -> x.Name.Text
                 | SequenceDescription x -> x.Name.Text
@@ -778,3 +787,7 @@ type ISqlMetadataProvider =
     /// </summary>
     abstract RefreshCache:unit->unit
 
+    /// <summary>
+    /// Describes a tabular object
+    /// </summary>
+    abstract DescribeDataMatrix:DataObjectName -> DataMatrixDescription

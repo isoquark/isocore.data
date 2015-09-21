@@ -149,56 +149,7 @@ type IDataStore<'T,'Q> =
     /// Inserts an arbitrary number of entities into the store, eliding existence checks
     /// </summary>
     abstract Insert:'T seq ->unit
-
-
-type ColumnDescriptor = | ColumnDescriptor of ColumnName : string * Position : int
-
-type DataTableDescriptor = | DataTableDescriptor of TableName : string * Columns : ColumnDescriptor list    
-
-/// <summary>
-/// Defines contract for a tabular data source
-/// </summary>
-type IDataTable =
-    /// <summary>
-    /// Describes the encapsulated data
-    /// </summary>
-    abstract Description : ITabularDescription
-    /// <summary>
-    /// Provides minimal table metadata, primary for use when the full description is not available
-    /// </summary>
-    abstract Descriptor : DataTableDescriptor
-    /// <summary>
-    /// The encapsulared data
-    /// </summary>
-    abstract RowValues : IReadOnlyList<obj[]>
-    /// <summary>
-    /// Gets the value at the intersection fo the specified (0-based) row and column
-    /// </summary>
-    abstract Item : row : int * col : int -> obj
-
-type TabularData = TabularData of description : ITabularDescription * rowValues : IReadOnlyList<obj[]>
-with
-    member this.RowValues = 
-        match this with TabularData(rowValues=x) -> x
-    
-    member this.Description = 
-        match this with TabularData(description=x) -> x
-    
-    interface IDataTable with
-        member this.RowValues = this.RowValues
-        member this.Description = this.Description
-        member this.Item(row,col) = this.RowValues.[row].[col]
-        member this.Descriptor = 
-            DataTableDescriptor(this.Description.Name, 
-                this.Description.Columns |> List.map(fun c -> ColumnDescriptor(c.Name, c.Position)))
-    
-type ITabularStore =
-    abstract Merge:IDataTable->unit
-    abstract Delete:'Q->unit
-    abstract Select: 'Q->IDataTable
-    abstract Insert:IDataTable->unit
-
-
+     
 type ColumnFilter = 
     | Equal of columnName : string * value : obj
     | NotEqual of columnName : string * value : obj
@@ -250,7 +201,7 @@ module DataStoreExtensions =
         member this.SelectOne(q) = q |> this.Select |> fun x -> x.First()
  
 
-type RoutineQuery = RoutineQuery of routineName : string * parameters : QueryParameter list
+type RoutineQuery = RoutineQuery of RoutineName : string * Parameters : QueryParameter list
 
 /// <summary>
 /// Represents the intent to retrieve data from a SQL data store
@@ -325,11 +276,51 @@ type AllocateSequenceRange = AllocateSequenceRange of SequenceName : DataObjectN
 /// </summary>
 type AllocateSequenceRangeResult = AllocateSequenceRangeResult of FirstNumber : obj
 
+
+/// <summary>
+/// Defines the contract for a SQL Server Data Store that can persist and hydrate data matrices
+/// </summary>
+type ISqlMatrixStore =
+    /// <summary>
+    /// Retrieves an identified set of tabular data from the store
+    /// </summary>
+    abstract GetMatrix:SqlDataStoreQuery -> IDataMatrix
+    /// <summary>
+    /// Inserts specified tabular data into the store
+    /// </summary>
+    abstract InsertMatrix:IDataMatrix->unit
+
+/// <summary>
+/// Defines the contract for a SQL Server Data Store that can persist and hydrate data via proxy types
+/// </summary>
+type ISqlProxyStore =
+    /// <summary>
+    /// Obtains an identified contract from the store
+    /// </summary>
+    abstract GetContract: unit -> 'TContract when 'TContract : not struct    
+    /// <summary>
+    /// Retrieves an identified collection of data entities from the store
+    /// </summary>
+    abstract Get:SqlDataStoreQuery -> 'T seq
+    /// <summary>
+    /// Retrieves all entities of a given type from the store
+    /// </summary>
+    abstract Get:unit -> 'T seq
+    /// <summary>
+    /// Persists a collection of data entities to the store, inserting or updating as appropriate
+    /// </summary>
+    abstract Merge:'T seq -> unit
+    /// <summary>
+    /// Inserts an arbitrary number of entities into the store, eliding existence checks
+    /// </summary>
+    abstract Insert:'T seq ->unit
        
 /// <summary>
 /// Defines the contract for a SQL Server Data Store that can persist and hydrate data via proxy types
 /// </summary>
 type ISqlDataStore =
+    inherit ISqlMatrixStore
+    inherit ISqlProxyStore
     /// <summary>
     /// Deletes and identified collection of data entities from the store
     /// </summary>
@@ -343,37 +334,9 @@ type ISqlDataStore =
     /// </summary>
     abstract MetadataProvider : ISqlMetadataProvider
     /// <summary>
-    /// Obtains an identified contract from the store
-    /// </summary>
-    abstract GetContract: unit -> 'TContract when 'TContract : not struct
-    /// <summary>
     /// Executes a supplied command against the store
     /// </summary>
     abstract ExecuteCommand:command : 'TCommand -> 'TResult
-    /// <summary>
-    /// Retrieves an identified collection of data entities from the store
-    /// </summary>
-    abstract Get:SqlDataStoreQuery -> 'T seq
-    /// <summary>
-    /// Retrieves all entities of a given type from the store
-    /// </summary>
-    abstract Get:unit -> 'T seq
-    /// <summary>
-    /// Retrieves an identified set of tabular data from the store
-    /// </summary>
-    abstract GetTable:SqlDataStoreQuery -> IDataTable
-    /// <summary>
-    /// Persists a collection of data entities to the store, inserting or updating as appropriate
-    /// </summary>
-    abstract Merge:'T seq -> unit
-    /// <summary>
-    /// Inserts an arbitrary number of entities into the store, eliding existence checks
-    /// </summary>
-    abstract Insert:'T seq ->unit
-    /// <summary>
-    /// Inserts specified tabular data into the store
-    /// </summary>
-    abstract InsertTable:IDataTable->unit
    
 /// <summary>
 /// Represents the intent to retrieve data from an Excel data store

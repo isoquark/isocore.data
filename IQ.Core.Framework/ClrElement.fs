@@ -749,6 +749,9 @@ module ClrElementExtensions =
         
         member this.HasAttribute<'T when 'T:> Attribute>() = 
             this.TryGetAttribute<'T>() |> Option.isSome
+        
+        member this.GetAttibuteInstance<'T when 'T:> Attribute>() =
+            this.TryGetAttribute<'T>().Value.AttributeInstance.Value :?> 'T
 
                 
 module ClrElement = 

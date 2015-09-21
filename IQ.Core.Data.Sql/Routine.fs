@@ -26,7 +26,7 @@ module internal Routine =
     /// <param name="cs">The connection string</param>
     /// <param name="paramValues">The values of the parameters</param>
     /// <param name="proc">The procedure to execute</param>
-    let executeProcedure cs (paramValues : RoutineParameterValue list) (proc : ProcedureDescription) =
+    let executeProcCommand cs (paramValues : RoutineParameterValue list) (proc : RoutineDescription) =
         use connection = cs |> SqlConnection.create
         use command = new SqlCommand(proc.Name |> SqlFormatter.formatObjectName, connection)
         command.CommandType <- CommandType.StoredProcedure
@@ -43,7 +43,18 @@ module internal Routine =
                 parameter.Direction = System.Data.ParameterDirection.ReturnValue then
                 yield parameter.ParameterName, i, parameter.Value
         ]|>ValueIndex.create                
-        
+
+
+    let executeProcQuery cs (paramValues : RoutineParameterValue list) (proc : RoutineDescription) =
+        use connection = cs |> SqlConnection.create
+        use command = new SqlCommand(proc.Name |> SqlFormatter.formatObjectName, connection)
+        command.CommandType <- CommandType.StoredProcedure
+        use adapter = new SqlDataAdapter(command)
+        let table = new DataTable()
+        adapter.Fill(table) |> ignore
+        table
+
+            
     /// <summary>
     /// Executes a table-valued function and returns a list of object arrays where each array
     /// represents a row of data
@@ -51,7 +62,7 @@ module internal Routine =
     /// <param name="cs">The connection string</param>
     /// <param name="paramValues">The values of the parameters</param>
     /// <param name="proc">The function to execute</param>
-    let executeTableFunction cs (paramValues : RoutineParameterValue list) (f : TableFunctionDescription) =
+    let executeTableFunction cs (paramValues : RoutineParameterValue list) (f : RoutineDescription) =
         use connection = cs |> SqlConnection.create
         let sql = f |> SqlFormatter.formatTableFunctionSelect
         use command = new SqlCommand(sql, connection)
@@ -65,7 +76,7 @@ module internal Routine =
     /// <param name="cs">The connection string</param>
     /// <param name="paramValues">The values of the parameters</param>
     /// <param name="proc">The function to execute</param>
-    let executeTableFunctionDataTable cs (paramValues : RoutineParameterValue list) (f : TableFunctionDescription) =
+    let executeTableFunctionDataTable cs (paramValues : RoutineParameterValue list) (f : RoutineDescription) =
         use connection = cs |> SqlConnection.create
         let sql = f |> SqlFormatter.formatTableFunctionSelect
         use command = new SqlCommand(sql, connection)
@@ -112,7 +123,7 @@ module internal Routine =
         match proxy with
         | ProcedureProxy(proxy) -> 
             let methodParameterValues = mii.Method.GetParameters() |> Array.mapi (fun i p -> p.Name, i, mii.MethodArgs.[i]) |> ValueIndex.create
-            [for p in proxy.Parameters do
+            [for p in proxy.CallProxy.Parameters do
                 let key = ValueIndexKey(p |> getMethodParameterName , p.ProxyParameterPosition)
                 match methodParameterValues |> ValueIndex.tryFindValue key  with
                 | Some(value) ->
@@ -144,11 +155,12 @@ module internal Routine =
                                     
             match proxy with
             | ProcedureProxy proxy ->
+//                if proxy.DataElement.Columns.Length <>  then
+//                    let table = proxy.DataElement |> executeProcQuery mii.ConnectionString routineArgs |> BclDataTable.toProxyValues 
                 let results = 
-                    proxy.DataElement |> executeProcedure mii.ConnectionString routineArgs
+                    proxy.DataElement |> executeProcCommand mii.ConnectionString routineArgs
                 let outputs = 
-                    proxy.Parameters |> List.filter(fun x -> x.DataElement.Direction = RoutineParameterDirection.Output)
-                
+                    proxy.CallProxy.Parameters |> List.filter(fun x -> x.DataElement.Direction = RoutineParameterDirection.Output)                
                 if outputs.Length = 0 then
                     results |> ValueIndex.tryFindNamedValue "Return"
                 else if outputs.Length = 1 then
@@ -159,10 +171,10 @@ module internal Routine =
             | TableFunctionProxy proxy ->
                 if usedatatable then
                     let result = proxy.DataElement|> executeTableFunctionDataTable mii.ConnectionString routineArgs
-                    result |> BclDataTable.toProxyValues proxy.ResultProxy.ProxyElement :> obj |> Some
+                    result |> BclDataTable.toProxyValues proxy.ResultProxy.Value.ProxyElement :> obj |> Some
                 else
                     let result = proxy.DataElement|> executeTableFunction mii.ConnectionString routineArgs
-                    let typedesc = proxy.ResultProxy.ProxyElement
+                    let typedesc = proxy.ResultProxy.Value.ProxyElement
                     match typedesc with
                     | CollectionType(x) ->
                         let provider = ClrMetadataProvider.getDefault()

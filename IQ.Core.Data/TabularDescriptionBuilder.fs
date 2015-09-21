@@ -26,10 +26,12 @@ type TabularDescriptionBuilder(schemaName, localName, doc) =
         TabularDescriptionBuilder(tabularName.SchemaName, tabularName.LocalName)
 
     member this.AddColumn(position, colname, dataTypeName, nullable, doc,  autoKind) =        
+        let dataType = dataTypeName |> DataType.parse |> Option.get
         columns.Add({
                         Name = colname
                         Position = position
                         DataType = dataTypeName |> DataType.parse |> Option.get
+                        DataKind = dataType |> DataProxyMetadata.getKind
                         Documentation = doc
                         Nullable = nullable
                         AutoValue = autoKind

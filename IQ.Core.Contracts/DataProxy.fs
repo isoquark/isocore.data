@@ -43,25 +43,25 @@ with
 /// Describes a proxy for a tabular result set
 /// </summary>
 [<DebuggerDisplay("{ToString(),nq}")>]
-type TableFunctionResultProxyDescription = TabularResultProxyDescription of proxy : ClrType  * dataElement : TableFunctionDescription * columns : ColumnProxyDescription list
+type RoutineResultProxyDescription = RoutineResultProxyDescription of proxy : ClrType  * dataElement : RoutineDescription * columns : ColumnProxyDescription list
 with
     /// <summary>
     /// Specifies the proxy record
     /// </summary>
     member this.ProxyElement = 
-        match this with TabularResultProxyDescription(proxy=x) -> x
+        match this with RoutineResultProxyDescription(proxy=x) -> x
 
     /// <summary>
     /// Specifies the data table
     /// </summary>
     member this.DataElement =
-        match this with TabularResultProxyDescription(dataElement=x) -> x
+        match this with RoutineResultProxyDescription(dataElement=x) -> x
 
     /// <summary>
     /// Specifies the column proxies
     /// </summary>
     member this.Columns = 
-        match this with TabularResultProxyDescription(columns=x) -> x
+        match this with RoutineResultProxyDescription(columns=x) -> x
 
     /// <summary>
     /// Renders a textual representation of the instance that is suitable for diagnostic purposes
@@ -158,57 +158,28 @@ with
     override this.ToString() = 
         sprintf "%O : %O" this.ProxyElement this.DataElement
                 
-/// <summary>
-/// Describes a proxy for a stored procedure
-/// </summary>
-[<DebuggerDisplay("{ToString(),nq}")>]
-type ProcedureCallProxyDescription = ProcedureCallProxyDescription of proxy : ClrMethod * dataElement : ProcedureDescription * parameters : ParameterProxyDescription list
-with
-    /// <summary>
-    /// Specifies  the CLR proxy element
-    /// </summary>
-    member this.ProxyElement = match this  with ProcedureCallProxyDescription(proxy=x) -> x
-
-    /// <summary>
-    /// Specifies  the data element that the proxy represents
-    /// </summary>
-    member this.DataElement = match this with ProcedureCallProxyDescription(dataElement=x) -> x
-
-    /// <summary>
-    /// Specifies the parameter proxies
-    /// </summary>
-    member this.Parameters = 
-        match this with ProcedureCallProxyDescription(parameters=x) -> x
-
-    /// <summary>
-    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
-    /// </summary>
-    override this.ToString() = 
-        sprintf "%O : %O" this.ProxyElement this.DataElement
-
-type ProcedureProxyDescription = ProcedureCallProxyDescription
 
 /// <summary>
 /// Describes a proxy for calling a table-valued function
 /// </summary>
 [<DebuggerDisplay("{ToString(),nq}")>]
-type TableFunctionCallProxyDescription = TableFunctionCallProxyDescription of proxy : ClrMethod * dataElement : TableFunctionDescription * parameters : ParameterProxyDescription list
+type RoutineCallProxyDescription = RoutineCallProxyDescription of proxy : ClrMethod * dataElement : RoutineDescription * parameters : ParameterProxyDescription list
 with
     /// <summary>
     /// Specifies  the CLR proxy element
     /// </summary>
-    member this.ProxyElement = match this  with TableFunctionCallProxyDescription(proxy=x) -> x
+    member this.ProxyElement = match this  with RoutineCallProxyDescription(proxy=x) -> x
 
     /// <summary>
     /// Specifies  the data element that the proxy represents
     /// </summary>
-    member this.DataElement = match this with TableFunctionCallProxyDescription(dataElement=x) -> x
+    member this.DataElement = match this with RoutineCallProxyDescription(dataElement=x) -> x
 
     /// <summary>
     /// Specifies the parameter proxies
     /// </summary>
     member this.Parameters = 
-        match this with TableFunctionCallProxyDescription(parameters=x) -> x
+        match this with RoutineCallProxyDescription(parameters=x) -> x
     
     /// <summary>
     /// Renders a textual representation of the instance that is suitable for diagnostic purposes
@@ -217,20 +188,20 @@ with
         sprintf "%O : %O" this.ProxyElement this.DataElement
     
 [<DebuggerDisplay("{ToString(),nq}")>]
-type TableFunctionProxyDescription = TableFunctionProxyDescription of call : TableFunctionCallProxyDescription * result : TableFunctionResultProxyDescription
+type RoutineProxyDescription = RoutineProxyDescription of call : RoutineCallProxyDescription * result : RoutineResultProxyDescription option
 with
     /// <summary>
     /// Specifies the proxy that mediates invocation, e.g., a function/method or a type with fields/properties
     /// that represent parameters
     /// </summary>
     member this.CallProxy = 
-        match this with TableFunctionProxyDescription(call=x) -> x
+        match this with RoutineProxyDescription(call=x) -> x
     
     /// <summary>
     /// Specifies the element that represents an item the function result set
     /// </summary>
     member this.ResultProxy = 
-        match this with TableFunctionProxyDescription(result=x) ->x
+        match this with RoutineProxyDescription(result=x) ->x
 
     /// <summary>
     /// Specifies  the data element that the proxy represents
@@ -250,8 +221,8 @@ with
 type DataObjectProxy =
 | TableProxy of TableProxyDescription
 | ViewProxy of ViewProxyDescription
-| ProcedureProxy of ProcedureProxyDescription
-| TableFunctionProxy of TableFunctionProxyDescription
+| ProcedureProxy of RoutineProxyDescription
+| TableFunctionProxy of RoutineProxyDescription
 
 type IDataProxyMetadataProvider =
     abstract DescribeProxies:SqlElementKind->ClrElement->DataObjectProxy list

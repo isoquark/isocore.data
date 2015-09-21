@@ -23,7 +23,7 @@ module DataObjectProxy =
         | ProcedureProxy(proxy) -> 
             []
         | TableFunctionProxy(proxy) ->
-            proxy.ResultProxy.Columns
+            proxy.ResultProxy.Value.Columns
 
     let getParameters (subject : DataObjectProxy) =
         match subject with
@@ -32,7 +32,7 @@ module DataObjectProxy =
         | ViewProxy(proxy) -> 
             []
         | ProcedureProxy(proxy) -> 
-            proxy.Parameters
+            proxy.CallProxy.Parameters
         | TableFunctionProxy(proxy) ->
             proxy.CallProxy.Parameters
     
@@ -43,7 +43,7 @@ module DataObjectProxy =
         | ViewProxy(proxy) -> 
             proxy.ProxyElement |> TypeElement
         | ProcedureProxy(proxy) -> 
-            proxy.ProxyElement |> MethodMember |> MemberElement
+            proxy.CallProxy.ProxyElement |> MethodMember |> MemberElement
         | TableFunctionProxy(proxy) ->
             proxy.CallProxy.ProxyElement |> MethodMember |> MemberElement
 
@@ -54,9 +54,9 @@ module DataObjectProxy =
         | ViewProxy(proxy) -> 
             proxy.DataElement |> ViewDescription
         | ProcedureProxy(proxy) -> 
-            proxy.DataElement |> ProcedureDescription
+            proxy.DataElement |> RoutineDescription
         | TableFunctionProxy(proxy) ->
-            proxy.CallProxy.DataElement |> TableFunctionDescription
+            proxy.CallProxy.DataElement |> RoutineDescription
 
     let unwrapTableFunctionProxy (subject : DataObjectProxy) =
         match subject with

@@ -16,9 +16,7 @@ open IQ.Core.Data.Contracts
 module DataObjectDescription =
     let getName (subject : DataObjectDescription) =
         match subject with
-        | TableFunctionDescription(x) -> 
-            x.Name
-        | ProcedureDescription(x) -> 
+        | RoutineDescription(x) -> 
             x.Name
         | TableDescription(x) ->
             x.Name
@@ -31,9 +29,7 @@ module DataObjectDescription =
 
     let getParameters (subject : DataObjectDescription) =
         match subject with
-        | TableFunctionDescription(x) -> 
-            x.Parameters
-        | ProcedureDescription(x) -> 
+        | RoutineDescription(x) -> 
             x.Parameters
         | TableDescription(x) ->
             List.empty
@@ -46,9 +42,7 @@ module DataObjectDescription =
     
     let tryFindParameter name (subject : DataObjectDescription) =
         match subject with
-        | TableFunctionDescription(x) -> 
-            x.Parameters |> Seq.tryFind(fun p -> p.Name = name)
-        | ProcedureDescription(x) -> 
+        | RoutineDescription(x) -> 
             x.Parameters |> Seq.tryFind(fun p -> p.Name = name)
         | TableDescription(x) ->
             None
@@ -62,15 +56,11 @@ module DataObjectDescription =
     let findParameter name (subject : DataObjectDescription) =
         subject |> tryFindParameter name |> Option.get
 
-    let unwrapTableFunction (subject : DataObjectDescription) =
+    let unwrapRoutine (subject : DataObjectDescription) =
         match subject with
-        | TableFunctionDescription(x) -> x
+        | RoutineDescription(x) -> x
         | _ -> ArgumentException() |> raise
         
-    let unwrapProcedure (subject : DataObjectDescription) =
-        match subject with
-        | ProcedureDescription(x) -> x
-        | _ -> ArgumentException() |> raise
 
     let unwrapTabular (subject : DataObjectDescription) =
         match subject with

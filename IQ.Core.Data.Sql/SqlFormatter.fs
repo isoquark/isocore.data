@@ -99,7 +99,7 @@ module SqlFormatter =
     /// Creates a SQL SELECT statement of the form "select * from [Schema].[Function](@Param1, ..., @ParamN)
     /// </summary>
     /// <param name="f">The table-valued function</param>
-    let formatTableFunctionSelect (f : TableFunctionDescription) =
+    let formatTableFunctionSelect (f : RoutineDescription) =
         let parameters = f.Parameters 
                          |> Seq.map (fun x -> x.Name |> formatParameterName)
                          |> Txt.delimit ","

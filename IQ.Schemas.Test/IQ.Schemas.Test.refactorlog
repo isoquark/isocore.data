@@ -139,4 +139,11 @@
     <Property Name="ParentElementType" Value="SqlSchema" />
     <Property Name="NewName" Value="Table0A" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="991b24f3-70fe-473f-8505-9b21afa01fae" ChangeDateTime="09/20/2015 18:07:42">
+    <Property Name="ElementName" Value="[SqlTest].[pTable08Select]" />
+    <Property Name="ElementType" Value="SqlProcedure" />
+    <Property Name="ParentElementName" Value="[SqlTest]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[pTable0CSelect]" />
+  </Operation>
 </Operations>

@@ -22,7 +22,7 @@ module DataProxyMetadata =
     /// <summary>
     /// Infers the kind of data type from a reference
     /// </summary>
-    let private toKind (t : DataTypeReference) =
+    let getKind (t : DataTypeReference) =
         match t with
         | BitDataType -> DataKind.Bit
         | UInt8DataType -> DataKind.UInt8
@@ -82,6 +82,94 @@ module DataProxyMetadata =
         ] |> dict
                
 
+    let getDefaultTypeFromKind kind =
+        match kind with
+        | DataKind.Bit -> 
+            BitDataType
+        | DataKind.UInt8 -> 
+            UInt8DataType
+        | DataKind.UInt16 -> 
+            UInt16DataType 
+        | DataKind.UInt32 ->
+            UInt32DataType
+        | DataKind.UInt64 ->
+            UInt64DataType
+        | DataKind.Int8 ->
+            Int8DataType
+        | DataKind.Int16 -> 
+            Int16DataType
+        | DataKind.Int32 -> 
+            Int32DataType
+        | DataKind.Int64 -> 
+            Int64DataType
+        | DataKind.BinaryFixed -> 
+            50 |> BinaryFixedDataType
+        | DataKind.BinaryVariable -> 
+            50 |> BinaryVariableDataType
+        | DataKind.BinaryMax -> 
+            BinaryMaxDataType      
+        | DataKind.AnsiTextFixed -> 
+            50 |> AnsiTextFixedDataType
+        | DataKind.AnsiTextVariable -> 
+            50 |> AnsiTextVariableDataType
+        | DataKind.AnsiTextMax -> 
+            AnsiTextMaxDataType
+        | DataKind.UnicodeTextFixed -> 
+            50 |> UnicodeTextFixedDataType
+        | DataKind.UnicodeTextVariable -> 
+            50 |> UnicodeTextVariableDataType
+        | DataKind.UnicodeTextMax -> 
+            UnicodeTextMaxDataType
+        | DataKind.DateTime -> 
+            DateTimeDataType(27uy, 7uy)
+        | DataKind.DateTimeOffset -> 
+            DateTimeOffsetDataType
+        | DataKind.TimeOfDay -> 
+            TimeOfDayDataType(16uy, 7uy)
+        | DataKind.Date -> 
+            DateDataType
+        | DataKind.Duration -> 
+            DurationDataType
+        | DataKind.LegacyDateTime -> 
+            DateTimeDataType(23uy, 3uy)
+        | DataKind.LegacySmallDateTime -> 
+            DateTimeDataType(16uy, 0uy)
+        | DataKind.Float32 -> 
+            Float32DataType
+        | DataKind.Float64 -> 
+            Float64DataType
+        | DataKind.Decimal -> 
+            DecimalDataType(19uy, 4uy)
+        | DataKind.Money -> 
+            MoneyDataType(19uy,4uy)
+        | DataKind.SmallMoney -> 
+            MoneyDataType(10uy, 4uy)
+        | DataKind.Guid -> 
+            GuidDataType
+        | DataKind.Xml -> 
+            String.Empty |> XmlDataType
+        | DataKind.Json -> 
+            UnicodeTextMaxDataType
+        | DataKind.Variant -> 
+            VariantDataType                      
+        | DataKind.Geography ->
+            ObjectDataType(DataObjectName("sys", "geography"), "Microsoft.SqlServer.Types.Geography")
+        | DataKind.Geometry -> 
+            ObjectDataType(DataObjectName("sys", "geometry"), "Microsoft.SqlServer.Types.SqlGeometry")
+        | DataKind.Hierarchy -> 
+            ObjectDataType(DataObjectName("sys", "hierarchyid"), "Microsoft.SqlServer.Types.SqlHierarchyId")
+        | DataKind.TypedDocument -> 
+            typeof<obj> |> TypedDocumentDataType
+        | DataKind.CustomTable -> 
+            nosupport()
+        | DataKind.CustomObject -> 
+            nosupport()
+        | DataKind.CustomPrimitive -> 
+            nosupport()
+        | _ ->
+            nosupport()
+
+
     let private getClrType (element : ClrElement) =
         match element with
         | MemberElement(m) -> 
@@ -112,6 +200,14 @@ module DataProxyMetadata =
     let hasFacet<'T> name element =
         element |> DataFacet.hasFacet<'T> name
 
+    let inferKindTypefromClrType(t : Type) =
+        if kindMap.ContainsKey(t) then
+            kindMap.[t]
+        else
+            ArgumentException(sprintf "No default mapping for %s exists" t.FullName) |> raise
+       
+            
+    
     let rec private inferStoreDataType(element : ClrElement) =
         
         let clrType = element |> getClrType
@@ -163,7 +259,7 @@ module DataProxyMetadata =
                 else if kindMap.ContainsKey(clrItemValueType) then
                         kindMap.[clrItemValueType]
                 else
-                     ArgumentException(sprintf "No default mapping for %s exists" clrType.FullName) |> raise                                                
+                     ArgumentException(sprintf "No default mapping for %s exists" clrType.FullName) |> raise 
 
         match kind with
         | DataKind.Bit -> 
@@ -342,6 +438,7 @@ module DataProxyMetadata =
                 Position = proxy.Position |> defaultArg attrib.Position 
                 Documentation = String.Empty
                 DataType = dataType
+                DataKind= dataType |> getKind
                 Nullable = isNullable
                 AutoValue = AutoValueKind.None
                 ParentName = parentName
@@ -354,6 +451,7 @@ module DataProxyMetadata =
                 Position = proxy.Position
                 Documentation = String.Empty
                 DataType = dataType
+                DataKind = dataType |> getKind
                 Nullable = isNullable
                 AutoValue = AutoValueKind.None
                 ParentName = parentName
@@ -453,18 +551,38 @@ module DataProxyMetadata =
     /// <param name="element">The CLR representation of the proxy</param>
     let describeProcedureProxy(element : ClrElement) =
         let objectName = element |> inferDataObjectName
+        let returnsRows = 
+            if element.HasAttribute<ProcedureAttribute>() then
+                element.GetAttibuteInstance<ProcedureAttribute>().ProvidesDataSet
+            else
+                false
         match element with
         | MemberElement(m) -> 
             match m with
             | MethodMember(m) ->
-                let parameters = m.Parameters |> List.map(fun x -> x |> describeParameterProxy m) 
+                let parameters = 
+                    if returnsRows then
+                        m.Parameters |> List.filter(fun x -> x.IsReturn |> not) 
+                    else
+                        m.Parameters 
+                    |> List.map(fun x -> x |> describeParameterProxy m) 
+
+                let columns = 
+                    if returnsRows then                
+                        let itemType = m.ReflectedElement.Value.ReturnType.ItemValueType.TypeName  |> describeType
+                        itemType |> describeColumnProxies objectName  |> List.map(fun c -> c.DataElement)   
+                    else
+                        []                                   
+                
                 let procedure = {
-                    ProcedureDescription.Name = objectName
+                    RoutineDescription.Name = objectName
                     Parameters = parameters |> List.map(fun p -> p.DataElement) 
+                    Columns = columns
                     Documentation = String.Empty
+                    RoutineKind = DataElementKind.Procedure
                     Properties = []
                 }            
-                ProcedureCallProxyDescription(m, procedure, parameters) |> ProcedureProxy
+                RoutineProxyDescription(RoutineCallProxyDescription(m, procedure, parameters), None) |> ProcedureProxy
             | _ -> nosupport()
 
         | _ -> nosupport()
@@ -521,15 +639,16 @@ module DataProxyMetadata =
             | _ ->
                 nosupport()
         let tableFunction = {
-            TableFunctionDescription.Name = objectName   
+            RoutineDescription.Name = objectName   
             Parameters = parameterProxies|> List.map(fun p -> p.DataElement) 
             Columns = columnProxies |> List.map(fun c -> c.DataElement) 
             Documentation = String.Empty
+            RoutineKind = DataElementKind.TableFunction
             Properties = []
         }
-        let callProxy = TableFunctionCallProxyDescription(clrMethod, tableFunction, parameterProxies)
-        let resultProxy = TabularResultProxyDescription(returnType, tableFunction, columnProxies)
-        TableFunctionProxyDescription(callProxy, resultProxy) |> TableFunctionProxy
+        let callProxy = RoutineCallProxyDescription(clrMethod, tableFunction, parameterProxies)
+        let resultProxy = RoutineResultProxyDescription(returnType, tableFunction, columnProxies) |> Some
+        RoutineProxyDescription(callProxy, resultProxy) |> TableFunctionProxy
 
     let describeRoutineProxy (description: ClrElement) =
         match description with

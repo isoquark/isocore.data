@@ -74,6 +74,7 @@ module DataProxyMetadata =
                       Position = 0
                       Documentation = String.Empty
                       DataType = Int32DataType
+                      DataKind = DataKind.Int32
                       Nullable = false  
                       AutoValue = AutoValueKind.None
                       ParentName = tableName
@@ -84,6 +85,7 @@ module DataProxyMetadata =
                       Position = 1
                       Documentation = String.Empty
                       DataType = BitDataType
+                      DataKind = DataKind.Bit
                       Nullable = false                
                       AutoValue = AutoValueKind.None
                       ParentName = tableName
@@ -94,6 +96,7 @@ module DataProxyMetadata =
                       Position = 2
                       Documentation = String.Empty
                       DataType = Int64DataType
+                      DataKind = DataKind.Int64
                       Nullable = true
                       AutoValue = AutoValueKind.None  
                       ParentName = tableName
@@ -173,7 +176,7 @@ module DataProxyMetadata =
             param1.DataElement.Position |> Claim.equal 0
             param1.DataElement.DataType |> Claim.equal (DateTimeDataType(27uy,7uy))
 
-            let resultProxy = proxy.ResultProxy
+            let resultProxy = proxy.ResultProxy.Value
             resultProxy.Columns.Length |> Claim.equal 4
             resultProxy.Columns.[0].DataElement.Name |> Claim.equal "Id"
             resultProxy.Columns.[1].DataElement.Name |> Claim.equal "Code"

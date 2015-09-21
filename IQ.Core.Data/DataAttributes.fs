@@ -135,7 +135,7 @@ module DataAttributes =
     /// <summary>
     /// Identifies a stored procedure
     /// </summary>
-    type ProcedureAttribute(schemaName, localName) =
+    type ProcedureAttribute(schemaName, localName, providesDataSet) =
         inherit DataObjectAttribute(schemaName, localName)
 
         /// <summary>
@@ -143,10 +143,18 @@ module DataAttributes =
         /// </summary>
         /// <param name="schemaName">The name of the schema in which the procedure is defined</param>
         new(schemaName) =
-            ProcedureAttribute(schemaName, UnspecifiedName)
+            ProcedureAttribute(schemaName, UnspecifiedName, false)
+
+        new(schemaName, providesDataSet) =
+            ProcedureAttribute(schemaName, UnspecifiedName, providesDataSet)
 
         new() =
-            ProcedureAttribute(UnspecifiedName, UnspecifiedName)
+            ProcedureAttribute(UnspecifiedName, UnspecifiedName, false)
+
+        new(providesDataSet) =
+            ProcedureAttribute(UnspecifiedName, UnspecifiedName, providesDataSet)
+
+        member this.ProvidesDataSet = providesDataSet
 
     /// <summary>
     /// Identifies a table-valued function

@@ -96,43 +96,13 @@ module Tabular =
             ]
             store |> verifyBulkInsert input (fun x -> x.Col02 :> IComparable)
 
-        [<Fact>]
-        let ``Retrieved paged tabular data``() =
-            
-            let rowcount = 100
-            let col2Values = [for rowid in 1..rowcount -> rowid, (sprintf "Row%i Description" rowid) :> obj] |> Map.ofList
-            let createRow(rowid) =                
-                [| rowid:> obj; col2Values.[rowid]; (rowid * 5 |> int16) :> obj|]
-                            
-            let tabularName = DataObjectName("SqlTest", "Table08")
-            tabularName |> TruncateTable |> store.ExecuteCommand |> ignore            
-            let description = sqlMetadata.DescribeTable(tabularName)
-            let rowValues =  [| for i in [1..rowcount] ->i |> createRow |] 
-            let data = TabularData(description :> ITabularDescription, rowValues)
-            store.InsertTable(data)
-
-            let q1 = DynamicQueryBuilder(tabularName)
-                        .Columns(description.Columns |> Seq.map(fun x -> x.Name) |> Array.ofSeq)
-                        .Sort([|AscendingSort(description.Columns.[0].Name)|])
-                        .Page(1, 10)
-                        .Build() 
-                        
-            let result = store.GetTable(q1);
-            result.RowValues.Count |> Claim.equal 10
-            for rowidx in 0..result.RowValues.Count-1 do
-                let row = result.RowValues.[rowidx]
-                let rowid = row.[0] :?> int
-                let actual = row.[1]
-                let expect = col2Values.[rowid]
-                Claim.equal expect actual
-            ()
 
         let csaw = "Initial Catalog=AdventureWorksLT2012;Data Source=eXaCore03;Integrated Security=SSPI"
         [<Fact>]
         let ``Inferred dynamic query defaults``() =
             let store = SqlDataStore.Get(csaw);
             let query = DynamicQueryBuilder("SalesLT", "Customer").Build()
-            let data1 =  query |> store.GetTable;
+            let data1 =  query |> store.GetMatrix;
             ()
 
             

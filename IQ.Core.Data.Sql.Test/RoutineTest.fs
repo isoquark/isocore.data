@@ -28,11 +28,11 @@ module Routine =
         let ``Executed [SqlTest].[pTable02Insert] procedure - Direct``() =
             let procName = thisMethod().Name |> DataObjectName.fuzzyParse
             let procProxy = routineproxies<ISqlTestRoutines> |> List.find(fun x -> x.DataElement.Name = procName)
-            let proc = procProxy.DataElement |> DataObjectDescription.unwrapProcedure
+            let proc = procProxy.DataElement |> DataObjectDescription.unwrapRoutine
             let inputValues =  
                 [("col01", 0, DBNull.Value :> obj); ("col02", 1, BclDateTime(2015, 5, 16) :> obj); ("col03", 2, 507L :> obj);]
                 |> List.map RoutineParameterValue
-            let outputvalues = proc |> Routine.executeProcedure store.ConnectionString inputValues
+            let outputvalues = proc |> Routine.executeProcCommand store.ConnectionString inputValues
             let col01Value = outputvalues.["col01"] :?> int
             Claim.greaterOrEqual col01Value 1
 
@@ -47,12 +47,12 @@ module Routine =
         let ``Executed [SqlTest].[pTable03Insert] procedure - Direct``() =
             let procName = thisMethod().Name |> DataObjectName.fuzzyParse
             let procProxy = routineproxies<ISqlTestRoutines> |> List.find(fun x -> x.DataElement.Name = procName) 
-            let proc = procProxy.DataElement |> DataObjectDescription.unwrapProcedure
+            let proc = procProxy.DataElement |> DataObjectDescription.unwrapRoutine
             let inputValues =
                 [("Col01", 0, 5uy :> obj); ("Col02", 1, 10s :> obj); ("Col03", 2, 15 :> obj); ("Col04", 3, 20L :> obj)]
                 |> List.map RoutineParameterValue
 
-            let outputValues = proc |> Routine.executeProcedure store.ConnectionString inputValues
+            let outputValues = proc |> Routine.executeProcCommand store.ConnectionString inputValues
             ()
     
         [<FactAttribute>]
@@ -91,7 +91,7 @@ module Routine =
             results.[1].EndDate |> Claim.equal (BclDateTime(2012,1,4))
 
         [<FactAttribute>]
-        let ``Executed [SqlTest].[fTable04Before] procedure - Array result``() =
+        let ``Executed [SqlTest].[fTable04Before] function - Array result``() =
             let routines = store.GetContract<ISqlTestRoutines>()
             routines.pTable04Truncate()
         
@@ -115,6 +115,19 @@ module Routine =
             results.[1].Code |> Claim.equal "ABC"
             results.[1].StartDate |> Claim.equal (BclDateTime(2012,1,3))
             results.[1].EndDate |> Claim.equal (BclDateTime(2012,1,4))
+
+        [<Fact>]
+        let ``Executed [SqlTest].[pTable0CSelect] procedure``() =
+            DataObjectName("SqlTest", "Table0C") |> TruncateTable |> store.ExecuteCommand |> ignore            
+            let values =
+                [for i in 1..100 ->
+                    {
+                        Table0C.Col01 = i
+                        Col02 = i.ToString()
+                        Col03 = i |> int16
+                    }
+                ] 
+            values |> store.Insert
 
 
     

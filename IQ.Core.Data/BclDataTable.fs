@@ -51,10 +51,12 @@ module BclDataTable =
     /// Creates a data table based on a tabular description
     /// </summary>
     /// <param name="d">The tabular description</param>
-    let fromTabularDescription(d : ITabularDescription) =
-        let table = new DataTable(d.ObjectName.Text)
-        d.Columns |> Seq.iter(fun c -> table.Columns.Add(c.Name, c.DataType |> DataTypeConverter.toBclTransportType) |> ignore)
-        table
+    let fromMatrixDescription(d : DataMatrixDescription) =
+        match d with 
+            | DataMatrixDescription(name, columns) ->
+                let table = new DataTable(name.Text)
+                columns |> Seq.iter(fun c -> table.Columns.Add(c.Name, c.DataType |> DataTypeConverter.toBclTransportType) |> ignore)
+                table
 
     /// <summary>
     /// Creates a <see cref="System.Data.DataTable"/> from a sequence of proxy values
@@ -63,23 +65,21 @@ module BclDataTable =
     /// <param name="values">The record values that will be transformed into table rows</param>
     let fromProxyValues (d : TableProxyDescription) (values : obj seq) =
         let excludeDefaults = true
-        let excludeIdentity = false
+        let excludeAutoIncrement = false
         let columns = [for c in d.Columns do 
                             match c.DataElement.AutoValue with
                                 | AutoValueKind.Default ->
                                     if excludeDefaults |> not then
                                         yield c
-                                | AutoValueKind.Identity ->
-                                    if excludeIdentity |> not then
+                                | AutoValueKind.AutoIncrement ->
+                                    if excludeAutoIncrement |> not then
                                         yield c
                                 | AutoValueKind.None ->
-                                    yield c
-                                | AutoValueKind.Sequence ->
                                     yield c
                                 | _ -> ()
                         ]
         
-        let table = d.DataElement |> fromTabularDescription
+        let table = DataMatrixDescription(d.TableName, d.DataElement.Columns)|> fromMatrixDescription
            
         let pocoConverter =  PocoConverter.getDefault()
         for value in values do
@@ -149,27 +149,37 @@ module BclDataTable =
                 values |> Seq.map(fun x -> x :> obj) |> fromProxyValues (tableproxy<'T> )    
         }
 
+    let describe(dataTable : DataTable) =
+        let tableName = DataObjectName.fuzzyParse(dataTable.TableName)
+        let columns = dataTable.Columns.Cast<DataColumn>() 
+                    |> List.ofSeq
+                    |> List.map(fun c ->
+                        let dataKind = c.DataType |> DataProxyMetadata.inferKindTypefromClrType
+                        {
+                            ColumnDescription.Name = c.ColumnName
+                            ColumnDescription.Position = c.Ordinal
+                            ColumnDescription.Nullable = c.AllowDBNull
+                            ColumnDescription.AutoValue = if c.AutoIncrement then AutoValueKind.AutoIncrement else AutoValueKind.None
+                            ColumnDescription.Documentation = String.Empty
+                            ParentName = tableName
+                            DataType = dataKind |> DataProxyMetadata.getDefaultTypeFromKind
+                            DataKind = dataKind
+                            Properties = []
+                        }                                        
+                    )
+        DataMatrixDescription(tableName, columns)
+
     /// <summary>
     /// Adapts a BCL <see cref="DataTable"/> to <see cref="IDataTable"/>
     /// </summary>
     /// <param name="dataTable">The BCL data table to adapt</param>
-    let asDataTable (dataTable : DataTable) =
-        let descriptor = 
-            DataTableDescriptor(
-                dataTable.TableName, 
-                dataTable.Columns.Cast<DataColumn>() |> Seq.mapi (fun i c -> ColumnDescriptor(c.ColumnName, i)) |> List.ofSeq)
-        let rowValues = [|for row in dataTable.Rows -> row.ItemArray|] :> IReadOnlyList<obj[]>
-        {new IDataTable with
-            member this.Description = 
-                {
-                    TableDescription.Name = DataObjectName(String.Empty, dataTable.TableName)
-                    Documentation = String.Empty
-                    Columns = []
-                    Properties = []
+    let asDataTable (dataTable : DataTable) =        
                 
-                } :> ITabularDescription
+        let rowValues = [|for row in dataTable.Rows -> row.ItemArray|] :> IReadOnlyList<obj[]>
+        let description = dataTable |> describe
+        {new IDataMatrix with
+            member this.Description = description
             member this.Item(row,col) = dataTable.Rows.[row].[col]
-            member this.Descriptor = descriptor
             member this.RowValues = rowValues
         
         }
