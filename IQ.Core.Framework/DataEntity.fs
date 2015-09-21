@@ -14,10 +14,9 @@ open Microsoft.FSharp.Reflection
 module internal DataEntity =
     type private PocoConverter(config : PocoConverterConfig) =
         let transforer = config.Transformer
-        let metadataProvider = config.ClrMetadataProvider
         
         let getTypeMetadata (t : Type) =
-            t.TypeName |> metadataProvider.FindType
+            t.TypeName |> ClrMetadata().FindType
 
         let getProperties(t : Type) =
             t |> getTypeMetadata |> fun t -> t.Properties            

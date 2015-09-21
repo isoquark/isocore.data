@@ -17,6 +17,8 @@ open IQ.Core.Framework
 /// </summary>
 module internal RoutineContract =            
         
+    let private PocoConverter() = PocoConverter.getDefault()
+    
     let private addParameter (command : SqlCommand) (param : SqlParameter) =
         param |> command.Parameters.Add |> ignore
 
@@ -41,23 +43,21 @@ module internal RoutineContract =
                 yield parameter.ParameterName, i, parameter.Value
         ]|>ValueIndex.create                
 
-    /// <summary>
-    /// Executes a stored procedure that yields a result set
-    /// </summary>
-    /// <param name="cs">The connection string</param>
-    /// <param name="paramValues">The values of the parameters</param>
-    /// <param name="proc">The procedure to execute</param>
-    let private executeProcQuery cs (paramValues : RoutineParameterValue list) (proc : RoutineDescription) =
+    let private executeProcQuery cs (paramValues : RoutineParameterValue list) (routine : RoutineProxyDescription) =
         use connection = cs |> SqlConnection.create
-        use command = new SqlCommand(proc.Name |> SqlFormatter.formatObjectName, connection)
+        use command = new SqlCommand(routine.CallProxy.DataElement.Name |> SqlFormatter.formatObjectName, connection)
         command.CommandType <- CommandType.StoredProcedure
-        proc.Parameters |> Seq.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
-
-        use adapter = new SqlDataAdapter(command)
-        let table = new DataTable()
-        adapter.Fill(table) |> ignore
-        table
-
+        routine.CallProxy.DataElement.Parameters |> Seq.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
+        let result = command |> SqlCommand.executeQuery
+        let typedesc = routine.ResultProxy.Value.ProxyElement
+        match typedesc with
+        | CollectionType(x) ->
+            let itemType = typedesc.Name |> ClrMetadata().FindType |> fun x -> x.ReflectedElement.Value.ItemValueType
+            let items = 
+                [for row in result -> PocoConverter().FromValueArray(row, itemType)]
+            items |> Collection.create x.Kind itemType |> Some                    
+        | _ -> NotSupportedException() |> raise                                            
+        
             
     /// <summary>
     /// Executes a table-valued function and returns a list of object arrays where each array
@@ -123,10 +123,14 @@ module internal RoutineContract =
     /// </summary>
     /// <param name="proxy">The routine proxy</param>
     /// <param name="mii">The method invocation information</param>
-    let private getRoutineArgs (proxy : DataObjectProxy) (mii : MethodInvocationInfo) =
+    let private getRoutineArgs (proxy : DataObjectProxy) (invokeInfo : MethodInvocationInfo) =
         match proxy with
         | ProcedureProxy(proxy) -> 
-            let methodParameterValues = mii.Method.GetParameters() |> Array.mapi (fun i p -> p.Name, i, mii.MethodArgs.[i]) |> ValueIndex.create
+            let methodParameterValues = 
+                invokeInfo.Method.GetParameters() 
+                |> Array.mapi (fun i p -> p.Name, i, invokeInfo.MethodArgs.[i]) 
+                |> ValueIndex.create
+            
             [for p in proxy.CallProxy.Parameters do
                 let key = ValueIndexKey(p |> getMethodParameterName , p.ProxyParameterPosition)
                 match methodParameterValues |> ValueIndex.tryFindValue key  with
@@ -136,7 +140,7 @@ module internal RoutineContract =
                     ()
             ]         
         | TableFunctionProxy(proxy) -> 
-             mii.MethodArgs |> List.zip proxy.CallProxy.Parameters
+             invokeInfo.MethodArgs |> List.zip proxy.CallProxy.Parameters
                             |> List.map (fun (param, value) -> 
                                         RoutineParameterValue(param.DataElement.Name, param.DataElement.Position, value))
         | _ -> []
@@ -161,8 +165,8 @@ module internal RoutineContract =
             | ProcedureProxy proxy ->
                 match proxy.ResultProxy with
                 | Some(resultProxy) ->
-                    proxy.DataElement |> executeProcQuery invokeInfo.ConnectionString routineArgs 
-                                      |> BclDataTable.toProxyValues proxy.ResultProxy.Value.ProxyElement :> obj |> Some 
+                    proxy |> executeProcQuery invokeInfo.ConnectionString routineArgs
+
                 | None ->                    
                     let results = 
                         proxy.DataElement |> executeProcCommand invokeInfo.ConnectionString routineArgs
@@ -184,12 +188,10 @@ module internal RoutineContract =
                     let typedesc = proxy.ResultProxy.Value.ProxyElement
                     match typedesc with
                     | CollectionType(x) ->
-                        let provider = ClrMetadataProvider.getDefault()
-                        let pocoConverter =  PocoConverter.getDefault()
 
-                        let itemType = typedesc.Name |> provider.FindType |> fun x -> x.ReflectedElement.Value.ItemValueType
+                        let itemType = typedesc.Name |> ClrMetadata().FindType |> fun x -> x.ReflectedElement.Value.ItemValueType
                         let items = 
-                            [for row in result -> pocoConverter.FromValueArray(row, itemType)]
+                            [for row in result -> PocoConverter().FromValueArray(row, itemType)]
                         items |> Collection.create x.Kind itemType |> Some                    
                     | _ -> NotSupportedException() |> raise                                            
             | _ -> nosupport()

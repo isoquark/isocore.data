@@ -17,7 +17,7 @@ type ITestContext =
     abstract AppContext : IAppContext
     abstract OutputDirectory : string
     abstract LogConnectionString : string
-    abstract ClrMetadataProvider : IClrMetadataProvider
+    //abstract ClrMetadataProvider : IClrMetadataProvider
 
 [<AbstractClass>]
 type TestContext(root : ICompositionRoot) as this =
@@ -25,7 +25,7 @@ type TestContext(root : ICompositionRoot) as this =
     let assemblyRoot = this.GetType().Assembly
     let context = root.CreateContext()
     let configManager = context.Resolve<IConfigurationManager>()
-    let clrMetadataProvider = context.Resolve<IClrMetadataProvider>()
+    //let clrMetadataProvider = context.Resolve<IClrMetadataProvider>()
      
     let outdir = Path.Combine("TestOutputDir" |> configManager.GetValue, assemblyRoot.GetName().Name)
     let cs = "csSqlDataStore" |> configManager.GetValue         
@@ -37,7 +37,7 @@ type TestContext(root : ICompositionRoot) as this =
     member this.ConfigurationManager = configManager
     member this.AppContext = context
     member this.OutputDirectory = outdir
-    member this.ClrMetadataProvider = clrMetadataProvider
+    //member this.ClrMetadataProvider = clrMetadataProvider
                                                        
             
     interface IDisposable with
@@ -49,7 +49,7 @@ type TestContext(root : ICompositionRoot) as this =
         member this.AppContext = context
         member this.OutputDirectory = outdir
         member this.LogConnectionString = cs
-        member this.ClrMetadataProvider = clrMetadataProvider
+        //member this.ClrMetadataProvider = clrMetadataProvider
 
 
 

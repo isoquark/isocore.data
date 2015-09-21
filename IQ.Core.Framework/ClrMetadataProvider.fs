@@ -236,19 +236,12 @@ module ClrMetadataProviderExtensions =
         /// <param name="name">Identifies the assembly</param>
         member this.FindModules() =
             ClrTypeKind.Module |> FindTypesByKind |> this.FindTypes 
-            
-
-    
-[<AutoOpen>]
-module internal ClrMetadataProviderInstance =
-    //This sucks, but we really have to do this if we are going to have the convenient operators below
+                                                                  
+    /// <summary>
+    /// Provides acces to the default metadata provider instance
+    /// </summary>
     let ClrMetadata() = ClrMetadataProvider.getDefault()        
-        
 
-                                           
-
-[<AutoOpen>]
-module ClrDescriptionExtensions =
     /// <summary>
     /// Creates a property description map keyed by name
     /// </summary>        

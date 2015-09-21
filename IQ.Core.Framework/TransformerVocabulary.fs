@@ -36,7 +36,7 @@ module TransformerVocabulary =
     /// <summary>
     /// Encapsulates Transformer configuration parameters
     /// </summary>
-    type TransformerConfig = TransformerConfig of searchElements : ClrElementQuery list * category : string option * metadataProvider : IClrMetadataProvider
+    type TransformerConfig = TransformerConfig of searchElements : ClrElementQuery list * category : string option
     with
         
         /// <summary>
@@ -49,10 +49,6 @@ module TransformerVocabulary =
         /// </summary>
         member this.Category = match this with TransformerConfig(category=x) -> x
 
-        /// <summary>
-        /// The CLR metadata provider used by the transformer
-        /// </summary>
-        member this.MetadataProvider = match this with TransformerConfig(metadataProvider=x) -> x
 
     type TransformationUndefinedException(srcType, dstType) =
         inherit Exception()

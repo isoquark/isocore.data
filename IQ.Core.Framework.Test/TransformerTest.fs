@@ -36,7 +36,7 @@ module Transformer =
     
     let getTransformerConfig(ctx : IAppContext) =
         let q = thisAssembly().AssemblyName |> FindAssemblyByName |> FindAssemblyElement |> List.singleton
-        TransformerConfig(q, None, ctx.Resolve<IClrMetadataProvider>())
+        TransformerConfig(q, None)
 
     type LogicTests(ctx,log) = 
         inherit ProjectTestContainer(ctx,log)
@@ -92,26 +92,6 @@ module Transformer =
     
         let transformer : ITransformer = getTransformerConfig(ctx.AppContext) |>ctx.AppContext.Resolve
 
-        [<Fact>]
-        let ``Benchmark - Called Method Invoke``() =
-            let m = funcinfo<@fun () -> TestTransformations.intToInt@>
-
-            let f() =
-                for i in 0..opcount do
-                    m.Invoke(null, [|i :> obj|]) |> ignore
-                                   
-            f |> Benchmark.capture ctx
-
-        [<Fact>]
-        let ``Benchmark - Called Method Directly``() =
-            let m = funcinfo<@fun () -> TestTransformations.intToInt@>
-                    
-            let f() =
-                for i in 0..opcount do
-                    Convert.ChangeType(i, typeof<int>) |> ignore
-                       
-            f |> Benchmark.capture ctx
-    
         [<Fact>]
         let ``Benchmark - Executed Transformation Int32->Int32 with Transformer``() =
                 

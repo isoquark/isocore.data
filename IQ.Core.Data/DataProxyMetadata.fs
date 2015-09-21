@@ -349,7 +349,6 @@ module DataProxyMetadata =
         | _ ->
             nosupport()
         
-    let clrMDP = ClrMetadataProvider.getDefault()
 
        
         
@@ -368,7 +367,7 @@ module DataProxyMetadata =
         let inferFromDeclaringType() =
                 match description.DeclaringType with
                 | Some(t) ->
-                    let description = t |> clrMDP.FindType |> TypeElement
+                    let description = t |> ClrMetadata().FindType |> TypeElement
                    
                     match description |> ClrElement.tryGetAttributeT<SchemaAttribute>  with
                     | Some(a) ->
@@ -507,7 +506,7 @@ module DataProxyMetadata =
     /// <param name="clrElement">The CLR element from which the parameter description will be inferred</param>
     let describeReturnParameter(description : ClrMethod) =
         let eDescription   = description |> MethodMember |> MemberElement 
-        let storageType = description.ReturnType  |> Option.get |> clrMDP.FindType |> TypeElement |>   inferStoreDataType
+        let storageType = description.ReturnType  |> Option.get |> ClrMetadata().FindType |> TypeElement |>   inferStoreDataType
         
         match description.ReturnAttributes |> List.tryFind(fun x -> x.AttributeName = typeinfo<RoutineParameterAttribute>.Name) with
         |Some(attrib) ->
@@ -571,7 +570,7 @@ module DataProxyMetadata =
                 let columns = 
                     if returnsRows then                
                         m.ReflectedElement.Value.ReturnType.ItemValueType.TypeName  
-                        |> clrMDP.FindType 
+                        |> ClrMetadata().FindType 
                         |> describeColumnProxies objectName                          
                     else
                         []                                   
@@ -586,7 +585,7 @@ module DataProxyMetadata =
                 }            
                 let call = RoutineCallProxyDescription(m, procedure, parameters)
                 let result = if returnsRows then
-                                let returnProxy = m.ReflectedElement.Value.ReturnType.TypeName |> clrMDP.FindType
+                                let returnProxy = m.ReflectedElement.Value.ReturnType.TypeName |> ClrMetadata().FindType
                                 RoutineResultProxyDescription(returnProxy, procedure, columns) |> Some
                              else
                                 None
@@ -636,12 +635,12 @@ module DataProxyMetadata =
             | MemberElement(m) -> 
                 match m with
                 | MethodMember(m) ->
-                    let itemType = m.ReflectedElement.Value.ReturnType.ItemValueType.TypeName  |> clrMDP.FindType
+                    let itemType = m.ReflectedElement.Value.ReturnType.ItemValueType.TypeName  |> ClrMetadata().FindType
                     let itemTypeProxies = itemType |> describeColumnProxies objectName                                       
                     m.InputParameters |> List.mapi (fun i x ->  x |> describeParameterProxy m ), 
                     itemTypeProxies,
                     m,
-                    m.ReturnType |> Option.get |> clrMDP.FindType
+                    m.ReturnType |> Option.get |> ClrMetadata().FindType
                 | _ ->
                     nosupport()
             | _ ->

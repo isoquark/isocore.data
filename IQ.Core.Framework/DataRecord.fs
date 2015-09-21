@@ -33,7 +33,7 @@ module internal DataRecord =
 
         let types = 
             t.TypeName   
-                |> config.ClrMetadataProvider.FindType 
+                |> ClrMetadata().FindType 
                 |> fun x -> x.Properties
                 |> List.map(fun p -> p.ReflectedElement.Value.PropertyType) |> Array.ofList
             
@@ -66,7 +66,7 @@ module internal DataRecord =
         if t |> Type.isRecordType |> not then
             argerrord "o" o "Not a record value"
         t.TypeName   
-            |> config.ClrMetadataProvider.FindType
+            |> ClrMetadata().FindType
             |> fun x -> x.Properties
             |> List.map(fun p -> p.ReflectedElement.Value.GetValue(o))
     
@@ -87,7 +87,7 @@ module internal DataRecord =
         if t |> Type.isRecordType |> not then
             argerrord "o" t "Not a record type"
 
-        let fields =  t.TypeName   |> config.ClrMetadataProvider.FindType |> fun x -> x.Properties
+        let fields =  t.TypeName   |> ClrMetadata().FindType |> fun x -> x.Properties
 
         let types = 
              fields |> List.map(fun p -> p.ReflectedElement.Value.PropertyType) 

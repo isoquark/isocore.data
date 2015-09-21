@@ -160,7 +160,7 @@ module Transformer =
                    
                                 let parameter = parameters.Head.ReflectedElement |> Option.get
                                 let srcType = parameter.ParameterType
-                                let dstType = m.ReturnType |> Option.get |> config.MetadataProvider.FindType |> fun x -> x.ReflectedElement.Value
+                                let dstType = m.ReturnType |> Option.get |> ClrMetadata().FindType |> fun x -> x.ReflectedElement.Value
                     
                                 let del = m.ReflectedElement.Value |> createDelegate
                                 let key = createKey srcType dstType
@@ -173,7 +173,7 @@ module Transformer =
             | _ -> ()
         
         [for q in config.SearchElements do 
-            yield! q |> config.MetadataProvider.FindElements] |> List.iter (fun x -> x |> ClrElement.walk handler)
+            yield! q |> ClrMetadata().FindElements] |> List.iter (fun x -> x |> ClrElement.walk handler)
             
         delegateIndex, identifiers |> List.ofSeq
                    
@@ -244,7 +244,7 @@ module Transformer =
 
     let getDefault() =
         let assemblyQuery = FrameworkAssemblyDescriptor.Assembly.AssemblyName |> FindAssemblyByName  |> FindAssemblyElement |> List.singleton
-        let transconfig = TransformerConfig(assemblyQuery, None, ClrMetadataProvider.getDefault())
+        let transconfig = TransformerConfig(assemblyQuery, None)
         transconfig |> get
         
 

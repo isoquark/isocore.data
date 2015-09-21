@@ -86,8 +86,7 @@ module ClrMetadataProvider =
     type Tests(ctx,log) =
         inherit ProjectTestContainer(ctx,log)
         
-        let provider = ctx.AppContext.Resolve<IClrMetadataProvider>()
-
+        let provider = ClrMetadata()
         [<Fact>]
         let ``Described records``() =
             //No optional fields

@@ -14,7 +14,7 @@ module Time =
     
         let getTransformer() =
             let q = TimeConversions.ModuleType.TypeName |> FindTypeByName |> FindTypeElement |> List.singleton
-            let t : ITransformer = TransformerConfig(q, None, ctx.AppContext.Resolve<IClrMetadataProvider>()) |> ctx.AppContext.Resolve 
+            let t : ITransformer = TransformerConfig(q, None) |> ctx.AppContext.Resolve 
             t.AsTyped()
 
         let tx = getTransformer()        
