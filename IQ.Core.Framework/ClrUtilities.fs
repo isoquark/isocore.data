@@ -6,6 +6,7 @@ open System
 open System.Reflection
 open System.IO
 open System.Collections.Generic
+open System.Linq
 open System.Linq.Expressions
 open System.Diagnostics
 open System.Runtime.CompilerServices
@@ -178,7 +179,7 @@ module Collection =
     /// I'm not crazy about this approach; it's logical but surely there's a better way.
     /// Source: http://blog.usermaatre.co.uk/programming/2013/07/24/fsharp-collections-reflection
     /// </remarks>
-    let private createList itemType (items : obj list)  =  
+    let private createList itemType (items : obj seq)  =  
          let listType = 
              makeGenericType <| typedefof<FSharpList<_>> <| [ itemType; ]
  
@@ -191,16 +192,17 @@ module Collection =
              let empty = listType.GetProperty ("Empty") 
              empty.GetValue (null) 
 
-         list |> List.foldBack add items    
+         list |> Seq.foldBack add items    
     
     /// <summary>
     /// Creates an array
     /// </summary>
     /// <param name="itemType">The type of items that the array will contain</param>
     /// <param name="items">The items with which to populate the list</param>
-    let private createArray itemType (items : obj list) =
-        let a = Array.CreateInstance(itemType, items.Length)
-        [0..items.Length-1] |> List.iter(fun i -> a.SetValue(items.[i], i))
+    let private createArray itemType (items : obj seq) =        
+        let a = Array.CreateInstance(itemType, items.Count())
+        items |> Seq.iteri(fun i item -> a.SetValue(item, i))
+        //[0..items.Length-1] |> Seq.iter(fun i -> a.SetValue(items.[i], i))
         a :> obj
 
     /// <summary>
@@ -208,11 +210,11 @@ module Collection =
     /// </summary>
     /// <param name="itemType">The type of items that the list will contain</param>
     /// <param name="items">The items with which to populate the list</param>
-    let private createGenericList itemType (items : obj list) =
+    let private createGenericList itemType (items : obj seq) =
         let listType = makeGenericType <| typedefof<GenericList<_>> <| [itemType;]
         let list = Activator.CreateInstance(listType)
         let add = listType.GetMethod("Add")
-        items |> List.iter(fun item -> add.Invoke(list, [|item|]) |> ignore)
+        items |> Seq.iter(fun item -> add.Invoke(list, [|item|]) |> ignore)
         list
         
     /// <summary>

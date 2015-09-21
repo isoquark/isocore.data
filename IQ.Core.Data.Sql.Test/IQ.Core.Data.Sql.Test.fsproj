@@ -46,7 +46,7 @@
     <Compile Include="TestConfiguration.fs" />
     <Compile Include="SqlFormatterTest.fs" />
     <Compile Include="TabularTest.fs" />
-    <Compile Include="RoutineTest.fs" />
+    <Compile Include="RoutineContractTest.fs" />
     <Compile Include="SqlMetadataProviderTest.fs" />
     <Compile Include="SqlCommandTest.fs" />
     <Compile Include="SqlDataStoreTest.fs" />

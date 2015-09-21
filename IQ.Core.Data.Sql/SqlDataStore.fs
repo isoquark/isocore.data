@@ -106,7 +106,7 @@ type internal SqlDataStoreRealization(config : SqlDataStoreConfig) =
             c |> SqlStoreCommand.execute cs 
 
         member this.GetContract() =
-            Routine.getContract<'TContract> cs
+            RoutineContract.get<'TContract> cs
 
         member this.ConnectionString = cs
             

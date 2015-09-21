@@ -53,7 +53,7 @@
     <Compile Include="SqlFormatter.fs" />
     <Compile Include="SqlDataReaders.fs" />
     <Compile Include="SqlWriters.fs" />
-    <Compile Include="Routine.fs" />
+    <Compile Include="RoutineContract.fs" />
     <Compile Include="SqlMetadataProxies.fs" />
     <Compile Include="SqlMetadataProvider.fs" />
     <Compile Include="SqlStoreCommand.fs" />

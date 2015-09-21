@@ -244,7 +244,9 @@ module internal ClrMetadataProviderInstance =
     //This sucks, but we really have to do this if we are going to have the convenient operators below
     let ClrMetadata() = ClrMetadataProvider.getDefault()        
         
+
                                            
+
 [<AutoOpen>]
 module ClrDescriptionExtensions =
     /// <summary>
@@ -270,3 +272,5 @@ module ClrDescriptionExtensions =
     /// </summary>
     let methinfos<'T> = typeinfo<'T>.Methods |> List.map(fun m -> m.Name, m) |> Map.ofList
 
+
+    
