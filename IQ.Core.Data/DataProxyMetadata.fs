@@ -349,8 +349,9 @@ module DataProxyMetadata =
         | _ ->
             nosupport()
         
-    let private describeType(name : ClrTypeName) =        
-        name |> ClrMetadataProvider.getDefault().FindType
+    let clrMDP = ClrMetadataProvider.getDefault()
+
+       
         
          
     let private getMemberDescription(m : MemberInfo) =
@@ -367,7 +368,7 @@ module DataProxyMetadata =
         let inferFromDeclaringType() =
                 match description.DeclaringType with
                 | Some(t) ->
-                    let description = t |> describeType |> TypeElement
+                    let description = t |> clrMDP.FindType |> TypeElement
                    
                     match description |> ClrElement.tryGetAttributeT<SchemaAttribute>  with
                     | Some(a) ->
@@ -506,7 +507,7 @@ module DataProxyMetadata =
     /// <param name="clrElement">The CLR element from which the parameter description will be inferred</param>
     let describeReturnParameter(description : ClrMethod) =
         let eDescription   = description |> MethodMember |> MemberElement 
-        let storageType = description.ReturnType  |> Option.get |> describeType |> TypeElement |>   inferStoreDataType
+        let storageType = description.ReturnType  |> Option.get |> clrMDP.FindType |> TypeElement |>   inferStoreDataType
         
         match description.ReturnAttributes |> List.tryFind(fun x -> x.AttributeName = typeinfo<RoutineParameterAttribute>.Name) with
         |Some(attrib) ->
@@ -569,20 +570,27 @@ module DataProxyMetadata =
 
                 let columns = 
                     if returnsRows then                
-                        let itemType = m.ReflectedElement.Value.ReturnType.ItemValueType.TypeName  |> describeType
-                        itemType |> describeColumnProxies objectName  |> List.map(fun c -> c.DataElement)   
+                        m.ReflectedElement.Value.ReturnType.ItemValueType.TypeName  
+                        |> clrMDP.FindType 
+                        |> describeColumnProxies objectName                          
                     else
                         []                                   
-                
+                                
                 let procedure = {
                     RoutineDescription.Name = objectName
                     Parameters = parameters |> List.map(fun p -> p.DataElement) 
-                    Columns = columns
+                    Columns = columns |> List.map(fun c -> c.DataElement)
                     Documentation = String.Empty
                     RoutineKind = DataElementKind.Procedure
                     Properties = []
                 }            
-                RoutineProxyDescription(RoutineCallProxyDescription(m, procedure, parameters), None) |> ProcedureProxy
+                let call = RoutineCallProxyDescription(m, procedure, parameters)
+                let result = if returnsRows then
+                                let returnProxy = m.ReflectedElement.Value.ReturnType.TypeName |> clrMDP.FindType
+                                RoutineResultProxyDescription(returnProxy, procedure, columns) |> Some
+                             else
+                                None
+                RoutineProxyDescription(call, result) |> ProcedureProxy
             | _ -> nosupport()
 
         | _ -> nosupport()
@@ -628,12 +636,12 @@ module DataProxyMetadata =
             | MemberElement(m) -> 
                 match m with
                 | MethodMember(m) ->
-                    let itemType = m.ReflectedElement.Value.ReturnType.ItemValueType.TypeName  |> describeType
+                    let itemType = m.ReflectedElement.Value.ReturnType.ItemValueType.TypeName  |> clrMDP.FindType
                     let itemTypeProxies = itemType |> describeColumnProxies objectName                                       
                     m.InputParameters |> List.mapi (fun i x ->  x |> describeParameterProxy m ), 
                     itemTypeProxies,
                     m,
-                    m.ReturnType |> Option.get |> describeType
+                    m.ReturnType |> Option.get |> clrMDP.FindType
                 | _ ->
                     nosupport()
             | _ ->

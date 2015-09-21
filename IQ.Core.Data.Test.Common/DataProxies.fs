@@ -1,9 +1,11 @@
 ﻿namespace IQ.Core.Data.Test
 
 open System
+open System.Collections.Generic
 
 open IQ.Core.Framework
 open IQ.Core.Data
+
 
 module TestProxies =
     type Table04FunctionResult = {
@@ -252,4 +254,7 @@ module TestProxies =
         abstract fTable04BeforeArray: startDate:BclDateTime-> Table04FunctionResult[]
 
         [<Procedure(true)>]
-        abstract pTable0CSelect: topCount : int -> Table0C[]
+        abstract pTable0CSelectA: topCount : int -> IReadOnlyList<Table0C>
+
+        [<Procedure("SqlTest", "pTable0CSelect", true)>]
+        abstract pTable0CSelectB: topCount : int -> Table0C list

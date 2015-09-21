@@ -98,12 +98,14 @@ module BclDataTable =
     let toProxyValues (t : ClrType) (dataTable : DataTable) =
         let pocoConverter =  PocoConverter.getDefault()
         match t with
+
         | CollectionType(x) ->
+            let itemType = Type.GetType(x.ItemType.AssemblyQualifiedName |> Option.get)
             let items = 
                 [for row in dataTable.Rows ->
-                    pocoConverter.FromValueArray(row.ItemArray, t.ReflectedElement.Value)
+                    pocoConverter.FromValueArray(row.ItemArray, itemType)
                     ]
-            let itemType = t.ReflectedElement.Value 
+            //let itemType = t.ReflectedElement.Value 
             items |> Collection.create x.Kind itemType :?> IEnumerable
         | _ ->
             let items = 

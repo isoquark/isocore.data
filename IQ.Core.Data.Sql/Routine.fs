@@ -49,6 +49,8 @@ module internal Routine =
         use connection = cs |> SqlConnection.create
         use command = new SqlCommand(proc.Name |> SqlFormatter.formatObjectName, connection)
         command.CommandType <- CommandType.StoredProcedure
+        proc.Parameters |> Seq.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
+
         use adapter = new SqlDataAdapter(command)
         let table = new DataTable()
         adapter.Fill(table) |> ignore
@@ -155,18 +157,21 @@ module internal Routine =
                                     
             match proxy with
             | ProcedureProxy proxy ->
-//                if proxy.DataElement.Columns.Length <>  then
-//                    let table = proxy.DataElement |> executeProcQuery mii.ConnectionString routineArgs |> BclDataTable.toProxyValues 
-                let results = 
-                    proxy.DataElement |> executeProcCommand mii.ConnectionString routineArgs
-                let outputs = 
-                    proxy.CallProxy.Parameters |> List.filter(fun x -> x.DataElement.Direction = RoutineParameterDirection.Output)                
-                if outputs.Length = 0 then
-                    results |> ValueIndex.tryFindNamedValue "Return"
-                else if outputs.Length = 1 then
-                    results |> ValueIndex.tryFindNamedValue outputs.Head.DataElement.Name
-                else
-                    NotSupportedException("Cannot yet support multiple output parameters") |> raise
+                match proxy.ResultProxy with
+                | Some(resultProxy) ->
+                    proxy.DataElement |> executeProcQuery mii.ConnectionString routineArgs 
+                                      |> BclDataTable.toProxyValues proxy.ResultProxy.Value.ProxyElement :> obj |> Some 
+                | None ->                    
+                    let results = 
+                        proxy.DataElement |> executeProcCommand mii.ConnectionString routineArgs
+                    let outputs = 
+                        proxy.CallProxy.Parameters |> List.filter(fun x -> x.DataElement.Direction = RoutineParameterDirection.Output)                
+                    if outputs.Length = 0 then
+                        results |> ValueIndex.tryFindNamedValue "Return"
+                    else if outputs.Length = 1 then
+                        results |> ValueIndex.tryFindNamedValue outputs.Head.DataElement.Name
+                    else
+                        NotSupportedException("Cannot yet support multiple output parameters") |> raise
             
             | TableFunctionProxy proxy ->
                 if usedatatable then

@@ -145,9 +145,6 @@ module DataAttributes =
         new(schemaName) =
             ProcedureAttribute(schemaName, UnspecifiedName, false)
 
-        new(schemaName, providesDataSet) =
-            ProcedureAttribute(schemaName, UnspecifiedName, providesDataSet)
-
         new() =
             ProcedureAttribute(UnspecifiedName, UnspecifiedName, false)
 

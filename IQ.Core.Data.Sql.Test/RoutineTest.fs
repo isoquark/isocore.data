@@ -128,6 +128,9 @@ module Routine =
                     }
                 ] 
             values |> store.Insert
+            let routines = store.GetContract<ISqlTestRoutines>()
+            let result = routines.pTable0CSelectB(50)
+            ()
 
 
     

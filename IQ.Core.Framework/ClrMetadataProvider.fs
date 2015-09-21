@@ -24,12 +24,15 @@ module ClrMetadataProviderVocbulary =
 module ClrMetadataProvider =    
     
     let private assemblyDescriptions = ConcurrentDictionary<Assembly, ClrAssembly>()            
-    let private typeIndex = ConcurrentDictionary<ClrTypeName, ClrType>()
+    let private typeNameIndex = ConcurrentDictionary<ClrTypeName, ClrType>()
     
     let private getAssemblyDescriptions() = assemblyDescriptions.Values |> List.ofSeq
 
-    let private acquireTypeDescription pos (t : Type) =
-        typeIndex.GetOrAdd(t.TypeName, fun n -> ClrType.describe pos t)
+    let private acquireTypeDescription pos (t : Type) =        
+        let describe typeName =
+            let description = t |> ClrType.describe pos
+            description
+        typeNameIndex.GetOrAdd(t.TypeName, describe)
         
     let private describeAssembly (a : Assembly) =                               
 
@@ -111,13 +114,13 @@ module ClrMetadataProvider =
     let private findTypes(q : ClrTypeQuery) =
         match q with
         | FindTypeByName(name) ->     
-            match name |> typeIndex.TryGetValue with
+            match name |> typeNameIndex.TryGetValue with
             | (true,descrption) -> [descrption]                
             | (false,_)->  
                 //TODO: whatever type this is needs to be discovered when the provider is created
                 [Type.GetType(name.Text) |> acquireTypeDescription -1]
         | FindTypesByKind(kind) ->
-            typeIndex.Values |> Seq.filter(fun t -> t.Kind = kind) |> List.ofSeq
+            typeNameIndex.Values |> Seq.filter(fun t -> t.Kind = kind) |> List.ofSeq
             
 
     let private findTypeProperties(q : ClrTypeQuery) =

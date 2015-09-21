@@ -670,6 +670,10 @@ with
     override this.ToString() = 
         match this with ClrCollection(info=x) -> sprintf "%O seq" x.Name
 
+    member this.ItemType = match this with ClrCollection(kind, info) -> info.ItemValueType
+
+    member this.CollectionKind = match this with ClrCollection(kind, info) -> kind
+
 /// <summary>
 /// Represents a struct
 /// </summary>
