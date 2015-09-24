@@ -20,6 +20,8 @@ module SqlDataStoreTest =
         [<Fact>]
         let ``Executed Dynamic Queries over [SqlTest].[Table08]``() =
             
+            let matrixStore = store :> ISqlMatrixStore
+
             let rowcount = 100
             let col2Values = [for rowid in 1..rowcount -> rowid, (sprintf "Row%i Description" rowid) :> obj] |> Map.ofList
             let createRow(rowid) =                
@@ -29,8 +31,8 @@ module SqlDataStoreTest =
             tabularName |> TruncateTable |> store.ExecuteCommand |> ignore            
             let description = sqlMetadata.DescribeTable(tabularName)
             let rowValues =  [| for i in [1..rowcount] ->i |> createRow |] 
-            let data = DataMatrix(DataMatrixDescription(description.Name, description.Columns), rowValues)
-            store.InsertMatrix(data)
+            let data = DataMatrix(DataMatrixDescription(description.Name, description.Columns), rowValues) :> IDataMatrix
+            matrixStore.Insert(data |> Seq.singleton)
 
             let q1 = DynamicQueryBuilder(tabularName)
                         .Columns(description.Columns |> Seq.map(fun x -> x.Name) |> Array.ofSeq)
@@ -38,7 +40,7 @@ module SqlDataStoreTest =
                         .Page(1, 10)
                         .Build() 
                         
-            let result = store.GetMatrix(q1);
+            let result = store.SelectOne(q1);
             result.RowValues.Count |> Claim.equal 10
             for rowidx in 0..result.RowValues.Count-1 do
                 let row = result.RowValues.[rowidx]

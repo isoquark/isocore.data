@@ -11,8 +11,6 @@ open IQ.Core.Data
 open OfficeOpenXml
 open OfficeOpenXml.Table
 
-type IExcelDataStore =
-    inherit IDataStore<IDataMatrix,ExcelDataStoreQuery>
 
 [<AutoOpen>]
 module DataMatrixExtensions =

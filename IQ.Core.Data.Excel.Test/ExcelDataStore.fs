@@ -20,18 +20,43 @@ module ExcelDataStore =
         
 
         [<Fact>]
-        let ``Hydrated data tables from Excel workbook - 01``() =
+        let ``Hydrated data matrix from Excel workbook - WB01``() =
             let xlspath = thisAssembly() |> Assembly.emitResource "WB01.xlsx" ctx.OutputDirectory
             let csvpath = thisAssembly() |> Assembly.emitResource "WB01.WS01.csv" ctx.OutputDirectory
             let store = xlspath |> ExcelDataStore.get
-            let xlsTable =  "WS01" |> FindWorksheetByName |> store.SelectOne 
-            let xlsProxies = xlsTable |> DataMatrix.toProxyValuesT<WB01.WS01> 
+            let matrix =  "WS01" |> FindWorksheetByName |> store.SelectOne 
+            let xlsProxies = matrix |> DataMatrix.toProxyValuesT<WB01.WS01> 
             let csvTable = csvpath |> CsvReader.readTable (CsvReader.getDefaultFormat())
             let csvProxies = csvTable |> BclDataTable.toProxyValuesT<WB01.WS01> 
             Seq.zip xlsProxies csvProxies |> Seq.iter(fun (x,y) ->
                 Claim.equal x y
             )
+
+
+        [<Fact>]
+        let ``Hydrated data matrix from Excel workbook - WB03``() =
+            let path = thisAssembly() |> Assembly.emitResource "WB03.xlsx" ctx.OutputDirectory
+            let store = path |> ExcelDataStore.get
+            let matrix = "WS01" |> FindWorksheetByName |> store.SelectOne
+            let proxies = matrix |> DataMatrix.toProxyValuesT<WB03.WS01> |> List.ofSeq
+
+            proxies.[0].Col01 |> Claim.equal "ABC"
+            proxies.[0].Col02 |> Claim.equal 5
+            proxies.[0].Col03 |> Claim.equal true
+            proxies.[0].Col04 |> Claim.equal 33.95
+            proxies.[0].Col05.Year |> Claim.equal 2015
+            proxies.[0].Col05.Month |> Claim.equal 1
+            proxies.[0].Col05.Day |> Claim.equal 5
             
+            proxies.[1].Col01 |> Claim.equal "DEF"
+            proxies.[1].Col02 |> Claim.equal 10
+            proxies.[1].Col03 |> Claim.equal false
+            proxies.[1].Col04 |> Claim.equal 44.81
+            proxies.[1].Col05.Year |> Claim.equal 2015
+            proxies.[1].Col05.Month |> Claim.equal 2
+            proxies.[1].Col05.Day |> Claim.equal 5
+
+
 
         [<Fact>]
         let ``Wrote data tables to Excel workbook - WB01``() =

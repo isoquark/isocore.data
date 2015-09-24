@@ -281,14 +281,15 @@ type AllocateSequenceRangeResult = AllocateSequenceRangeResult of FirstNumber : 
 /// Defines the contract for a SQL Server Data Store that can persist and hydrate data matrices
 /// </summary>
 type ISqlMatrixStore =
+    inherit IDataStore<IDataMatrix,SqlDataStoreQuery>
     /// <summary>
     /// Retrieves an identified set of tabular data from the store
     /// </summary>
-    abstract GetMatrix:SqlDataStoreQuery -> IDataMatrix
+    //abstract GetMatrix:SqlDataStoreQuery -> IDataMatrix
     /// <summary>
     /// Inserts specified tabular data into the store
     /// </summary>
-    abstract InsertMatrix:IDataMatrix->unit
+    //abstract InsertMatrix:IDataMatrix->unit
 
 /// <summary>
 /// Defines the contract for a SQL Server Data Store that can persist and hydrate data via proxy types
@@ -349,4 +350,8 @@ type ExcelDataStoreQuery =
     /// Retrieves all worksheets in the workbook
     | FindAllWorksheets
 
-
+/// <summary>
+/// Defines the contract for a data store that can read/write Excel workbooks
+/// </summary>
+type IExcelDataStore =
+    inherit IDataStore<IDataMatrix,ExcelDataStoreQuery>

@@ -100,9 +100,9 @@ module Tabular =
         let csaw = "Initial Catalog=AdventureWorksLT2012;Data Source=eXaCore03;Integrated Security=SSPI"
         [<Fact>]
         let ``Inferred dynamic query defaults``() =
-            let store = SqlDataStore.Get(csaw);
+            let store = SqlDataStore.Get(csaw) :> ISqlMatrixStore;
             let query = DynamicQueryBuilder("SalesLT", "Customer").Build()
-            let data1 =  query |> store.GetMatrix;
+            let data1 =  query |> store.SelectOne;
             ()
 
             

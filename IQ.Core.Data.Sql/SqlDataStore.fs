@@ -92,12 +92,27 @@ type internal SqlDataStoreRealization(config : SqlDataStoreConfig) =
         command.CommandType <- CommandType.Text
         command |> SqlCommand.executeQuery
 
-    interface ISqlDataStore with
-        member this.GetMatrix q = 
-            q |> readMatrix
+    interface ISqlMatrixStore with
+        member this.Select q = 
+            q |> readMatrix |> Seq.singleton
 
-        member this.InsertMatrix (data : IDataMatrix) =
-            data |> SqlTableWriter.bulkInsert cs
+        member this.Insert data  =
+            data |> Seq.iter(fun x -> x|> SqlTableWriter.bulkInsert cs)
+
+        member this.Delete q =
+            nosupport()
+
+        member this.Merge data =
+            nosupport()
+
+        member this.ConnectionString = cs
+    
+    interface ISqlDataStore with
+//        member this.GetMatrix q = 
+//            q |> readMatrix
+//
+//        member this.InsertMatrix (data : IDataMatrix) =
+//            data |> SqlTableWriter.bulkInsert cs
 
         member this.Delete q =
             nosupport()
