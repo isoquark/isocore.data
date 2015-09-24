@@ -28,12 +28,12 @@ module internal RoutineContract =
     /// <param name="cs">The connection string</param>
     /// <param name="paramValues">The values of the parameters</param>
     /// <param name="proc">The procedure to execute</param>
-    let private executeProcCommand cs (paramValues : RoutineParameterValue list) (proc : RoutineDescription) =
+    let private executeProcCommand cs (paramValues : RoutineParameterValue list) (proc : RoutineProxyDescription) =
         use connection = cs |> SqlConnection.create
-        use command = new SqlCommand(proc.Name |> SqlFormatter.formatObjectName, connection)
+        use command = new SqlCommand(proc.DataElement.Name |> SqlFormatter.formatObjectName, connection)
         command.CommandType <- CommandType.StoredProcedure
         
-        proc.Parameters |> Seq.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
+        proc.DataElement.Parameters |> Seq.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
         command.ExecuteNonQuery() |> ignore
         [for i in [0..command.Parameters.Count-1] do
             let parameter = command.Parameters.[i]  
@@ -43,6 +43,12 @@ module internal RoutineContract =
                 yield parameter.ParameterName, i, parameter.Value
         ]|>ValueIndex.create                
 
+    /// <summary>
+    /// Executes a stored procedure that returns a result set
+    /// </summary>
+    /// <param name="cs">The connection string</param>
+    /// <param name="paramValues">The values of the parameters</param>
+    /// <param name="proc">The proxy of the procedure to execute</param>
     let private executeProcQuery cs (paramValues : RoutineParameterValue list) (routine : RoutineProxyDescription) =
         use connection = cs |> SqlConnection.create
         use command = new SqlCommand(routine.CallProxy.DataElement.Name |> SqlFormatter.formatObjectName, connection)
@@ -55,7 +61,7 @@ module internal RoutineContract =
             let itemType = typedesc.Name |> ClrMetadata().FindType |> fun x -> x.ReflectedElement.Value.ItemValueType
             let items = 
                 [for row in result -> PocoConverter().FromValueArray(row, itemType)]
-            items |> Collection.create x.Kind itemType |> Some                    
+            items |> CollectionBuilder.create x.Kind itemType |> Some                    
         | _ -> NotSupportedException() |> raise                                            
         
             
@@ -66,30 +72,13 @@ module internal RoutineContract =
     /// <param name="cs">The connection string</param>
     /// <param name="paramValues">The values of the parameters</param>
     /// <param name="proc">The function to execute</param>
-    let private executeTableFunction cs (paramValues : RoutineParameterValue list) (f : RoutineDescription) =
+    let private executeTableFunction cs (paramValues : RoutineParameterValue list) (f : RoutineProxyDescription) =
         use connection = cs |> SqlConnection.create
-        let sql = f |> SqlFormatter.formatTableFunctionSelect
+        let sql = f.DataElement |> SqlFormatter.formatTableFunctionSelect
         use command = new SqlCommand(sql, connection)
-        f.Parameters |> Seq.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
+        f.DataElement.Parameters |> Seq.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
         command |> SqlCommand.executeQuery 
                    
-
-    /// <summary>
-    /// Executes a table-valued function and returns a data table
-    /// </summary>
-    /// <param name="cs">The connection string</param>
-    /// <param name="paramValues">The values of the parameters</param>
-    /// <param name="proc">The function to execute</param>
-    let private executeTableFunctionDataTable cs (paramValues : RoutineParameterValue list) (f : RoutineDescription) =
-        use connection = cs |> SqlConnection.create
-        let sql = f |> SqlFormatter.formatTableFunctionSelect
-        use command = new SqlCommand(sql, connection)
-        f.Parameters |> Seq.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
-        
-        use adapter = new SqlDataAdapter(command)
-        let table = new DataTable()
-        adapter.Fill(table) |> ignore       
-        table        
 
     let private getMethodParameterName(proxy : ParameterProxyDescription) =
         if proxy.ProxyElement.IsReturn then "Return" else proxy.ProxyElement.Name.Text
@@ -145,8 +134,6 @@ module internal RoutineContract =
                                         RoutineParameterValue(param.DataElement.Name, param.DataElement.Position, value))
         | _ -> []
 
-
-    let private usedatatable = false
        
     /// <summary>
     /// Creates a function that will be invoked whenever a contracted method is called to execute a stored procedure
@@ -166,10 +153,9 @@ module internal RoutineContract =
                 match proxy.ResultProxy with
                 | Some(resultProxy) ->
                     proxy |> executeProcQuery invokeInfo.ConnectionString routineArgs
-
                 | None ->                    
                     let results = 
-                        proxy.DataElement |> executeProcCommand invokeInfo.ConnectionString routineArgs
+                        proxy |> executeProcCommand invokeInfo.ConnectionString routineArgs
                     let outputs = 
                         proxy.CallProxy.Parameters |> List.filter(fun x -> x.DataElement.Direction = RoutineParameterDirection.Output)                
                     if outputs.Length = 0 then
@@ -180,20 +166,16 @@ module internal RoutineContract =
                         NotSupportedException("Cannot yet support multiple output parameters") |> raise
             
             | TableFunctionProxy proxy ->
-                if usedatatable then
-                    let result = proxy.DataElement|> executeTableFunctionDataTable invokeInfo.ConnectionString routineArgs
-                    result |> BclDataTable.toProxyValues proxy.ResultProxy.Value.ProxyElement :> obj |> Some
-                else
-                    let result = proxy.DataElement|> executeTableFunction invokeInfo.ConnectionString routineArgs
-                    let typedesc = proxy.ResultProxy.Value.ProxyElement
-                    match typedesc with
-                    | CollectionType(x) ->
+                let result = proxy|> executeTableFunction invokeInfo.ConnectionString routineArgs
+                let typedesc = proxy.ResultProxy.Value.ProxyElement
+                match typedesc with
+                | CollectionType(x) ->
 
-                        let itemType = typedesc.Name |> ClrMetadata().FindType |> fun x -> x.ReflectedElement.Value.ItemValueType
-                        let items = 
-                            [for row in result -> PocoConverter().FromValueArray(row, itemType)]
-                        items |> Collection.create x.Kind itemType |> Some                    
-                    | _ -> NotSupportedException() |> raise                                            
+                    let itemType = typedesc.Name |> ClrMetadata().FindType |> fun x -> x.ReflectedElement.Value.ItemValueType
+                    let items = 
+                        [for row in result -> PocoConverter().FromValueArray(row, itemType)]
+                    items |> CollectionBuilder.create x.Kind itemType |> Some                    
+                | _ -> NotSupportedException() |> raise                                            
             | _ -> nosupport()
             
         //Note that this is the method being returned to the caller                

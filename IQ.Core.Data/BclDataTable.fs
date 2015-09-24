@@ -24,6 +24,14 @@ type IDataTableConverter<'T> =
     abstract FromProxyValues: TableProxyDescription->values : 'T seq -> DataTable
     abstract ToProxyValues: DataTable->'T seq
 
+type IDataMatrixConverter = 
+    abstract FromProxyValues: TableProxyDescription->values : obj seq -> IDataMatrix
+    abstract ToProxyValues: Type-> IDataMatrix->IEnumerable
+
+type IDataMatrixConverter<'T> =
+    abstract FromProxyValues: TableProxyDescription->values : 'T seq -> IDataMatrix
+    abstract ToProxyValues: IDataMatrix->'T seq
+
 
 /// <summary>
 /// Defines operations for working with Data Tables
@@ -105,14 +113,13 @@ module BclDataTable =
                 [for row in dataTable.Rows ->
                     pocoConverter.FromValueArray(row.ItemArray, itemType)
                     ]
-            //let itemType = t.ReflectedElement.Value 
-            items |> Collection.create x.Kind itemType :?> IEnumerable
+            items |> CollectionBuilder.create x.Kind itemType :?> IEnumerable
         | _ ->
             let items = 
                 [for row in dataTable.Rows ->                
                     pocoConverter.FromValueArray(row.ItemArray, t.ReflectedElement.Value)] 
             let itemType = t.ReflectedElement.Value 
-            items |> Collection.create ClrCollectionKind.GenericList itemType :?> IEnumerable
+            items |> CollectionBuilder.create ClrCollectionKind.GenericList itemType :?> IEnumerable
 
 
     /// <summary>
@@ -175,7 +182,7 @@ module BclDataTable =
     /// Adapts a BCL <see cref="DataTable"/> to <see cref="IDataTable"/>
     /// </summary>
     /// <param name="dataTable">The BCL data table to adapt</param>
-    let asDataTable (dataTable : DataTable) =        
+    let asDataMatrix (dataTable : DataTable) =        
                 
         let rowValues = [|for row in dataTable.Rows -> row.ItemArray|] :> IReadOnlyList<obj[]>
         let description = dataTable |> describe
@@ -184,4 +191,89 @@ module BclDataTable =
             member this.Item(row,col) = dataTable.Rows.[row].[col]
             member this.RowValues = rowValues
         
+        }
+
+module DataMatrix =
+    
+    /// <summary>
+    /// Creates a <see cref="System.Data.DataTable"/> from a sequence of proxy values
+    /// </summary>
+    /// <param name="proxyDescription">Description of the proxy</param>
+    /// <param name="values">The record values that will be transformed into table rows</param>
+    let fromProxyValues (d : TableProxyDescription) (values : obj seq) =
+        let excludeDefaults = true
+        let excludeAutoIncrement = false
+        let columns = [for c in d.Columns do 
+                            match c.DataElement.AutoValue with
+                                | AutoValueKind.Default ->
+                                    if excludeDefaults |> not then
+                                        yield c
+                                | AutoValueKind.AutoIncrement ->
+                                    if excludeAutoIncrement |> not then
+                                        yield c
+                                | AutoValueKind.None ->
+                                    yield c
+                                | _ -> ()
+                        ]
+        
+        let rows = new List<obj[]>()
+        let table = DataMatrix(DataMatrixDescription(d.TableName, d.DataElement.Columns), rows)
+           
+        let pocoConverter =  PocoConverter.getDefault()
+        for value in values do
+            let valueidx = value |> pocoConverter.ToValueIndex
+            [|for column in columns do 
+                yield valueidx.[column.ProxyElement.Name.Text] |> DataTypeConverter.toBclTransportValue column.DataElement.DataType
+            |] |> rows.Add
+        table :> IDataMatrix               
+    
+    /// <summary>
+    /// Creates a collection of proxies from rows in a data table
+    /// </summary>
+    /// <param name="t">The proxy type</param>
+    /// <param name="dataTable">The data table</param>
+    let toProxyValues (t : ClrType) (dataTable : IDataMatrix) =
+        let pocoConverter =  PocoConverter.getDefault()
+        match t with
+
+        | CollectionType(x) ->
+            let itemType = Type.GetType(x.ItemType.AssemblyQualifiedName |> Option.get)
+            let items = 
+                [for row in dataTable.RowValues ->
+                    pocoConverter.FromValueArray(row, itemType)
+                    ]
+            items |> CollectionBuilder.create x.Kind itemType :?> IEnumerable
+        | _ ->
+            let items = 
+                [for row in dataTable.RowValues ->                
+                    pocoConverter.FromValueArray(row, t.ReflectedElement.Value)] 
+            let itemType = t.ReflectedElement.Value 
+            items |> CollectionBuilder.create ClrCollectionKind.GenericList itemType :?> IEnumerable
+    
+    
+    /// <summary>
+    /// Creates a collection of proxies from rows in a data matrix
+    /// </summary>
+    /// <param name="t">The proxy type</param>
+    /// <param name="dataTable">The data table</param>
+    let toProxyValuesT<'T>  (dataTable : IDataMatrix) =        
+        let t = ClrMetadata().FindType(typeof<'T>.TypeName)
+        dataTable |> toProxyValues t :?> IEnumerable<'T>
+
+    let getUntypedConverter() =
+        {new IDataMatrixConverter with
+            member this.ToProxyValues t dataTable =
+                let clrType = ClrMetadata().FindType(t.TypeName) 
+                dataTable |> toProxyValues clrType
+            member this.FromProxyValues d values =
+                fromProxyValues d values        
+        }
+
+
+    let getTypedConverter<'T>() =
+        {new IDataMatrixConverter<'T> with
+            member this.ToProxyValues dataTable =
+                dataTable |> toProxyValuesT<'T>
+            member this.FromProxyValues d values =
+                values |> Seq.map(fun x -> x :> obj) |> fromProxyValues (tableproxy<'T> )    
         }

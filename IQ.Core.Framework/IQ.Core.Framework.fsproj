@@ -62,6 +62,7 @@
     <Compile Include="Txt.fs" />
     <Compile Include="Configuration.fs" />
     <Compile Include="ClrUtilities.fs" />
+    <Compile Include="CollectionBuilder.fs" />
     <Compile Include="CompositionRoot.fs" />
     <Compile Include="TransformerVocabulary.fs" />
     <Compile Include="Time.fs" />
@@ -69,8 +70,6 @@
     <Compile Include="ClrElement.fs" />
     <Compile Include="ClrMetadataProvider.fs" />
     <Compile Include="Transformer.fs" />
-    <Compile Include="DataRecord.fs" />
-    <Compile Include="DataEntity.fs" />
     <Compile Include="DynamicContract.fs" />
     <Compile Include="DataStructures.fs" />
     <Compile Include="CoreRegistration.fs" />

@@ -38,7 +38,7 @@ module internal SqlDataReader =
         [for row in data -> 
             pocoConverter.FromValueArray(row, itemType)
         ] 
-        |> Collection.create ClrCollectionKind.Array itemType :?> 'T seq
+        |> CollectionBuilder.create ClrCollectionKind.Array itemType :?> 'T seq
 
     
     let selectAll<'T> cs  =

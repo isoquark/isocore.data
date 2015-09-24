@@ -87,7 +87,7 @@ module Type =
         [<Fact>]
         let ``Created F# list via reflection``() =
             let actual = [1 :> obj;2:> obj; 3:> obj]   
-                        |> Collection.create ClrCollectionKind.FSharpList typeof<int> 
+                        |> CollectionBuilder.create ClrCollectionKind.FSharpList typeof<int> 
                         :?> list<int>
             let expect = [1; 2; 3;]
             actual |> Claim.equal expect
@@ -95,7 +95,7 @@ module Type =
         [<Fact>]
         let ``Created array via reflection``() =
             let actual = [1 :> obj;2:> obj; 3:> obj]   
-                        |> Collection.create ClrCollectionKind.Array typeof<int> 
+                        |> CollectionBuilder.create ClrCollectionKind.Array typeof<int> 
                         :?> array<int>
             let expect = [|1; 2; 3|]
             actual |> Claim.equal expect
@@ -103,7 +103,7 @@ module Type =
         [<Fact>]
         let ``Created generic list via reflection``() =
             let actual = [1 :> obj;2:> obj; 3:> obj]   
-                        |> Collection.create ClrCollectionKind.GenericList typeof<int>
+                        |> CollectionBuilder.create ClrCollectionKind.GenericList typeof<int>
                         :?> List<int>
             let expect = List<int>([1;2;3])
             actual.[0] |> Claim.equal expect.[0]

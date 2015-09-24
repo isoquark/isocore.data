@@ -232,7 +232,7 @@ with
 /// </summary>
 /// <remarks>
 /// The intent is not to use this for calculations and such as it would be very slow; its
-/// intended use case is rather clarity of expression and/or type-safety when.
+/// intended use case is rather clarity of expression and/or type-safety when useful.
 /// </remarks>
 type NumericValue =
     | UInt8Value of uint8
@@ -406,6 +406,7 @@ with
 /// Describes a data matrix
 /// </summary>
 type DataMatrixDescription = DataMatrixDescription of Name : DataObjectName * Columns : ColumnDescription list
+
 
 /// <summary>
 /// Defines contract for a tabular data source

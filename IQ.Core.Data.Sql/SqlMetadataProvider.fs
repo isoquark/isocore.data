@@ -263,7 +263,82 @@ module SqlMetadataProvider =
     let private unbracket name =
         name |> Txt.removeChar '[' |> Txt.removeChar ']'
 
+    let private badargs() =
+        ArgumentException() |> raise
     
+    //TODO:Intent is to use this structure to more smoothly implement the metadata provider
+    type private DataObjectIndex() = 
+        let schemaObjects = Dictionary<string, Dictionary<DataElementKind, List<DataObjectDescription>>>()
+        let allObjects = Dictionary<DataObjectName, DataObjectDescription>()
+
+        let getSchemaObjects elementKind schemaName =
+            if schemaObjects.[schemaName].ContainsKey(elementKind) then
+                schemaObjects.[schemaName].[elementKind] :> seq<_>
+            else
+                Seq.empty
+            
+
+        member this.IndexObject(o : DataObjectDescription) =
+            allObjects.[o.Name] <- o
+            let elementKind = (o :> IDataObjectDescription).ElementKind
+            let schemaName = o.Name.SchemaName
+            let schemaIndex =
+                if schemaObjects.ContainsKey(schemaName) then
+                    schemaObjects.[schemaName]
+                else
+                    schemaObjects.[schemaName] <- Dictionary<DataElementKind, List<DataObjectDescription>>()
+                    schemaObjects.[schemaName]
+            if schemaIndex.ContainsKey(elementKind) then
+                schemaIndex.[elementKind].Add(o)
+            else
+                schemaIndex.[elementKind] <- List([o])
+        
+        member this.DescribeTable(name : DataObjectName) =
+            match allObjects.[name] with
+            | TableDescription(x) -> x
+            | _ -> badargs()
+
+        member this.DescribeView(name : DataObjectName) =
+            match allObjects.[name] with
+            | ViewDescription(x) -> x
+            | _ -> badargs()
+
+        member this.DescribeViewsInSchema(schemaName) =
+            if schemaObjects.ContainsKey(schemaName) then
+                schemaName |> getSchemaObjects DataElementKind.View 
+                           |> Seq.map(fun x -> match x with | ViewDescription(x) -> x | _ -> badargs())
+                           |> List.ofSeq                
+            else
+                []
+
+        member this.DescribeProcedure(name : DataObjectName) =
+            match allObjects.[name] with
+            | RoutineDescription(x) -> 
+                if x.RoutineKind <> DataElementKind.Procedure then
+                    badargs()
+                x
+            | _ -> badargs()
+            
+        member this.DescribeTableFunction(name : DataObjectName) =
+            match allObjects.[name] with
+            | RoutineDescription(x) -> 
+                if x.RoutineKind <> DataElementKind.TableFunction then
+                    badargs()
+                x
+            | _ -> badargs()
+
+        member this.DescribeDataType(name : DataObjectName) =
+            match allObjects.[name] with
+            | DataTypeDescription(x) ->
+                x
+            | _ -> badargs()
+    
+        member this.DescribeSequence(name : DataObjectName) =
+            match allObjects.[name] with
+            | SequenceDescription(x) ->
+                x
+            | _ -> badargs()
+
     type private Realization(config : SqlMetadataProviderConfig) =
         let tables  = Dictionary<string, ResizeArray<TableDescription>>()        
         let views = Dictionary<string, ResizeArray<ViewDescription>>()

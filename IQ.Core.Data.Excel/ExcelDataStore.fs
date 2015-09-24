@@ -12,7 +12,14 @@ open OfficeOpenXml
 open OfficeOpenXml.Table
 
 type IExcelDataStore =
-    inherit IDataStore<DataTable,ExcelDataStoreQuery>
+    inherit IDataStore<IDataMatrix,ExcelDataStoreQuery>
+
+[<AutoOpen>]
+module DataMatrixExtensions =
+    type DataMatrixDescription
+    with
+        member this.Name = match this with | DataMatrixDescription(name,columns) -> name
+        member this.Columns = match this with | DataMatrixDescription(name,columns) -> columns
 
 module ExcelDataStore =
     
@@ -28,15 +35,15 @@ module ExcelDataStore =
     ]
 
 
+    let private getValue (cell : ExcelRange) =
+        match StandardDateFormats |> List.tryFind (fun x -> x = cell.Style.Numberformat.Format ) with
+        | Some(x) ->
+            DateTime.FromOADate(cell.Value :?> float) :> obj
+        | None ->
+            cell.Value
+
     let private readWorksheet(worksheet : ExcelWorksheet) =
         let table = new DataTable(worksheet.Name)
-
-        let getValue (cell : ExcelRange) =
-            match StandardDateFormats |> List.tryFind (fun x -> x = cell.Style.Numberformat.Format ) with
-            | Some(x) ->
-                DateTime.FromOADate(cell.Value :?> float) :> obj
-            | None ->
-                cell.Value
         
         //This assumes we have a header row
         let mutable i = 1
@@ -55,6 +62,39 @@ module ExcelDataStore =
             j <- j+ 1                    
         table
 
+    let private readWorksheet2(worksheet : ExcelWorksheet) =
+        //This assumes we have a header row
+        let rows = List<obj[]>()
+        let matrixName = DataObjectName(String.Empty, worksheet.Name)
+        let mutable i = 1
+        let columns = [
+            while(worksheet.Cells.[1,i] |> hasValue) do
+                let colname = worksheet.Cells.[1,i].Value.ToString()
+                yield {
+                    Position = i-1
+                    ColumnDescription.Name = colname
+                    ParentName = matrixName
+                    DataType = VariantDataType
+                    DataKind = DataKind.Variant
+                    Documentation = String.Empty
+                    Nullable = false
+                    AutoValue = AutoValueKind.None
+                    Properties = []
+                 
+                }
+                i <- i + 1
+        ]
+        let colcount = columns.Length
+        let mutable j = 2
+        while(worksheet.Cells.[j, 1] |> hasValue) do
+            let row = Array.zeroCreate<obj>(colcount)
+            rows.Add(row)
+            for k in 0..i-2 do
+                let cell = worksheet.Cells.[j, k + 1]
+                if(cell.Value <> null && cell.Value.ToString() |> String.IsNullOrWhiteSpace |> not ) then
+                    row.[k] <- cell |> getValue
+            j <- j+ 1                    
+        DataMatrix(DataMatrixDescription(matrixName, columns), rows) :> IDataMatrix
 
     let private getValueFormat (value : obj)  =
         match value with
@@ -62,6 +102,42 @@ module ExcelDataStore =
         | :? Decimal | :? float | :? single -> "#,##0.00"
         | :? int -> "0"
         | _ -> ""
+
+
+    let private addWorksheet2 (workbook : ExcelWorkbook) (table : IDataMatrix) =
+        let description = table.Description
+        let rowcount = table.RowValues.Count
+        let colcount = description.Columns.Length
+        let worksheet = workbook.Worksheets.Add(description.Name.LocalName)
+        
+        //Temporary
+        let inline convertValue (value : obj) =
+            match value with
+            | :? DateTime as x -> x.ToDateTimeUnspecified() :> obj
+            | _ -> value
+
+
+        //Emit header
+        for idx in [1..colcount] do
+            let col = description.Columns.Item(idx - 1)
+            worksheet.Cells.[1, idx].Value <- col.Name
+            worksheet.Cells.[1, idx].Style.Font.Bold <- true
+
+        //Emit data
+        for rowidx in [2..rowcount+1] do
+            for colidx in [1..colcount] do
+                let row = table.RowValues.[rowidx - 2]
+                let value = row.[colidx - 1] |> convertValue
+                let cell = worksheet.Cells.[rowidx,colidx]
+                cell.Value <- value
+                cell.Style.Numberformat.Format <- value |> getValueFormat
+
+        //Apply global formatting options and create a table
+        worksheet.Cells.AutoFitColumns()
+        let tableRange = worksheet.Cells.[1,1, rowcount + 1, colcount]
+        let table = worksheet.Tables.Add(tableRange, "table_" + worksheet.Name)        
+        table.ShowTotal <- false
+        table.TableStyle <- TableStyles.Light9
 
 
     let private addWorksheet (workbook : ExcelWorkbook) (table : DataTable) =
@@ -105,6 +181,11 @@ module ExcelDataStore =
             [for worksheet in workbook.Workbook.Worksheets ->
                 worksheet  |> readWorksheet ] |> Seq.ofList
 
+        let readWorkbook2() =        
+            use workbook = openPackage()
+            [for worksheet in workbook.Workbook.Worksheets ->
+                worksheet  |> readWorksheet2 ] |> Seq.ofList
+
 
         interface IExcelDataStore with
             member this.Select(q) =  
@@ -113,13 +194,13 @@ module ExcelDataStore =
                     use workbook = openPackage()
                     match workbook.Workbook.Worksheets |> Seq.tryFind(fun x -> x.Name = worksheetName) with
                     | Some(ws) ->
-                        ws |> readWorksheet |> Seq.singleton
+                        ws |> readWorksheet2 |> Seq.singleton
                     | None ->
                         Seq.empty
                 | FindTableByName(tableName) ->
                     nosupport()
                 | FindAllWorksheets ->
-                     readWorkbook() 
+                     readWorkbook2() 
             member this.Delete(q) = 
                 nosupport()
 
@@ -132,7 +213,7 @@ module ExcelDataStore =
                         openPackage()
                      else
                         new ExcelPackage(new FileInfo(cs)) 
-                tables |> Seq.iter(fun table -> table |> addWorksheet package.Workbook) 
+                tables |> Seq.iter(fun table -> table |> addWorksheet2 package.Workbook) 
                 package.Save()                                                                                 
 
             member this.ConnectionString = cs

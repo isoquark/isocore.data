@@ -126,29 +126,6 @@ type ICompositionRoot =
     abstract CreateContext:unit -> IAppContext
 
 /// <summary>
-/// Classifies native CLR metadata elements
-/// </summary>
-type ReflectedKind =
-    /// Identifies an Assembly
-    | Assembly = 1
-    /// Identifies a Type
-    | Type = 2
-    /// Identifies a Method
-    | Method = 3
-    /// Identifies a Property
-    | Property = 4
-    /// Identifies a Field
-    | Field = 5
-    /// Identifies a Constructor
-    | Constructor = 6
-    /// Identifies an Event
-    | Event = 7
-    /// Identifies a Method Parameter
-    | Parameter = 8
-    /// Identifies a Union Case
-    | UnionCase = 9
-
-/// <summary>
 /// Classifies CLR collections
 /// </summary>
 type ClrCollectionKind = 

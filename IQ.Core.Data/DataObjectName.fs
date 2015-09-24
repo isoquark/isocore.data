@@ -26,10 +26,13 @@ module DataObjectName =
             ArgumentException("The LocalName of the DataObject cannot be empty") |> raise
         DataObjectName(groups?X, groups?Y)
 
-    let fuzzyParse (text) =
-        let text = text |> Txt.betweenMarkers "[" "]" true 
-        let m = QualifiedDataObjectNameRegex().Match(text)
-        DataObjectName(m.Schema.Value, m.Name.Value)
+    let fuzzyParse (text : string) =
+        if text.Contains("[") |> not then
+            DataObjectName(String.Empty, text)
+        else
+            let text = text |> Txt.betweenMarkers "[" "]" true 
+            let m = QualifiedDataObjectNameRegex().Match(text)
+            DataObjectName(m.Schema.Value, m.Name.Value)
 
 
 [<AutoOpen>]
