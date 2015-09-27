@@ -27,7 +27,7 @@ module Routine =
 
         [<FactAttribute>]
         let ``Executed [SqlTest].[pTable02Insert] procedure``() =
-            let procs = store.GetContract<ISqlTestRoutines>()
+            let procs = store.GetCommandContract<ISqlTestRoutines>()
             let result = procs.pTable02Insert (BclDateTime(2015, 5, 16)) (507L)
             Claim.greater result 1
 
@@ -35,13 +35,13 @@ module Routine =
     
         [<FactAttribute>]
         let ``Executed [SqlTest].[pTable03Insert] procedure``() =
-            let procs = store.GetContract<ISqlTestRoutines>()
+            let procs = store.GetCommandContract<ISqlTestRoutines>()
             let result = procs.pTable03Insert 5uy 10s 15 20L
             0 |> Claim.greater result
     
         [<FactAttribute>]
         let ``Executed [SqlTest].[fTable04Before] procedure - List result``() =
-            let routines = store.GetContract<ISqlTestRoutines>()
+            let routines = store.GetCommandContract<ISqlTestRoutines>()
             routines.pTable04Truncate()
         
             let d0 = BclDateTime(2012, 1, 1)
@@ -69,7 +69,7 @@ module Routine =
 
         [<FactAttribute>]
         let ``Executed [SqlTest].[fTable04Before] function - Array result``() =
-            let routines = store.GetContract<ISqlTestRoutines>()
+            let routines = store.GetCommandContract<ISqlTestRoutines>()
             routines.pTable04Truncate()
         
             let d0 = BclDateTime(2012, 1, 1)
@@ -105,7 +105,7 @@ module Routine =
                     }
                 ] 
             values |> store.Insert
-            let routines = store.GetContract<ISqlTestRoutines>()
+            let routines = store.GetCommandContract<ISqlTestRoutines>()
             let actual = routines.pTable0CSelectB(50)
             let expect = values |> List.take 50
             Claim.equal expect actual

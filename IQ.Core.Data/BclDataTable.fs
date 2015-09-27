@@ -29,7 +29,7 @@ type IDataMatrixConverter =
     abstract ToProxyValues: Type-> IDataMatrix->IEnumerable
 
 type IDataMatrixConverter<'T> =
-    abstract FromProxyValues: TableProxyDescription->values : 'T seq -> IDataMatrix
+    abstract FromProxyValues: values : 'T seq -> IDataMatrix
     abstract ToProxyValues: IDataMatrix->'T seq
 
 
@@ -189,7 +189,7 @@ module BclDataTable =
         {new IDataMatrix with
             member this.Description = description
             member this.Item(row,col) = dataTable.Rows.[row].[col]
-            member this.RowValues = rowValues
+            member this.Rows = rowValues
         
         }
 
@@ -239,13 +239,13 @@ module DataMatrix =
         | CollectionType(x) ->
             let itemType = Type.GetType(x.ItemType.AssemblyQualifiedName |> Option.get)
             let items = 
-                [for row in dataTable.RowValues ->
+                [for row in dataTable.Rows ->
                     pocoConverter.FromValueArray(row, itemType)
                     ]
             items |> CollectionBuilder.create x.Kind itemType :?> IEnumerable
         | _ ->
             let items = 
-                [for row in dataTable.RowValues ->                
+                [for row in dataTable.Rows ->                
                     pocoConverter.FromValueArray(row, t.ReflectedElement.Value)] 
             let itemType = t.ReflectedElement.Value 
             items |> CollectionBuilder.create ClrCollectionKind.GenericList itemType :?> IEnumerable
@@ -262,9 +262,9 @@ module DataMatrix =
 
     let getUntypedConverter() =
         {new IDataMatrixConverter with
-            member this.ToProxyValues t dataTable =
+            member this.ToProxyValues t matrix =                
                 let clrType = ClrMetadata().FindType(t.TypeName) 
-                dataTable |> toProxyValues clrType
+                matrix |> toProxyValues clrType
             member this.FromProxyValues d values =
                 fromProxyValues d values        
         }
@@ -274,6 +274,6 @@ module DataMatrix =
         {new IDataMatrixConverter<'T> with
             member this.ToProxyValues dataTable =
                 dataTable |> toProxyValuesT<'T>
-            member this.FromProxyValues d values =
+            member this.FromProxyValues values =
                 values |> Seq.map(fun x -> x :> obj) |> fromProxyValues (tableproxy<'T> )    
         }

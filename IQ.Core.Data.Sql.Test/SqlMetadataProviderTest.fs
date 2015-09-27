@@ -12,7 +12,7 @@ module SqlMetadataProvider =
     type Tests(ctx, log)= 
         inherit ProjectTestContainer(ctx,log)
 
-        let mdp = ctx.Store.MetadataProvider
+        let mdp = ctx.Store.GetMetadataProvider()
 
         [<Fact>]
         let ``Discovered Tables``() =

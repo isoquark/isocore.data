@@ -21,3 +21,17 @@ module SqlExtensions =
     [<Extension>]
     let ToSql(x : DataTypeReference) =  x |> SqlFormatter.formatDataTypeReference
 
+    [<Extension>]
+    let GetMetadataProvider (x : ISqlDataStore) =
+            {
+                ConnectionString = x.ConnectionString
+                IgnoreSystemObjects = true
+            } |> SqlMetadataProvider.get        
+
+[<AutoOpen>]
+module SqlAugmentations =
+    type ISqlDataStore 
+    with
+        member this.GetMetadataProvider() = this |> SqlExtensions.GetMetadataProvider
+            
+            

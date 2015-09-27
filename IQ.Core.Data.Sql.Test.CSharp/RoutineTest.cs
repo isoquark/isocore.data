@@ -29,7 +29,7 @@ namespace IQ.Core.Data.Sql.Test.CSharp
         private void TestSqlData()
         {
             var store = Context.DataStore;
-            var routines = store.GetContract<ISqlTestRoutines>();
+            var routines = store.GetCommandContract<ISqlTestRoutines>();
             var result = routines.pTable03Insert(5, 10, 15, 20);
         }
 

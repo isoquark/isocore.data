@@ -48,7 +48,7 @@ namespace IQ.Core.Package
     class Program
     {
 
-        private static PackageToolConfig CreateConfig(string version)
+        private static PackageToolConfig CreateConfig(string version, string outdir, string workdir)
         {
             return new PackageToolConfig
             {
@@ -66,9 +66,9 @@ namespace IQ.Core.Package
                 CondensedAssemblyName = "isocore.data.dll",
                 OutputNuspecName = "isocore.data.nuspec",
                 NuspecTemplateName = "isocore.data.nuspec",
-                OutputDirectory = @"C:\dev\packages",
+                OutputDirectory = outdir,
                 Version = Version.Parse(version),
-                WorkingDirectory = @"C:\Temp\isocore.data"
+                WorkingDirectory = workdir
 
             };
         }
@@ -178,7 +178,9 @@ namespace IQ.Core.Package
 
         static void Main(string[] args)
         {
-            var config = CreateConfig("1.0.34");
+
+            //var config = CreateConfig("1.0.35", @"C:\dev\packages", @"C:\Temp\isocore.data");
+            var config = CreateConfig("1.0.35", @"C:\Work\lib\packages", @"C:\Temp\isocore.data");
 
             if (Directory.Exists(config.WorkingDirectory))
                 Directory.Delete(config.WorkingDirectory, true);

@@ -31,13 +31,14 @@ namespace IQ.Core.Data.Sql.Test.CSharp
 
         private static void RegisterDependencies(ICompositionRegistry registry)
         {
-            registry.RegisterFactoryDelegate<SqlDataStoreConfig, ISqlDataStore>(config => SqlDataStore.Get(config));
+            registry.RegisterInstance<IDataStoreProvider>(SqlDataStoreProvider.GetProvider());
         }
 
         private readonly ICompositionRoot root;
         private readonly IAppContext appContext;
         private readonly IConfigurationManager configurationManager;
         private readonly ISqlDataStore dataStore;
+        private readonly string cs;
 
 
         public AppTestContext(ICompositionRoot root)
@@ -45,9 +46,9 @@ namespace IQ.Core.Data.Sql.Test.CSharp
             this.root = root;
             this.appContext = root.CreateContext();
             this.configurationManager = appContext.Resolve<IConfigurationManager>();
-            var cs = configurationManager.GetValue("csSqlDataStore");
-            var dsConfig = SqlDataStoreConfig.NewSqlDataStoreConfig(cs);
-            this.dataStore = appContext.Resolve<SqlDataStoreConfig, ISqlDataStore>(dsConfig);
+            this.cs = configurationManager.GetValue("csSqlDataStore");
+            var dsProvider = appContext.Resolve<IDataStoreProvider>();
+            this.dataStore = dsProvider.GetSpecificStore<ISqlDataStore>(cs);
         }
 
         public AppTestContext()
@@ -56,6 +57,7 @@ namespace IQ.Core.Data.Sql.Test.CSharp
 
         }
 
+        public string ConnectionString => cs;
 
         IConfigurationManager IAppTestContext.ConfigurationManager => configurationManager;
 

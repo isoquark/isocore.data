@@ -50,6 +50,7 @@
     <Compile Include="CsvData.fs" />
     <Compile Include="EtlVocabulary.fs" />
     <Compile Include="TabularDescriptionBuilder.fs" />
+    <Compile Include="MemoryDataStore.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="CsvHelper">

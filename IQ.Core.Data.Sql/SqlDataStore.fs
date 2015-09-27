@@ -91,50 +91,34 @@ type internal SqlDataStoreRealization(config : SqlDataStoreConfig) =
         use command = new SqlCommand(sql, connection)
         command.CommandType <- CommandType.Text
         command |> SqlCommand.executeQuery
-
-    interface ISqlMatrixStore with
-        member this.Select q = 
-            q |> readMatrix |> Seq.singleton
-
-        member this.Insert data  =
-            data |> Seq.iter(fun x -> x|> SqlTableWriter.bulkInsert cs)
-
-        member this.Delete q =
-            nosupport()
-
-        member this.Merge data =
-            nosupport()
-
-        member this.ConnectionString = cs
     
     interface ISqlDataStore with
-//        member this.GetMatrix q = 
-//            q |> readMatrix
-//
-//        member this.InsertMatrix (data : IDataMatrix) =
-//            data |> SqlTableWriter.bulkInsert cs
+        member this.SelectMatrix q  = 
+            q |> readMatrix 
 
-        member this.Delete q =
+        member this.InsertMatrix m  =
+            m|> SqlMatrixWriter.bulkInsert cs
+
+        member this.MergeMatrix m =
             nosupport()
 
         member this.ExecuteCommand c =
             c |> SqlStoreCommand.execute cs 
 
-        member this.GetContract() =
+        member this.GetCommandContract() =
             RoutineContract.get<'TContract> cs
 
-        member this.ConnectionString = cs
+        member this.GetQueryContract() =
+            RoutineContract.get<'TContract> cs
             
-        member this.MetadataProvider = mdp
-
-        member this.Get q  = 
+        member this.Select q  = 
             use connection = createConnection()
             use command = connection |> createQueryCommand q
             command |> executeQueryCommand
-                    |> fun x -> x.RowValues
+                    |> fun x -> x.Rows
                     |> SqlDataReader.toPocos<'T>
 
-        member this.Get()  =
+        member this.SelectAll()  =
             cs |> SqlDataReader.selectAll<'T>
                 
             
@@ -144,20 +128,23 @@ type internal SqlDataStoreRealization(config : SqlDataStoreConfig) =
 
         member this.Insert (items : 'T seq) =
             items |> SqlProxyWriter.bulkInsert cs
+
+        member this.ConnectionString = cs
             
 
             
-
-
 /// <summary>
-/// Factory that delivers realization of ISqlDataStore
+/// Provides factory services for SQL data stores
 /// </summary>
-type SqlDataStore() =                               
-    static member Get(config)  =
-        SqlDataStoreRealization(config) :> ISqlDataStore
-    
-    static member Get(cs) =
-        SqlDataStoreRealization(SqlDataStoreConfig(cs)) :> ISqlDataStore
+type SqlDataStoreProvider private () =
+    inherit DataStoreProvider<SqlDataStoreQuery>(
+        fun cs -> SqlDataStoreRealization(SqlDataStoreConfig(cs)) :> IDataStore<SqlDataStoreQuery>)   
+
+    static member GetProvider() =
+        SqlDataStoreProvider() :> IDataStoreProvider
+    static member GetStore(cs) =
+        SqlDataStoreProvider.GetProvider().GetSpecificStore(cs)
+                         
 
 
 

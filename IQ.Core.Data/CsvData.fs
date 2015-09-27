@@ -6,6 +6,7 @@ open System
 open System.IO
 open System.Data
 open System.Collections.Generic
+open System.Linq
 
 open FSharp.Data
 
@@ -214,49 +215,64 @@ module CsvWriter =
                   |> writer.WriteLine
                
 
-type CsvDataStoreQuery =
-    | FindCsvByFilename of filename : string
+module internal CsvDataStore  =
 
-type ICsvDataStore =
-    inherit IDataStore<DataTable,CsvDataStoreQuery>
 
-module CsvDataStore  =
-
-    let private readTable (csvPath)=
-        let table = new DataTable( csvPath |> Path.GetFileName)
+    let private describeColumn tableName colName position =
+        {
+            ColumnDescription.Name = colName
+            Position = position
+            ParentName = tableName
+            DataType = VariantDataType
+            DataKind = DataKind.Variant
+            Documentation = String.Empty
+            Nullable = false
+            AutoValue = AutoValueKind.None
+            Properties = []
+        }
+        
+    let private readMatrix (csvPath) =
+        let tableName = DataObjectName(String.Empty, csvPath |> Path.GetFileName)
         use sr = new StreamReader(csvPath)
         use reader = new CsvReader(sr)
-
-        
+        let columns = List<ColumnDescription>()
+        let rows = List<obj[]>()        
         let mutable columnsAdded = false        
         while(reader.Read()) do
 
-            if columnsAdded = false then
-                reader.FieldHeaders |> Array.iter(fun header -> 
-                    table.Columns.Add(header) |> ignore)
+            if columnsAdded = false then                
+                reader.FieldHeaders |> Array.iteri(fun i header -> 
+                    columns.Add(describeColumn tableName header i ) |> ignore)                                
                 columnsAdded <- true
 
-            let data = [|for col in reader.FieldHeaders ->                        
+            [|for col in reader.FieldHeaders ->                        
                             try
                                 reader.GetField(col)  :> obj
                             with
                                 e ->
                                     Unchecked.defaultof<obj>
             
-                       |]
-            table.LoadDataRow(data, true) |> ignore
-        table
+            |] |> rows.Add
+                        
+        DataMatrix(DataMatrixDescription(tableName, columns |> List.ofSeq), rows) :> IDataMatrix
+        
+ 
+
     
-    let private writeTable (csvPath : string) (csvTable : DataTable) = 
+    
+    let private writeMatrix (csvPath : string) (m : IDataMatrix) =
         use stream = new StreamWriter(csvPath) 
         use writer = new CsvWriter(stream)
-        let colCount = csvTable.Columns.Count
-        for col in  csvTable.Columns do col.ColumnName |> writer.WriteField
+        let colCount = m.Description.Columns.Length
+        for col in  m.Description.Columns do col.Name |> writer.WriteField
         writer.NextRecord()
-        for row in csvTable.Rows do
+        for row in m.Rows do
             for i in 0..colCount-1 do
                 writer.WriteField<obj>(row.[i])
             writer.NextRecord()
+        
+
+
     
     type Realization(cs) =
         do
@@ -264,19 +280,52 @@ module CsvDataStore  =
                 Directory.CreateDirectory(cs) |> ignore
                 
         interface ICsvDataStore with
-            member this.Select(q) =  
+            member this.SelectMatrix(q) =  
                 match q with
                 | FindCsvByFilename(filename) -> 
-                    Path.Combine(cs, filename) |> readTable |> Seq.singleton 
-            member this.Delete(q) = 
-                nosupport()
+                    Path.Combine(cs, filename) |> readMatrix 
 
-            member this.Merge(table) = 
+            member this.MergeMatrix(m : IDataMatrix) = 
                 nosupport()
             
-            member this.Insert(tables) = 
-                tables |> Seq.iter(fun table ->
-                    table |> writeTable (Path.Combine(cs, table.TableName))
-                )
+            member this.InsertMatrix(m : IDataMatrix)  = 
+                    m |> writeMatrix (Path.Combine(cs, m.Description.Name.LocalName))
 
-            member this.ConnectionString = cs
+            member this.Merge (items : seq<_>) : unit =
+                nosupport()
+
+            member this.Select(q) =
+                let converter = DataMatrix.getTypedConverter<'T>()
+                let matrix = (this :> ICsvDataStore).Select(q)
+                if matrix.Count() <> 0 then
+                    matrix |> Seq.exactlyOne |> converter.ToProxyValues
+                else
+                    Seq.empty
+
+            member this.SelectAll() = 
+                nosupport()
+                                            
+            member this.Insert (items : seq<'T>) =
+                let converter = DataMatrix.getTypedConverter<'T>()                 
+                (this :> ICsvDataStore).Insert(items |> converter.FromProxyValues |> Seq.singleton)
+
+            member this.GetCommandContract() =
+                nosupport()
+
+            member this.GetQueryContract() =
+                nosupport()
+
+            member this.ExecuteCommand(c) =
+                nosupport()
+
+            member this.ConnectionString =
+                cs
+
+type CsvDataStoreProvider private () =
+    inherit DataStoreProvider<CsvDataStoreQuery>(
+        fun cs -> CsvDataStore.Realization(cs) :> IDataStore<CsvDataStoreQuery>)   
+
+    static member GetProvider() =
+        CsvDataStoreProvider() :> IDataStoreProvider
+    static member GetStore(cs) =
+        CsvDataStoreProvider.GetProvider().GetSpecificStore(cs)

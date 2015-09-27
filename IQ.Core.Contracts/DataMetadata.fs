@@ -419,7 +419,7 @@ type IDataMatrix =
     /// <summary>
     /// The encapsulared data
     /// </summary>
-    abstract RowValues : IReadOnlyList<obj[]>
+    abstract Rows : IReadOnlyList<obj[]>
     /// <summary>
     /// Gets the value at the intersection fo the specified (0-based) row and column
     /// </summary>
@@ -429,7 +429,7 @@ type IDataMatrix =
 type DataMatrix =  DataMatrix of Description : DataMatrixDescription * Rows : obj[] IReadOnlyList
 with
     interface IDataMatrix with
-        member this.RowValues = match this with DataMatrix(Rows=x) -> x
+        member this.Rows = match this with DataMatrix(Rows=x) -> x
         member this.Description = match this with DataMatrix(Description=x) -> x
         member this.Item(row,col) = match this with DataMatrix(Rows=x) -> x.[row].[col]
 
@@ -792,3 +792,5 @@ type ISqlMetadataProvider =
     /// Describes a tabular object
     /// </summary>
     abstract DescribeDataMatrix:DataObjectName -> DataMatrixDescription
+
+

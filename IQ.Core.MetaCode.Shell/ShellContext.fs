@@ -8,12 +8,11 @@ open IQ.Core.Data.Sql
 
 type ShellContext()= 
     let registerDependencies(registry : ICompositionRegistry) =
-            registry.RegisterFactory(fun (config : SqlDataStoreConfig) -> config |> SqlDataStore.Get)
+            registry.RegisterInstance<IDataStoreProvider>(SqlDataStoreProvider.GetProvider())            
 
     let root = registerDependencies |> CoreRegistration.compose (thisAssembly())
     let context = root.CreateContext()
     let configManager = context.Resolve<IConfigurationManager>()
-    let cs = "csSqlDataStore" |> configManager.GetValue  
 
     member this.ConfigurationManager = configManager
 

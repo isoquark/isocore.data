@@ -37,9 +37,9 @@ module SqlCommandTest =
             
         [<Fact>]
         let ``Created table``() =
-            let storeMetadata = store.MetadataProvider
+            let mdp = store.GetMetadataProvider()
             let tableName = DataObjectName(SchemaNames.SqlTest, "TableCreateTest")
-            if tableName |> storeMetadata.ObjectExists then
+            if tableName |> mdp.ObjectExists then
                 tableName |> DropTable |> store.ExecuteCommand
 
             let tableExpect = {
@@ -76,9 +76,9 @@ module SqlCommandTest =
             
             tableExpect |> CreateTable |> store.ExecuteCommand
 
-            storeMetadata.RefreshCache()
+            mdp.RefreshCache()
 
-            let tableActual = tableName |> storeMetadata.DescribeTable
+            let tableActual = tableName |> mdp.DescribeTable
             tableActual.Name |> Claim.equal tableExpect.Name
             tableActual.Documentation |> Claim.equal tableExpect.Documentation
             tableActual.Columns.Length |> Claim.equal tableExpect.Columns.Length           

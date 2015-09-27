@@ -41,11 +41,14 @@
     </Content>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="Common.fs" />
+    <Compile Include="TypeSystem.fs" />
     <Compile Include="DataMetadata.fs" />
     <Compile Include="DataStore.fs" />
+    <Compile Include="SqlDataStore.fs" />
     <Compile Include="DataProxy.fs" />
     <Compile Include="Math.fs" />
     <Compile Include="Synthetics.fs" />
+    <Compile Include="ContractExtensions.fs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

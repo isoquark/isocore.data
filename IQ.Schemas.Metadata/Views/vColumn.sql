@@ -1,5 +1,5 @@
 ﻿CREATE VIEW [Metadata].[vColumn] as
-	select 
+	select top(50000)
 		o.CatalogId,
 		o.CatalogName,
 		s.SchemaId as ParentSchemaId,
@@ -26,3 +26,5 @@
 		inner join Metadata.vSchema s on s.SchemaId = o.SchemaId
 		inner join Metadata.vDataType t on t.DataTypeId = x.user_type_id
 		outer apply Metadata.fColumnDescription(o.ObjectId, x.column_id) d
+	order by
+		ParentSchemaName, ParentName, Position

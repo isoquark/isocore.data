@@ -24,10 +24,10 @@ open TestProxies
 module Tabular =
     
     let private verifyBulkInsert<'T>(input : 'T list) (sortBy: 'T->IComparable) (store : ISqlDataStore)=
-        let count = tableproxy<'T>.DataElement.Name |> TruncateTable |> store.ExecuteCommand 
-        store.Get<'T>() |> Claim.seqIsEmpty
+        let result = tableproxy<'T>.DataElement.Name |> TruncateTable |> store.ExecuteCommand 
+        store.SelectAll<'T>() |> Claim.seqIsEmpty
         input |> store.Insert
-        let output = store.Get<'T>() |> Seq.sortBy sortBy |> List.ofSeq
+        let output = store.SelectAll<'T>() |> Seq.sortBy sortBy |> List.ofSeq
         output |> Claim.equal input
 
     type Customer1() =
@@ -40,13 +40,13 @@ module Tabular =
         inherit ProjectTestContainer(ctx,log)
         
         let store = ctx.Store
-        let sqlMetadata = ctx.Store.MetadataProvider
+        let mdp = ctx.Store.GetMetadataProvider()
         let proxyMetadata = DataProxyMetadataProvider.get()
 
 
         [<Fact>]
         let ``Queried vDataType metadata - Partial column set A``() =
-            let items = store.Get<Metadata.vDataTypeA>() 
+            let items = store.SelectAll<Metadata.vDataTypeA>() 
                      |> Seq.map(fun item -> item.DataTypeName, item) 
                      |> Map.ofSeq
             let money = items.["money"]
@@ -56,7 +56,7 @@ module Tabular =
 
         [<Fact>]
         let ``Queried vDataType metadata - Partial column set B``() =
-            let items = store.Get<Metadata.vDataTypeB>() 
+            let items = store.SelectAll<Metadata.vDataTypeB>() 
                      |> Seq.map(fun item -> item.DataTypeName, item) 
                      |> Map.ofSeq
             let money = items.["money"]
@@ -97,12 +97,13 @@ module Tabular =
             store |> verifyBulkInsert input (fun x -> x.Col02 :> IComparable)
 
 
-        let csaw = "Initial Catalog=AdventureWorksLT2012;Data Source=eXaCore03;Integrated Security=SSPI"
         [<Fact>]
-        let ``Inferred dynamic query defaults``() =
-            let store = SqlDataStore.Get(csaw) :> ISqlMatrixStore;
+        let ``Inferred dynamic query defaults``() =            
+            let csaw = "Initial Catalog=AdventureWorksLT2012;Data Source=eXaCore03;Integrated Security=SSPI"
+            let provider = SqlDataStoreProvider.GetProvider()
+            let store = provider.GetDataStore(csaw)
             let query = DynamicQueryBuilder("SalesLT", "Customer").Build()
-            let data1 =  query |> store.SelectOne;
+            let data1 =  query |> store.SelectMatrix
             ()
 
             

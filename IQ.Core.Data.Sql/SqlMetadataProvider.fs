@@ -171,7 +171,8 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
                 nosupport()
             
     member private this.IndexColumns() =
-        for column in this.GetMetadataView<vColumn>()  do
+                
+        for column in this.GetMetadataView<vColumn>()  do            
             let dataType = this.GetColumnDataType(column)
             let description = {
                 ColumnDescription.Name = column.ColumnName

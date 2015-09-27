@@ -17,14 +17,14 @@ module ExcelDataStore =
     type Tests(ctx, log) = 
         inherit ProjectTestContainer(ctx,log)
         
-        
+        let xlsProvider = ExcelDataStoreProvider.GetProvider()
 
         [<Fact>]
         let ``Hydrated data matrix from Excel workbook - WB01``() =
             let xlspath = thisAssembly() |> Assembly.emitResource "WB01.xlsx" ctx.OutputDirectory
             let csvpath = thisAssembly() |> Assembly.emitResource "WB01.WS01.csv" ctx.OutputDirectory
-            let store = xlspath |> ExcelDataStore.get
-            let matrix =  "WS01" |> FindWorksheetByName |> store.SelectOne 
+            let store = xlspath |> xlsProvider.GetDataStore
+            let matrix =  "WS01" |> FindWorksheetByName |> store.SelectMatrix 
             let xlsProxies = matrix |> DataMatrix.toProxyValuesT<WB01.WS01> 
             let csvTable = csvpath |> CsvReader.readTable (CsvReader.getDefaultFormat())
             let csvProxies = csvTable |> BclDataTable.toProxyValuesT<WB01.WS01> 
@@ -35,9 +35,9 @@ module ExcelDataStore =
 
         [<Fact>]
         let ``Hydrated data matrix from Excel workbook - WB03``() =
-            let path = thisAssembly() |> Assembly.emitResource "WB03.xlsx" ctx.OutputDirectory
-            let store = path |> ExcelDataStore.get
-            let matrix = "WS01" |> FindWorksheetByName |> store.SelectOne
+            let xlspath = thisAssembly() |> Assembly.emitResource "WB03.xlsx" ctx.OutputDirectory
+            let store = xlspath |> xlsProvider.GetDataStore
+            let matrix = "WS01" |> FindWorksheetByName |> store.SelectMatrix
             let proxies = matrix |> DataMatrix.toProxyValuesT<WB03.WS01> |> List.ofSeq
 
             proxies.[0].Col01 |> Claim.equal "ABC"
@@ -87,10 +87,11 @@ module ExcelDataStore =
             if xlspath |> File.Exists then
                 xlspath |> File.Delete
             
-            let store = xlspath |> ExcelDataStore.get
-            store.Insert([t0_in_matrix; t1_matrix])
+            let store = xlspath |> xlsProvider.GetDataStore
+            store.InsertMatrix(t0_in_matrix)
+            store.InsertMatrix(t1_matrix)
 
-            let t0_out = FindWorksheetByName("WS01") |> store.SelectOne
+            let t0_out = FindWorksheetByName("WS01") |> store.SelectMatrix
             let t0_out_proxies = t0_out |> converter.ToProxyValues
 
             Seq.zip t0_in_proxies t0_out_proxies |> Seq.iter(fun (x,y) ->

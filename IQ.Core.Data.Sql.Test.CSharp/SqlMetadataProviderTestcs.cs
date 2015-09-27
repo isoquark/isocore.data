@@ -25,16 +25,18 @@ namespace IQ.Core.Data.Sql.Test.CSharp
 
     public class SqlMetadataProviderTest : UnitTest
     {
+        private new AppTestContext Context;
+
         public SqlMetadataProviderTest(AppTestContext ctx, ITestOutputHelper log)
             : base(ctx, log)
         {
+            this.Context = ctx;
         }
 
         [Fact(DisplayName = "Discovered tables - C#")]
         private void DiscoveredTables()
         {
-            var store = Context.DataStore;
-            var metadata = store.MetadataProvider;
+            var metadata = SqlMetadataProvider.get(new SqlMetadataProviderConfig(Context.ConnectionString, true));
             var t0 = metadata.DescribeNamedTable(SchemaNames.SqlTest, TableNames.Table01);
         }
 
