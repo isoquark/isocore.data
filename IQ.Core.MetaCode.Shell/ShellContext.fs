@@ -8,7 +8,7 @@ open IQ.Core.Data.Sql
 
 type ShellContext()= 
     let registerDependencies(registry : ICompositionRegistry) =
-            registry.RegisterInstance<IDataStoreProvider>(SqlDataStoreProvider.GetProvider())            
+            registry.RegisterInstance<IDataStoreProvider>(SqlDataStore.getProvider())            
 
     let root = registerDependencies |> CoreRegistration.compose (thisAssembly())
     let context = root.CreateContext()

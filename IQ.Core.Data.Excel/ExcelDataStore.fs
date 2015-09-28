@@ -20,7 +20,7 @@ module DataMatrixExtensions =
         member this.Name = match this with | DataMatrixDescription(name,columns) -> name
         member this.Columns = match this with | DataMatrixDescription(name,columns) -> columns
 
-module internal ExcelDataStore =
+module ExcelDataStore =
     
 
     let private hasValue (range : ExcelRange) =
@@ -120,7 +120,7 @@ module internal ExcelDataStore =
         table.TableStyle <- TableStyles.Light9
 
                                    
-    type Realization(cs) =
+    type internal Realization(cs) =
         
         let openPackage() =
             new OfficeOpenXml.ExcelPackage(new FileInfo(cs))
@@ -187,16 +187,19 @@ module internal ExcelDataStore =
 
             member this.ConnectionString = cs
 
+    /// <summary>
+    /// Provides factory services for XLS data stores
+    /// </summary>
+    type internal ExcelDataStoreProvider() =
+        inherit DataStoreProvider<ExcelDataStoreQuery>(
+            fun cs -> Realization(cs) :> IDataStore<ExcelDataStoreQuery>)   
+        
+        static member GetProvider() =
+            ExcelDataStoreProvider() :> IDataStoreProvider
+        static member GetStore(cs) =
+            ExcelDataStoreProvider.GetProvider().GetSpecificStore(cs)
+    
+    let private provider = lazy(ExcelDataStoreProvider() :> IDataStoreProvider)
 
-
-/// <summary>
-/// Provides factory services for XLS data stores
-/// </summary>
-type ExcelDataStoreProvider private () =
-    inherit DataStoreProvider<ExcelDataStoreQuery>(
-        fun cs -> ExcelDataStore.Realization(cs) :> IDataStore<ExcelDataStoreQuery>)   
-
-    static member GetProvider() =
-        ExcelDataStoreProvider() :> IDataStoreProvider
-    static member GetStore(cs) =
-        ExcelDataStoreProvider.GetProvider().GetSpecificStore(cs)
+    [<DataStoreProviderFactory(DataStoreKind.Xls)>]
+    let getProvider() = provider.Value

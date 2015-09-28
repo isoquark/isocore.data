@@ -17,7 +17,7 @@ module ExcelDataStore =
     type Tests(ctx, log) = 
         inherit ProjectTestContainer(ctx,log)
         
-        let xlsProvider = ExcelDataStoreProvider.GetProvider()
+        let xlsProvider = ExcelDataStore.getProvider()
 
         [<Fact>]
         let ``Hydrated data matrix from Excel workbook - WB01``() =

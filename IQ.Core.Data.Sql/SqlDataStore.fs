@@ -24,127 +24,129 @@ type SqlDataStoreConfig = SqlDataStoreConfig of cs : string
 with
     member this.ConnectionString = match this with SqlDataStoreConfig(cs=x) -> x               
             
-type internal SqlDataStoreRealization(config : SqlDataStoreConfig) =
-    let cs = config.ConnectionString
-    let mdp = {ConnectionString = cs; IgnoreSystemObjects = true} |> SqlMetadataProvider.get
+
+module SqlDataStore =
+    type internal SqlDataStoreRealization(config : SqlDataStoreConfig) =
+        let cs = config.ConnectionString
+        let mdp = {ConnectionString = cs; IgnoreSystemObjects = true} |> SqlMetadataProvider.get
     
-    let createConnection() =
-        cs |> SqlConnection.create
+        let createConnection() =
+            cs |> SqlConnection.create
 
-    let executeQueryCommand(command : SqlCommand) =
-        use adapter = new SqlDataAdapter(command)
-        use table = new DataTable()
-        adapter.Fill(table) |> ignore
-        let description = table |> BclDataTable.describe
-        let rowValues = List<obj[]>();
-        for row in table.Rows do
-            rowValues.Add(row.ItemArray)
-        DataMatrix(description, rowValues) :> IDataMatrix
-
-    let createQueryCommand (q : SqlDataStoreQuery) connection =
-        match q with
-        | DynamicStoreQuery(q) ->
-            //This guarantees that a well-formed query is provided to the formatter
-            let q = match DynamicQueryBuilder.WithDefaults(mdp, q) with 
-                    | DynamicStoreQuery(q) -> q | _ -> nosupport()
-            let sql = q |> SqlFormatter.formatTabularQuery
-            use command = new SqlCommand(sql, connection)
-            command.CommandType <- CommandType.Text
-            command
-        | DirectStoreQuery(sql) ->
-            use command = new SqlCommand(sql, connection)
-            command.CommandType <- CommandType.Text
-            command
-        | TableFunctionQuery(x) ->
-            nosupport()
-        | ProcedureQuery(q) ->
-            match q with
-            | RoutineQuery(routineName, parameters) ->
-                use command = new SqlCommand(routineName, connection)
-                command.CommandType <- CommandType.StoredProcedure
-                parameters |> List.iter(fun parameter -> 
-                    match parameter with 
-                        | QueryParameter(name,value) ->
-                            command.Parameters.AddWithValue(name, value) |> ignore
-                )
-                command
-                                    
-    let readMatrix (q : SqlDataStoreQuery) =
-        use connection = createConnection()
-        use command = connection |> createQueryCommand q
-        match q with
-        | DynamicStoreQuery(q) ->
-            let rowValues = command |> SqlCommand.executeQuery                        
-            let description = mdp.DescribeDataMatrix(q.TabularName)
+        let executeQueryCommand(command : SqlCommand) =
+            use adapter = new SqlDataAdapter(command)
+            use table = new DataTable()
+            adapter.Fill(table) |> ignore
+            let description = table |> BclDataTable.describe
+            let rowValues = List<obj[]>();
+            for row in table.Rows do
+                rowValues.Add(row.ItemArray)
             DataMatrix(description, rowValues) :> IDataMatrix
-        | DirectStoreQuery(sql) ->
-            command |> executeQueryCommand
-        | TableFunctionQuery(x) ->
-            nosupport()
-        | ProcedureQuery(q) ->
+
+        let createQueryCommand (q : SqlDataStoreQuery) connection =
             match q with
-            | RoutineQuery(routineName, parameters) ->
-                command |> executeQueryCommand                    
-
-    let selectFiltered cs (d : ITabularDescription) sql =
-        use connection = createConnection()
-        use command = new SqlCommand(sql, connection)
-        command.CommandType <- CommandType.Text
-        command |> SqlCommand.executeQuery
-    
-    interface ISqlDataStore with
-        member this.SelectMatrix q  = 
-            q |> readMatrix 
-
-        member this.InsertMatrix m  =
-            m|> SqlMatrixWriter.bulkInsert cs
-
-        member this.MergeMatrix m =
-            nosupport()
-
-        member this.ExecuteCommand c =
-            c |> SqlStoreCommand.execute cs 
-
-        member this.GetCommandContract() =
-            RoutineContract.get<'TContract> cs
-
-        member this.GetQueryContract() =
-            RoutineContract.get<'TContract> cs
-            
-        member this.Select q  = 
+            | DynamicStoreQuery(q) ->
+                //This guarantees that a well-formed query is provided to the formatter
+                let q = match DynamicQueryBuilder.WithDefaults(mdp, q) with 
+                        | DynamicStoreQuery(q) -> q | _ -> nosupport()
+                let sql = q |> SqlFormatter.formatTabularQuery
+                use command = new SqlCommand(sql, connection)
+                command.CommandType <- CommandType.Text
+                command
+            | DirectStoreQuery(sql) ->
+                use command = new SqlCommand(sql, connection)
+                command.CommandType <- CommandType.Text
+                command
+            | TableFunctionQuery(x) ->
+                nosupport()
+            | ProcedureQuery(q) ->
+                match q with
+                | RoutineQuery(routineName, parameters) ->
+                    use command = new SqlCommand(routineName, connection)
+                    command.CommandType <- CommandType.StoredProcedure
+                    parameters |> List.iter(fun parameter -> 
+                        match parameter with 
+                            | QueryParameter(name,value) ->
+                                command.Parameters.AddWithValue(name, value) |> ignore
+                    )
+                    command
+                                    
+        let readMatrix (q : SqlDataStoreQuery) =
             use connection = createConnection()
             use command = connection |> createQueryCommand q
-            command |> executeQueryCommand
-                    |> fun x -> x.Rows
-                    |> SqlDataReader.toPocos<'T>
+            match q with
+            | DynamicStoreQuery(q) ->
+                let rowValues = command |> SqlCommand.executeQuery                        
+                let description = mdp.DescribeDataMatrix(q.TabularName)
+                DataMatrix(description, rowValues) :> IDataMatrix
+            | DirectStoreQuery(sql) ->
+                command |> executeQueryCommand
+            | TableFunctionQuery(x) ->
+                nosupport()
+            | ProcedureQuery(q) ->
+                match q with
+                | RoutineQuery(routineName, parameters) ->
+                    command |> executeQueryCommand                    
 
-        member this.SelectAll()  =
-            cs |> SqlDataReader.selectAll<'T>
+        let selectFiltered cs (d : ITabularDescription) sql =
+            use connection = createConnection()
+            use command = new SqlCommand(sql, connection)
+            command.CommandType <- CommandType.Text
+            command |> SqlCommand.executeQuery
+    
+        interface ISqlDataStore with
+            member this.SelectMatrix q  = 
+                q |> readMatrix 
+
+            member this.InsertMatrix m  =
+                m|> SqlMatrixWriter.bulkInsert cs
+
+            member this.MergeMatrix m =
+                nosupport()
+
+            member this.ExecuteCommand c =
+                c |> SqlStoreCommand.execute cs 
+
+            member this.GetCommandContract() =
+                RoutineContract.get<'TContract> cs
+
+            member this.GetQueryContract() =
+                RoutineContract.get<'TContract> cs
+            
+            member this.Select q  = 
+                use connection = createConnection()
+                use command = connection |> createQueryCommand q
+                command |> executeQueryCommand
+                        |> fun x -> x.Rows
+                        |> SqlDataReader.toPocos<'T>
+
+            member this.SelectAll()  =
+                cs |> SqlDataReader.selectAll<'T>
                 
             
-        member this.Merge items = 
-            items |> SqlProxyWriter.bulkInsert cs
+            member this.Merge items = 
+                items |> SqlProxyWriter.bulkInsert cs
             
 
-        member this.Insert (items : 'T seq) =
-            items |> SqlProxyWriter.bulkInsert cs
+            member this.Insert (items : 'T seq) =
+                items |> SqlProxyWriter.bulkInsert cs
 
-        member this.ConnectionString = cs
+            member this.ConnectionString = cs
             
-
             
-/// <summary>
-/// Provides factory services for SQL data stores
-/// </summary>
-type SqlDataStoreProvider private () =
-    inherit DataStoreProvider<SqlDataStoreQuery>(
-        fun cs -> SqlDataStoreRealization(SqlDataStoreConfig(cs)) :> IDataStore<SqlDataStoreQuery>)   
+    type internal SqlDataStoreProvider () =
+        inherit DataStoreProvider<SqlDataStoreQuery>(
+            fun cs -> SqlDataStoreRealization(SqlDataStoreConfig(cs)) :> IDataStore<SqlDataStoreQuery>)   
 
-    static member GetProvider() =
-        SqlDataStoreProvider() :> IDataStoreProvider
-    static member GetStore(cs) =
-        SqlDataStoreProvider.GetProvider().GetSpecificStore(cs)
+        static member GetProvider() =
+            SqlDataStoreProvider() :> IDataStoreProvider
+        static member GetStore(cs) =
+            SqlDataStoreProvider.GetProvider().GetSpecificStore(cs)
                          
 
+    let private provider = lazy(SqlDataStoreProvider() :> IDataStoreProvider)
+
+    [<DataStoreProviderFactory(DataStoreKind.Sql)>]
+    let getProvider() = provider.Value
 
 

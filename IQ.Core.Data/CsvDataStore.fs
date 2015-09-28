@@ -58,8 +58,7 @@ module CsvDataVocabulary =
 /// <summary>
 /// Defines operations for reading delimited text
 /// </summary>
-module CsvReader =
-       
+module CsvReader =       
     
     /// <summary>
     /// Hydrates list of records from file content
@@ -215,9 +214,7 @@ module CsvWriter =
                   |> writer.WriteLine
                
 
-module internal CsvDataStore  =
-
-
+module CsvDataStore  =
     let private describeColumn tableName colName position =
         {
             ColumnDescription.Name = colName
@@ -255,11 +252,7 @@ module internal CsvDataStore  =
             |] |> rows.Add
                         
         DataMatrix(DataMatrixDescription(tableName, columns |> List.ofSeq), rows) :> IDataMatrix
-        
- 
-
-    
-    
+            
     let private writeMatrix (csvPath : string) (m : IDataMatrix) =
         use stream = new StreamWriter(csvPath) 
         use writer = new CsvWriter(stream)
@@ -270,11 +263,8 @@ module internal CsvDataStore  =
             for i in 0..colCount-1 do
                 writer.WriteField<obj>(row.[i])
             writer.NextRecord()
-        
-
-
-    
-    type Realization(cs) =
+            
+    type internal Realization(cs) =
         do
             if cs |> Directory.Exists |> not then
                 Directory.CreateDirectory(cs) |> ignore
@@ -321,11 +311,16 @@ module internal CsvDataStore  =
             member this.ConnectionString =
                 cs
 
-type CsvDataStoreProvider private () =
-    inherit DataStoreProvider<CsvDataStoreQuery>(
-        fun cs -> CsvDataStore.Realization(cs) :> IDataStore<CsvDataStoreQuery>)   
+    type internal CsvDataStoreProvider () =
+        inherit DataStoreProvider<CsvDataStoreQuery>(
+            fun cs -> Realization(cs) :> IDataStore<CsvDataStoreQuery>)   
 
-    static member GetProvider() =
-        CsvDataStoreProvider() :> IDataStoreProvider
-    static member GetStore(cs) =
-        CsvDataStoreProvider.GetProvider().GetSpecificStore(cs)
+        static member GetProvider() =
+            CsvDataStoreProvider() :> IDataStoreProvider
+        static member GetStore(cs) =
+            CsvDataStoreProvider.GetProvider().GetSpecificStore(cs)
+
+    let private provider = lazy(CsvDataStoreProvider() :> IDataStoreProvider)
+
+    [<DataStoreProviderFactory(DataStoreKind.Csv)>]
+    let getProvider() = provider.Value

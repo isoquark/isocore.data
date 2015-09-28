@@ -15,30 +15,6 @@ open IQ.Core.Framework.Contracts
 type IDataStoreCommon =
     abstract ConnectionString:string
 
-/// <summary>
-/// Defines contract for unparameterized queryable data store
-/// </summary>
-type IQueryableDataStore =
-    inherit IDataStoreCommon
-    /// <summary>
-    /// Retrieves a query-identified collection of data entities from the store
-    /// </summary>
-    abstract Select:'Q->'T seq
-
-    /// <summary>
-    /// Retrieves all the items of a specified type
-    /// </summary>
-    abstract SelectAll:unit ->'T seq
-
-    /// <summary>
-    /// Retrieves an identified matrix
-    /// </summary>
-    abstract SelectMatrix: 'Q -> IDataMatrix
-
-    /// <summary>
-    /// Retrieves implementation of the identified command contract from the store
-    /// </summary>
-    abstract GetQueryContract: unit -> 'TContract when 'TContract : not struct    
         
 /// <summary>
 /// Defines contract for queryable data store parameterized by query type
@@ -65,6 +41,48 @@ type IQueryableDataStore<'Q> =
     /// </summary>
     abstract GetQueryContract: unit -> 'TContract when 'TContract : not struct    
 
+
+/// <summary>
+/// Defines contract for mutable data store parametrized by query type
+/// </summary>
+type IMutableDataStore<'Q> =
+    inherit IDataStoreCommon
+    /// <summary>
+    /// Persists a collection of data entities to the store, inserting or updating as appropriate
+    /// </summary>
+    abstract Merge:'T seq->unit
+    
+    /// <summary>
+    /// Inserts an arbitrary number of entities into the store, eliding existence checks
+    /// </summary>
+    abstract Insert:'T seq ->unit
+
+    /// <summary>
+    /// Inserts the matrix into the store
+    /// </summary>
+    abstract InsertMatrix:IDataMatrix -> unit
+
+    /// <summary>
+    /// Merges the matrix into the store
+    /// </summary>
+    abstract MergeMatrix:IDataMatrix->unit
+
+    /// <summary>
+    /// Retrieves implementation of the identified command contract from the store
+    /// </summary>
+    abstract GetCommandContract: unit -> 'TContract when 'TContract : not struct    
+
+    /// <summary>
+    /// Executes a supplied command against the store
+    /// </summary>
+    abstract ExecuteCommand:command : 'TCommand -> 'TResult
+
+/// <summary>
+/// Defines contract for a fully-capable data store parameterized by query type
+/// </summary>
+type IDataStore<'Q> =
+    inherit IMutableDataStore<'Q>
+    inherit IQueryableDataStore<'Q>
 
 /// <summary>
 /// Defines contract for unparameterized mutable data store
@@ -102,41 +120,29 @@ type IMutableDataStore =
     abstract ExecuteCommand:command : 'TCommand -> 'TResult
 
 /// <summary>
-/// Defines contract for mutable data store parametrized by query type
+/// Defines contract for unparameterized queryable data store
 /// </summary>
-type IMutableDataStore<'Q> =
+type IQueryableDataStore =
     inherit IDataStoreCommon
     /// <summary>
-    /// Persists a collection of data entities to the store, inserting or updating as appropriate
+    /// Retrieves a query-identified collection of data entities from the store
     /// </summary>
-    abstract Merge:'T seq->unit
-    
-    /// <summary>
-    /// Inserts an arbitrary number of entities into the store, eliding existence checks
-    /// </summary>
-    abstract Insert:'T seq ->unit
+    abstract Select:'Q->'T seq
 
     /// <summary>
-    /// Inserts the matrix into the store
+    /// Retrieves all the items of a specified type
     /// </summary>
-    abstract InsertMatrix:IDataMatrix -> unit
+    abstract SelectAll:unit ->'T seq
 
     /// <summary>
-    /// Merges the matrix into the store
+    /// Retrieves an identified matrix
     /// </summary>
-    abstract MergeMatrix:IDataMatrix->unit
+    abstract SelectMatrix: 'Q -> IDataMatrix
 
     /// <summary>
     /// Retrieves implementation of the identified command contract from the store
     /// </summary>
-    abstract GetCommandContract: unit -> 'TContract when 'TContract : not struct    
-
-    /// <summary>
-    /// Executes a supplied command against the store
-    /// </summary>
-    abstract ExecuteCommand:command : 'TCommand -> 'TResult
-
-
+    abstract GetQueryContract: unit -> 'TContract when 'TContract : not struct    
 
 /// <summary>
 /// Defines contract for fully-capable unparameterized data store
@@ -144,68 +150,32 @@ type IMutableDataStore<'Q> =
 type IDataStore =
     inherit IQueryableDataStore
     inherit IMutableDataStore
-
-/// <summary>
-/// Defines contract for a fully-capable data store parameterized by query type
-/// </summary>
-type IDataStore<'Q> =
-    inherit IMutableDataStore<'Q>
-    inherit IQueryableDataStore<'Q>
     
 type IDataStoreProvider =
     abstract GetDataStore:string-> IDataStore
     abstract GetSpecificStore: string -> 'T
 
-[<AbstractClass>]
-type DataStoreProvider<'Q>( factory: string -> IDataStore<'Q>) =
-                
-    let adapt (store : IDataStore<'Q>) =
-        {
-            new IDataStore with
-                member this.Insert items =
-                    items |> store.Insert
-
-                member this.InsertMatrix m =
-                    m |> store.InsertMatrix
-                        
-                member this.Merge items =
-                    items |> store.Merge
-        
-                member this.MergeMatrix m =
-                    m |> store.MergeMatrix
-
-                member this.SelectAll() =
-                    store.SelectAll()
-        
-                member this.SelectMatrix(q) =
-                    store.SelectMatrix(q :> obj :?> 'Q)
-
-                member this.Select(q) = 
-                    store.Select(q :> obj :?> 'Q)
-
-                member this.GetCommandContract() : 'TContract =
-                    store.GetCommandContract<'TContract>()
-
-                member this.GetQueryContract() =
-                    NotImplementedException() |> raise
-
-                member this.ExecuteCommand(c) =
-                    store.ExecuteCommand(c)
-                member this.ConnectionString =
-                    store.ConnectionString
-          }
-           
-    interface IDataStoreProvider with
-        member this.GetDataStore cs = 
-            cs |> factory |> adapt
-
-        member this.GetSpecificStore cs =
-            cs |> factory :> obj :?> 'T    
-        
-
-
-        
-     
+/// <summary>
+/// Lists the supported kinds of data stores
+/// </summary>
+type DataStoreKind =
+    /// Identifies a SQL Server data store
+    | Sql = 1uy
+    /// Identifies a CSV data store
+    | Csv = 2uy
+    /// Identifies an Excel data store
+    | Xls = 3uy
+    
+/// <summary>
+/// Identifies a function that produces a data store provider
+/// </summary>
+[<AttributeUsage(AttributeTargets.Method)>]
+type DataStoreProviderFactoryAttribute(storeKind) =
+    inherit Attribute()
+    
+    member this.StoreKind : DataStoreKind = storeKind
+    
+            
 type ColumnFilter = 
     | Equal of columnName : string * value : obj
     | NotEqual of columnName : string * value : obj
@@ -253,9 +223,7 @@ type DynamicQuery =
 /// Specifies a query that is fulfilled by a routine
 /// </summary>
 type RoutineQuery = RoutineQuery of RoutineName : string * Parameters : QueryParameter list
-
-        
-           
+                 
 /// <summary>
 /// Represents the intent to retrieve data from an Excel workbook
 /// </summary>

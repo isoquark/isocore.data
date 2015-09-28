@@ -47,7 +47,8 @@
     <Compile Include="DataProxyMetadata.fs" />
     <Compile Include="DataTypeConverter.fs" />
     <Compile Include="BclDataTable.fs" />
-    <Compile Include="CsvData.fs" />
+    <Compile Include="DataStoreProvider.fs" />
+    <Compile Include="CsvDataStore.fs" />
     <Compile Include="EtlVocabulary.fs" />
     <Compile Include="TabularDescriptionBuilder.fs" />
     <Compile Include="MemoryDataStore.fs" />

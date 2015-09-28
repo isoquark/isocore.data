@@ -31,7 +31,7 @@ namespace IQ.Core.Data.Sql.Test.CSharp
 
         private static void RegisterDependencies(ICompositionRegistry registry)
         {
-            registry.RegisterInstance<IDataStoreProvider>(SqlDataStoreProvider.GetProvider());
+            registry.RegisterInstance<IDataStoreProvider>(SqlDataStore.getProvider());
         }
 
         private readonly ICompositionRoot root;

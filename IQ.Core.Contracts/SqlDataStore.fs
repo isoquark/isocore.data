@@ -88,11 +88,6 @@ type SqlDataStoreQuery =
 /// </summary>
 type ISqlDataStore =
     inherit IDataStore<SqlDataStoreQuery>        
-        
-    /// <summary>
-    /// Gets the store's metadata provider
-    /// </summary>    
-    //abstract MetadataProvider : ISqlMetadataProvider
-    
+            
 
 
