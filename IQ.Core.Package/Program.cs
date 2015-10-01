@@ -10,8 +10,12 @@ using System.IO;
 using System.Diagnostics;
 
 
+using IQ.Core.Contracts;
 using IQ.Core.Data;
 using IQ.Core.Data.Contracts;
+using IQ.Core.Framework;
+using IQ.Core.Math;
+using IQ.Core.Synthetics;
 
 namespace IQ.Core.Package
 {
@@ -49,21 +53,22 @@ namespace IQ.Core.Package
     class Program
     {
 
+        private static List<string> AssemblyNames = new List<string>
+                {
+                    ContractAssemblyDescriptor.SimpleName,
+                    FrameworkAssemblyDescriptor.SimpleName,
+                    DataAssemblyDescriptor.SimpleName,
+                    ExcelAssemblyDescriptor.SimpleName,
+                    SqlAssemblyDescriptor.SimpleName,
+                    MathAssemblyDescriptor.SimpleName,
+                    SyntheticsAssemblyDescriptor.SimpleName,
+
+                };
         private static PackageToolConfig CreateConfig(string version, string outdir, string workdir)
         {
             return new PackageToolConfig
             {
-                InputAssemblyNames = new List<string>
-                {
-                    Contracts.ContractAssemblyDescriptor.SimpleName,
-                    Framework.FrameworkAssemblyDescriptor.SimpleName,
-                    Data.DataAssemblyDescriptor.SimpleName,
-                    ExcelAssemblyDescriptor.SimpleName,
-                    SqlAssemblyDescriptor.SimpleName,
-                    Math.MathAssemblyDescriptor.SimpleName,
-                    Synthetics.SyntheticsAssemblyDescriptor.SimpleName,
-
-                },
+                InputAssemblyNames = AssemblyNames,
                 CondensedAssemblyName = "isocore.data.dll",
                 OutputNuspecName = "isocore.data.nuspec",
                 NuspecTemplateName = "isocore.data.nuspec",
@@ -73,8 +78,6 @@ namespace IQ.Core.Package
 
             };
         }
-
-
 
         private static string GetResourceText(string partialName)
         {
@@ -87,7 +90,6 @@ namespace IQ.Core.Package
 
         }
 
-
         private static void CreateIsocoreData(PackageToolConfig config)
         {
 
@@ -95,21 +97,10 @@ namespace IQ.Core.Package
             Directory.CreateDirectory(libdir);
 
             var outputAssemblyPath = Path.Combine(libdir, config.CondensedAssemblyName);
-            //The simple names of the assemblies to be packaged
-            var assNames = new []
-                {
-                    Contracts.ContractAssemblyDescriptor.SimpleName,
-                    Framework.FrameworkAssemblyDescriptor.SimpleName,
-                    DataAssemblyDescriptor.SimpleName,
-                    ExcelAssemblyDescriptor.SimpleName,
-                    SqlAssemblyDescriptor.SimpleName,
-                    Math.MathAssemblyDescriptor.SimpleName,
-                    Synthetics.SyntheticsAssemblyDescriptor.SimpleName,
-                };
 
             var nuspec = GetResourceText(config.NuspecTemplateName);
             var assFiles = new List<string>();
-            foreach(var assName in assNames)
+            foreach(var assName in AssemblyNames)
             {
                 var assembly = Assembly.LoadFrom($"{assName}.dll");
                 assFiles.Add(assembly.CodeBase.Replace("file:///", String.Empty));
@@ -120,17 +111,14 @@ namespace IQ.Core.Package
 
         private static void NupackIsocoreData(PackageToolConfig config)
         {
-            //var outputNuspecName = "isocore.data.nuspec";
             var outputNuspecPath = Path.Combine(config.WorkingDirectory, config.OutputNuspecName);
             var versionText = String.Format($"{config.Version.Major}.{config.Version.Minor}.{config.Version.Build}");
             var nuspec = GetResourceText(config.OutputNuspecName).Replace("$VERSION$", versionText);
             File.WriteAllText(outputNuspecPath, nuspec);
 
 
-
             var p = new Process();
             p.StartInfo.UseShellExecute = false;
-            //p.StartInfo.RedirectStandardOutput = true;
             p.StartInfo.FileName = "nuget.exe";
             p.StartInfo.Arguments = $"pack \"{outputNuspecPath}\" -Verbosity detailed -OutputDirectory \"{config.OutputDirectory}\"";
             p.Start();
@@ -142,7 +130,7 @@ namespace IQ.Core.Package
         {
 
             var config = CreateConfig("1.0.66", @"T:\lib\nuget\external", @"C:\Temp\isocore.data");
-            //var config = CreateConfig("1.0.35", @"C:\Work\lib\packages", @"C:\Temp\isocore.data");
+            //var config = CreateConfig("1.0.66", @"C:\Work\lib\packages", @"C:\Temp\isocore.data");
 
             if (Directory.Exists(config.WorkingDirectory))
                 Directory.Delete(config.WorkingDirectory, true);
