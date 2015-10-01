@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data.Sql.Behavior
+namespace IQ.Core.Data
 
 open System
 open System.Data
@@ -29,8 +29,13 @@ module internal SqlStoreCommand =
         use command = new SqlCommand(sql(), connection)
         command.ExecuteNonQuery() |> ignore
          
-        
-
+    [<SqlCommandHandler>]
+    let getFileTableRoot cs (spec : GetFileTableRoot) =
+        let sql = SqlFormatter.formatGetFileTableRoot()
+        use connection = cs |> SqlConnection.create
+        use cmd = new SqlCommand(sql, connection)
+        cmd.ExecuteScalar() :?> string |> GetFileTableRootResult
+    
     [<SqlCommandHandler>]
     let truncateTable cs (spec : TruncateTable)=
         match spec with 

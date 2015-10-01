@@ -17,13 +17,14 @@ module ExcelDataStore =
     type Tests(ctx, log) = 
         inherit ProjectTestContainer(ctx,log)
         
-        let xlsProvider = ExcelDataStore.getProvider()
+        //let xlsProvider = ExcelDataStore.getProvider()
+        let dsProvider = ctx.AppContext.Resolve<IDataStoreProvider>()
 
         [<Fact>]
         let ``Hydrated data matrix from Excel workbook - WB01``() =
-            let xlspath = thisAssembly() |> Assembly.emitResource "WB01.xlsx" ctx.OutputDirectory
-            let csvpath = thisAssembly() |> Assembly.emitResource "WB01.WS01.csv" ctx.OutputDirectory
-            let store = xlspath |> xlsProvider.GetDataStore
+            let xlspath = thisAssembly() |> AssemblyResource.emit "WB01.xlsx" ctx.OutputDirectory
+            let csvpath = thisAssembly() |> AssemblyResource.emit "WB01.WS01.csv" ctx.OutputDirectory
+            let store = dsProvider.GetDataStore<IExcelDataStore>(xlspath)
             let matrix =  "WS01" |> FindWorksheetByName |> store.SelectMatrix 
             let xlsProxies = matrix |> DataMatrix.toProxyValuesT<WB01.WS01> 
             let csvTable = csvpath |> CsvReader.readTable (CsvReader.getDefaultFormat())
@@ -35,8 +36,8 @@ module ExcelDataStore =
 
         [<Fact>]
         let ``Hydrated data matrix from Excel workbook - WB03``() =
-            let xlspath = thisAssembly() |> Assembly.emitResource "WB03.xlsx" ctx.OutputDirectory
-            let store = xlspath |> xlsProvider.GetDataStore
+            let xlspath = thisAssembly() |> AssemblyResource.emit "WB03.xlsx" ctx.OutputDirectory
+            let store = dsProvider.GetDataStore<IExcelDataStore>(xlspath)
             let matrix = "WS01" |> FindWorksheetByName |> store.SelectMatrix
             let proxies = matrix |> DataMatrix.toProxyValuesT<WB03.WS01> |> List.ofSeq
 
@@ -87,7 +88,7 @@ module ExcelDataStore =
             if xlspath |> File.Exists then
                 xlspath |> File.Delete
             
-            let store = xlspath |> xlsProvider.GetDataStore
+            let store = dsProvider.GetDataStore<IExcelDataStore>(xlspath)
             store.InsertMatrix(t0_in_matrix)
             store.InsertMatrix(t1_matrix)
 

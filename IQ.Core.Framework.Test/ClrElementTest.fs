@@ -66,7 +66,7 @@ type ClrElementNameTests(ctx,log)  =
 
     [<Fact>]
     let ``Extracted embedded text resource from assembly``() =
-        let text = thisAssembly() |> Assembly.findTextResource "EmbeddedResource01.txt"
+        let text = thisAssembly() |> AssemblyResource.findResourceText "EmbeddedResource01.txt"
         text |> Claim.isSome
         text.Value.Trim() |> Claim.equal "This is an embedded text resource"
     

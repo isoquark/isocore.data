@@ -14,7 +14,6 @@ open IQ.Core.Framework.Contracts
 
 type IDataStoreCommon =
     abstract ConnectionString:string
-
         
 /// <summary>
 /// Defines contract for queryable data store parameterized by query type
@@ -77,6 +76,11 @@ type IMutableDataStore<'Q> =
     /// </summary>
     abstract ExecuteCommand:command : 'TCommand -> 'TResult
 
+    /// <summary>
+    /// Executes a supplied command against the store that returns no result
+    /// </summary>
+    abstract ExecutePureCommand: command : 'TCommand -> unit
+
 /// <summary>
 /// Defines contract for a fully-capable data store parameterized by query type
 /// </summary>
@@ -119,6 +123,11 @@ type IMutableDataStore =
     /// </summary>
     abstract ExecuteCommand:command : 'TCommand -> 'TResult
 
+    /// <summary>
+    /// Executes a supplied command against the store that returns no result
+    /// </summary>
+    abstract ExecutePureCommand: command : 'TCommand -> unit
+
 /// <summary>
 /// Defines contract for unparameterized queryable data store
 /// </summary>
@@ -151,9 +160,6 @@ type IDataStore =
     inherit IQueryableDataStore
     inherit IMutableDataStore
     
-type IDataStoreProvider =
-    abstract GetDataStore:string-> IDataStore
-    abstract GetSpecificStore: string -> 'T
 
 /// <summary>
 /// Lists the supported kinds of data stores
@@ -165,6 +171,24 @@ type DataStoreKind =
     | Csv = 2uy
     /// Identifies an Excel data store
     | Xls = 3uy
+    /// Identifies a memory store
+    | Mem = 4uy
+
+type IDataStoreProvider =
+    abstract GetDataStore: string-> IDataStore
+    abstract GetDataStore: string -> 'T
+    
+    /// <summary>
+    ///  Specifies the kinds of data stores the provider can yield
+    /// </summary>
+    abstract SupportedStores : DataStoreKind list
+
+
+[<AttributeUsage(AttributeTargets.Interface)>]
+type DataStoreContractAttribute(storeKind) =
+    inherit Attribute()
+    
+    member this.StoreKind : DataStoreKind = storeKind
     
 /// <summary>
 /// Identifies a function that produces a data store provider
@@ -238,6 +262,7 @@ type ExcelDataStoreQuery =
 /// <summary>
 /// Defines the contract for a data store that can read/write Excel workbooks
 /// </summary>
+[<DataStoreContract(DataStoreKind.Xls)>]
 type IExcelDataStore =
     inherit IDataStore<ExcelDataStoreQuery>
 
@@ -251,5 +276,96 @@ type CsvDataStoreQuery =
 /// <summary>
 /// Defines the contract for a data store that can read/write CSV files
 /// </summary>
+[<DataStoreContract(DataStoreKind.Csv)>]
 type ICsvDataStore =
     inherit IDataStore<CsvDataStoreQuery>
+
+/// <summary>
+/// Classifies supported data object/element types
+/// </summary>
+type SqlElementKind =
+    /// Identifies a table
+    | Table = 1uy
+    /// Identifies a view
+    | View = 2uy
+    /// Identifies a stored procedure
+    | Procedure = 3uy
+    /// Identifies a table-valued function
+    | TableFunction = 4uy
+    /// Identifies a scalar function
+    | ScalarFunction = 6uy
+    /// Identifies a sequence object
+    | Sequence = 5uy
+    /// Identifies a column
+    | Column = 1uy
+    /// Identifies a schema
+    | Schema = 1uy
+    /// Identifies a custom primitive, e.g., an object created by issuing
+    /// a CREATE TYPE command that is based on an intrinsic type
+    | CustomPrimitive = 1uy
+
+/// <summary>
+/// Identifies a function that handles a SQL command
+/// </summary>
+[<AttributeUsage(AttributeTargets.Method)>]
+type SqlCommandHandlerAttribute() =
+    inherit Attribute()
+
+/// <summary>
+/// Represents the intent to truncate a table
+/// </summary>
+type TruncateTable = TruncateTable of TableName : DataObjectName
+
+/// <summary>
+/// Encapsulates the result of executing the TruncateTable command
+/// </summary>
+type TruncateTableResult = TruncateTableResult of RowCount : int
+    
+/// <summary>
+/// Represents the intent to create a table
+/// </summary>
+type CreateTable = CreateTable of Description : TableDescription
+
+/// <summary>
+/// Represents the intent to drop a table
+/// </summary>
+type DropTable = DropTable of TableName : DataObjectName
+    
+/// <summary>
+/// Represents the intent to allocate a range of sequence values
+/// </summary>
+type AllocateSequenceRange = AllocateSequenceRange of SequenceName : DataObjectName * Count : int
+
+/// <summary>
+/// Encapsulates the result of executing the AllocateSequenceRange command
+/// </summary>
+type AllocateSequenceRangeResult = AllocateSequenceRangeResult of FirstNumber : obj
+
+/// <summary>
+/// Represents the intent to retrieve the file table root of the current database
+/// </summary>
+type GetFileTableRoot() = class end
+
+/// <summary>
+/// Encapsulates the result of executing the FILETABLEROOTPATH() command
+/// </summary>
+type GetFileTableRootResult = GetFileTableRootResult of string
+
+/// <summary>
+/// Represents the intent to retrieve data from a SQL data store
+/// </summary>
+type SqlDataStoreQuery =
+    | DirectStoreQuery of string
+    | DynamicStoreQuery of  DynamicQuery
+    | TableFunctionQuery of  RoutineQuery
+    | ProcedureQuery of RoutineQuery
+       
+/// <summary>
+/// Defines the contract for a SQL Server Data Store that can persist and hydrate data via proxy types
+/// </summary>
+[<DataStoreContract(DataStoreKind.Sql)>]
+type ISqlDataStore =
+    inherit IDataStore<SqlDataStoreQuery>        
+            
+
+

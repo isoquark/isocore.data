@@ -1,4 +1,4 @@
-﻿namespace IQ.Core.Data.Sql
+﻿namespace IQ.Core.Data
 
 open System
 open System.Linq
@@ -11,8 +11,6 @@ open System.Data.SqlClient
 
 open IQ.Core.Contracts
 open IQ.Core.Framework
-open IQ.Core.Data
-open IQ.Core.Data.Sql.Behavior
 
 
 type SqlMetadataProviderConfig = {
@@ -59,10 +57,14 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
                 IsTableType = item.IsTableType
                 IsCustomObject = item.IsAssemblyType
                 IsUserDefined = item.IsUserDefined
-                BaseTypeName = if item.BaseTypeId.HasValue then 
+//                BaseTypeName = if item.BaseTypeId.HasValue then 
+//                                    getName(item.BaseTypeId.Value |> int) |> Some 
+//                                else 
+//                                None  
+                BaseTypeName = if item.IsUserDefined && not(item.IsTableType) then
                                     getName(item.BaseTypeId.Value |> int) |> Some 
-                                else 
-                                None  
+                               else
+                                    None
                 DefaultBclTypeName = item.MappedBclType      
                 Properties = []
                 Documentation = item.Description

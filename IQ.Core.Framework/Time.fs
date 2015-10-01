@@ -248,6 +248,16 @@ module TimeConversions =
     [<Transformation>]
     let textToLocalDateTime(src : string) =  src |> BclDateTime.Parse |> NodaTime.LocalDateTime.FromDateTime
 
+    /// <summary>
+    /// Converts a <see cref="System.Double"/> to a <see cref="NodaTime.LocalDateTime"/>
+    /// </summary>
+    /// <param name="src"></param>
+    [<Transformation>]
+    let doubleToLocalDateTime(src : double) = src |> BclDateTime.FromOADate |> NodaTime.LocalDateTime.FromDateTime
+
+    [<Transformation>]
+    let localDateTimeToDouble(src : NodaTime.LocalDateTime) = src.ToDateTimeUnspecified().ToOADate()
+
 module DefaultTimeProvider =
     let private clock = NodaTime.SystemClock.Instance
     let get() = 

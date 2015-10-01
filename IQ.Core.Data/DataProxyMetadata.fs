@@ -4,7 +4,7 @@ namespace IQ.Core.Data.Behavior
 
 open System
 open System.Reflection
-//open System.Data
+
 open System.Text.RegularExpressions
 
 open FSharp.Data
@@ -200,15 +200,14 @@ module DataProxyMetadata =
     let hasFacet<'T> name element =
         element |> DataFacet.hasFacet<'T> name
 
-    let inferKindTypefromClrType(t : Type) =
+    let inferTypeKind(t : Type) =
         if kindMap.ContainsKey(t) then
             kindMap.[t]
         else
             ArgumentException(sprintf "No default mapping for %s exists" t.FullName) |> raise
-       
-            
-    
-    let rec private inferStoreDataType(element : ClrElement) =
+        
+                       
+    let rec internal inferStoreType(element : ClrElement) =
         
         let clrType = element |> getClrType
         let clrItemValueType = clrType.ItemValueType
@@ -240,27 +239,33 @@ module DataProxyMetadata =
         let tryGetDataObjectName() =
             element |> facet<DataObjectName> DataFacetNames.DataObjectName  
 
+            
+        let guessKind() =
+            if clrType = typeof<Byte[]> then
+                if element |> hasFacet<int> DataFacetNames.FixedLength then
+                    DataKind.BinaryFixed
+                else if element |> hasFacet<int> DataFacetNames.MaxLength then
+                    DataKind.BinaryVariable
+                else
+                    DataKind.BinaryMax
+            else if clrItemValueType = typeof<string> then
+                if element |> hasFacet<int> DataFacetNames.FixedLength then
+                    DataKind.UnicodeTextFixed
+                else
+                    DataKind.UnicodeTextVariable                    
+            else if kindMap.ContainsKey(clrItemValueType) then
+                    kindMap.[clrItemValueType]
+            else
+                if Attribute.IsDefined(clrItemValueType, typeof<TableTypeAttribute>) then
+                    DataKind.CustomTable
+                else
+                    ArgumentException(sprintf "No default mapping for %s exists" clrType.FullName) |> raise                         
+            
         let kind = 
             match element |> facet<DataKind>(DataFacetNames.DataKind) with
             | Some(x) -> x
-            | None ->
-                if clrType = typeof<Byte[]> then
-                    if element |> hasFacet<int> DataFacetNames.FixedLength then
-                        DataKind.BinaryFixed
-                    else if element |> hasFacet<int> DataFacetNames.MaxLength then
-                        DataKind.BinaryVariable
-                    else
-                        DataKind.BinaryMax
-                else if clrItemValueType = typeof<string> then
-                    if element |> hasFacet<int> DataFacetNames.FixedLength then
-                        DataKind.UnicodeTextFixed
-                    else
-                        DataKind.UnicodeTextVariable                    
-                else if kindMap.ContainsKey(clrItemValueType) then
-                        kindMap.[clrItemValueType]
-                else
-                     ArgumentException(sprintf "No default mapping for %s exists" clrType.FullName) |> raise 
-
+            | None -> guessKind()
+                        
         match kind with
         | DataKind.Bit -> 
             BitDataType
@@ -426,7 +431,7 @@ module DataProxyMetadata =
     /// <param name="proxy">The CLR element from which the column description will be inferred</param>
     let describeColumn (parentName : DataObjectName) (proxy: ClrProperty) =
         let gDescription = proxy |> PropertyMember |> MemberElement
-        let dataType = gDescription |> inferStoreDataType
+        let dataType = gDescription |> inferStoreType
         let isNullable = proxy.IsOptional || proxy.IsNullable || proxy.HasAttribute<NullableAttribute>()
         match gDescription |> ClrElement.tryGetAttributeT<ColumnAttribute> with
         | Some(attrib) ->
@@ -495,7 +500,7 @@ module DataProxyMetadata =
             Position = position
             Direction = direction
             Documentation = String.Empty
-            DataType = description |> ParameterElement|> inferStoreDataType 
+            DataType = description |> ParameterElement|> inferStoreType 
             Properties = []
         }
     
@@ -506,7 +511,7 @@ module DataProxyMetadata =
     /// <param name="clrElement">The CLR element from which the parameter description will be inferred</param>
     let describeReturnParameter(description : ClrMethod) =
         let eDescription   = description |> MethodMember |> MemberElement 
-        let storageType = description.ReturnType  |> Option.get |> ClrMetadata().FindType |> TypeElement |>   inferStoreDataType
+        let storageType = description.ReturnType  |> Option.get |> ClrMetadata().FindType |> TypeElement |>   inferStoreType
         
         match description.ReturnAttributes |> List.tryFind(fun x -> x.AttributeName = typeinfo<RoutineParameterAttribute>.Name) with
         |Some(attrib) ->
@@ -757,9 +762,13 @@ module TableFunctionProxy =
 /// </summary>
 [<AutoOpen>]
 module DataProxyOperators =    
+    
     let tableproxy<'T> =
         typeinfo<'T> |> DataProxyMetadata.describeTableProxy
 
+    let objectname<'T> =
+        typeinfo<'T> |> TypeElement |> DataProxyMetadata.inferDataObjectName
+           
     let viewproxy<'T> =
         typeinfo<'T> |> DataProxyMetadata.describeViewProxy
 

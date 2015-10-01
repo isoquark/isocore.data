@@ -4,7 +4,7 @@ open System
 
 open IQ.Core.Framework
 open IQ.Core.Data
-open IQ.Core.Data.Sql
+
 
 type ShellContext()= 
     let registerDependencies(registry : ICompositionRegistry) =

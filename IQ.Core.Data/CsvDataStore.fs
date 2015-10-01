@@ -1,6 +1,9 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data.Behavior
+namespace IQ.Core.Data
+
+
+
 
 open System
 open System.IO
@@ -12,6 +15,8 @@ open FSharp.Data
 
 open CsvHelper
 
+
+open IQ.Core.Data.Behavior
 open IQ.Core.Framework
 open IQ.Core.Data.Contracts
 
@@ -308,17 +313,20 @@ module CsvDataStore  =
             member this.ExecuteCommand(c) =
                 nosupport()
 
+            member this.ExecutePureCommand(c) =
+                nosupport()
+
             member this.ConnectionString =
                 cs
 
     type internal CsvDataStoreProvider () =
-        inherit DataStoreProvider<CsvDataStoreQuery>(
+        inherit DataStoreProvider<CsvDataStoreQuery>(DataStoreKind.Csv,
             fun cs -> Realization(cs) :> IDataStore<CsvDataStoreQuery>)   
 
         static member GetProvider() =
             CsvDataStoreProvider() :> IDataStoreProvider
         static member GetStore(cs) =
-            CsvDataStoreProvider.GetProvider().GetSpecificStore(cs)
+            CsvDataStoreProvider.GetProvider().GetDataStore(cs)
 
     let private provider = lazy(CsvDataStoreProvider() :> IDataStoreProvider)
 

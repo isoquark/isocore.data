@@ -4,7 +4,7 @@ namespace IQ.Core.MetaCode.Shell
 
 
 open IQ.Core.Data
-open IQ.Core.Data.Sql
+
 
 open IQ.Core.MetaCode
 

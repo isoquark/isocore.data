@@ -60,7 +60,7 @@ module CsvReader =
     let private resname<'T> = typeof<'T>.Name |> sprintf "%s.csv"
 
     let private hydrate<'T>(resname) =
-        let text = thisAssembly() |> Assembly.findTextResource resname |> Option.get
+        let text = thisAssembly() |> AssemblyResource.findResourceText resname |> Option.get
         let format = CsvReader.getDefaultFormat()
         text |> CsvReader.readText<'T> format
         
@@ -95,7 +95,7 @@ module CsvReader =
         [<Fact>]
         let ``Desribed CSV file - no attribute overrides``() =
             let resname = resname<CsvTestCase1>
-            let path = thisAssembly() |> Assembly.writeTextResource resname (ctx.OutputDirectory)
+            let path = thisAssembly() |> AssemblyResource.emitResourceText resname (ctx.OutputDirectory)
             let format = CsvReader.getDefaultFormat()
             let actual = path |> CsvReader.describeFile format
             let tinfo = typeinfo<CsvTestCase1>
@@ -111,7 +111,7 @@ module CsvReader =
                
         [<Fact; Benchmark>]
         let ``Benchmark - CsvReader 2A``() =
-            let path = thisAssembly() |> Assembly.writeTextResource "CsvTestCase2.csv" (ctx.OutputDirectory)
+            let path = thisAssembly() |> AssemblyResource.emitResourceText "CsvTestCase2.csv" (ctx.OutputDirectory)
             let format = CsvReader.getDefaultFormat()
             let  description = path |> CsvReader.describeFile format
             let f() =
@@ -121,7 +121,7 @@ module CsvReader =
 
         [<Fact; Benchmark>]
         let ``Benchmark - CsvReader 2B``() =
-            let path = thisAssembly() |> Assembly.writeTextResource "CsvTestCase2.csv" (ctx.OutputDirectory)
+            let path = thisAssembly() |> AssemblyResource.emitResourceText "CsvTestCase2.csv" (ctx.OutputDirectory)
             let format = CsvReader.getDefaultFormat()
             let  description = path |> CsvReader.describeFile format
             let f() =

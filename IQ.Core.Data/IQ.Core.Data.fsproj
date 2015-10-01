@@ -41,12 +41,13 @@
     <Compile Include="DataObjectName.fs" />
     <Compile Include="DataType.fs" />
     <Compile Include="DataValue.fs" />
-    <Compile Include="DataAttributes.fs" />
+    <Compile Include="DataFacet.fs" />
     <Compile Include="DataMetamodel.fs" />
     <Compile Include="DataProxyMetamodel.fs" />
     <Compile Include="DataProxyMetadata.fs" />
     <Compile Include="DataTypeConverter.fs" />
     <Compile Include="BclDataTable.fs" />
+    <Compile Include="DataMatrix.fs" />
     <Compile Include="DataStoreProvider.fs" />
     <Compile Include="CsvDataStore.fs" />
     <Compile Include="EtlVocabulary.fs" />

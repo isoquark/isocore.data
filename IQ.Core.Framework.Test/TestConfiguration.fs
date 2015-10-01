@@ -7,7 +7,7 @@ open System.Reflection
 
 open IQ.Core.Framework
 open IQ.Core.Data
-open IQ.Core.Data.Sql
+
 
 
 [<AutoOpen>]

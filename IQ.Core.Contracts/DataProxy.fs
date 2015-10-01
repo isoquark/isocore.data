@@ -6,6 +6,7 @@ open System
 open System.Diagnostics
 open System.Collections.Generic
 open System.Runtime.CompilerServices
+open System.Collections
 
 open IQ.Core.Framework
 
@@ -227,4 +228,13 @@ type DataObjectProxy =
 type IDataProxyMetadataProvider =
     abstract DescribeProxies:SqlElementKind->ClrElement->DataObjectProxy list
     abstract DescribeTableProxy<'T> :unit ->TableProxyDescription
+
+
+type IDataMatrixConverter = 
+    abstract FromProxyValues: TableProxyDescription->values : obj seq -> IDataMatrix
+    abstract ToProxyValues: Type-> IDataMatrix->IEnumerable
+
+type IDataMatrixConverter<'T> =
+    abstract FromProxyValues: values : 'T seq -> IDataMatrix
+    abstract ToProxyValues: IDataMatrix->'T seq
    

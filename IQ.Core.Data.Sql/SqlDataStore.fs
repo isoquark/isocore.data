@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data.Sql
+namespace IQ.Core.Data
 
 open System
 open System.Data
@@ -10,8 +10,6 @@ open System.Collections.Generic
 
 open IQ.Core.Contracts
 open IQ.Core.Framework
-open IQ.Core.Data
-open IQ.Core.Data.Sql.Behavior
                                         
 /// <summary>
 /// Encapsulates Sql Data Store configuration parameters
@@ -107,6 +105,9 @@ module SqlDataStore =
             member this.ExecuteCommand c =
                 c |> SqlStoreCommand.execute cs 
 
+            member this.ExecutePureCommand c =
+                c |> SqlStoreCommand.execute cs |> ignore
+
             member this.GetCommandContract() =
                 RoutineContract.get<'TContract> cs
 
@@ -135,13 +136,13 @@ module SqlDataStore =
             
             
     type internal SqlDataStoreProvider () =
-        inherit DataStoreProvider<SqlDataStoreQuery>(
+        inherit DataStoreProvider<SqlDataStoreQuery>(DataStoreKind.Sql,
             fun cs -> SqlDataStoreRealization(SqlDataStoreConfig(cs)) :> IDataStore<SqlDataStoreQuery>)   
 
         static member GetProvider() =
             SqlDataStoreProvider() :> IDataStoreProvider
         static member GetStore(cs) =
-            SqlDataStoreProvider.GetProvider().GetSpecificStore(cs)
+            SqlDataStoreProvider.GetProvider().GetDataStore(cs)
                          
 
     let private provider = lazy(SqlDataStoreProvider() :> IDataStoreProvider)

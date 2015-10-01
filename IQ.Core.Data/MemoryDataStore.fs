@@ -13,10 +13,9 @@ open IQ.Core.Data.Contracts
 type ItemSelector<'Q> = Func<'Q, obj seq, obj seq>
 
 
-
+open IQ.Core.Data
         
-    
-
+   
 module internal MemoryDataStore =    
 
     
@@ -73,14 +72,16 @@ module internal MemoryDataStore =
             member this.ExecuteCommand(c) =
                 nosupport()
 
+            member this.ExecutePureCommand(c) =
+                nosupport()
+
             member this.ConnectionString = cs
 
     let get<'Q>(itemSelector, keyBuilder) = 
         Realization(itemSelector) :> IDataStore<'Q>
-        
-        
+                
 type MemoryDataStoreProvider<'Q> private (selector : ItemSelector<'Q>) =
-    inherit DataStoreProvider<'Q>(
+    inherit DataStoreProvider<'Q>(DataStoreKind.Mem,
         fun cs -> MemoryDataStore.Realization<'Q>(cs, selector) :> IDataStore<'Q>)   
 
     static member GetProvider(selector) =

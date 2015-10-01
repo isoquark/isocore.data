@@ -10,7 +10,8 @@ using System.IO;
 using System.Diagnostics;
 
 
-
+using IQ.Core.Data;
+using IQ.Core.Data.Contracts;
 
 namespace IQ.Core.Package
 {
@@ -57,8 +58,8 @@ namespace IQ.Core.Package
                     Contracts.ContractAssemblyDescriptor.SimpleName,
                     Framework.FrameworkAssemblyDescriptor.SimpleName,
                     Data.DataAssemblyDescriptor.SimpleName,
-                    Data.Excel.ExcelAssemblyDescriptor.SimpleName,
-                    Data.Sql.SqlAssemblyDescriptor.SimpleName,
+                    ExcelAssemblyDescriptor.SimpleName,
+                    SqlAssemblyDescriptor.SimpleName,
                     Math.MathAssemblyDescriptor.SimpleName,
                     Synthetics.SyntheticsAssemblyDescriptor.SimpleName,
 
@@ -73,41 +74,6 @@ namespace IQ.Core.Package
             };
         }
 
-        //private static string GetSourceDirectory()
-        //{
-        //    return Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + "\\";
-        //}
-
-        //private static void ObserveResolutions()
-        //{
-        //    var hostAssembly = System.Reflection.Assembly.GetExecutingAssembly();
-        //    var loadedNames = new Dictionary<string, System.Reflection.Assembly>();
-        //    System.AppDomain.CurrentDomain.AssemblyResolve += (s, eventArgs) =>
-        //        {
-        //            var assname = new AssemblyName(eventArgs.Name);
-        //            if (loadedNames.ContainsKey(assname.FullName))
-        //                return loadedNames[assname.FullName];
-
-
-        //            var resname = $"IQ.Core.Package.Assemblies.{eventArgs.Name}";
-        //            using (var stream = hostAssembly.GetManifestResourceStream(resname))
-        //            {
-        //                if (stream != null)
-        //                {
-        //                    var data = new Byte[stream.Length];
-        //                    stream.Read(data, 0, data.Length);
-        //                    var a = System.Reflection.Assembly.Load(data);
-        //                    loadedNames[a.GetName().FullName] = a;
-        //                    return a;
-        //                }
-        //                else
-        //                {
-        //                    return null;
-        //                }
-        //            }
-
-        //        };
-        //}
 
 
         private static string GetResourceText(string partialName)
@@ -121,9 +87,6 @@ namespace IQ.Core.Package
 
         }
 
-        //private static readonly string WorkingDirectory = @"C:\Temp\isocore.data";
-        //private static readonly string TargetDirectory = @"C:\Work\lib\packages";
-        //private static Version PackageVersion = Version.Parse("1.0.31");
 
         private static void CreateIsocoreData(PackageToolConfig config)
         {
@@ -131,16 +94,15 @@ namespace IQ.Core.Package
             var libdir = Path.Combine(config.WorkingDirectory, @"lib\net45\");
             Directory.CreateDirectory(libdir);
 
-            //var outputAssemblyName = "isocore.data.dll";
             var outputAssemblyPath = Path.Combine(libdir, config.CondensedAssemblyName);
             //The simple names of the assemblies to be packaged
             var assNames = new []
                 {
                     Contracts.ContractAssemblyDescriptor.SimpleName,
                     Framework.FrameworkAssemblyDescriptor.SimpleName,
-                    Data.DataAssemblyDescriptor.SimpleName,
-                    Data.Excel.ExcelAssemblyDescriptor.SimpleName,
-                    Data.Sql.SqlAssemblyDescriptor.SimpleName,
+                    DataAssemblyDescriptor.SimpleName,
+                    ExcelAssemblyDescriptor.SimpleName,
+                    SqlAssemblyDescriptor.SimpleName,
                     Math.MathAssemblyDescriptor.SimpleName,
                     Synthetics.SyntheticsAssemblyDescriptor.SimpleName,
                 };
@@ -179,8 +141,8 @@ namespace IQ.Core.Package
         static void Main(string[] args)
         {
 
-            //var config = CreateConfig("1.0.35", @"C:\dev\packages", @"C:\Temp\isocore.data");
-            var config = CreateConfig("1.0.35", @"C:\Work\lib\packages", @"C:\Temp\isocore.data");
+            var config = CreateConfig("1.0.66", @"T:\lib\nuget\external", @"C:\Temp\isocore.data");
+            //var config = CreateConfig("1.0.35", @"C:\Work\lib\packages", @"C:\Temp\isocore.data");
 
             if (Directory.Exists(config.WorkingDirectory))
                 Directory.Delete(config.WorkingDirectory, true);

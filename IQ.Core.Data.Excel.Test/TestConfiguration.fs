@@ -9,23 +9,22 @@ open IQ.Core.Framework
 open IQ.Core.TestFramework
 open IQ.Core.Data
 open IQ.Core.Data.Excel
-open IQ.Core.Data.Sql
 
 [<AutoOpen>]
 module TestConfiguration =
 
     let private registerDependencies(registry : ICompositionRegistry) =
-            registry.RegisterInstance<IDataStoreProvider>(SqlDataStore.getProvider())
+            let provider = DataStoreProvider.Create(SqlDataStore.getProvider(), ExcelDataStore.getProvider())
+            registry.RegisterInstance<IDataStoreProvider>(provider)
                                 
     //This is instantiated/cleaned-up once per collection
     type ProjectTestContext() as this = 
         inherit TestContext(registerDependencies |> CoreRegistration.compose (thisAssembly()))
 
         let cs = "csSqlDataStore" |> this.ConfigurationManager.GetValue 
-        let dsProvider = this.AppContext.Resolve<IDataStoreProvider>()
-        let store : ISqlDataStore = dsProvider.GetSpecificStore(cs)
-
+        let store = this.AppContext.Resolve<IDataStoreProvider>().GetDataStore<ISqlDataStore>(cs)
         member this.Store = store
+
         
         
     [<Literal>]

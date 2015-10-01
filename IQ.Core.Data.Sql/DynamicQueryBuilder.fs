@@ -1,4 +1,4 @@
-﻿namespace IQ.Core.Data.Sql
+﻿namespace IQ.Core.Data
 
 open System
 

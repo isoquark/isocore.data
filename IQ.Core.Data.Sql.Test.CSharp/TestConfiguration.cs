@@ -5,12 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 
 using IQ.Core.Framework;
-using IQ.Core.TestFramework;
-using IQ.Core.Data;
-using IQ.Core.Data.Sql;
-
 using IQ.Core.Framework.Contracts;
+
+using IQ.Core.Data;
 using IQ.Core.Data.Contracts;
+
+using IQ.Core.TestFramework;
+
+
 using static IQ.Core.TestFramework.TestVocabulary;
 using Assembly = System.Reflection.Assembly;
 
@@ -31,7 +33,9 @@ namespace IQ.Core.Data.Sql.Test.CSharp
 
         private static void RegisterDependencies(ICompositionRegistry registry)
         {
-            registry.RegisterInstance<IDataStoreProvider>(SqlDataStore.getProvider());
+            var provider = DataStoreProvider.Create(SqlDataStore.getProvider(), ExcelDataStore.getProvider(), CsvDataStore.getProvider());
+            registry.RegisterInstance<IDataStoreProvider>(provider);
+            
         }
 
         private readonly ICompositionRoot root;
@@ -48,7 +52,7 @@ namespace IQ.Core.Data.Sql.Test.CSharp
             this.configurationManager = appContext.Resolve<IConfigurationManager>();
             this.cs = configurationManager.GetValue("csSqlDataStore");
             var dsProvider = appContext.Resolve<IDataStoreProvider>();
-            this.dataStore = dsProvider.GetSpecificStore<ISqlDataStore>(cs);
+            this.dataStore = dsProvider.GetDataStore<ISqlDataStore>(cs);
         }
 
         public AppTestContext()

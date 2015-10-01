@@ -1,4 +1,4 @@
-﻿namespace IQ.Core.Data.Excel
+﻿namespace IQ.Core.Data
 
 
 open System.Reflection

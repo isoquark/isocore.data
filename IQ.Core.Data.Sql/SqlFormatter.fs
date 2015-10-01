@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data.Sql.Behavior
+namespace IQ.Core.Data
 
 open System
 open System.Data
@@ -112,6 +112,11 @@ module SqlFormatter =
     let formatTruncateTable (n : DataObjectName) =
         n |> formatObjectName |> sprintf "truncate table %s"
 
+    /// <summary>
+    /// Creates the SQL that when executed determines the file table root path of the database
+    /// </summary>
+    let formatGetFileTableRoot() = "select FILETABLEROOTPATH() as RootPath"
+        
     /// <summary>
     /// Formats a select statement for a tabular element
     /// </summary>

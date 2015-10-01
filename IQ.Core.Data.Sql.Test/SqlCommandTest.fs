@@ -8,6 +8,7 @@ open IQ.Core.TestFramework
 open IQ.Core.Data
 open IQ.Core.Data.Sql
 open IQ.Core.Framework
+open IQ.Core.Data.Contracts
 
 open IQ.Core.Data.Test.TestProxies
 

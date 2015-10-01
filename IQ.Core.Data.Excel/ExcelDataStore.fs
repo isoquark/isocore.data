@@ -1,4 +1,4 @@
-﻿namespace IQ.Core.Data.Excel
+﻿namespace IQ.Core.Data
 
 open System
 open System.Collections.Generic
@@ -39,7 +39,10 @@ module ExcelDataStore =
         | Some(x) ->
             DateTime.FromOADate(cell.Value :?> float) :> obj
         | None ->
-            cell.Value
+            if cell.Value <> null && cell.Value.ToString().ToLower() = "null" then
+                null
+            else
+                cell.Value
 
 
     let private readWorksheetMatrix(worksheet : ExcelWorksheet) =
@@ -66,14 +69,21 @@ module ExcelDataStore =
         ]
         let colcount = columns.Length
         let mutable j = 2
-        while(worksheet.Cells.[j, 1] |> hasValue) do
+        let mutable stop = false
+        while worksheet.Cells.[j,1]  <> null && not(stop) do
+            let mutable isEmptyRow = true
             let row = Array.zeroCreate<obj>(colcount)
-            rows.Add(row)
             for k in 0..i-2 do
                 let cell = worksheet.Cells.[j, k + 1]
-                if(cell.Value <> null && cell.Value.ToString() |> String.IsNullOrWhiteSpace |> not ) then
-                    row.[k] <- cell |> getValue
+                if cell.Value <> null then
+                    isEmptyRow <-false
+                    row.[k] <- if cell.Value.ToString().ToLower() <> "null" then cell.Value else null
+            if isEmptyRow |> not then
+                rows.Add(row)
+            
+            stop <- isEmptyRow            
             j <- j+ 1                    
+                    
         DataMatrix(DataMatrixDescription(matrixName, columns), rows) :> IDataMatrix
 
     let private getValueFormat (value : obj)  =
@@ -163,18 +173,14 @@ module ExcelDataStore =
 
             member this.Select(q) =
                 let converter = DataMatrix.getTypedConverter<'T>()
-                let matrix = (this :> IExcelDataStore).Select(q)
-                if matrix.Count() <> 0 then
-                    matrix |> Seq.exactlyOne |> converter.ToProxyValues
-                else
-                    Seq.empty
+                (this :> IExcelDataStore).SelectMatrix(q) |> converter.ToProxyValues
 
             member this.SelectAll() = 
                 nosupport()
                                             
             member this.Insert (items : seq<'T>) =
                 let converter = DataMatrix.getTypedConverter<'T>()                 
-                (this :> IExcelDataStore).Insert(items |> converter.FromProxyValues |> Seq.singleton)
+                (this :> IExcelDataStore).InsertMatrix(items |> converter.FromProxyValues )
 
             member this.GetCommandContract() =
                 nosupport()
@@ -185,21 +191,38 @@ module ExcelDataStore =
             member this.ExecuteCommand(c) =
                 nosupport()
 
+            member this.ExecutePureCommand(c) =
+                nosupport()
+
             member this.ConnectionString = cs
 
     /// <summary>
     /// Provides factory services for XLS data stores
     /// </summary>
     type internal ExcelDataStoreProvider() =
-        inherit DataStoreProvider<ExcelDataStoreQuery>(
+        inherit DataStoreProvider<ExcelDataStoreQuery>(DataStoreKind.Xls,
             fun cs -> Realization(cs) :> IDataStore<ExcelDataStoreQuery>)   
         
         static member GetProvider() =
             ExcelDataStoreProvider() :> IDataStoreProvider
         static member GetStore(cs) =
-            ExcelDataStoreProvider.GetProvider().GetSpecificStore(cs)
+            ExcelDataStoreProvider.GetProvider().GetDataStore(cs)
     
     let private provider = lazy(ExcelDataStoreProvider() :> IDataStoreProvider)
 
     [<DataStoreProviderFactory(DataStoreKind.Xls)>]
     let getProvider() = provider.Value
+
+namespace IQ.Core.Data.Contracts
+
+open System.Runtime.CompilerServices
+
+[<Extension>]
+module ExcelExtensions =
+    [<Extension>]
+    let SelectWorksheet<'T>(store : IExcelDataStore, name : string) =
+        store.Select<'T>(name |> FindWorksheetByName)
+
+    [<Extension>]
+    let SelectWorksheetMatrix(store : IExcelDataStore, name : string) =
+        store.SelectMatrix(name |> FindWorksheetByName)

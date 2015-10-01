@@ -14,6 +14,14 @@ open System.Text.RegularExpressions
 open FSharp.Text.RegexProvider
 
 
+type ConversionException(dstType, srcValue, innerException) =
+    inherit Exception(String.Empty, innerException)
+
+    member this.DstType : Type = dstType
+    member this.SrcValue = srcValue
+
+    override this.Message = 
+        sprintf "Could not convert %O value to %s type" srcValue dstType.FullName
 
 module SmartConvert =    
     /// <summary>
@@ -21,39 +29,43 @@ module SmartConvert =
     /// </summary>
     /// <param name="value">The value to convert</param>
     let convert (dstType : Type) (srcValue : obj) =
-        if srcValue = null then
-            null                   
-        else if srcValue.GetType() = dstType then
-            srcValue
-        else
-            let srcValueType = srcValue.GetType()
-            let dstValueType = dstType.ItemValueType
-            if dstType |> Option.isOptionType then
-                if srcValue |> Option.isOptionValue then
-                    //Convert an option value to an option type
-                    Convert.ChangeType(srcValue |> Option.unwrapValue |> Option.get, dstValueType) |> Option.makeSome
-                else
-                    //Convert an non-option value to an option type; note though, special
-                    //handling is required for DBNull
-                    if srcValueType = typeof<DBNull> then
-                        dstType |> Option.makeNone
-                    else
-                        Convert.ChangeType(srcValue, dstValueType) |> Option.makeSome
+        try
+            if srcValue = null then
+                null                   
+            else if srcValue.GetType() = dstType then
+                srcValue
             else
-                if srcValue |> Option.isOptionValue then
-                    //Convert an option value to a non-option type
-                    Convert.ChangeType(srcValue |> Option.unwrapValue |> Option.get, dstValueType)
-                else  
-                    //Convert a non-option value to a non-option type
-                    if dstType |> Type.isNullableType then
-                        if srcValueType = typeof<DBNull> then
-                            //Should create the right type of nullable type instance but have no value
-                            Activator.CreateInstance(dstType);
-                        else
-                            //Should create the right type of nullable type instance but with a value
-                            Activator.CreateInstance(dstType, Convert.ChangeType(srcValue, dstValueType))
+                let srcValueType = srcValue.GetType()
+                let dstValueType = dstType.ItemValueType
+                if dstType |> Option.isOptionType then
+                    if srcValue |> Option.isOptionValue then
+                        //Convert an option value to an option type
+                        Convert.ChangeType(srcValue |> Option.unwrapValue |> Option.get, dstValueType) |> Option.makeSome
                     else
-                        Convert.ChangeType(srcValue, dstValueType)                                                
+                        //Convert an non-option value to an option type; note though, special
+                        //handling is required for DBNull
+                        if srcValueType = typeof<DBNull> then
+                            dstType |> Option.makeNone
+                        else
+                            Convert.ChangeType(srcValue, dstValueType) |> Option.makeSome
+                else
+                    if srcValue |> Option.isOptionValue then
+                        //Convert an option value to a non-option type
+                        Convert.ChangeType(srcValue |> Option.unwrapValue |> Option.get, dstValueType)
+                    else  
+                        //Convert a non-option value to a non-option type
+                        if dstType |> Type.isNullableType then
+                            if srcValueType = typeof<DBNull> then
+                                //Should create the right type of nullable type instance but have no value
+                                Activator.CreateInstance(dstType);
+                            else
+                                //Should create the right type of nullable type instance but with a value
+                                Activator.CreateInstance(dstType, Convert.ChangeType(srcValue, dstValueType))
+                        else
+                            Convert.ChangeType(srcValue, dstValueType)   
+        with
+        | e  ->
+            ConversionException(dstType, srcValue, e) |> raise
         
     let inline cast<'TDst> (src : obj) = 
         src :?> 'TDst
@@ -68,6 +80,23 @@ module SmartConvert =
     let inline convertAll(items : 'TSrc seq) =
         seq {for item in items -> item |> convertT<'TDst>}
 
+module SmartProject =
+    let update dst src =
+        let dstProps = dst.GetType().GetProperties() 
+                         |> Array.filter(fun p -> p.CanWrite)         
+        let srcProps = src.GetType().GetProperties()
+                         |> Array.filter(fun p -> p.CanRead) 
+                         |> Array.map(fun p -> p.Name, p)
+                         |> Map.ofArray
+        dstProps |> Array.iter(fun p ->
+            if srcProps.ContainsKey(p.Name) then
+                let dstValue = srcProps.[p.Name].GetValue(src) 
+                             |> SmartConvert.convert p.PropertyType
+                p.SetValue(dst, dstValue)
+            
+        )
+        dst
+                
 /// <summary>
 /// Defines generally-applicable conversion utilities
 /// </summary>

@@ -8,7 +8,7 @@ open System.Reflection
 open IQ.Core.Framework
 open IQ.Core.TestFramework
 open IQ.Core.Data
-open IQ.Core.Data.Sql
+
 
 
 [<AutoOpen>]
@@ -23,7 +23,7 @@ module TestConfiguration =
 
         let cs = "csSqlDataStore" |> this.ConfigurationManager.GetValue 
         let dsProvider = this.AppContext.Resolve<IDataStoreProvider>()
-        let store : ISqlDataStore = dsProvider.GetSpecificStore(cs)
+        let store = dsProvider.GetDataStore<ISqlDataStore>(cs)
 
         member this.Store = store
         member this.ConnectionString = cs
