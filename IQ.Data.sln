@@ -45,7 +45,7 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.MetaCode.Test", "IQ
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.MetaCode.Shell", "IQ.Core.MetaCode.Shell\IQ.Core.MetaCode.Shell.fsproj", "{DDC35261-4953-4F0D-99D9-8C5A1BB24636}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Data", "IQ.Core.Data\IQ.Core.Data.fsproj", "{5D4ADA5C-B453-432C-A419-81BF001EDD14}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Data.Common", "IQ.Core.Data.Common\IQ.Core.Data.Common.fsproj", "{5D4ADA5C-B453-432C-A419-81BF001EDD14}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Data.Excel", "IQ.Core.Data.Excel\IQ.Core.Data.Excel.fsproj", "{94EFA850-9E4F-4808-A152-B09A43885A91}"
 EndProject

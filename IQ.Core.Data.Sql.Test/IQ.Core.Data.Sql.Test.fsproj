@@ -72,8 +72,8 @@
       <Project>{c75bf451-5658-4fd3-b4da-d7d4550fde05}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\IQ.Core.Data\IQ.Core.Data.fsproj">
-      <Name>IQ.Core.Data</Name>
+    <ProjectReference Include="..\IQ.Core.Data\IQ.Core.Data.Common.fsproj">
+      <Name>IQ.Core.Data.Common</Name>
       <Project>{5d4ada5c-b453-432c-a419-81bf001edd14}</Project>
       <Private>True</Private>
     </ProjectReference>

@@ -9,11 +9,11 @@
     <ProjectGuid>5d4ada5c-b453-432c-a419-81bf001edd14</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>IQ.Core.Data</RootNamespace>
-    <AssemblyName>IQ.Core.Data</AssemblyName>
+    <AssemblyName>IQ.Core.Data.Common</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Name>IQ.Core.Data</Name>
+    <Name>IQ.Core.Data.Common</Name>
   </PropertyGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
