@@ -1,18 +1,19 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <Import Project="..\build.props" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>4a63b16d-2d65-4a6c-a1dd-b0d555ab9018</ProjectGuid>
+    <ProjectGuid>77511d20-eb21-4220-8939-cc0e5525da3a</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>IQ.Core.Data.Test.Common</RootNamespace>
-    <AssemblyName>IQ.Core.Data.Test.Common</AssemblyName>
+    <RootNamespace>IQ.Core.Data.Text</RootNamespace>
+    <AssemblyName>IQ.Core.Data.Text</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <Name>IQ.Core.Data.Test.Common</Name>
+    <Name>IQ.Core.Data.Text</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -22,7 +23,7 @@
     <OutputPath>bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Debug\IQ.Core.Data.Test.Common.XML</DocumentationFile>
+    <DocumentationFile>bin\Debug\IQ.Core.Data.Text.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,7 +32,7 @@
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <WarningLevel>3</WarningLevel>
-    <DocumentationFile>bin\Release\IQ.Core.Data.Test.Common.XML</DocumentationFile>
+    <DocumentationFile>bin\Release\IQ.Core.Data.Text.XML</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
@@ -51,22 +52,11 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="DataProxies.fs" />
+    <Compile Include="CsvDataStore.fs" />
+    <Content Include="packages.config" />
     <Content Include="app.config" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="mscorlib" />
-    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Numerics" />
-    <ProjectReference Include="..\IQ.Core.Contracts\IQ.Core.Contracts.fsproj">
-      <Name>IQ.Core.Contracts</Name>
-      <Project>{8690d158-dd5f-4b78-b542-a4cd5757c20c}</Project>
-      <Private>True</Private>
-    </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Data.Common\IQ.Core.Data.Common.fsproj">
       <Name>IQ.Core.Data.Common</Name>
       <Project>{5d4ada5c-b453-432c-a419-81bf001edd14}</Project>
@@ -77,6 +67,29 @@
       <Project>{8e2497e0-941b-4ca7-ab78-4ca15291c56a}</Project>
       <Private>True</Private>
     </ProjectReference>
+    <Reference Include="CsvHelper">
+      <HintPath>..\packages\CsvHelper.2.13.2.0\lib\net40-client\CsvHelper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FSharp.Data">
+      <HintPath>..\packages\FSharp.Data.2.2.5\lib\net40\FSharp.Data.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="mscorlib" />
+    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
+    <ProjectReference Include="..\IQ.Core.Contracts\IQ.Core.Contracts.fsproj">
+      <Name>IQ.Core.Contracts</Name>
+      <Project>{8690d158-dd5f-4b78-b542-a4cd5757c20c}</Project>
+      <Private>True</Private>
+    </ProjectReference>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

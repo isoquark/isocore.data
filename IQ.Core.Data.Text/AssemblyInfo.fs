@@ -1,20 +1,19 @@
 ﻿namespace IQ.Core.Data
 
+open IQ.Core.Contracts
 
 open System.Reflection
 open System.Runtime.CompilerServices
 open System.Runtime.InteropServices
 
-open IQ.Core.Contracts
-
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[<assembly: AssemblyTitle("IQ.Core.Data.Common")>]
+[<assembly: AssemblyTitle("IQ.Core.Data.Text")>]
 [<assembly: AssemblyDescription("")>]
 [<assembly: AssemblyConfiguration("")>]
 [<assembly: AssemblyCompany("eXaPhase")>]
-[<assembly: AssemblyProduct("IQ.Core.Data.Common")>]
+[<assembly: AssemblyProduct("IQ.Core.Data.Text")>]
 [<assembly: AssemblyCopyright("Copyright © eXaPhase 2015")>]
 [<assembly: AssemblyTrademark("")>]
 [<assembly: AssemblyCulture("")>]
@@ -25,24 +24,13 @@ open IQ.Core.Contracts
 [<assembly: ComVisible(false)>]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[<assembly: Guid("5d4ada5c-b453-432c-a419-81bf001edd14")>]
+[<assembly: Guid("77511d20-eb21-4220-8939-cc0e5525da3a")>]
 
-// Version information for an assembly consists of the following four values:
-// 
-//       Major Version
-//       Minor Version 
-//       Build Number
-//       Revision
-// 
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [<assembly: AssemblyVersion("1.0.*")>]
 [<assembly: AssemblyVersion("1.0.*")>]
 [<assembly: AssemblyFileVersion("1.0.*")>]
 
-[<assembly: AutoOpen("IQ.Core.Data.Behavior")>]
 do
     ()
 
-type DataAssemblyDescriptor() =
-    inherit AssemblyDescriptor<DataAssemblyDescriptor>()
+type TextDataAssemblyDescriptor() =
+    inherit AssemblyDescriptor<TextDataAssemblyDescriptor>()

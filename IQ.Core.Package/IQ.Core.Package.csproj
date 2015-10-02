@@ -108,6 +108,10 @@
       <Project>{5d4ada5c-b453-432c-a419-81bf001edd14}</Project>
       <Name>IQ.Core.Data.Common</Name>
     </ProjectReference>
+    <ProjectReference Include="..\IQ.Core.Data.Text\IQ.Core.Data.Text.fsproj">
+      <Project>{77511d20-eb21-4220-8939-cc0e5525da3a}</Project>
+      <Name>IQ.Core.Data.Text</Name>
+    </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Framework\IQ.Core.Framework.fsproj">
       <Project>{8e2497e0-941b-4ca7-ab78-4ca15291c56a}</Project>
       <Name>IQ.Core.Framework</Name>

@@ -62,6 +62,7 @@ namespace IQ.Core.Package
                     SqlAssemblyDescriptor.SimpleName,
                     MathAssemblyDescriptor.SimpleName,
                     SyntheticsAssemblyDescriptor.SimpleName,
+                    TextDataAssemblyDescriptor.SimpleName
 
                 };
         private static PackageToolConfig CreateConfig(string version, string outdir, string workdir)

@@ -49,7 +49,6 @@
     <Compile Include="BclDataTable.fs" />
     <Compile Include="DataMatrix.fs" />
     <Compile Include="DataStoreProvider.fs" />
-    <Compile Include="CsvDataStore.fs" />
     <Compile Include="EtlVocabulary.fs" />
     <Compile Include="TableDescriptionBuilder.fs" />
     <Compile Include="MemoryDataStore.fs" />

@@ -65,6 +65,8 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "IQ.Schemas.Metadata", "IQ.S
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "IQ.Schemas.Test", "IQ.Schemas.Test\IQ.Schemas.Test.sqlproj", "{43C6EBF6-B693-47E5-99F2-A446A96BB4F3}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Data.Text", "IQ.Core.Data.Text\IQ.Core.Data.Text.fsproj", "{77511D20-EB21-4220-8939-CC0E5525DA3A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -369,6 +371,18 @@ Global
 		{43C6EBF6-B693-47E5-99F2-A446A96BB4F3}.Release|x86.ActiveCfg = Release|Any CPU
 		{43C6EBF6-B693-47E5-99F2-A446A96BB4F3}.Release|x86.Build.0 = Release|Any CPU
 		{43C6EBF6-B693-47E5-99F2-A446A96BB4F3}.Release|x86.Deploy.0 = Release|Any CPU
+		{77511D20-EB21-4220-8939-CC0E5525DA3A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77511D20-EB21-4220-8939-CC0E5525DA3A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77511D20-EB21-4220-8939-CC0E5525DA3A}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{77511D20-EB21-4220-8939-CC0E5525DA3A}.Debug|x64.Build.0 = Debug|Any CPU
+		{77511D20-EB21-4220-8939-CC0E5525DA3A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{77511D20-EB21-4220-8939-CC0E5525DA3A}.Debug|x86.Build.0 = Debug|Any CPU
+		{77511D20-EB21-4220-8939-CC0E5525DA3A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77511D20-EB21-4220-8939-CC0E5525DA3A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77511D20-EB21-4220-8939-CC0E5525DA3A}.Release|x64.ActiveCfg = Release|Any CPU
+		{77511D20-EB21-4220-8939-CC0E5525DA3A}.Release|x64.Build.0 = Release|Any CPU
+		{77511D20-EB21-4220-8939-CC0E5525DA3A}.Release|x86.ActiveCfg = Release|Any CPU
+		{77511D20-EB21-4220-8939-CC0E5525DA3A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
