@@ -51,7 +51,7 @@
     <Compile Include="DataStoreProvider.fs" />
     <Compile Include="CsvDataStore.fs" />
     <Compile Include="EtlVocabulary.fs" />
-    <Compile Include="TabularDescriptionBuilder.fs" />
+    <Compile Include="TableDescriptionBuilder.fs" />
     <Compile Include="MemoryDataStore.fs" />
   </ItemGroup>
   <ItemGroup>

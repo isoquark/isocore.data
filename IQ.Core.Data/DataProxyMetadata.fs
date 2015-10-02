@@ -610,6 +610,8 @@ module DataProxyMetadata =
             TableDescription.Name = objectName
             Documentation = t.ReflectedElement.Value|> getMemberDescription
             Columns = columnProxies |> List.map(fun p -> p.DataElement) 
+            //TODO: Define a file table facet/property that can be discovered
+            IsFileTable = false
             Properties = []
         }
         TableProxyDescription(t, table, columnProxies) 

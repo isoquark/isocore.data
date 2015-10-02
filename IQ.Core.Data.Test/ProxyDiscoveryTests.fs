@@ -67,6 +67,7 @@ module DataProxyMetadata =
                 TableDescription.Name = tableName
                 Documentation = String.Empty
                 Properties = []
+                IsFileTable = false
                 Columns = 
                 [
                     { 

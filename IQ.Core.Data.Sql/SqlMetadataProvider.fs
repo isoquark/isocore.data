@@ -57,10 +57,6 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
                 IsTableType = item.IsTableType
                 IsCustomObject = item.IsAssemblyType
                 IsUserDefined = item.IsUserDefined
-//                BaseTypeName = if item.BaseTypeId.HasValue then 
-//                                    getName(item.BaseTypeId.Value |> int) |> Some 
-//                                else 
-//                                None  
                 BaseTypeName = if item.IsUserDefined && not(item.IsTableType) then
                                     getName(item.BaseTypeId.Value |> int) |> Some 
                                else
@@ -207,6 +203,7 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
                 TableDescription.Name = tableName
                 Documentation = table.Description
                 Columns = columns.[tableName] |> List.ofSeq
+                IsFileTable = table.IsFileTable
                 Properties = []
             }        
             if tables.ContainsKey(table.SchemaName) then 

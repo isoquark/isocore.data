@@ -6,6 +6,7 @@ open System
 open System.Collections
 open System.Reflection
 open System.Collections.Generic
+open System.Data
 
 module DataMatrix =
     
@@ -93,3 +94,17 @@ module DataMatrix =
         }
 
 
+    /// <summary>
+    /// Adapts a BCL <see cref="DataTable"/> to <see cref="IDataTable"/>
+    /// </summary>
+    /// <param name="dataTable">The BCL data table to adapt</param>
+    let fromDataTable (dataTable : DataTable) =        
+                
+        let rowValues = [|for row in dataTable.Rows -> row.ItemArray|] :> IReadOnlyList<obj[]>
+        let description = dataTable |> BclDataTable.describe
+        {new IDataMatrix with
+            member this.Description = description
+            member this.Item(row,col) = dataTable.Rows.[row].[col]
+            member this.Rows = rowValues
+        
+        }

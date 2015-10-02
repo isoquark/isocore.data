@@ -47,6 +47,7 @@ module SqlCommandTest =
                 TableDescription.Name = tableName
                 Documentation = String.Empty
                 Properties = []
+                IsFileTable = false
                 Columns = 
                 [
                     {

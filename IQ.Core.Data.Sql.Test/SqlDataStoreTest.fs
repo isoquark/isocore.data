@@ -21,8 +21,6 @@ module SqlDataStoreTest =
         [<Fact>]
         let ``Executed Dynamic Queries over [SqlTest].[Table08]``() =
             
-            let matrixStore = store //:> ISqlMatrixStore
-
             let rowcount = 100
             let col2Values = [for rowid in 1..rowcount -> rowid, (sprintf "Row%i Description" rowid) :> obj] |> Map.ofList
             let createRow(rowid) =                
@@ -33,7 +31,7 @@ module SqlDataStoreTest =
             let description = mdp.DescribeTable(tabularName)
             let rowValues =  [| for i in [1..rowcount] ->i |> createRow |] 
             let m = DataMatrix(DataMatrixDescription(description.Name, description.Columns), rowValues) :> IDataMatrix
-            matrixStore.InsertMatrix(m)
+            store.InsertMatrix(m)
 
             let q1 = DynamicQueryBuilder(tabularName)
                         .Columns(description.Columns |> Seq.map(fun x -> x.Name) |> Array.ofSeq)

@@ -171,18 +171,4 @@ module BclDataTable =
                     )
         DataMatrixDescription(tableName, columns)
 
-    /// <summary>
-    /// Adapts a BCL <see cref="DataTable"/> to <see cref="IDataTable"/>
-    /// </summary>
-    /// <param name="dataTable">The BCL data table to adapt</param>
-    let asDataMatrix (dataTable : DataTable) =        
-                
-        let rowValues = [|for row in dataTable.Rows -> row.ItemArray|] :> IReadOnlyList<obj[]>
-        let description = dataTable |> describe
-        {new IDataMatrix with
-            member this.Description = description
-            member this.Item(row,col) = dataTable.Rows.[row].[col]
-            member this.Rows = rowValues
-        
-        }
 

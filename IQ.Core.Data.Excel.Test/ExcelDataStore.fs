@@ -71,7 +71,7 @@ module ExcelDataStore =
             t0_in.LoadDataRow([|"ABC" :> obj; 34:> obj; 59.8m :> obj;  BclDateTime(2003, 7, 15,0,0,0) :> obj|], true) |> ignore
             t0_in.LoadDataRow([|"DEF" :> obj; 13:> obj; 12.24m :> obj;  BclDateTime(2012, 12, 12,0,0,0) :> obj|], true) |> ignore
             t0_in.LoadDataRow([|"HIJ" :> obj; 11:> obj; 44.95m :> obj;  BclDateTime(2011, 2, 17,0,0,0) :> obj|], true) |> ignore
-            let t0_in_matrix = t0_in |> BclDataTable.asDataMatrix
+            let t0_in_matrix = t0_in |> DataMatrix.fromDataTable
 
             let t0_in_proxies = t0_in_matrix |> converter.ToProxyValues
 
@@ -81,7 +81,7 @@ module ExcelDataStore =
             t1.Columns.Add("Value", typeof<int>) |> ignore
             t1.LoadDataRow([|"This is the first name" :> obj; 15 :> obj|], true) |> ignore
             t1.LoadDataRow([|"This is the second name" :> obj; 17 :> obj|], true) |> ignore
-            let t1_matrix = t1 |> BclDataTable.asDataMatrix
+            let t1_matrix = t1 |> DataMatrix.fromDataTable
 
             
             let xlspath = Path.Combine(ctx.OutputDirectory, "WB01_Generated.xlsx")

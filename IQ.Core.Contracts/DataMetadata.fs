@@ -542,6 +542,8 @@ type TableDescription = {
     Columns : ColumnDescription list
     /// The attached properties
     Properties : DataElementProperty list
+    /// Specifies whether the table is a file table
+    IsFileTable : bool
 }
 with
     interface ITabularDescription  with

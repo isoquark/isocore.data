@@ -37,3 +37,29 @@ module internal SqlConnection =
         connection
 
 
+type internal BulkInsertConfig = {
+    OverwriteDefaults : bool
+    OverwriteIdentity : bool
+}
+
+module internal SqlProxyWriter =
+    let bulkInsert<'T> cs (items : 'T seq) =
+        let config = {
+            OverwriteDefaults = true
+            OverwriteIdentity = false
+        }
+   
+        let proxy = tableproxy<'T>
+        use bcp = new SqlBulkCopy(cs, SqlBulkCopyOptions.CheckConstraints)
+        bcp.DestinationTableName <- proxy.DataElement.Name |> SqlFormatter.formatObjectName
+        use table = items |> BclDataTable.fromProxyValuesT 
+        bcp.WriteToServer(table)
+
+module internal SqlMatrixWriter =
+    let bulkInsert cs (data : IDataMatrix) =
+        use table = data.Description |> BclDataTable.fromMatrixDescription
+        data.Rows |> Seq.iter(fun x ->table.LoadDataRow(x,true) |> ignore)
+        use bcp = new SqlBulkCopy(cs, SqlBulkCopyOptions.CheckConstraints)
+        bcp.DestinationTableName <- match data.Description with DataMatrixDescription(Name=x) -> x |> SqlFormatter.formatObjectName
+        bcp.WriteToServer(table)    
+

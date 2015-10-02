@@ -11,7 +11,7 @@ open IQ.Core.Data.Contracts
 /// <summary>
 /// Implements a builder pattern for <see cref="TabularDescription"/> values
 /// </summary>
-type TabularDescriptionBuilder(schemaName, localName, doc) =
+type TableDescriptionBuilder(schemaName, localName, doc) =
     let columns = ResizeArray<ColumnDescription>()
     let parentName = DataObjectName(schemaName, localName)
     let mutable colidx = -1
@@ -20,10 +20,10 @@ type TabularDescriptionBuilder(schemaName, localName, doc) =
         Interlocked.Increment(ref colidx)
 
     new(schemaName, localName) =
-        TabularDescriptionBuilder(schemaName, localName, String.Empty)
+        TableDescriptionBuilder(schemaName, localName, String.Empty)
     
     new(tabularName : DataObjectName) =
-        TabularDescriptionBuilder(tabularName.SchemaName, tabularName.LocalName)
+        TableDescriptionBuilder(tabularName.SchemaName, tabularName.LocalName)
 
     member this.AddColumn(position, colname, dataTypeName, nullable, doc,  autoKind) =        
         let dataType = dataTypeName |> DataType.parse |> Option.get
@@ -55,6 +55,7 @@ type TabularDescriptionBuilder(schemaName, localName, doc) =
                 Documentation = doc
                 Columns = columns |> List.ofSeq
                 Properties = []
+                IsFileTable = false
             }
         
 

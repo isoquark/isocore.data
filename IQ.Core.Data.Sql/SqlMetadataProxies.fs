@@ -74,6 +74,7 @@ module internal Metadata =
         member val TableName = String.Empty  with get, set    
         member val Description = String.Empty  with get, set    
         member val IsUserDefined = false with get, set
+        member val IsFileTable = false with get, set
     with
         interface IMetadataView with
             member this.IsUserDefined = this.IsUserDefined
