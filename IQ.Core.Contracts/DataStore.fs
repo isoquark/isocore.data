@@ -81,6 +81,7 @@ type IMutableDataStore<'Q> =
     /// </summary>
     abstract ExecutePureCommand: command : 'TCommand -> unit
 
+
 /// <summary>
 /// Defines contract for a fully-capable data store parameterized by query type
 /// </summary>

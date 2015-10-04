@@ -7,7 +7,8 @@
 		x.user_type_id as TableTypeId,
 		x.name as TableTypeName,
 		o.IsUserDefined,
-		d.PropertyValue as Description
+		d.PropertyValue as Description,
+		x.type_table_object_id as ObjectId
 	from 
 		sys.table_types x 
 		inner join Metadata.vDataType o on o.DataTypeId = x.user_type_id

@@ -8,7 +8,7 @@
 		x.name as TableName,
 		o.IsUserDefined,
 		d.PropertyValue as Description,
-		x.is_filetable
+		x.is_filetable as IsFileTable
 	from 
 		sys.tables x 
 		inner join Metadata.vObject o on o.ObjectId = x.object_id

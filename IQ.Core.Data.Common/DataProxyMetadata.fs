@@ -205,7 +205,66 @@ module DataProxyMetadata =
             kindMap.[t]
         else
             ArgumentException(sprintf "No default mapping for %s exists" t.FullName) |> raise
+    /// <summary>
+    /// Infers the name of the schema in which the element lives or represents
+    /// </summary>
+    /// <param name="clrElement">The element from which to infer the schema name</param>
+    let inferSchemaName(description: ClrElement) =              
+        let inferFromDeclaringType() =
+                match description.DeclaringType with
+                | Some(t) ->
+                    let description = t |> ClrMetadata().FindType |> TypeElement
+                   
+                    match description |> ClrElement.tryGetAttributeT<SchemaAttribute>  with
+                    | Some(a) ->
+                        match a.Name with
+                        | Some(n) ->
+                            n
+                        | None ->
+                            t.SimpleName
+                    | None ->
+                        t.SimpleName
+                | None ->
+                    nosupport()                    
         
+        match description |> ClrElement.tryGetAttributeT<SchemaAttribute> with        
+        | Some(a) ->
+            match a.Name with
+            | Some(name) -> 
+                name
+            | None -> 
+                inferFromDeclaringType()
+
+        | None ->
+            match description |> ClrElement.tryGetAttributeT<DataObjectAttribute> with        
+            | Some(a) ->
+                match a.SchemaName with
+                | Some(schemaName) -> 
+                    schemaName
+                | None -> 
+                    inferFromDeclaringType()
+            | None ->                                
+                inferFromDeclaringType()
+        
+    /// <summary>
+    /// Infers a <see cref="DataObjectName"/> from a CLR element
+    /// </summary>
+    /// <param name="clrElement">The CLR element from which the object name will be inferred</param>
+    let inferDataObjectName(description : ClrElement) =        
+        match description |> ClrElement.tryGetAttributeT<DataObjectAttribute> with
+        | Some(a) -> 
+            let schemaName = description |> inferSchemaName
+            let localName = 
+                match a.Name with
+                | Some(x) -> 
+                    x
+                | None ->
+                    description.Name.SimpleName
+            DataObjectName(schemaName, localName)
+                    
+        | None ->
+            let schemaName = description |> inferSchemaName
+            DataObjectName(schemaName, description.Name.SimpleName)
                        
     let rec internal inferStoreType(element : ClrElement) =
         
@@ -235,11 +294,7 @@ module DataProxyMetadata =
         let getRepresentationType defaultValue =
             match element |> facet<Type> DataFacetNames.RepresentationType with
             | Some x -> x | None -> defaultValue
-
-        let tryGetDataObjectName() =
-            element |> facet<DataObjectName> DataFacetNames.DataObjectName  
-
-            
+                        
         let guessKind() =
             if clrType = typeof<Byte[]> then
                 if element |> hasFacet<int> DataFacetNames.FixedLength then
@@ -344,7 +399,22 @@ module DataProxyMetadata =
         | DataKind.TypedDocument -> 
             typeof<obj> |> getRepresentationType |> TypedDocumentDataType
         | DataKind.CustomTable -> 
-            tryGetDataObjectName() |> Option.get |> TableDataType
+            //element |> inferDataObjectName |> TableDataType
+            match element with
+            | ParameterElement(p) ->                
+                let pType = ClrMetadata().FindType(p.ParameterType)
+                match pType.Kind with
+                | ClrTypeKind.Collection ->
+                    let clrItemType = pType.ReflectedElement.Value.ItemValueType;
+                    let itemElement = ClrMetadata().FindTypeElement(clrItemType.TypeName)
+                    itemElement |> inferDataObjectName |> TableDataType
+                | _ ->
+                    nosupport()
+
+                
+            | _ ->
+                nosupport()
+
         | DataKind.CustomObject -> 
             let objectName = element |> facet<DataObjectName>(DataFacetNames.CustomObjectName) |> Option.get
             ObjectDataType(objectName, clrItemValueType.Name)     
@@ -364,66 +434,7 @@ module DataProxyMetadata =
         else
             String.Empty
 
-    /// <summary>
-    /// Infers the name of the schema in which the element lives or represents
-    /// </summary>
-    /// <param name="clrElement">The element from which to infer the schema name</param>
-    let inferSchemaName(description: ClrElement) =              
-        let inferFromDeclaringType() =
-                match description.DeclaringType with
-                | Some(t) ->
-                    let description = t |> ClrMetadata().FindType |> TypeElement
-                   
-                    match description |> ClrElement.tryGetAttributeT<SchemaAttribute>  with
-                    | Some(a) ->
-                        match a.Name with
-                        | Some(n) ->
-                            n
-                        | None ->
-                            t.SimpleName
-                    | None ->
-                        t.SimpleName
-                | None ->
-                    nosupport()                    
-        
-        match description |> ClrElement.tryGetAttributeT<SchemaAttribute> with        
-        | Some(a) ->
-            match a.Name with
-            | Some(name) -> 
-                name
-            | None -> 
-                inferFromDeclaringType()
 
-        | None ->
-            match description |> ClrElement.tryGetAttributeT<DataObjectAttribute> with        
-            | Some(a) ->
-                match a.SchemaName with
-                | Some(schemaName) -> 
-                    schemaName
-                | None -> 
-                    inferFromDeclaringType()
-            | None ->                                
-                inferFromDeclaringType()
-
-    /// <summary>
-    /// Infers a <see cref="DataObjectName"/> from a CLR element
-    /// </summary>
-    /// <param name="clrElement">The CLR element from which the object name will be inferred</param>
-    let inferDataObjectName(description : ClrElement) =        
-        match description |> ClrElement.tryGetAttributeT<DataObjectAttribute> with
-        | Some(a) -> 
-            let schemaName = description |> inferSchemaName
-            let localName = 
-                match a.Name with
-                | Some(x) -> 
-                    x
-                | None ->
-                    description.Name.SimpleName
-            DataObjectName(schemaName, localName)
-                    
-        | None ->
-            let schemaName = description |> inferSchemaName
-            DataObjectName(schemaName, description.Name.SimpleName)
     
     /// <summary>
     /// Infers a <see cref"ColumnDescription"/>  from a CLR element

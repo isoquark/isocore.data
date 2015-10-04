@@ -13,6 +13,7 @@ open IQ.Core.Data
 open IQ.Core.Data.Test
 open IQ.Core.Data.Sql
 open IQ.Core.Framework
+open IQ.Core.Data.Contracts
 
 open TestProxies
 
@@ -111,5 +112,12 @@ module Routine =
             Claim.equal expect actual
 
 
-    
+        [<Fact>]
+        let ``Executed [SqlTest].[pTable0DInsert] procedure``() =
+            DataObjectName("SqlTest", "Table0D")  |> store.TrunctateTable
+            let records =
+                [|for i in 1..100 -> TableType01(Col01 = i, Col02 = i.ToString(), Col03 = (i |> int16))|] 
+            store.GetCommandContract<ISqlTestRoutines>().pTable0DInsert(records)
+            ()
+            
         

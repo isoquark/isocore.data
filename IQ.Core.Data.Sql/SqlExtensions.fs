@@ -48,5 +48,6 @@ module SqlAugmentations =
     type ISqlDataStore 
     with
         member this.GetMetadataProvider() = this |> SqlExtensions.GetMetadataProvider
+        member this.TrunctateTable(tableName) = tableName |> TruncateTable |> this.ExecuteCommand |> ignore
             
             

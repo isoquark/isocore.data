@@ -44,7 +44,8 @@ module BclDataTable =
     /// </summary>
     /// <param name="description">The proxy description</param>
     let fromProxyDescription (description : DataObjectProxy) =        
-        let table = new DataTable(description.DataElement.Name.Text)
+        let dataElement = description.DataElement :> IDataElementDescription
+        let table = new DataTable(dataElement.Name)
         description.Columns |> List.iter(fun c -> table.Columns.Add(c.DataElement.Name, c.ProxyElement.ReflectedElement.Value.PropertyType) |> ignore)
         table
 

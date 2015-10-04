@@ -8,6 +8,7 @@ type internal IMetadataView =
     abstract IsUserDefined : bool
     abstract Documentation : string 
 
+
 //These proxies align with (a subset of) the columns returned by the views in the Metadata schema
 module internal Metadata =
     
@@ -34,6 +35,8 @@ module internal Metadata =
         member val IsAssemblyType = false with get, set
         member val IsUserDefined = false with get, set
         member val BaseTypeId : Nullable<uint8> = Nullable<uint8>() with get, set
+        member val BaseSchemaName = String.Empty with get, set
+        member val BaseTypeName = String.Empty with get, set
     with
         interface IMetadataView with
             member this.IsUserDefined = this.IsUserDefined
@@ -90,6 +93,35 @@ module internal Metadata =
             member this.IsUserDefined = this.IsUserDefined
             member this.Documentation = this.Description
 
-    
+    type vProcedure() =
+        member val CatalogName = String.Empty with get, set
+        member val SchemaName = String.Empty with get, set
+        member val ProcedureName = String.Empty with get, set
+        member val IsUserDefined = false with get, set
+        member val Description = String.Empty with get, set
+    with
+        interface IMetadataView with
+            member this.IsUserDefined = this.IsUserDefined
+            member this.Documentation = this.Description
+       
+    type vProcedureParameter()=
+        member val CatalogName = String.Empty with get, set
+        member val ParentSchemaName = String.Empty with get, set
+        member val ProcedureName = String.Empty with get, set
+        member val IsUserDefined = false with get, set
+        member val Description = String.Empty with get, set
+        member val ParameterName = String.Empty with get, set
+        member val Position = 0  with get, set    
+        member val DataTypeSchemaName = String.Empty with get,set
+        member val DataTypeName = String.Empty with get,set
+        member val MaxLength = 0 with get, set
+        member val Precision = 0uy with get, set
+        member val Scale = 0uy with get, set
+        member val IsOutput = false with get, set
+    with
+        interface IMetadataView with
+            member this.IsUserDefined = this.IsUserDefined
+            member this.Documentation = this.Description
+        
 
 

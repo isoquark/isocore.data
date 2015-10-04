@@ -329,16 +329,3 @@ module SqlFormatter =
     let formatTableDrop(name : DataObjectName) =
         sprintf "drop table %s" (name |> formatObjectName)
 
-module internal SqlParameter =
-    let create (paramValues : RoutineParameterValue list) (d : RoutineParameterDescription) =
-        let p = if d.Direction = RoutineParameterDirection.ReturnValue then 
-                    SqlParameter("Return", DBNull.Value) 
-                else if d.Direction = RoutineParameterDirection.Input then
-                    SqlParameter(d.Name |> SqlFormatter.formatParameterName, paramValues |> List.find(fun v -> v.Name = d.Name) |> fun value -> value.Value)
-                else if d.Direction = RoutineParameterDirection.Output then
-                    SqlParameter(d.Name, DBNull.Value)
-                else
-                    NotSupportedException() |> raise
-        p.Direction <- enum<System.Data.ParameterDirection>(int d.Direction)
-        p.SqlDbType <- d.DataType |> DataType.toSqlDbType   
-        p     

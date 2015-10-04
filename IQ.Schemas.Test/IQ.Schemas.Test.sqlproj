@@ -130,6 +130,10 @@
     <Build Include="SqlTest\Tables\Table0C.sql" />
     <Build Include="SqlTest\Tables\FIleTable01.sql" />
     <Build Include="SqlTest\FilestreamFilegroup.sql" />
+    <Build Include="SqlTest\Types\TableType01.sql" />
+    <Build Include="SqlTest\Tables\Table0D.sql" />
+    <Build Include="SqlTest\Procedures\pTable0DInsert.sql" />
+    <Build Include="SqlTest\Types\TableType02.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="IQ.Schemas.Test.refactorlog" />

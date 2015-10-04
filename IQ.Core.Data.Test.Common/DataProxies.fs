@@ -218,6 +218,22 @@ module TestProxies =
             Col03 : int16    
         }
 
+        [<TableType>]
+        type TableType01() =
+            [<Column("TTCol01")>]
+            member val Col01 = 0 with get, set
+            [<Column("TTCol02")>]
+            member val Col02 = String.Empty with get, set
+            [<Column("TTCol03")>]
+            member val Col03 = 0s with get, set
+
+        [<TableType>]
+        type TableType02 = {
+            Col01 : int
+            Col02 : string
+        }
+
+
     [<Schema("SqlTest")>]
     type ISqlTestRoutines =
         /// <summary>
@@ -258,3 +274,6 @@ module TestProxies =
 
         [<Procedure("SqlTest", "pTable0CSelect", true)>]
         abstract pTable0CSelectB: topCount : int -> Table0C list
+
+        [<Procedure>]
+        abstract pTable0DInsert: records : IReadOnlyList<TableType01> -> unit

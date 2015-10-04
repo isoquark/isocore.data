@@ -12,6 +12,7 @@ with Objects as (select
 			when 1 then 0 end), 0) as IsUserDefined
 	from 
 		sys.all_objects x 
+	where x.type_desc <> 'TYPE_TABLE'
 )
 select 
 	[o].CatalogId,
@@ -29,3 +30,17 @@ select
 			end , 0)as IsUserDefined
 from Objects o 
 	left join sys.schemas s on s.schema_id = o.SchemaId
+
+union
+	select 
+		[CatalogId], 
+		[CatalogName], 
+		[SchemaId], 
+		[SchemaName], 
+		[ObjectId],
+		[TableTypeName] as ObjectName, 
+		null as [ParentObjectId],
+		'TYPE_TABLE' as TableType,
+		[IsUserDefined] 
+	from 
+		Metadata.vUserTableType t

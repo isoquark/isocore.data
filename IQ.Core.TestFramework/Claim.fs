@@ -3,6 +3,7 @@
 namespace IQ.Core.TestFramework
 
 open System
+open System.Collections.Generic
 
 
 /// <summary>
@@ -23,6 +24,11 @@ module Claim =
     let isFalse (value : bool) = 
             value |> Assert.False
     
+    /// <summary>
+    /// Asserts that a dictionary contains a specific key
+    /// </summary>
+    let containsKey (d : IDictionary<_,_>) key =
+        key |> d.ContainsKey |> isTrue
 
     /// <summary>
     /// Asserts that the expected and actual values are identical

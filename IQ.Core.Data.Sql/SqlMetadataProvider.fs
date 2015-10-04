@@ -27,7 +27,18 @@ module internal MetadataUtil =
         else
             SqlDataReader.selectAll<'T> config.ConnectionString
             
+
+[<AutoOpen>]
+module internal MetadataExensions =
+    type vColumn 
+    with
+        member this.ParentObjectName = DataObjectName(this.ParentSchemaName, this.ParentName)
+    
+    type vProcedureParameter
+    with
+        member this.ParentObjectName = DataObjectName(this.ParentSchemaName, this.ProcedureName)
           
+
 type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =            
     
     let dataTypes = Dictionary<DataObjectName, DataTypeDescription>()        
@@ -35,21 +46,14 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
     let tables = Dictionary<string, TableDescription ResizeArray>()
     let views = Dictionary<string, ViewDescription ResizeArray>()
     let schemas = Dictionary<string, SchemaDescription>()
+    let procs = Dictionary<string, RoutineDescription ResizeArray>()
    
     member private this.GetMetadataView<'T when 'T :> IMetadataView>() =
         config |> MetadataUtil.getMetadataView<'T>
 
-    member private this.IndexDataTypes() =
-        let index = (SqlDataReader.selectAll<vDataType> config.ConnectionString).ToDictionary(fun x -> x.DataTypeId)
-        
-        let getName id =
-            let item = index.[id]
-            DataObjectName(item.SchemaName, item.DataTypeName)
-
-        for id in index.Keys do
-            let item = index.[id]
-            let description ={
-                DataTypeDescription.Name = getName(id)
+    member private this.CreateTypeDescription(item : vDataType, columns) =
+            {
+                DataTypeDescription.Name = DataObjectName(item.SchemaName, item.DataTypeName)
                 MaxLength = item.MaxLength
                 Precision = item.Precision
                 Scale = item.Scale
@@ -58,15 +62,32 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
                 IsCustomObject = item.IsAssemblyType
                 IsUserDefined = item.IsUserDefined
                 BaseTypeName = if item.IsUserDefined && not(item.IsTableType) then
-                                    getName(item.BaseTypeId.Value |> int) |> Some 
+                                    DataObjectName(item.BaseSchemaName, item.BaseTypeName) |> Some
                                else
                                     None
                 DefaultBclTypeName = item.MappedBclType      
                 Properties = []
                 Documentation = item.Description
-            }  
-            dataTypes.Add(description.Name, description)              
+                Columns = columns
+           }
         
+    
+    member private this.IndexSimpleDataTypes() =
+        let items = (SqlDataReader.selectAll<vDataType> config.ConnectionString)
+                        .Where(fun x -> x.IsTableType = false)
+        for dataType in items do
+            let description = this.CreateTypeDescription(dataType, [])
+            dataTypes.Add(description.Name, description)   
+
+    member private this.IndexComplexDataTypes() =
+        let items = (SqlDataReader.selectAll<vDataType> config.ConnectionString)
+                        .Where(fun x -> x.IsTableType = true)
+                        .ToList()
+        
+        for dataType in items do
+            let description = this.CreateTypeDescription(dataType, columns.[DataObjectName(dataType.SchemaName, dataType.DataTypeName)] |> List.ofSeq)            
+            dataTypes.Add(description.Name, description)
+               
             
 
     member private this.GetIntrinsicTypeReference(dataTypeName : DataObjectName, maxlen, precision, scale) =
@@ -142,36 +163,40 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
         | _ ->
             None
             
-    member private this.GetColumnDataType(c : vColumn) =
-        let dataTypeName = DataObjectName(c.DataTypeSchemaName, c.DataTypeName)
+    member private this.GetDataTypeReference (dataTypeName, maxLength, precision, scale) =
         let reference = 
-            this.GetIntrinsicTypeReference(dataTypeName, c.MaxLength, c.Precision, c.Scale)
+            this.GetIntrinsicTypeReference(dataTypeName, maxLength, precision, scale)
         match reference with
         | Some x  -> x
         | None ->            
             let dataType = dataTypes.[dataTypeName]
             if dataType.IsUserDefined then
-                let baseTypeName = 
-                    if dataType.BaseTypeName |> Option.isNone then
-                        nosupport()
-                    else
-                        dataType.BaseTypeName |> Option.get
+                if dataType.IsTableType then
+                    TableDataType(dataTypeName)
+                else
+                    let baseTypeName = 
+                        if dataType.BaseTypeName |> Option.isNone then
+                            nosupport()
+                        else
+                            dataType.BaseTypeName |> Option.get
                 
-                let baseType = dataTypes.[baseTypeName]
-                let reference = 
-                    this.GetIntrinsicTypeReference(baseTypeName, dataType.MaxLength |> int, dataType.Precision, dataType.Scale)
-                match reference with
-                | Some x ->
-                    CustomPrimitiveDataType(dataTypeName, x)
-                | None ->
-                    nosupport()
+                    let baseType = dataTypes.[baseTypeName]
+                    let reference = 
+                        this.GetIntrinsicTypeReference(baseTypeName, dataType.MaxLength |> int, dataType.Precision, dataType.Scale)
+                    match reference with
+                    | Some x ->
+                        CustomPrimitiveDataType(dataTypeName, x)
+                    | None ->
+                        nosupport()
             else
                 nosupport()
+    
             
     member private this.IndexColumns() =
                 
-        for column in this.GetMetadataView<vColumn>()  do            
-            let dataType = this.GetColumnDataType(column)
+        let items = this.GetMetadataView<vColumn>()
+        for column in items do            
+            let dataType = this.GetDataTypeReference(DataObjectName(column.DataTypeSchemaName, column.DataTypeName), column.MaxLength, column.Precision, column.Scale)
             let description = {
                 ColumnDescription.Name = column.ColumnName
                 ParentName = DataObjectName(column.ParentSchemaName, column.ParentName)
@@ -225,16 +250,61 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
             else
                 views.Add(view.SchemaName, ResizeArray([description]))
 
+    member private this.IndexProcedures() =
+        let parameters = this.GetMetadataView<vProcedureParameter>().GroupBy(fun p -> p.ParentObjectName).ToDictionary(fun x -> x.Key)  
+        
+        let getParametersByParent(parentName)       =
+            if( parameters.ContainsKey(parentName) ) then
+                [for parameter in parameters.[parentName] -> 
+                    {
+                        RoutineParameterDescription.Name = parameter.ParameterName
+                        RoutineParameterDescription.DataType = 
+                            this.GetDataTypeReference(DataObjectName(parameter.DataTypeSchemaName, parameter.DataTypeName), parameter.MaxLength, parameter.Precision, parameter.Scale)
+                        Position = parameter.Position
+                        Documentation = parameter.Description
+                        Direction = if parameter.IsOutput then RoutineParameterDirection.Output else RoutineParameterDirection.Input
+                        Properties = []                    
+                    }                                
+                ]
+            else
+                []
+        for proc in this.GetMetadataView<vProcedure>() do
+            let procName = DataObjectName(proc.SchemaName, proc.ProcedureName)
+            let description = 
+                {
+                    RoutineDescription.Name = procName
+                    RoutineDescription.RoutineKind = DataElementKind.Procedure
+                    Documentation = proc.Description
+                    Parameters = getParametersByParent(procName)
+                    RoutineDescription.Properties = []
+                    RoutineDescription.Columns = []                            
+                }
+            if(procs.ContainsKey(proc.SchemaName)) then
+                procs.[proc.SchemaName].Add(description)
+            else
+                procs.Add(proc.SchemaName, ResizeArray([description]))
+            
+            
+        ()
+
+
     member private this.IndexSchemas() =
 
-        for schema in this.GetMetadataView<vSchema>() do
-            
+        for schema in this.GetMetadataView<vSchema>() do            
             let allObjects = ResizeArray<DataObjectDescription>()
             if tables.ContainsKey(schema.SchemaName) then
                 tables.[schema.SchemaName] |> Seq.map(TableDescription) |> allObjects.AddRange
             if views.ContainsKey(schema.SchemaName) then
                 views.[schema.SchemaName] |> Seq.map(ViewDescription) |> allObjects.AddRange
-            
+            if procs.ContainsKey(schema.SchemaName) then
+                procs.[schema.SchemaName] |> Seq.map(RoutineDescription) |> allObjects.AddRange
+                            
+            let schemaDataTypes = 
+                dataTypes.Values |> Seq.filter(fun x -> x.Name.SchemaName = schema.SchemaName) 
+                                 |> Seq.map(DataTypeDescription) 
+
+            schemaDataTypes |> allObjects.AddRange
+
             schemas.Add(schema.SchemaName,
                 {
                    SchemaDescription.Name = schema.SchemaName
@@ -244,12 +314,16 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
                 }
             )
 
+    
     member this.ReadCatalog() =
-        this.IndexDataTypes()
+        this.IndexSimpleDataTypes()
         this.IndexColumns()
+        this.IndexComplexDataTypes()
         this.IndexTables()
         this.IndexViews()
+        this.IndexProcedures()                    
         this.IndexSchemas()
+        
         {
             SqlMetadataCatalog.CatalogName = (SqlConnectionStringBuilder(config.ConnectionString).InitialCatalog)
             Schemas = schemas.Values |> List.ofSeq
@@ -266,86 +340,14 @@ module SqlMetadataProvider =
     let private badargs() =
         ArgumentException() |> raise
     
-    //TODO:Intent is to use this structure to more smoothly implement the metadata provider
-    type private DataObjectIndex() = 
-        let schemaObjects = Dictionary<string, Dictionary<DataElementKind, List<DataObjectDescription>>>()
-        let allObjects = Dictionary<DataObjectName, DataObjectDescription>()
-
-        let getSchemaObjects elementKind schemaName =
-            if schemaObjects.[schemaName].ContainsKey(elementKind) then
-                schemaObjects.[schemaName].[elementKind] :> seq<_>
-            else
-                Seq.empty
-            
-
-        member this.IndexObject(o : DataObjectDescription) =
-            allObjects.[o.Name] <- o
-            let elementKind = (o :> IDataObjectDescription).ElementKind
-            let schemaName = o.Name.SchemaName
-            let schemaIndex =
-                if schemaObjects.ContainsKey(schemaName) then
-                    schemaObjects.[schemaName]
-                else
-                    schemaObjects.[schemaName] <- Dictionary<DataElementKind, List<DataObjectDescription>>()
-                    schemaObjects.[schemaName]
-            if schemaIndex.ContainsKey(elementKind) then
-                schemaIndex.[elementKind].Add(o)
-            else
-                schemaIndex.[elementKind] <- List([o])
-        
-        member this.DescribeTable(name : DataObjectName) =
-            match allObjects.[name] with
-            | TableDescription(x) -> x
-            | _ -> badargs()
-
-        member this.DescribeView(name : DataObjectName) =
-            match allObjects.[name] with
-            | ViewDescription(x) -> x
-            | _ -> badargs()
-
-        member this.DescribeViewsInSchema(schemaName) =
-            if schemaObjects.ContainsKey(schemaName) then
-                schemaName |> getSchemaObjects DataElementKind.View 
-                           |> Seq.map(fun x -> match x with | ViewDescription(x) -> x | _ -> badargs())
-                           |> List.ofSeq                
-            else
-                []
-
-        member this.DescribeProcedure(name : DataObjectName) =
-            match allObjects.[name] with
-            | RoutineDescription(x) -> 
-                if x.RoutineKind <> DataElementKind.Procedure then
-                    badargs()
-                x
-            | _ -> badargs()
-            
-        member this.DescribeTableFunction(name : DataObjectName) =
-            match allObjects.[name] with
-            | RoutineDescription(x) -> 
-                if x.RoutineKind <> DataElementKind.TableFunction then
-                    badargs()
-                x
-            | _ -> badargs()
-
-        member this.DescribeDataType(name : DataObjectName) =
-            match allObjects.[name] with
-            | DataTypeDescription(x) ->
-                x
-            | _ -> badargs()
-    
-        member this.DescribeSequence(name : DataObjectName) =
-            match allObjects.[name] with
-            | SequenceDescription(x) ->
-                x
-            | _ -> badargs()
 
     type private Realization(config : SqlMetadataProviderConfig) =
         let tables  = Dictionary<string, ResizeArray<TableDescription>>()        
         let views = Dictionary<string, ResizeArray<ViewDescription>>()
-        let procedures = Dictionary<string, RoutineDescription>()
+        let procedures = Dictionary<string, ResizeArray<RoutineDescription>>()
         let sequences = Dictionary<string, SequenceDescription>()
-        let tableFunctions = Dictionary<string, RoutineDescription>()
-        let dataTypes = Dictionary<string, DataTypeDescription>()
+        let tableFunctions = Dictionary<string, ResizeArray<RoutineDescription>>()
+        let dataTypes = Dictionary<string, ResizeArray<DataTypeDescription>>()
         let allObjects = Dictionary<DataObjectName, IDataObjectDescription>()
         
         let refresh() =
@@ -361,7 +363,8 @@ module SqlMetadataProvider =
             for schema in catalog.Schemas do
                 let schemaName = schema.Name
                 for o in schema.Objects do
-                    allObjects.Add(o.Name, o)
+                    
+                    allObjects.Add(o.ObjectName, o)
                     match o with
                     | TableDescription(x) -> 
                         if tables.ContainsKey(schemaName) then
@@ -375,14 +378,28 @@ module SqlMetadataProvider =
                             views.[schemaName] <- ResizeArray[x]
                     | RoutineDescription(x) -> 
                         if x.RoutineKind = DataElementKind.Procedure then
-                            procedures.Add(schemaName, x)   
+                            if(procedures.ContainsKey(schemaName)) then
+                                procedures.[schemaName].Add(x)  
+                            else
+                                procedures.[schemaName] <- ResizeArray[x]
+                            
                         else if x.RoutineKind = DataElementKind.TableFunction then
-                            tableFunctions.Add(schemaName, x)
+                        
+                            if(tableFunctions.ContainsKey(schemaName)) then
+                                tableFunctions.[schemaName].Add(x)  
+                            else
+                                tableFunctions.[schemaName] <- ResizeArray[x]
+                        
                         else
                             nosupport()
                             
                     | DataTypeDescription(x) ->
-                         dataTypes.Add(schemaName, x)
+                        if dataTypes.ContainsKey(x.Name.SchemaName) then
+                            dataTypes.[x.Name.SchemaName].Add(x)
+                        else
+                            dataTypes.[x.Name.SchemaName] <- ResizeArray[x]
+                        
+
                     | SequenceDescription(x) -> 
                         sequences.Add(schemaName, x)
 

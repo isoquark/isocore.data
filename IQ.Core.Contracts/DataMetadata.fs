@@ -348,48 +348,6 @@ type IDataObjectDescription =
     inherit IDataElementDescription
     abstract ObjectName : DataObjectName
 
-
-/// <summary>
-/// Describes a data type definition
-/// </summary>
-type DataTypeDescription = {
-    /// The name of the data type
-    Name : DataObjectName
-    /// The data type's documentation
-    Documentation : string
-    /// The maximum length of the data type, if applicable
-    MaxLength : int16
-    /// The precision of the data type, if applicable 
-    Precision : uint8
-    /// The scale of the data type, if applicable 
-    Scale : uint8
-    /// Specifies whether the data type is allowed to be null
-    IsNullable : bool
-    /// Specifies whether the data type is a (user-defined) table data type
-    IsTableType : bool
-    /// Specifies whether the data type is a (user-defined) CLR object
-    IsCustomObject : bool
-    /// Specifies whether the data type is user-defined
-    IsUserDefined : bool
-    /// Specifies the name of the BCL type that the is used by ADO.Net
-    DefaultBclTypeName : string
-    /// If a user-defined primitive, the name of the intrinsic primitive base type
-    BaseTypeName : DataObjectName option
-    /// The attached properties
-    Properties : DataElementProperty list
-}
-with
-    /// <summary>
-    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
-    /// </summary>
-    override this.ToString() = this.Name.Text
-
-    interface IDataObjectDescription with
-        member this.ElementKind = DataElementKind.DataType
-        member this.ObjectName = this.Name
-        member this.Name = this.Name.Text
-        member this.Documentation = this.Documentation
-
 /// <summary>
 /// Describes a column in a table or view
 /// </summary>
@@ -424,6 +382,53 @@ with
         member this.ElementKind = DataElementKind.Column
         member this.Name = this.Name
         member this.Documentation = this.Documentation
+
+
+/// <summary>
+/// Describes a data type definition
+/// </summary>
+type DataTypeDescription = {
+    /// The name of the data type
+    Name : DataObjectName
+    /// The data type's documentation
+    Documentation : string
+    /// The maximum length of the data type, if applicable
+    MaxLength : int16
+    /// The precision of the data type, if applicable 
+    Precision : uint8
+    /// The scale of the data type, if applicable 
+    Scale : uint8
+    /// Specifies whether the data type is allowed to be null
+    IsNullable : bool
+    /// Specifies whether the data type is a (user-defined) table data type
+    IsTableType : bool
+    /// Specifies whether the data type is a (user-defined) CLR object
+    IsCustomObject : bool
+    /// Specifies whether the data type is user-defined
+    IsUserDefined : bool
+    /// Specifies the name of the BCL type that the is used by ADO.Net
+    DefaultBclTypeName : string
+    /// If a user-defined primitive, the name of the intrinsic primitive base type
+    BaseTypeName : DataObjectName option
+    /// If table data type, the columents defined by the type
+    Columns : ColumnDescription list
+    /// The attached properties
+    Properties : DataElementProperty list
+
+
+}
+with
+    /// <summary>
+    /// Renders a textual representation of the instance that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = this.Name.Text
+
+    interface IDataObjectDescription with
+        member this.ElementKind = DataElementKind.DataType
+        member this.ObjectName = this.Name
+        member this.Name = this.Name.Text
+        member this.Documentation = this.Documentation
+
 
 /// <summary>
 /// Describes a data matrix
@@ -556,8 +561,7 @@ with
     /// <summary>
     /// Renders a textual representation of the object that is suitable for diagnostic purposes
     /// </summary>
-    override this.ToString() =
-      this.Name.ToString()
+    override this.ToString() = this.Name.ToString()
 
 /// <summary>
 /// Describes a table
@@ -580,7 +584,10 @@ with
         member this.Documentation = this.Documentation
         member this.Columns = this.Columns 
 
-
+    /// <summary>
+    /// Renders a textual representation of the object that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = this.Name.ToString()
 
 
 
@@ -602,12 +609,19 @@ type RoutineDescription = {
     RoutineKind : DataElementKind
 }
 with 
+    member this.Item(name) =
+        this.Parameters |> List.find(fun x -> x.Name = name)
+    
     interface IDataObjectDescription with
         member this.Name = this.Name.Text
         member this.ElementKind = this.RoutineKind
         member this.ObjectName = this.Name
         member this.Documentation = this.Documentation
         
+    /// <summary>
+    /// Renders a textual representation of the object that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = this.Name.ToString()
    
 /// <summary>
 /// Describes a sequence 
@@ -646,6 +660,11 @@ with
         member this.ObjectName = this.Name
         member this.Documentation = this.Documentation
 
+    /// <summary>
+    /// Renders a textual representation of the object that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = this.Name.ToString()
+
 /// <summary>
 /// Unifies data object types
 /// </summary>
@@ -655,8 +674,33 @@ type DataObjectDescription =
 | ViewDescription of ViewDescription
 | SequenceDescription of SequenceDescription
 | DataTypeDescription of DataTypeDescription
+
+
 with         
-    interface IDataObjectDescription with
+    member this.Name = 
+        match this with
+            | RoutineDescription x -> x.Name.Text
+            | TableDescription x -> x.Name.Text
+            | ViewDescription x -> x.Name.Text
+            | SequenceDescription x -> x.Name.Text
+            | DataTypeDescription x -> x.Name.Text
+    
+    member this.Documentation =     
+            match this with
+            | RoutineDescription x -> x.Documentation
+            | TableDescription x -> x.Documentation
+            | ViewDescription x -> x.Documentation
+            | SequenceDescription x -> x.Documentation
+            | DataTypeDescription x -> x.Documentation
+    
+    member this.ElementKind = 
+        match this with
+            | RoutineDescription(_) -> DataElementKind.TableFunction
+            | TableDescription(_) -> DataElementKind.Table
+            | ViewDescription(_) -> DataElementKind.View
+            | SequenceDescription(_) -> DataElementKind.Sequence
+            | DataTypeDescription(_) -> DataElementKind.DataType
+
         member this.ObjectName =
             match this with
                 | RoutineDescription x -> x.Name
@@ -664,30 +708,17 @@ with
                 | ViewDescription x -> x.Name
                 | SequenceDescription x -> x.Name
                 | DataTypeDescription x -> x.Name
-        
-        member this.ElementKind =
-            match this with
-                | RoutineDescription(_) -> DataElementKind.TableFunction
-                | TableDescription(_) -> DataElementKind.Table
-                | ViewDescription(_) -> DataElementKind.View
-                | SequenceDescription(_) -> DataElementKind.Sequence
-                | DataTypeDescription(_) -> DataElementKind.DataType
-        
-        member this.Documentation =     
-                match this with
-                | RoutineDescription x -> x.Documentation
-                | TableDescription x -> x.Documentation
-                | ViewDescription x -> x.Documentation
-                | SequenceDescription x -> x.Documentation
-                | DataTypeDescription x -> x.Documentation
 
-        member this.Name =
-            match this with
-                | RoutineDescription x -> x.Name.Text
-                | TableDescription x -> x.Name.Text
-                | ViewDescription x -> x.Name.Text
-                | SequenceDescription x -> x.Name.Text
-                | DataTypeDescription x -> x.Name.Text
+    interface IDataObjectDescription with
+        member this.ObjectName = this.ObjectName        
+        member this.ElementKind = this.ElementKind        
+        member this.Documentation = this.Documentation                
+        member this.Name = this.Name
+
+    /// <summary>
+    /// Renders a textual representation of the object that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = this.Name
 
 type SchemaDescription = {
     /// The name of the schema
@@ -703,13 +734,19 @@ with
     interface IDataElementDescription with
         member this.ElementKind = DataElementKind.Schema
         member this.Name = this.Name
+
         member this.Documentation = this.Documentation
+    /// <summary>
+    /// Renders a textual representation of the object that is suitable for diagnostic purposes
+    /// </summary>
+    override this.ToString() = this.Name
 
 
 type SqlMetadataCatalog = {
     CatalogName : string
     Schemas : SchemaDescription list
 }
+
 
 /// <summary>
 /// Represents routine parameter value

@@ -126,21 +126,25 @@ module DataProxyMetadata =
             
             let procName = thisMethod().Name |> DataObjectName.fuzzyParse
             let proxies = routineproxies<ISqlTestRoutines>
-            let proxy = proxies |> List.find(fun x -> x.DataElement.Name = procName) 
-            let proc = proxy.DataElement
+            //let proxy = proxies |> List.find(fun x -> x.DataElement.Name = procName) 
+            let proxy = proxies |> List.find(fun x -> x.DataElement.ObjectName = procName)
+            let proc = 
+                match proxy.DataElement with
+                | RoutineDescription(r) -> (r)
+                | _ -> failwith "?"
 
             proc.Name |> Claim.equal procName
             proc.Parameters.Count() |> Claim.equal 3
 
-            let param01 = proc.FindParameter "col01"
+            let param01 = proc.["col01"]
             param01.Direction |> Claim.equal RoutineParameterDirection.Output
             param01.DataType |> Claim.equal Int32DataType
         
-            let param02 = proc.FindParameter "col02"
+            let param02 = proc.["col02"]
             param02.Direction |> Claim.equal RoutineParameterDirection.Input
             param02.DataType |> Claim.equal (DateTimeDataType(27uy,7uy))
 
-            let param03 = proc.FindParameter "col03"
+            let param03 = proc.["col03"]
             param03.Direction |> Claim.equal RoutineParameterDirection.Input
             param03.DataType |> Claim.equal Int64DataType       
 

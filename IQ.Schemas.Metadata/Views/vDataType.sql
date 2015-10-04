@@ -16,10 +16,16 @@
 		t.is_user_defined as IsUserDefined,
 		case t.is_user_defined when
 			1 then t.system_type_id 
-			else null end BaseTypeId
+			else null end BaseTypeId,
+		sbase.SchemaName as BaseSchemaName,
+		tbase.name as BaseTypeName,
+		tt.type_table_object_id as ObjectId
+		
 	from 
 		sys.types t 
 		inner join Metadata.vSchema s on s.SchemaId = t.schema_id
 		left join Metadata.AdoTypeMap m on m.SqlTypeName = t.name
-		--left join Metadata.vDescription d on d.MajorId = t.user_type_id and d.MinorId = 0
+		left join sys.types tbase on t.system_type_id = tbase.system_type_id  and t.is_user_defined = 1 and tbase.is_user_defined = 0
+		left join Metadata.vSchema sbase on sbase.SchemaId = tbase.schema_id
+		left join sys.table_types tt on tt.user_type_id = t.user_type_id
 		outer apply Metadata.fDescription(t.user_type_id, 0) d

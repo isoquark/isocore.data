@@ -98,14 +98,14 @@ module Tabular =
             store |> verifyBulkInsert input (fun x -> x.Col02 :> IComparable)
 
 
-        [<Fact>]
-        let ``Inferred dynamic query defaults``() =            
-            let csaw = "Initial Catalog=AdventureWorksLT2012;Data Source=eXaCore03;Integrated Security=SSPI"
-            let provider = SqlDataStore.getProvider()
-            let store = provider.GetDataStore(csaw)
-            let query = DynamicQueryBuilder("SalesLT", "Customer").Build()
-            let data1 =  query |> store.SelectMatrix
-            ()
+//        [<Fact>]
+//        let ``Inferred dynamic query defaults``() =            
+//            let csaw = "Initial Catalog=AdventureWorksLT2012;Data Source=eXaCore03;Integrated Security=SSPI"
+//            let provider = SqlDataStore.getProvider()
+//            let store = provider.GetDataStore(csaw)
+//            let query = DynamicQueryBuilder("SalesLT", "Customer").Build()
+//            let data1 =  query |> store.SelectMatrix
+//            ()
 
             
         [<Fact>]

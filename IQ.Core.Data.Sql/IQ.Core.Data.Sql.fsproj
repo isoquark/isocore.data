@@ -55,6 +55,7 @@
     <Compile Include="SqlWriters.fs" />
     <Compile Include="RoutineContract.fs" />
     <Compile Include="SqlMetadataProxies.fs" />
+    <Compile Include="SqlMetadataIndex.fs" />
     <Compile Include="SqlMetadataProvider.fs" />
     <Compile Include="SqlStoreCommand.fs" />
     <Compile Include="SqlDataStore.fs" />

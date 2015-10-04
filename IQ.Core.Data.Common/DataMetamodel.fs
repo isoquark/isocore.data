@@ -94,16 +94,16 @@ module DataMetamodelExtensions =
     /// <summary>
     /// Defines augmentations for the ProcedureDescription type
     /// </summary>
-    type DataObjectDescription
-    with
-        member this.FindParameter(name) =
-            this |> DataObjectDescription.findParameter name
-
-        member this.Parameters = 
-            this |> DataObjectDescription.getParameters
-        
-        member this.Name =
-            this |> DataObjectDescription.getName
+//    type DataObjectDescription
+//    with
+//        member this.FindParameter(name) =
+//            this |> DataObjectDescription.findParameter name
+//
+//        member this.Parameters = 
+//            this |> DataObjectDescription.getParameters
+//        
+//        member this.Name =
+//            this |> DataObjectDescription.getName
 
 
 

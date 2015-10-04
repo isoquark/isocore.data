@@ -8,6 +8,7 @@ open System.Data
 open System.Data.SqlClient
 open System.Reflection
 open System.Diagnostics
+open System.Collections
 
 open IQ.Core.Data
 open IQ.Core.Framework
@@ -15,12 +16,41 @@ open IQ.Core.Framework
 /// <summary>
 /// Provides capability to execute routines via a strongly-typed contract
 /// </summary>
-module internal RoutineContract =            
+module internal RoutineContract =   
+
+         
         
     let private PocoConverter() = PocoConverter.getDefault()
+
     
-    let private addParameter (command : SqlCommand) (param : SqlParameter) =
-        param |> command.Parameters.Add |> ignore
+    
+    let addParameter (command : SqlCommand) (paramValues : RoutineParameterValue list) (proxyDescription : ParameterProxyDescription) =
+        let elementDescription = proxyDescription.DataElement
+        let p = if elementDescription.Direction = RoutineParameterDirection.ReturnValue then 
+                    SqlParameter("Return", DBNull.Value) 
+                else if elementDescription.Direction = RoutineParameterDirection.Input then
+                    let value = paramValues |> List.find(fun v -> v.Name = elementDescription.Name) |> fun value -> value.Value
+                    match elementDescription.DataType with
+                    | TableDataType(name) ->
+                        let values = [for item in (value :?> IEnumerable) -> item] 
+                        let itemValueType = proxyDescription.ProxyElement.ReflectedElement.Value.ParameterType.ItemValueType 
+                        let itemProxyDesc = itemValueType.TypeName |> ClrMetadata().FindType |>  DataProxyMetadata.describeTableProxy 
+                        let tableParamValue = values |> BclDataTable.fromProxyValues itemProxyDesc
+                        SqlParameter(elementDescription.Name, tableParamValue)                                                
+                    | _ ->
+                        SqlParameter(elementDescription.Name |> SqlFormatter.formatParameterName, value)
+                else if elementDescription.Direction = RoutineParameterDirection.Output then
+                    SqlParameter(elementDescription.Name, DBNull.Value)
+                else
+                    NotSupportedException() |> raise
+        p.Direction <- enum<System.Data.ParameterDirection>(int elementDescription.Direction)
+        match elementDescription.DataType with
+            | TableDataType(name) ->
+                p.SqlDbType <- SqlDbType.Structured
+            | _ ->
+                p.SqlDbType <- elementDescription.DataType |> DataType.toSqlDbType   
+        command.Parameters.Add(p) |> ignore
+
 
     /// <summary>
     /// Executes a stored procedure
@@ -33,7 +63,8 @@ module internal RoutineContract =
         use command = new SqlCommand(proc.DataElement.Name |> SqlFormatter.formatObjectName, connection)
         command.CommandType <- CommandType.StoredProcedure
         
-        proc.DataElement.Parameters |> Seq.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
+        //proc.DataElement.Parameters |> Seq.iter (fun x ->x |> addParameter command paramValues )
+        proc.CallProxy.Parameters |> Seq.iter (fun x -> x |> addParameter command paramValues)
         command.ExecuteNonQuery() |> ignore
         [for i in [0..command.Parameters.Count-1] do
             let parameter = command.Parameters.[i]  
@@ -53,7 +84,7 @@ module internal RoutineContract =
         use connection = cs |> SqlConnection.create
         use command = new SqlCommand(routine.CallProxy.DataElement.Name |> SqlFormatter.formatObjectName, connection)
         command.CommandType <- CommandType.StoredProcedure
-        routine.CallProxy.DataElement.Parameters |> Seq.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
+        routine.CallProxy.Parameters |> Seq.iter (fun x ->x |> addParameter command paramValues)
         let result = command |> SqlCommand.executeQuery
         let typedesc = routine.ResultProxy.Value.ProxyElement
         match typedesc with
@@ -76,7 +107,7 @@ module internal RoutineContract =
         use connection = cs |> SqlConnection.create
         let sql = f.DataElement |> SqlFormatter.formatTableFunctionSelect
         use command = new SqlCommand(sql, connection)
-        f.DataElement.Parameters |> Seq.iter (fun x ->x |> SqlParameter.create paramValues |> addParameter command)
+        f.CallProxy.Parameters |> Seq.iter (fun x ->x |> addParameter command paramValues)
         command |> SqlCommand.executeQuery 
                    
 
