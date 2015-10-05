@@ -67,8 +67,8 @@
       <Project>{29aedcf6-3187-4c89-aa30-d3d60a8e3379}</Project>
       <Private>True</Private>
     </ProjectReference>
-    <ProjectReference Include="..\IQ.Core.Data.Test.Common\IQ.Core.Data.Test.Common.fsproj">
-      <Name>IQ.Core.Data.Test.Common</Name>
+    <ProjectReference Include="..\IQ.Core.Data.Test.Common\IQ.Core.Data.Test.Proxies.fsproj">
+      <Name>IQ.Core.Data.Test.Proxies</Name>
       <Project>{4a63b16d-2d65-4a6c-a1dd-b0d555ab9018}</Project>
       <Private>True</Private>
     </ProjectReference>

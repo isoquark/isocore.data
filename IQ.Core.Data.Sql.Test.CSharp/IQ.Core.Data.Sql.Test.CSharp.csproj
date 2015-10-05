@@ -75,13 +75,13 @@
       <Project>{29aedcf6-3187-4c89-aa30-d3d60a8e3379}</Project>
       <Name>IQ.Core.Data.Sql</Name>
     </ProjectReference>
-    <ProjectReference Include="..\IQ.Core.Data.Test.Common\IQ.Core.Data.Test.Common.fsproj">
-      <Project>{4a63b16d-2d65-4a6c-a1dd-b0d555ab9018}</Project>
-      <Name>IQ.Core.Data.Test.Common</Name>
-    </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Data.Common\IQ.Core.Data.Common.fsproj">
       <Project>{5d4ada5c-b453-432c-a419-81bf001edd14}</Project>
       <Name>IQ.Core.Data.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\IQ.Core.Data.Test.Common\IQ.Core.Data.Test.Proxies.fsproj">
+      <Project>{4a63b16d-2d65-4a6c-a1dd-b0d555ab9018}</Project>
+      <Name>IQ.Core.Data.Test.Proxies</Name>
     </ProjectReference>
     <ProjectReference Include="..\IQ.Core.Data.Text\IQ.Core.Data.Text.fsproj">
       <Project>{77511d20-eb21-4220-8939-cc0e5525da3a}</Project>

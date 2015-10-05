@@ -46,9 +46,7 @@ module Routine =
             routines.pTable04Truncate()
         
             let d0 = BclDateTime(2012, 1, 1)
-        
-        
-
+              
             let identities =
                 [0..2..20] |> List.map(fun i ->                        
                 routines.pTable04Insert "ABC" (d0.AddDays(float(i))) (d0.AddDays( float(i) + 1.0))      
@@ -98,7 +96,7 @@ module Routine =
         let ``Executed [SqlTest].[pTable0CSelect] procedure``() =
             DataObjectName("SqlTest", "Table0C") |> TruncateTable |> store.ExecuteCommand |> ignore            
             let values =
-                [for i in 1..100 ->
+                [for i in 1..50 ->
                     {
                         Table0C.Col01 = i
                         Col02 = i.ToString()
@@ -115,9 +113,18 @@ module Routine =
         [<Fact>]
         let ``Executed [SqlTest].[pTable0DInsert] procedure``() =
             DataObjectName("SqlTest", "Table0D")  |> store.TrunctateTable
-            let records =
-                [|for i in 1..100 -> TableType01(Col01 = i, Col02 = i.ToString(), Col03 = (i |> int16))|] 
+            let input = [for i in 1m..500m -> 
+                            {
+                                Table0D.Col01 = i |> int
+                                Col02 = i
+                                Col03 = (i |> int16)
+                            }] 
+            
+            let records = input 
+                       |> List.map(fun x -> TableType01(Col01 = x.Col01, Col02 = x.Col02, Col03 = x.Col03)) 
+                       |> Array.ofList
             store.GetCommandContract<ISqlTestRoutines>().pTable0DInsert(records)
-            ()
+            let output = store.SelectAll<Table0D>() |> List.ofSeq
+            Claim.equal input output
             
         

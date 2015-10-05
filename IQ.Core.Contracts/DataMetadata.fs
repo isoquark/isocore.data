@@ -410,7 +410,7 @@ type DataTypeDescription = {
     DefaultBclTypeName : string
     /// If a user-defined primitive, the name of the intrinsic primitive base type
     BaseTypeName : DataObjectName option
-    /// If table data type, the columents defined by the type
+    /// If table data type, the columns defined by the type
     Columns : ColumnDescription list
     /// The attached properties
     Properties : DataElementProperty list

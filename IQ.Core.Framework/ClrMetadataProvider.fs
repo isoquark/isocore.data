@@ -201,11 +201,23 @@ module ClrMetadataProviderExtensions =
             name |> FindTypeByName |> this.FindType 
 
         /// <summary>
+        /// Finds metadata for the specfied type
+        /// </summary>
+        member this.FindType (t : Type) =
+            t.TypeName |> FindTypeByName |> this.FindType
+            
+        /// <summary>
         /// Finds type identified by name and raises error if not found
         /// </summary>
         /// <param name="name">The name of the type</param>
         member this.FindTypeElement name =
             name |> FindTypeByName |> this.FindType |> TypeElement
+
+        /// <summary>
+        /// Finds the corresponding type element
+        /// </summary>
+        member this.FindTypeElement (t : Type) =
+            t.TypeName |> FindTypeByName |> this.FindType |> TypeElement
 
         /// <summary>
         /// Finds the type identified by type prameter

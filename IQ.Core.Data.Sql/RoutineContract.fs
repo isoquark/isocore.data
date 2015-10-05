@@ -22,9 +22,8 @@ module internal RoutineContract =
         
     let private PocoConverter() = PocoConverter.getDefault()
 
-    
-    
-    let addParameter (command : SqlCommand) (paramValues : RoutineParameterValue list) (proxyDescription : ParameterProxyDescription) =
+       
+    let private addParameter (command : SqlCommand) (paramValues : RoutineParameterValue list) (proxyDescription : ParameterProxyDescription) =
         let elementDescription = proxyDescription.DataElement
         let p = if elementDescription.Direction = RoutineParameterDirection.ReturnValue then 
                     SqlParameter("Return", DBNull.Value) 
@@ -34,7 +33,7 @@ module internal RoutineContract =
                     | TableDataType(name) ->
                         let values = [for item in (value :?> IEnumerable) -> item] 
                         let itemValueType = proxyDescription.ProxyElement.ReflectedElement.Value.ParameterType.ItemValueType 
-                        let itemProxyDesc = itemValueType.TypeName |> ClrMetadata().FindType |>  DataProxyMetadata.describeTableProxy 
+                        let itemProxyDesc = itemValueType |> ClrMetadata().FindType |>  DataProxyMetadata.describeTableProxy 
                         let tableParamValue = values |> BclDataTable.fromProxyValues itemProxyDesc
                         SqlParameter(elementDescription.Name, tableParamValue)                                                
                     | _ ->
@@ -63,7 +62,6 @@ module internal RoutineContract =
         use command = new SqlCommand(proc.DataElement.Name |> SqlFormatter.formatObjectName, connection)
         command.CommandType <- CommandType.StoredProcedure
         
-        //proc.DataElement.Parameters |> Seq.iter (fun x ->x |> addParameter command paramValues )
         proc.CallProxy.Parameters |> Seq.iter (fun x -> x |> addParameter command paramValues)
         command.ExecuteNonQuery() |> ignore
         [for i in [0..command.Parameters.Count-1] do
@@ -89,7 +87,7 @@ module internal RoutineContract =
         let typedesc = routine.ResultProxy.Value.ProxyElement
         match typedesc with
         | CollectionType(x) ->
-            let itemType = typedesc.Name |> ClrMetadata().FindType |> fun x -> x.ReflectedElement.Value.ItemValueType
+            let itemType = typedesc.ReflectedElement.Value.ItemValueType
             let items = 
                 [for row in result -> PocoConverter().FromValueArray(row, itemType)]
             items |> CollectionBuilder.create x.Kind itemType |> Some                    
@@ -201,8 +199,7 @@ module internal RoutineContract =
                 let typedesc = proxy.ResultProxy.Value.ProxyElement
                 match typedesc with
                 | CollectionType(x) ->
-
-                    let itemType = typedesc.Name |> ClrMetadata().FindType |> fun x -> x.ReflectedElement.Value.ItemValueType
+                    let itemType = typedesc.ReflectedElement.Value.ItemValueType
                     let items = 
                         [for row in result -> PocoConverter().FromValueArray(row, itemType)]
                     items |> CollectionBuilder.create x.Kind itemType |> Some                    

@@ -399,14 +399,13 @@ module DataProxyMetadata =
         | DataKind.TypedDocument -> 
             typeof<obj> |> getRepresentationType |> TypedDocumentDataType
         | DataKind.CustomTable -> 
-            //element |> inferDataObjectName |> TableDataType
             match element with
             | ParameterElement(p) ->                
                 let pType = ClrMetadata().FindType(p.ParameterType)
                 match pType.Kind with
                 | ClrTypeKind.Collection ->
                     let clrItemType = pType.ReflectedElement.Value.ItemValueType;
-                    let itemElement = ClrMetadata().FindTypeElement(clrItemType.TypeName)
+                    let itemElement = ClrMetadata().FindTypeElement(clrItemType)
                     itemElement |> inferDataObjectName |> TableDataType
                 | _ ->
                     nosupport()
@@ -585,7 +584,7 @@ module DataProxyMetadata =
 
                 let columns = 
                     if returnsRows then                
-                        m.ReflectedElement.Value.ReturnType.ItemValueType.TypeName  
+                        m.ReflectedElement.Value.ReturnType.ItemValueType
                         |> ClrMetadata().FindType 
                         |> describeColumnProxies objectName                          
                     else
@@ -601,7 +600,7 @@ module DataProxyMetadata =
                 }            
                 let call = RoutineCallProxyDescription(m, procedure, parameters)
                 let result = if returnsRows then
-                                let returnProxy = m.ReflectedElement.Value.ReturnType.TypeName |> ClrMetadata().FindType
+                                let returnProxy = m.ReflectedElement.Value.ReturnType |> ClrMetadata().FindType
                                 RoutineResultProxyDescription(returnProxy, procedure, columns) |> Some
                              else
                                 None
@@ -653,7 +652,7 @@ module DataProxyMetadata =
             | MemberElement(m) -> 
                 match m with
                 | MethodMember(m) ->
-                    let itemType = m.ReflectedElement.Value.ReturnType.ItemValueType.TypeName  |> ClrMetadata().FindType
+                    let itemType = m.ReflectedElement.Value.ReturnType.ItemValueType  |> ClrMetadata().FindType
                     let itemTypeProxies = itemType |> describeColumnProxies objectName                                       
                     m.InputParameters |> List.mapi (fun i x ->  x |> describeParameterProxy m ), 
                     itemTypeProxies,

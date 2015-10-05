@@ -218,12 +218,19 @@ module TestProxies =
             Col03 : int16    
         }
 
+        type Table0D = {
+            Col01 : int32
+            Col02 : decimal
+            Col03 : int16        
+        }
+
+
         [<TableType>]
         type TableType01() =
             [<Column("TTCol01")>]
             member val Col01 = 0 with get, set
             [<Column("TTCol02")>]
-            member val Col02 = String.Empty with get, set
+            member val Col02 = 0m with get, set
             [<Column("TTCol03")>]
             member val Col03 = 0s with get, set
 

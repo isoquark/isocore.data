@@ -122,7 +122,7 @@ module BclDataTable =
     /// <param name="t">The proxy type</param>
     /// <param name="dataTable">The data table</param>
     let toProxyValuesT<'T>  (dataTable : DataTable) =        
-        let t = ClrMetadata().FindType(typeof<'T>.TypeName)
+        let t = ClrMetadata().FindType<'T>()
         dataTable |> toProxyValues t :?> IEnumerable<'T>
 
  
@@ -137,7 +137,7 @@ module BclDataTable =
     let getUntypedConverter() =
         {new IDataTableConverter with
             member this.ToProxyValues t dataTable =
-                let clrType = ClrMetadata().FindType(t.TypeName) 
+                let clrType = ClrMetadata().FindType(t) 
                 dataTable |> toProxyValues clrType
             member this.FromProxyValues d values =
                 fromProxyValues d values        

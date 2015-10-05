@@ -32,10 +32,9 @@ module PocoConverter =
                 argerrord "o" t "Not a record type"
 
             let types = 
-                t.TypeName   
-                    |> ClrMetadata().FindType 
-                    |> fun x -> x.Properties
-                    |> List.map(fun p -> p.ReflectedElement.Value.PropertyType) |> Array.ofList
+                t |> ClrMetadata().FindType 
+                  |> fun x -> x.Properties
+                  |> List.map(fun p -> p.ReflectedElement.Value.PropertyType) |> Array.ofList
             
             valueArray |> config.Transformer.TransformArray types 
                        |> getRecordFactory(t)
@@ -49,10 +48,9 @@ module PocoConverter =
             let t = o.GetType()
             if t |> Type.isRecordType |> not then
                 argerrord "o" o "Not a record value"
-            t.TypeName   
-                |> ClrMetadata().FindType
-                |> fun x -> x.Properties
-                |> List.map(fun field ->                 
+            t |> ClrMetadata().FindType
+              |> fun x -> x.Properties
+              |> List.map(fun field ->                 
                     let p = field.ReflectedElement |> Option.get
                     field.Name.Text, field.Position, p.GetValue(o))                 
                     |> ValueIndex.create
@@ -65,8 +63,7 @@ module PocoConverter =
             let t = o.GetType()
             if t |> Type.isRecordType |> not then
                 argerrord "o" o "Not a record value"
-            t.TypeName   
-                |> ClrMetadata().FindType
+            t   |> ClrMetadata().FindType
                 |> fun x -> x.Properties
                 |> List.map(fun p -> p.ReflectedElement.Value.GetValue(o))
     
@@ -87,7 +84,7 @@ module PocoConverter =
             if t |> Type.isRecordType |> not then
                 argerrord "o" t "Not a record type"
 
-            let fields =  t.TypeName   |> ClrMetadata().FindType |> fun x -> x.Properties
+            let fields =  t |> ClrMetadata().FindType |> fun x -> x.Properties
 
             let types = 
                  fields |> List.map(fun p -> p.ReflectedElement.Value.PropertyType) 
@@ -112,11 +109,9 @@ module PocoConverter =
         type private PocoConverter(config : PocoConverterConfig) =
             let transforer = config.Transformer
         
-            let getTypeMetadata (t : Type) =
-                t.TypeName |> ClrMetadata().FindType
 
             let getProperties(t : Type) =
-                t |> getTypeMetadata |> fun t -> t.Properties            
+                t |> ClrMetadata().FindType |> fun t -> t.Properties            
 
             let getPropertyTypes (props : ClrProperty list) =
                 props |> List.map(fun p -> p.ReflectedElement.Value.PropertyType) |> Array.ofList                    

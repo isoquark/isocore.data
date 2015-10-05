@@ -72,13 +72,13 @@ module DataMatrix =
     /// <param name="t">The proxy type</param>
     /// <param name="dataTable">The data table</param>
     let toProxyValuesT<'T>  (dataTable : IDataMatrix) =        
-        let t = ClrMetadata().FindType(typeof<'T>.TypeName)
+        let t = ClrMetadata().FindType<'T>()
         dataTable |> toProxyValues t :?> IEnumerable<'T>
 
     let getUntypedConverter() =
         {new IDataMatrixConverter with
             member this.ToProxyValues t matrix =                
-                let clrType = ClrMetadata().FindType(t.TypeName) 
+                let clrType = ClrMetadata().FindType(t) 
                 matrix |> toProxyValues clrType
             member this.FromProxyValues d values =
                 fromProxyValues d values        
