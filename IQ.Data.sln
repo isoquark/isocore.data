@@ -65,7 +65,7 @@ Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "IQ.Schemas.Test", "IQ.Schem
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Data.Text", "IQ.Core.Data.Text\IQ.Core.Data.Text.fsproj", "{77511D20-EB21-4220-8939-CC0E5525DA3A}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Data.Test.Proxies", "IQ.Core.Data.Test.Common\IQ.Core.Data.Test.Proxies.fsproj", "{4A63B16D-2D65-4A6C-A1DD-B0D555AB9018}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "IQ.Core.Data.Test.Proxies", "IQ.Core.Data.Test.Proxies\IQ.Core.Data.Test.Proxies.fsproj", "{4A63B16D-2D65-4A6C-A1DD-B0D555AB9018}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
