@@ -13,7 +13,14 @@
 		x.is_computed as IsComputed,
 		x.is_identity as IsIdentity,
 		x.is_nullable as IsNullable,
-		x.max_length as MaxLength,
+		case 
+			when t.DataTypeName = 'nvarchar' and x.max_length <> -1 then x.max_length/2
+			when t.DataTypeName = 'nchar' then x.max_length/2
+			else
+				x.max_length
+			end as MaxLength,
+												
+						
 		x.precision as Precision,
 		x.scale as Scale,
 		x.user_type_id as DataTypeId,

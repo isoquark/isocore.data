@@ -46,15 +46,24 @@ type SqlMetadataIndex(catalog : SqlMetadataCatalog) =
         /// <summary>
         /// Retrieves an identified table
         /// </summary>
-        member this.DescribeTable(name : DataObjectName) =
+        member this.GetTable(name : DataObjectName) =
             match allObjects.[name] with
             | TableDescription(x) -> x
             | _ -> badargs()
 
         /// <summary>
+        /// Retrieves views defined in an identified schema
+        /// </summary>
+        member this.GetSchemaTables(schemaName) =
+            schemaName |> getSchemaObjects DataElementKind.Table
+                        |> Seq.map(fun x -> match x with | TableDescription(x) -> x | _ -> badargs())
+                        |> List.ofSeq                
+
+
+        /// <summary>
         /// Retrieves an identified view
         /// </summary>
-        member this.DescribeView(name : DataObjectName) =
+        member this.GetView(name : DataObjectName) =
             match allObjects.[name] with
             | ViewDescription(x) -> x
             | _ -> badargs()
@@ -63,12 +72,9 @@ type SqlMetadataIndex(catalog : SqlMetadataCatalog) =
         /// Retrieves views defined in an identified schema
         /// </summary>
         member this.GetSchemaViews(schemaName) =
-            if schemaObjects.ContainsKey(schemaName) then
-                schemaName |> getSchemaObjects DataElementKind.View 
-                           |> Seq.map(fun x -> match x with | ViewDescription(x) -> x | _ -> badargs())
-                           |> List.ofSeq                
-            else
-                []
+            schemaName |> getSchemaObjects DataElementKind.View 
+                        |> Seq.map(fun x -> match x with | ViewDescription(x) -> x | _ -> badargs())
+                        |> List.ofSeq                
 
         /// <summary>
         /// Retrieves an identified procedure
@@ -105,7 +111,8 @@ type SqlMetadataIndex(catalog : SqlMetadataCatalog) =
         /// Retrieves data types defined in an identified schema
         /// </summary>
         member this.GetSchemaDataTypes(schema : string) =
-            schema |> getSchemaObjects DataElementKind.DataType
+            schema |> getSchemaObjects DataElementKind.DataType 
+                   |> Seq.map(fun x -> match x with | DataTypeDescription(x) -> x | _ -> nosupport())
     
         /// <summary>
         /// Retrieves an identified sequence

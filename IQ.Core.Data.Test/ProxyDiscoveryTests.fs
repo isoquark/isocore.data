@@ -126,7 +126,6 @@ module DataProxyMetadata =
             
             let procName = thisMethod().Name |> DataObjectName.fuzzyParse
             let proxies = routineproxies<ISqlTestRoutines>
-            //let proxy = proxies |> List.find(fun x -> x.DataElement.Name = procName) 
             let proxy = proxies |> List.find(fun x -> x.DataElement.ObjectName = procName)
             let proc = 
                 match proxy.DataElement with

@@ -30,36 +30,48 @@ module SqlMetadataProvider =
 
         [<Fact>]
         let ``Discovered Tables``() =
-            let tables = FindAllTables |> FindTables |> mdp.Describe
-            ()
+            let tables = [for t in idx.GetSchemaTables("SqlTest") -> t.Name, t ] |> dict
+
+            let table = idx.GetTable(objectname<Table01>)          
+            table.["Col01"].DataKind |> Claim.equal DataKind.Int32
+            table.["Col01"].DataType |> Claim.equal Int32DataType
+            
+            table.["Col02"].DataKind |> Claim.equal DataKind.Int64
+            table.["Col02"].DataType |> Claim.equal Int64DataType
+
+            table.["Col03"].DataKind |> Claim.equal DataKind.UnicodeTextVariable
+            table.["Col03"].DataType |> Claim.equal (UnicodeTextVariableDataType(50))
+
+            table.["Col04"].DataKind |> Claim.equal DataKind.UnicodeTextMax
+            table.["Col04"].DataType |> Claim.equal UnicodeTextMaxDataType
+                        
+            table.["Col05"].DataKind |> Claim.equal DataKind.CustomPrimitive            
+            table.["Col05"].DataType |> Claim.equal(
+                CustomPrimitiveDataType(DataObjectName("SqlTest", "PhoneNumber"), AnsiTextVariableDataType(11)))
+            
+
+            
 
         [<Fact>]
         let ``Discovered Data Types``() =            
-            let dataTypes = [for t in idx.GetSchemaDataTypes("SqlTest") -> t.ObjectName, t ] |> dict            
+            let dataTypes = [for t in idx.GetSchemaDataTypes("SqlTest") -> t.Name, t ] |> dict            
 
             let name = objectname<TableType01>
             name  |> Claim.containsKey dataTypes            
-            match dataTypes.[name] with
-            | DataTypeDescription(x) ->
-                x.Documentation |> Claim.equal "Documentation for [SqlTest].[TableType01]"
-                x.Columns.[0].Name |> Claim.equal "TTCol01"
-                x.Columns.[1].Name |> Claim.equal "TTCol02"
-                x.Columns.[2].Name |> Claim.equal "TTCol03"
-            | _ ->
-                nosupport()
+            let dataType = dataTypes.[name]
+            dataType.Documentation |> Claim.equal "Documentation for [SqlTest].[TableType01]"
+            dataType.Columns.[0].Name |> Claim.equal "TTCol01"
+            dataType.Columns.[1].Name |> Claim.equal "TTCol02"
+            dataType.Columns.[2].Name |> Claim.equal "TTCol03"
             
             let name = objectname<TableType02>
             name  |> Claim.containsKey dataTypes
             let dataType = dataTypes.[name]
-            match dataTypes.[name] with
-            | DataTypeDescription(x) ->
-                x.Columns.[0].Name |> Claim.equal (propname<@ fun (x : TableType02) -> x.Col01 @>)
-            | _ ->
-                nosupport()
+            dataType.Columns.[0].Name |> Claim.equal (propname<@ fun (x : TableType02) -> x.Col01 @>)
 
             let name = DataObjectName("SqlTest", "PhoneNumber") 
             name  |> Claim.containsKey dataTypes
             let dataType = dataTypes.[name]
+            dataType.BaseTypeName.Value |> Claim.equal (DataObjectName("sys", SqlDataTypeNames.varchar))
+           
 
-            
-            ()

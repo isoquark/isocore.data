@@ -54,7 +54,6 @@
     <EmbeddedResource Include="Resources\CsvTestCase1.csv" />
     <EmbeddedResource Include="Resources\CsvTestCase3.csv" />
     <EmbeddedResource Include="Resources\CsvTestCase2.csv" />
-    <Compile Include="ProxyTestCases.fs" />
     <Compile Include="TestConfiguration.fs" />
     <Compile Include="DataStorageTypeTest.fs" />
     <Compile Include="ProxyDiscoveryTests.fs" />

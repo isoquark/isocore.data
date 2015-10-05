@@ -7,6 +7,8 @@ open IQ.Core.Framework
 open IQ.Core.Data
 
 
+
+[<Schema("SqlTest")>]
 module TestProxies =
     type Table04FunctionResult = {
         Id : int
@@ -31,8 +33,7 @@ module TestProxies =
 
     [<Description("SQL Test Table01")>]
     type Table01 = {
-        [<Description("Col01 Description Text")>]
-            
+        [<Description("Col01 Description Text")>]            
         Col01 : uint16
         [<Description("Col02 Description Text")>]
         Col02 : int64 option
