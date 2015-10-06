@@ -110,20 +110,31 @@ module Tabular =
             
         [<Fact>]
         let ``Executed parametrized dynamic query``() =
-            let proxyInfo = proxyMetadata.DescribeTableProxy<Table0A>()   
-            proxyInfo.DataElement.Name |> TruncateTable |> store.ExecuteCommand
+            store.TrunctateTable(objectname<Table0A>)
             
             let fixture = Fixture();
-            let proxies = [for i in 1..2000 do
+            let input = [for i in 1..500 do
                                 let proxy =  fixture.Create<Table0A>()
                                 proxy.Col19 <- i
                                 yield proxy
-                          ]
+                          ] |> List.sortBy(fun x -> x.Col01)
             
-            //proxies |> store.Insert
+            input |> store.Insert
+
+            let query = DynamicQueryBuilder(objectname<Table0A>).Page(1, 50).AscendingSort("Col01").Build()
+            let page1Actual = query |> store.Select |> List.ofSeq
+            let page1Expect = input |> List.take 50
+            let row1Actual = page1Actual.[0]
+            let row1Expect = page1Expect.[0]
+
+            Claim.equal row1Actual row1Expect
+
+            
+            Claim.equal page1Expect page1Actual
+
+
                      
             //TODO: 
-            //1. Generate date
             //2. Write a TVF that brings back the data and verify the results
             ()
 

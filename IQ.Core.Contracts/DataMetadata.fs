@@ -1077,177 +1077,7 @@ type SourceSequenceAttribute(schemaName, localName) =
     /// </summary>
     member this.Name = 
         if localName = UnspecifiedName then None else Some(localName)
-            
-[<AbstractClass>]
-type ElementFacetAttribute<'T>(value : 'T) =
-    inherit DataElementAttribute()
 
-    /// <summary>
-    /// Specifies the facet's value
-    /// </summary>    
-    member this.Value = value
-            
-/// <summary>
-/// Specifies the nullability of the element to which it applies 
-/// </summary>
-type NullableAttribute(isNullable) =
-    inherit ElementFacetAttribute<bool>(isNullable)
-
-    new() =
-        NullableAttribute(true)
-    
-/// <summary>
-/// Specifies the relative position of the element to which it is applied
-/// </summary>
-type PositionAttribute(position) =
-    inherit ElementFacetAttribute<int>(position)        
-
-/// <summary>
-/// Specifies the (intrinsic) kind of data that is pxoxied by the element to which it is applied
-/// </summary>
-type DataKindAttribute(value) =
-    inherit ElementFacetAttribute<DataKind>(value)            
-
-/// <summary>
-/// Specifies the (custom) kind of data that is pxoxied by the element to which it is applied
-/// </summary>
-type CustomDataKindAttribute(kind, schemaName, typeName) =
-    inherit DataKindAttribute(kind)
-
-    member this.ObjectName = DataObjectName(schemaName, typeName) 
-    
-/// <summary>
-/// Specifies the absolute length of the element to which it is applied
-/// </summary>
-type FixedLengthAttribute(len) =
-    inherit ElementFacetAttribute<int>(len)
-        
-/// <summary>
-/// Specifies the maximum length of the element to which it is applied
-/// </summary>
-type MaxLengthAttribute(len) =
-    inherit ElementFacetAttribute<int>(len)
-        
-/// <summary>
-/// Specifies the minimum length of the element to which it is applied
-/// </summary>
-type MinLengthAttribute(len) =
-    inherit ElementFacetAttribute<int>(len)
-    
-/// <summary>
-/// Specifies the inclusive lower and upper bounds of the length of the element to which it applies
-/// </summary>
-/// <remarks>
-/// Logically equivalent to application of both <see cref="MinLengthAttribute"/> and <see cref="MaxLengthAttribute"/>
-/// </remarks>
-type LengthRangeAttribute(minLength, maxLength) =
-    inherit ElementFacetAttribute<Range<int>>(Range(minLength,maxLength))
-    
-/// <summary>
-/// Specifies the numeric precision of the element to which it is applied
-/// </summary>
-type PrecisionAttribute(value) =
-    inherit ElementFacetAttribute<uint8>(value)
-        
-/// <summary>
-/// Specifies the numeric scale of the element to which it is applied
-/// </summary>
-type ScaleAttribute(value) =
-    inherit ElementFacetAttribute<uint8>(value)
-            
-/// <summary>
-/// Specifies the minimum value of the element to which it is applied
-/// </summary>
-type MinScalarAttribute private (value) =
-    inherit ElementFacetAttribute<NumericValue>(value)
-        
-    new (value : uint8) = MinScalarAttribute(UInt8Value(value))
-    new (value : int8) = MinScalarAttribute(Int8Value(value))
-    new (value : uint16) = MinScalarAttribute(UInt16Value(value))
-    new (value : int16) = MinScalarAttribute(Int16Value(value))
-    new (value : uint32) = MinScalarAttribute(UInt32Value(value))
-    new (value : int32) = MinScalarAttribute(Int32Value(value))
-    new (value : uint64) = MinScalarAttribute(UInt64Value(value))
-    new (value : int64) = MinScalarAttribute(Int64Value(value))
-    new (value : float32) = MinScalarAttribute(Float32Value(value))
-    new (value : float) = MinScalarAttribute(Float64Value(value))        
-    new (value : decimal) = MinScalarAttribute(DecimalValue(value))
-        
-
-
-/// <summary>
-/// Specifies the minimum value of the element to which it is applied
-/// </summary>
-type MaxScalarAttribute private (value) =
-    inherit ElementFacetAttribute<NumericValue>(value)
-        
-    new (value : uint8) = MaxScalarAttribute(UInt8Value(value))
-    new (value : int8) = MaxScalarAttribute(Int8Value(value))
-    new (value : uint16) = MaxScalarAttribute(UInt16Value(value))
-    new (value : int16) = MaxScalarAttribute(Int16Value(value))
-    new (value : uint32) = MaxScalarAttribute(UInt32Value(value))
-    new (value : int32) = MaxScalarAttribute(Int32Value(value))
-    new (value : uint64) = MaxScalarAttribute(UInt64Value(value))
-    new (value : int64) = MaxScalarAttribute(Int64Value(value))
-    new (value : float32) = MaxScalarAttribute(Float32Value(value))
-    new (value : float) = MaxScalarAttribute(Float64Value(value))
-    new (value : decimal) = MaxScalarAttribute(DecimalValue(value))
-
-
-/// <summary>
-/// Specifies the inclusive lower and upper bounds of the scalar value of the element to which it applies
-/// </summary>
-/// <remarks>
-/// Logically equivalent to application of both <see cref="MinScalarAttribute"/> and <see cref="MaxScalarAttribute"/>
-/// </remarks>
-type ScalarRangeAttribute(minValue, maxValue) =
-    inherit ElementFacetAttribute<Range<NumericValue>>(Range(minValue,maxValue))
-        
-    new (minValue : uint8, maxValue : uint8) = ScalarRangeAttribute(UInt8Value(minValue), UInt8Value(maxValue))
-    new (minValue : int8, maxValue : int8) = ScalarRangeAttribute(Int8Value(minValue), Int8Value(maxValue))
-    new (minValue : uint16, maxValue : uint16) = ScalarRangeAttribute(UInt16Value(minValue), UInt16Value(maxValue))
-    new (minValue : int16, maxValue : int16) = ScalarRangeAttribute(Int16Value(minValue), Int16Value(maxValue))
-    new (minValue : uint32, maxValue : uint32) = ScalarRangeAttribute(UInt32Value(minValue), UInt32Value(maxValue))
-    new (minValue : int32, maxValue : int32) = ScalarRangeAttribute(Int32Value(minValue), Int32Value(maxValue))
-    new (minValue : uint64, maxValue : uint64) = ScalarRangeAttribute(UInt64Value(minValue), UInt64Value(maxValue))
-    new (minValue : int64, maxValue : int64) = ScalarRangeAttribute(Int64Value(minValue), Int64Value(maxValue))
-    new (minValue : float32, maxValue : float32) = ScalarRangeAttribute(Float32Value(minValue), Float32Value(maxValue))
-    new (minValue : float, maxValue : float) = ScalarRangeAttribute(Float64Value(minValue), Float64Value(maxValue))
-    new (minValue : decimal,maxValue : decimal) = ScalarRangeAttribute(DecimalValue(minValue), DecimalValue(maxValue))
-
-/// <summary>
-/// Specifies the minimum date value of the element to which it is applied
-/// </summary>
-type MinDateAttribute(value : string) =
-    inherit ElementFacetAttribute<DateTime>(DateTime.Parse(value))
-
-            
-/// <summary>
-/// Specifies the maximum date value of the element to which it is applied
-/// </summary>
-type MaxDateAttribute(value : string) =
-    inherit ElementFacetAttribute<DateTime>(DateTime.Parse(value))
-
-
-/// <summary>
-/// Specifies the inclusive lower and upper bounds of the date value of the element to which it applies
-/// </summary>
-type DateRangeAttribute(minValue : string, maxValue : string) =
-    inherit ElementFacetAttribute<Range<DateTime>>(Range(DateTime.Parse(minValue), DateTime.Parse(maxValue)))
-
-type XmlSchemaAttribute(value : string) =
-    inherit ElementFacetAttribute<string>(value)
-
-
-type RepresentationTypeAttribute(t : Type) =
-    inherit ElementFacetAttribute<Type>(t)
-
-type DataObjectNameFacetAttribute private (name : DataObjectName) =
-    inherit ElementFacetAttribute<DataObjectName>(name)
-
-    new(schemaName, localName) =
-        DataObjectNameFacetAttribute(DataObjectName(schemaName, localName))
-                       
 /// <summary>
 /// Defines the supported data facet names
 /// </summary>
@@ -1271,17 +1101,171 @@ module DataFacetNames =
     [<Literal>]
     let Scale = "Scale"
     [<Literal>]
-    let MinScalar = "MinScalar"
+    let MinValue = "MinValue"
     [<Literal>]
-    let MaxScalar = "MaxScalar"
-    [<Literal>]
-    let MinDate = "MinDate"
-    [<Literal>]
-    let MaxDate = "MaxDate"
+    let MaxValue = "MaxValue"
     [<Literal>]
     let XmlSchema = "XmlSchema"
     [<Literal>]
     let RepresentationType = "RepresentationType"
     [<Literal>]
     let DataObjectName = "DataObjectName"
+    [<Literal>]
+    let Range = "Range"
+            
+type IFacetAttribute =
+    abstract Value: obj
+    abstract Name: string
+
+[<AbstractClass>]
+type FacetAttribute<'T>(value : 'T) =
+    inherit Attribute()
+
+    /// <summary>
+    /// Specifies the facet's value
+    /// </summary>    
+    member this.Value = value
+
+    abstract Name : string with get
+    
+    interface IFacetAttribute with
+        member this.Value = value :> obj
+        member this.Name = this.Name
+            
+/// <summary>
+/// Specifies the nullability of the element to which it applies 
+/// </summary>
+type NullableAttribute(isNullable) =
+    inherit FacetAttribute<bool>(isNullable)
+
+    new() =
+        NullableAttribute(true)
+
+    override this.Name = DataFacetNames.Nullable
+    
+/// <summary>
+/// Specifies the relative position of the element to which it is applied
+/// </summary>
+type PositionAttribute(position) =
+    inherit FacetAttribute<int>(position)        
+
+    override this.Name = DataFacetNames.Position
+
+/// <summary>
+/// Specifies the (intrinsic) kind of data that is pxoxied by the element to which it is applied
+/// </summary>
+type DataKindAttribute(value) =
+    inherit FacetAttribute<DataKind>(value)            
+
+    override this.Name = DataFacetNames.DataKind
+
+    
+/// <summary>
+/// Specifies the (custom) kind of data that is pxoxied by the element to which it is applied
+/// </summary>
+type CustomDataKindAttribute(kind, schemaName, typeName) =
+    inherit DataKindAttribute(kind)
+
+    member this.ObjectName = DataObjectName(schemaName, typeName) 
+
+/// <summary>
+/// Specifies the absolute length of the element to which it is applied
+/// </summary>
+type FixedLengthAttribute(len) =
+    inherit FacetAttribute<int>(len)
+
+    override this.Name = DataFacetNames.FixedLength
+        
+
+/// <summary>
+/// Specifies the maximum length of the element to which it is applied
+/// </summary>
+type MaxLengthAttribute(len) =
+    inherit FacetAttribute<int>(len)
+
+    override this.Name = DataFacetNames.MaxLength
+        
+/// <summary>
+/// Specifies the minimum length of the element to which it is applied
+/// </summary>
+type MinLengthAttribute(len) =
+    inherit FacetAttribute<int>(len)
+
+    override this.Name = DataFacetNames.MinLength
+    
+
+    
+/// <summary>
+/// Specifies the numeric precision of the element to which it is applied
+/// </summary>
+type PrecisionAttribute(value) =
+    inherit FacetAttribute<uint8>(value)
+
+    override this.Name = DataFacetNames.Precision
+
+        
+/// <summary>
+/// Specifies the numeric scale of the element to which it is applied
+/// </summary>
+type ScaleAttribute(value) =
+    inherit FacetAttribute<uint8>(value)
+            
+    override this.Name = DataFacetNames.Scale
+
+/// <summary>
+/// Specifies the lower bound of a value
+/// </summary>
+type MinValueAttribute (value, inclusive) =
+    inherit FacetAttribute<IComparable>(value)
+
+    new(value) =
+        MinValueAttribute(value, true)
+
+    member val Inclusive = inclusive
+
+    override this.Name = DataFacetNames.MinValue
+
+/// <summary>
+/// Specifies the upper bound of a value
+/// </summary>
+type MaxValueAttribute (value, inclusive) = 
+    inherit FacetAttribute<IComparable>(value)
+
+    new(value) =
+        MaxValueAttribute(value, true)
+
+    member val Inclusive = inclusive
+
+    override this.Name = DataFacetNames.MaxValue
+
+
+/// <summary>
+/// Specifies the (inclusive) lower and upper bounds of a value
+/// </summary>
+type RangeAttribute (minValue, maxValue) =
+    inherit FacetAttribute<IComparable>(Range(minValue,maxValue))
+
+    override this.Name = DataFacetNames.Range
+
+
+type XmlSchemaAttribute(value : string) =
+    inherit FacetAttribute<string>(value)
+
+    override this.Name = DataFacetNames.XmlSchema
+
+
+type RepresentationTypeAttribute(t : Type) =
+    inherit FacetAttribute<Type>(t)
+
+    override this.Name = DataFacetNames.RepresentationType
+
+type DataObjectNameFacetAttribute private (name : DataObjectName) =
+    inherit FacetAttribute<DataObjectName>(name)
+
+    new(schemaName, localName) =
+        DataObjectNameFacetAttribute(DataObjectName(schemaName, localName))
+
+    override this.Name = DataFacetNames.DataObjectName
+
+                       
 

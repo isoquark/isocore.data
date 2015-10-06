@@ -51,13 +51,10 @@
     <Compile Include="SqlDataType.fs" />
     <Compile Include="SqlFormatter.fs" />
     <Compile Include="SqlHelpers.fs" />
-    <Compile Include="SqlDataReaders.fs" />
-    <Compile Include="SqlWriters.fs" />
-    <Compile Include="RoutineContract.fs" />
     <Compile Include="SqlMetadataProxies.fs" />
+    <Compile Include="SqlService.fs" />
     <Compile Include="SqlMetadataIndex.fs" />
     <Compile Include="SqlMetadataProvider.fs" />
-    <Compile Include="SqlStoreCommand.fs" />
     <Compile Include="SqlDataStore.fs" />
     <Compile Include="SqlExtensions.fs" />
     <None Include="app.config" />

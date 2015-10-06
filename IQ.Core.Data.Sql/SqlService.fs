@@ -3,25 +3,107 @@
 namespace IQ.Core.Data
 
 open System
-open System.ComponentModel
 open System.Data
-open System.Data.SqlClient
+open System.Linq
+open System.Data.Linq
 open System.Reflection
-open System.Diagnostics
 open System.Collections
+open System.Text
+open System.Data.SqlClient
+open System.Diagnostics
 
-open IQ.Core.Data
+open IQ.Core.Contracts
 open IQ.Core.Framework
+open IQ.Core.Data
+
+type internal ISqlService =
+    abstract ExecuteQueryText:string->obj[][]
+    abstract ExecuteQueryCommand:SqlCommand->obj[][]
+    abstract BulkInsert:IDataMatrix->unit
+    abstract GetContract: unit -> 'TContract when 'TContract : not struct 
+    abstract ExecuteStoreCommand:'TCommand->'TResult 
+
+
+module internal SqlStoreCommand =
+    type private Marker = class end
     
-/// <summary>
-/// Provides capability to execute routines via a strongly-typed contract
-/// </summary>
-module internal RoutineContract =   
+    let private createSqlCommand cs sql=
+        let connection = cs |> SqlConnection.create
+        new SqlCommand(sql, connection)
+    
+    let private executeSqlCommand (cmd : SqlCommand) =
+        cmd.ExecuteNonQuery()
 
+    
+    let private executeSql cs sql =
+        use connection = cs |> SqlConnection.create
+        use command = new SqlCommand(sql(), connection)
+        command.ExecuteNonQuery() |> ignore
          
-        
-    let private PocoConverter() = PocoConverter.getDefault()
+    [<SqlCommandHandler>]
+    let getFileTableRoot cs (spec : GetFileTableRoot) =
+        let sql = SqlFormatter.formatGetFileTableRoot()
+        use connection = cs |> SqlConnection.create
+        use cmd = new SqlCommand(sql, connection)
+        cmd.ExecuteScalar() :?> string |> GetFileTableRootResult
+    
+    [<SqlCommandHandler>]
+    let truncateTable cs (spec : TruncateTable)=
+        match spec with 
+            TruncateTable tableName ->
+            let sql = tableName |> SqlFormatter.formatTruncateTable                   
+            use connection = cs |> SqlConnection.create
+            use sqlcommand = new SqlCommand(sql, connection)
+            sqlcommand.ExecuteNonQuery() |> TruncateTableResult
+    
+    [<SqlCommandHandler>]
+    let allocateSequenceRange cs (spec : AllocateSequenceRange) =
+        match spec with
+            AllocateSequenceRange(seqname,count) ->
+            let sql = "sys.sp_sequence_get_range"
+            use connection = cs |> SqlConnection.create
+            use sqlcommand = new SqlCommand(sql, connection)
+            sqlcommand.CommandType <- CommandType.StoredProcedure
+            sqlcommand.Parameters.AddWithValue("@sequence_name", seqname |> SqlFormatter.formatObjectName) |> ignore
+            sqlcommand.Parameters.AddWithValue("@range_size", count) |> ignore
+            let firstValParam = SqlParameter(@"range_first_value", SqlDbType.Variant)
+            firstValParam.Direction <- System.Data.ParameterDirection.Output
+            sqlcommand.Parameters.Add(firstValParam) |> ignore
+            sqlcommand.ExecuteNonQuery() |> ignore
+            firstValParam.Value |> AllocateSequenceRangeResult
+    
+    [<SqlCommandHandler>]
+    let createTable cs (spec : CreateTable) =
+        match spec with
+            CreateTable description ->    
+                executeSql cs (fun () -> description |> SqlFormatter.formatTableCreate )
 
+    [<SqlCommandHandler>]
+    let dropTable cs (spec : DropTable) =
+        match spec with
+            |DropTable name ->
+                executeSql cs (fun () -> name |> SqlFormatter.formatTableDrop )
+                            
+    let private commandHandlers = lazy(
+        [for m in typeof<Marker>.DeclaringType.GetMethods(BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.Static ||| BindingFlags.Instance) do
+            if Attribute.IsDefined(m, typeof<SqlCommandHandlerAttribute>) then
+                let cmdType = m.GetParameters().Last().ParameterType
+                yield (cmdType, m)
+        ] |> dict
+    )
+    let execute cs (spec : 'TCommand) : 'TResult =
+        let m = commandHandlers.Value.[spec.GetType()]
+        let result = m.Invoke(null, [|cs; spec|]) 
+        if typeof<'TResult> = typeof<Unit>  then
+            null :> obj :?> 'TResult
+        else
+            result :?> 'TResult
+       
+
+module internal SqlService =
+    
+
+    let private PocoConverter() = PocoConverter.getDefault()
        
     let private addParameter (command : SqlCommand) (paramValues : RoutineParameterValue list) (proxyDescription : ParameterProxyDescription) =
         let elementDescription = proxyDescription.DataElement
@@ -213,12 +295,42 @@ module internal RoutineContract =
                 Method = targetMethod
                 MethodArgs = args |> List.ofArray
             } |> invoke
-                        
-    /// <summary>
-    /// Gets a realization of an identified contract
-    /// </summary>
-    /// <param name="cs">The connection string to use when executing contract operations</param>
-    let get<'TContract when 'TContract : not struct> (cs : string) =        
-        createInvoker<'TContract,string>() |> DynamicContract.realize<'TContract,string> cs
 
+
+    type private SqlService(cs : string) =
+        interface ISqlService with
+            member this.ExecuteQueryCommand cmd =
+                use reader = cmd.ExecuteReader()
+                let count = reader.FieldCount
+                if reader.HasRows then
+                    [|while reader.Read() do
+                        let buffer = Array.zeroCreate<obj>(count)
+                        let valueCount = buffer |> reader.GetValues
+                        Debug.Assert((valueCount = count), "Column / Value count mismatch")
+                        yield buffer 
+                    |] 
+                else
+                    [||] 
+            
+            member this.ExecuteQueryText text =
+                use con = new SqlConnection(cs)
+                use cmd = new SqlCommand(text, con)
+                cmd |> (this :> ISqlService).ExecuteQueryCommand
+
+            member this.BulkInsert data =
+                use table = data.Description |> BclDataTable.fromMatrixDescription
+                data.Rows |> Seq.iter(fun x ->table.LoadDataRow(x,true) |> ignore)
+                use bcp = new SqlBulkCopy(cs, SqlBulkCopyOptions.CheckConstraints)
+                bcp.DestinationTableName <- match data.Description with DataMatrixDescription(Name=x) -> x |> SqlFormatter.formatObjectName
+                bcp.WriteToServer(table)    
+
+            member this.GetContract()  =
+                createInvoker<'TContract,string>() |> DynamicContract.realize<'TContract,string> cs
+
+            member this.ExecuteStoreCommand spec =
+                spec |> SqlStoreCommand.execute cs
+                
+                
+
+    let get(cs) = SqlService(cs) :> ISqlService
 

@@ -49,4 +49,11 @@
     <Property Name="ParentElementType" Value="SqlSchema" />
     <Property Name="NewName" Value="fColumn" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="307f8033-210a-4d84-839e-5ec8007ce037" ChangeDateTime="10/05/2015 13:56:19">
+    <Property Name="ElementName" Value="[Metadata].[AdoTypeMap].[CSharpTypeName]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[Metadata].[AdoTypeMap]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CSharpKeyword" />
+  </Operation>
 </Operations>

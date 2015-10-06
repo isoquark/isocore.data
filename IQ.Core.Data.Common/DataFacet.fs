@@ -16,7 +16,7 @@ module DataFacet =
     let private cast<'T>(x : obj) = x :?> 'T
 
     let private value<'T>(a : ClrAttribution) =
-        a.AttributeInstance |> Option.get |> cast<ElementFacetAttribute<'T>> |> fun x -> x.Value
+        a.AttributeInstance |> Option.get |> cast<FacetAttribute<'T>> |> fun x -> x.Value
     
     let private attrib<'A,'T when 'A :> Attribute>(element : ClrElement) =
         match element.TryGetAttribute<'A>() with
@@ -55,18 +55,12 @@ module DataFacet =
         | DataFacetNames.MinLength -> 
             match element |> attrib<MinLengthAttribute, 'T> with
             | Some(x) -> Some(x)
-            | None ->
-                match element |> attrib<LengthRangeAttribute, Range<'T>> with
-                | Some(x) -> x |> getRangeMin |> Some 
-                | None -> None
+            | None -> None
         
         | DataFacetNames.MaxLength -> 
             match element |> attrib<MaxLengthAttribute, 'T> with
             | Some(x) -> Some(x)
-            | None ->
-                match element |> attrib<LengthRangeAttribute, Range<'T>> with
-                | Some(x) -> x |> getRangeMin |> Some 
-                | None -> None
+            | None -> None
 
         | DataFacetNames.Precision -> 
             element |> attrib<PrecisionAttribute, 'T>            
@@ -74,37 +68,22 @@ module DataFacet =
         | DataFacetNames.Scale -> 
             element |> attrib<ScaleAttribute, 'T>    
         
-        | DataFacetNames.MinScalar -> 
-            match element |> attrib<MinScalarAttribute, 'T> with
+        | DataFacetNames.MinValue -> 
+            match element |> attrib<MinValueAttribute, 'T> with
             | Some(x) -> Some(x)
             | None ->
-                match element |> attrib<ScalarRangeAttribute, Range<'T>> with
+                match element |> attrib<RangeAttribute, Range<'T>> with
                 | Some(x) -> x |> getRangeMin |> Some 
                 | None -> None
         
-        | DataFacetNames.MaxScalar -> 
-            match element |> attrib<MaxScalarAttribute, 'T> with
+        | DataFacetNames.MaxValue -> 
+            match element |> attrib<MaxValueAttribute, 'T> with
             | Some(x) -> Some(x)
             | None ->
-                match element |> attrib<ScalarRangeAttribute, Range<'T>> with
+                match element |> attrib<RangeAttribute, Range<'T>> with
                 | Some(x) -> x |> getRangeMin |> Some 
                 | None -> None
         
-        | DataFacetNames.MinDate -> 
-            match element |> attrib<MinDateAttribute, 'T> with
-            | Some(x) -> Some(x)
-            | None ->
-                match element |> attrib<DateRangeAttribute, Range<'T>> with
-                | Some(x) -> x |> getRangeMin |> Some 
-                | None -> None
-        
-        | DataFacetNames.MaxDate -> 
-            match element |> attrib<MaxDateAttribute, 'T> with
-            | Some(x) -> Some(x)
-            | None ->
-                match element |> attrib<DateRangeAttribute, Range<'T>> with
-                | Some(x) -> x |> getRangeMin |> Some 
-                | None -> None
 
         | DataFacetNames.XmlSchema ->
             element |> attrib<XmlSchemaAttribute, 'T> 

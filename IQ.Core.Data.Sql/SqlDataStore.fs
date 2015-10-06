@@ -24,10 +24,12 @@ with
             
 
 module SqlDataStore =
+    
     type internal SqlDataStoreRealization(config : SqlDataStoreConfig) =
         let cs = config.ConnectionString
         let mdp = {ConnectionString = cs; IgnoreSystemObjects = true} |> SqlMetadataProvider.get
-    
+        let sqlService = SqlService.get(cs) 
+
         let createConnection() =
             cs |> SqlConnection.create
 
@@ -74,7 +76,7 @@ module SqlDataStore =
             use command = connection |> createQueryCommand q
             match q with
             | DynamicStoreQuery(q) ->
-                let rowValues = command |> SqlCommand.executeQuery                        
+                let rowValues = command |> sqlService.ExecuteQueryCommand
                 let description = mdp.DescribeDataMatrix(q.TabularName)
                 DataMatrix(description, rowValues) :> IDataMatrix
             | DirectStoreQuery(sql) ->
@@ -90,7 +92,7 @@ module SqlDataStore =
             use connection = createConnection()
             use command = new SqlCommand(sql, connection)
             command.CommandType <- CommandType.Text
-            command |> SqlCommand.executeQuery
+            command |> sqlService.ExecuteQueryCommand
     
         interface ISqlDataStore with
             member this.SelectMatrix q  = 
@@ -103,16 +105,16 @@ module SqlDataStore =
                 nosupport()
 
             member this.ExecuteCommand c =
-                c |> SqlStoreCommand.execute cs 
+                c |> sqlService.ExecuteStoreCommand 
 
             member this.ExecutePureCommand c =
-                c |> SqlStoreCommand.execute cs |> ignore
+                c |> sqlService.ExecuteStoreCommand |> ignore
 
             member this.GetCommandContract() =
-                RoutineContract.get<'TContract> cs
+                sqlService.GetContract<'TContract>()
 
             member this.GetQueryContract() =
-                RoutineContract.get<'TContract> cs
+                sqlService.GetContract<'TContract>()
             
             member this.Select q  = 
                 use connection = createConnection()

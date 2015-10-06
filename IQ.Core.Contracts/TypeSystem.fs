@@ -41,7 +41,7 @@ module UniversalTypeSystem =
 
         /// Specifies that the length of subject values can be no greater than a specified value
         [<Literal>]
-        let MaxLengthFacet = "MaxLengthFacet"
+        let MaxLengthFacet = "MaxLength"
 
         /// Specifies that subject values must always be of a specified, fixed length
         [<Literal>]
@@ -49,20 +49,23 @@ module UniversalTypeSystem =
 
         /// Specifies a pattern, such as a regular expression, that the subject values are required to satisfy
         [<Literal>]
-        let PatternFacet = 8
+        let PatternFacet = "Pattern"
 
         /// Specifies the focument/file format type. For example, JSON, XML, HTML, ZIP ...
-
         [<Literal>]
-        let DocumentTypeFacet = 9
+        let DocumentTypeFacet = "DocumentType"
+        
         /// Specifies whether the value/structure of the subject can be altered following creation
-
         [<Literal>]
-        let ImmutableFacet = 10
+        let ImmutableFacet = "Immutable"
+        
         /// Specifies the name of a runtime type
-
         [<Literal>]
-        let RuntimeTypeFacet = 11
+        let RuntimeTypeFacet = "RuntimeType"
+
+        /// Specifies the order of the element relevant to some context
+        [<Literal>]
+        let Position = "Position"
     
     //A character set is a set of symbols and encodings. A collation is a set of rules for comparing characters in a character set
     //See: http://stackoverflow.com/questions/341273/what-does-character-set-and-collation-mean-exactly

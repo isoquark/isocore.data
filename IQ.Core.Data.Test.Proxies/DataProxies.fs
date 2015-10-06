@@ -199,13 +199,13 @@ module TestProxies =
 
         type Table0B = {
             Col01 : int        
-            [<ScalarRange(15uy, 60uy)>]
+            [<Range(15uy, 60uy)>]
             Col02 : uint8
-            [<ScalarRange(-500s, 500s)>]
+            [<Range(-500s, 500s)>]
             Col03 : int16
-            [<ScalarRange(25000, 30000)>]
+            [<Range(25000, 30000)>]
             Col04 : int
-            [<ScalarRange(0L, 100000L)>]
+            [<Range(0L, 100000L)>]
             Col05 : int64    
             Col06 : float
             Col07 : float32

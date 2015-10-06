@@ -2,6 +2,7 @@
 (
 	SqlTypeName nvarchar(25) not null,
 	BclTypeName nvarchar(250) not null,
+	CSharpTypeName nvarchar(250) not null,
 	SqlDbTypeEnum nvarchar(25) not null,
 	SqlDbTypeDataReader nvarchar(25) not null,
 	DbTypeEnum nvarchar(25) not null,

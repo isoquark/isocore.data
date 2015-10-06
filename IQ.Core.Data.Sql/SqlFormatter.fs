@@ -3,9 +3,7 @@
 namespace IQ.Core.Data
 
 open System
-open System.Data
 open System.Data.Linq
-open System.Data.SqlClient
 open System.Diagnostics
 open System.Text
 
