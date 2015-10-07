@@ -138,6 +138,13 @@ type ClrCollectionKind =
     | GenericList = 3
 
 
+type ClrCollectionType =
+    | FSharpListType
+    | ArrayType
+    | GenericListType
+    | GenericListContractType
+    | ReadOnlyListContractType
+
 /// <summary>
 /// Classifies CLR types
 /// </summary>
@@ -611,6 +618,11 @@ with
     override this.ToString() = 
         match this with ClrClass(info=x) -> x.Name.ToString()
     
+    /// <summary>
+    /// Retrieves the associated type information
+    /// </summary>
+    member this.TypeInfo = match this with ClrClass(x) -> x
+    
 /// <summary>
 /// Represents a CLR Enum
 /// </summary>
@@ -622,6 +634,12 @@ with
     /// </summary>
     override this.ToString() = 
         match this with ClrEnum(info=x) -> x.Name.ToString()
+
+    /// <summary>
+    /// Retrieves the associated type information
+    /// </summary>
+    member this.TypeInfo = match this with ClrEnum(_,x) -> x
+
 
 /// <summary>
 /// Represents an F# module
@@ -635,6 +653,11 @@ with
     override this.ToString() = 
         match this with ClrModule(info=x) -> x.Name.ToString()
 
+    /// <summary>
+    /// Retrieves the associated type information
+    /// </summary>
+    member this.TypeInfo = match this with ClrModule(x) -> x
+
 /// <summary>
 /// Represents a collection type
 /// </summary>
@@ -647,9 +670,20 @@ with
     override this.ToString() = 
         match this with ClrCollection(info=x) -> sprintf "%O seq" x.Name
 
+    /// <summary>
+    /// Gets the collection item type
+    /// </summary>
     member this.ItemType = match this with ClrCollection(kind, info) -> info.ItemValueType
 
+    /// <summary>
+    /// Retrieves the associated collection kind
+    /// </summary>
     member this.CollectionKind = match this with ClrCollection(kind, info) -> kind
+
+    /// <summary>
+    /// Retrieves the associated type information
+    /// </summary>
+    member this.TypeInfo = match this with ClrCollection(_,info) -> info
 
 /// <summary>
 /// Represents a struct
@@ -663,6 +697,11 @@ with
     override this.ToString() = 
         match this with ClrStruct(info=x) -> x.Name.ToString()
 
+    /// <summary>
+    /// Retrieves the associated type information
+    /// </summary>
+    member this.TypeInfo = match this with ClrStruct(_,info) -> info
+
 /// <summary>
 /// Represents an F# union
 /// </summary>
@@ -674,6 +713,12 @@ with
     /// </summary>
     override this.ToString() = 
         match this with ClrUnion(info=x) -> x.Name.ToString()
+
+    /// <summary>
+    /// Retrieves the associated type information
+    /// </summary>
+    member this.TypeInfo = match this with ClrUnion(_,info) -> info
+
 
 /// <summary>
 /// Represents an F# record
@@ -687,6 +732,11 @@ with
     override this.ToString() = 
         match this with ClrRecord(info=x) -> x.Name.ToString()
 
+    /// <summary>
+    /// Retrieves the associated type information
+    /// </summary>
+    member this.TypeInfo = match this with ClrRecord(info) -> info
+
 /// <summary>
 /// Represents an interface
 /// </summary>
@@ -698,6 +748,11 @@ with
     /// </summary>
     override this.ToString() = 
         match this with ClrInterface(info=x) -> x.Name.ToString()
+
+    /// <summary>
+    /// Retrieves the associated type information
+    /// </summary>
+    member this.TypeInfo = match this with ClrInterface(info) -> info
 
 /// <summary>
 /// Represents some sort of type
@@ -726,7 +781,21 @@ with
         | UnionType(x) -> x.ToString()
         | RecordType(x) -> x.ToString()
         | InterfaceType(x) -> x.ToString()
-          
+
+    /// <summary>
+    /// Retrieves the associated type information
+    /// </summary>
+    member this.TypeInfo =
+            match this with
+            | ClassType x -> x.TypeInfo
+            | EnumType x -> x.TypeInfo
+            | ModuleType x -> x.TypeInfo
+            | CollectionType x -> x.TypeInfo
+            | StructType x -> x.TypeInfo
+            | UnionType x -> x.TypeInfo
+            | RecordType x -> x.TypeInfo
+            | InterfaceType x -> x.TypeInfo
+                  
 /// <summary>
 /// Represents an assembly
 /// </summary>

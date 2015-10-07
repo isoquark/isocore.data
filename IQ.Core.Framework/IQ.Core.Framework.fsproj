@@ -68,6 +68,7 @@
     <Compile Include="Time.fs" />
     <Compile Include="ClrAttribute.fs" />
     <Compile Include="ClrElement.fs" />
+    <Compile Include="ClrModelExtensions.fs" />
     <Compile Include="ClrMetadataProvider.fs" />
     <Compile Include="Transformer.fs" />
     <Compile Include="DynamicContract.fs" />

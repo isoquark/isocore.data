@@ -84,6 +84,14 @@ module Type =
                 [|1;2;3|].GetType() |>Type.getCollectionKind |> Claim.equal ClrCollectionKind.Array
                 Some([|1;2;3|]).GetType()   |> Type.getCollectionKind |> Claim.equal ClrCollectionKind.Array
 
+                [1;2;3].GetType() |> Type.getCollectionType |> Claim.equal FSharpListType
+                [|1;2;3;|].GetType() |> Type.getCollectionType |> Claim.equal ArrayType
+                ResizeArray<string>().GetType() |> Type.getCollectionType |> Claim.equal GenericListType
+                typeof<IList<decimal>> |> Type.getCollectionType |> Claim.equal GenericListContractType
+                typeof<IReadOnlyList<int>> |> Type.getCollectionType |> Claim.equal ReadOnlyListContractType
+
+
+
         [<Fact>]
         let ``Created F# list via reflection``() =
             let actual = [1 :> obj;2:> obj; 3:> obj]   

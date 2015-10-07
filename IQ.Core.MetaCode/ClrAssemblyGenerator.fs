@@ -95,8 +95,8 @@ module ClrType =
         | _ -> nosupport()
 
     let generate (context : GenerationContext) (t : ClrType) =
-        if t.Info.Namespace <> context.CurrentNamespace then
-            context.CurrentNamespace <- t.Info.Namespace
+        if t.TypeInfo.Namespace <> context.CurrentNamespace then
+            context.CurrentNamespace <- t.TypeInfo.Namespace
             context.CurrentNamespace |> sprintf "namespace %s"  |> StringBuilder.appendLine  <| context.Builder
         
         match t with

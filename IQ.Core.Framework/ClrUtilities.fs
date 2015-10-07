@@ -425,6 +425,23 @@ module Type =
             ClrCollectionKind.FSharpList            
         else
             ClrCollectionKind.Unclassified
+
+    let getCollectionType t =
+        let actualType = if t |> Option.isOptionType then t |> Option.getOptionValueType |> Option.get else t
+        if actualType |> isArray then
+            ArrayType
+        else if actualType.FullName.StartsWith("Microsoft.FSharp.Collections.FSharpList") then        
+            FSharpListType
+        else if actualType.IsGenericType && actualType.GetGenericTypeDefinition() = typedefof<List<_>> then
+            GenericListType            
+        else if actualType.IsGenericType && actualType.GetGenericTypeDefinition() = typedefof<IList<_>> then
+            GenericListContractType
+        else if actualType.IsGenericType && actualType.GetGenericTypeDefinition() = typedefof<IReadOnlyList<_>> then
+            ReadOnlyListContractType
+        else
+            nosupport()
+        
+        
        
     
     /// <summary>
