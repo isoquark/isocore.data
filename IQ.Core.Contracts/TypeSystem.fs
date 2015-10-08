@@ -2,6 +2,8 @@
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
 namespace IQ.Core.Framework.Contracts
 
+open System
+
 /// <summary>
 /// Defines common vocabulary for conforming and converting between different type sytems
 /// such as: CLR/.Net, SQL Server, Power Query, Python, etc.
@@ -67,66 +69,126 @@ module UniversalTypeSystem =
         [<Literal>]
         let Position = "Position"
     
+    type IntegerValue =
+        /// 14 : int(u, 8)
+        /// 14 : uint8
+        /// 14uy
+        | UInt8Value of uint8
+        | Int8Value of int8
+        | UInt16Value of uint16
+        | Int16Value of int16
+        | UInt32Value of uint32
+        | Int32Value of int32
+        | UInt64Value of uint64
+        | Int64Value of int64
+
+    type RealValue =
+        | Float32Value of float32
+        | Float64Value of float
+
     //A character set is a set of symbols and encodings. A collation is a set of rules for comparing characters in a character set
     //See: http://stackoverflow.com/questions/341273/what-does-character-set-and-collation-mean-exactly
-    type Primitive =
+    type PrimitiveType =
         /// A whole number
+        /// int(s|u, n)[f1 = v1; ...; fm = vm]
+        /// Aliases for common types
+        /// int16 := int(s, 16)
+        /// uint16 := int(u, 16)
+        /// ...
         | Integer of Signed : bool * Bits : uint8
         /// A precise decimal
+        /// dec(p,s)
         | Decimal of Precision : uint8 * Scale : uint8
         /// A floating-point decimal
+        /// real(n)
         | Real of Bits : uint8
         //Assumed to be unicode and of arbitrary length in the absence of applicable facets
+        /// text[MinLength=50; MaxLength=100]
         | Text 
         /// Specifies a date, in terms of the Gregorian calendary in the absence of applicable facets
+        /// date
         | Date 
         /// Specifies an instant in time
+        /// datetime(p,s)
         | DateTime of Precision : uint8 * Scale : uint8
         /// Specifies the time of day
+        /// time(p,s)
         | Time  of Precision : uint8 * Scale : uint8
         /// A non-negative interval of time measured in nanoseconds
+        /// duration(n)
         | Duration of Bits : uint8
         /// True or False, 0 or 1, etc.
+        /// bool
         | Boolean
         //A single byte
+        /// byte
         | Byte
         /// An ordered sequence of bytes, assumed to be of arbitrary length in the absence of constraining facets
-        | ByteArray
+        /// blob
+        | Blob
         /// A specialized primitive
-        | CustomPrimitive of Name : string * Base : Primitive * Facets : Facet list
+        /// name( int(s,32), [f1=v1; ...; fn=vn])
+        | CustomPrimitive of Name : string * Base : PrimitiveType * Facets : Facet list
+
+    type PrimitiveValue =
+        | IntegerValue of IntegerValue
+        | DecimalValue of decimal
+        | RealValue of RealValue
+        | TextValue of string
+        | DateValue of DateTime
+        | DateTimeValue of DateTime
+        | TimeValue of float
+        | DurationValue of IntegerValue
+        | BooleanValue of bool
+        | ByteValue of uint8
+        | ByteArray of uint8[]
+        | CustomValue of uint8[]
 
     /// <summary>
     /// Represents a reference/instantiation of a primitive type within some context, e.g.,
     /// a an entity definition, a database column, etc.
     /// </summary>
-    type PrimitiveReference = PrimitiveReference of DataType : Primitive * Facets : Facet list
+    type PrimitiveReference = PrimitiveReference of DataType : PrimitiveType * Facets : Facet list
       
     /// <summary>
     /// Represents an intrinsic notion of a table column
+    /// column(0, Col01, int(s, 32)[?])
+    /// column(1, Col02, dec(19, 4)[?])
     /// </summary>
     type TableColumn = TableColumn of Name : string * Position : int * DataType : PrimitiveReference
+
+    
 
     /// <summary>
     /// Defines a data type
     /// </summary>
     type DataType =
         /// A primitive data type
-        | PrimitiveType of Primitive 
+        | PrimitiveType of PrimitiveType 
         /// A tabular dataset
+        /// table(name, column(0, Col01, int(s, 32)[?]),  column(1, Col02, dec(19, 4)[?]), ...)        
         | TableType of Name : string * Columns : TableColumn list
-        /// A fixed-length ordered collection of elements whose members can be identified/accesed by their 
-        /// relative position in the collection
+        /// A collection of elements        
+        | CollectionType of CollectionType
+        /// A context-sensitive "object" value, whatever "object" means in the concrete system
+        /// and the value of the name field can identify the type in that context
+        /// object(name)
+        | ObjectType of name : string 
+    and CollectionType =
+        /// A fixed-length ordered collection of elements 
+        /// array<T>(50)
         | ArrayType of ElementType : DataType * Length : int
         /// A variable-length ordered collection of elements whose members can be identified/accesed by their 
         /// relative position in the collection
+        /// list<T>
         | ListType of DataType
         /// A collection of elements whose membes can be identified/accessed by a key
-        | DictionaryType of KeyType : Primitive * ValueType : DataType
+        /// dict<T,K>
+        | DictionaryType of KeyType : PrimitiveType * ValueType : DataType
         /// A collection of elements
+        /// set<T>
         | SetType of DataType
-        /// A context-sensitive "object" value, whatever "object" means in the concrete system
-        /// and the value of the name field can identify the type in that context
-        | ObjectType of name : string 
+
 
     /// <summary>
     /// Represents a reference to a data type
