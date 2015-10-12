@@ -45,6 +45,7 @@
     <EmbeddedResource Include="Workbooks\WB01.xlsx" />
     <EmbeddedResource Include="Workbooks\WB01.WS01.csv" />
     <EmbeddedResource Include="Workbooks\WB03.xlsx" />
+    <EmbeddedResource Include="Workbooks\WB04.xlsx" />
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="TestConfiguration.fs" />
     <Compile Include="ExcelProxies.fs" />

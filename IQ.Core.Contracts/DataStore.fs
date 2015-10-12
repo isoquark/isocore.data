@@ -255,6 +255,8 @@ type RoutineQuery = RoutineQuery of RoutineName : string * Parameters : QueryPar
 type ExcelDataStoreQuery =
     /// Retrieves the data contained within a named worksheet
     | FindWorksheetByName of worksheetName : string
+    /// Retrieves the data contained within a worksheet at a specified (0-based) index
+    | FindWorksheetByIndex of index : uint16
     /// Retrieves data contained in an excel table identified by name
     | FindTableByName of tableName : string
     /// Retrieves all worksheets in the workbook
@@ -366,7 +368,10 @@ type SqlDataStoreQuery =
 /// </summary>
 [<DataStoreContract(DataStoreKind.Sql)>]
 type ISqlDataStore =
-    inherit IDataStore<SqlDataStoreQuery>        
+    inherit IDataStore<SqlDataStoreQuery>
+    /// <summary>
+    /// Provides access to the store's underlying metadata provider
+    abstract MetadataProvider : ISqlMetadataProvider
             
 
 

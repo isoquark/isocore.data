@@ -49,14 +49,14 @@ module internal ClrAccessKind =
         | _ -> nosupport()
 
 
-module internal ClrProperty =        
+module internal ClrProperty =
     let private addModifiers modifiers (syntax : PropertyDeclarationSyntax) =
         syntax.AddModifiers(modifiers)
     
     let private addAccessor accessor (syntax : PropertyDeclarationSyntax) =
         syntax.AddAccessorListAccessors([|accessor|])
 
-    let private addAutoGetAccessor (syntax : PropertyDeclarationSyntax) =       
+    let private addAutoGetAccessor (syntax : PropertyDeclarationSyntax) =
         addAccessor <| SF.AccessorDeclaration(SyntaxKind.GetAccessorDeclaration).WithSemicolonToken(SF.Token(SyntaxKind.SemicolonToken)) 
                     <| syntax
 
@@ -98,12 +98,17 @@ module internal ClrMember=
             nosupport()
         
         
-module internal ClrClass =        
+module internal ClrClass =
+   let private addModifiers modifiers (syntax : ClassDeclarationSyntax) =
+        syntax.AddModifiers(modifiers)   
+   
    let private addMembers (members : MemberDeclarationSyntax seq) (syntax : ClassDeclarationSyntax) =
         syntax.AddMembers (members |> Array.ofSeq)
     
    let declare (c : ClrClass) =
+        let accessModifiers = c.Access |> ClrAccessKind.getKeywords |> Array.map SF.Token
         SF.ClassDeclaration(c.Name.SimpleName)
+        |> addModifiers accessModifiers
         |> addMembers (List.map ClrMember.declare <| c.Info.Members )
 
                              
@@ -142,7 +147,7 @@ module CSharpGenerator =
     let private genType (t : ClrType) =
         match t with
         | ClassType(t) -> 
-            t |> ClrClass.declare  :> TypeDeclarationSyntax            
+            t |> ClrClass.declare  :> TypeDeclarationSyntax
         
         | EnumType(t) -> 
             nosupport()
@@ -162,11 +167,11 @@ module CSharpGenerator =
             UnsupportedConstruct(LanguageKind.CSharp, "record") |> raise
         
         | InterfaceType(t) -> 
-            nosupport()    
+            nosupport()
     
 
     let genProject (dstFolder : string) (a : ClrAssembly) =
-        let cu = CU.create() |> CU.using "System"  
+        let cu = CU.create() |> CU.using "System"
                              |> CU.using "System.Collections.Generic" 
                              |> CU.addTypes (a.Types |> List.map genType)
         use workspace = new AdhocWorkspace()

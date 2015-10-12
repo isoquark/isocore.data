@@ -17,8 +17,22 @@ module ExcelDataStore =
     type Tests(ctx, log) = 
         inherit ProjectTestContainer(ctx,log)
         
-        //let xlsProvider = ExcelDataStore.getProvider()
         let dsProvider = ctx.AppContext.Resolve<IDataStoreProvider>()
+
+        [<Fact>]
+        let ``Found worksheet by index``() =
+            let xlspath = thisAssembly() |> AssemblyResource.emit "WB04.xlsx" ctx.OutputDirectory
+            let store = dsProvider.GetDataStore<IExcelDataStore>(xlspath)
+            let m1 = 0us |> FindWorksheetByIndex |> store.SelectMatrix
+            m1.Item(0,0).ToString() |> Claim.equal "WS01-A1";
+
+            let m2 = 1us |> FindWorksheetByIndex |> store.SelectMatrix
+            m2.Item(0,0).ToString() |> Claim.equal "WS02-A1";
+
+            let m3 = 2us |> FindWorksheetByIndex |> store.SelectMatrix
+            m3.Item(0,0).ToString() |> Claim.equal "WS03-A1";
+
+            ()
 
         [<Fact>]
         let ``Hydrated data matrix from Excel workbook - WB01``() =

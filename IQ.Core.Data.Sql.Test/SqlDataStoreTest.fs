@@ -23,11 +23,11 @@ module SqlDataStoreTest =
             
             let rowcount = 100
             let col2Values = [for rowid in 1..rowcount -> rowid, (sprintf "Row%i Description" rowid) :> obj] |> Map.ofList
-            let createRow(rowid) =                
+            let createRow(rowid) =
                 [| rowid:> obj; col2Values.[rowid]; (rowid * 5 |> int16) :> obj|]
                             
             let tabularName = DataObjectName("SqlTest", "Table08")
-            tabularName |> TruncateTable |> store.ExecuteCommand |> ignore            
+            tabularName |> TruncateTable |> store.ExecuteCommand |> ignore
             let description = mdp.DescribeTable(tabularName)
             let rowValues =  [| for i in [1..rowcount] ->i |> createRow |] 
             let m = DataMatrix(DataMatrixDescription(description.Name, description.Columns), rowValues) :> IDataMatrix

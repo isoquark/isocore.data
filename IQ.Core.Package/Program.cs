@@ -130,7 +130,7 @@ namespace IQ.Core.Package
         static void Main(string[] args)
         {
 
-            var config = CreateConfig("1.0.67", @"T:\lib\nuget\external", @"C:\Temp\isocore.data");
+            var config = CreateConfig("1.0.70", @"T:\lib\nuget\external", @"C:\Temp\isocore.data");
             //var config = CreateConfig("1.0.66", @"C:\Work\lib\packages", @"C:\Temp\isocore.data");
 
             if (Directory.Exists(config.WorkingDirectory))

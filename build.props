@@ -9,7 +9,7 @@
       <DefineConstants>DEBUG;TRACE</DefineConstants>
       <WarningLevel>3</WarningLevel>
       <BaseIntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</BaseIntermediateOutputPath>
-      <BaseIntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</BaseIntermediateOutputPath>
+      <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
       <OutputPath>..\build\targets\$(Platform)\</OutputPath>
       <DocumentationFile>..\build\targets\$(Platform)\$(MSBuildProjectName).XML</DocumentationFile>
       <ErrorReport>prompt</ErrorReport>

@@ -150,11 +150,15 @@ module ExcelDataStore =
                     | Some(ws) ->
                         ws |> readWorksheetMatrix 
                     | None ->
-                        nosupport()
+                        ArgumentException(sprintf "The worksheet %s was not found" worksheetName ) |> raise
                 | FindTableByName(tableName) ->
                     nosupport()
                 | FindAllWorksheets ->
                      nosupport()
+                | FindWorksheetByIndex(idx) ->
+                    use workbook = openPackage()
+                    workbook.Workbook.Worksheets.ElementAt(idx |> int) |> readWorksheetMatrix
+                    
 
             member this.MergeMatrix m =
                 nosupport()
@@ -217,12 +221,24 @@ namespace IQ.Core.Data.Contracts
 
 open System.Runtime.CompilerServices
 
+
 [<Extension>]
-module ExcelExtensions =
+module ExcelExtensionsA =
     [<Extension>]
-    let SelectWorksheet<'T>(store : IExcelDataStore, name : string) =
+    let SelectWorksheet<'T>(store : IExcelDataStore, name) =
         store.Select<'T>(name |> FindWorksheetByName)
 
     [<Extension>]
-    let SelectWorksheetMatrix(store : IExcelDataStore, name : string) =
+    let SelectWorksheetMatrix(store : IExcelDataStore, name) =
         store.SelectMatrix(name |> FindWorksheetByName)
+
+[<Extension>]
+module ExcelExtensionsB =
+
+    [<Extension>]
+    let SelectWorksheet<'T>(store : IExcelDataStore, index) =
+        store.Select<'T>(index |> FindWorksheetByIndex)
+
+    [<Extension>]
+    let SelectWorksheetMatrix(store : IExcelDataStore, index) =
+        store.SelectMatrix(index |> FindWorksheetByIndex)

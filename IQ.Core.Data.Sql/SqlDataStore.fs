@@ -18,9 +18,9 @@ open IQ.Core.Framework
 /// This should really be defined seperately from the contract because different realizations may
 /// require different configuration information
 /// </remarks>
-type SqlDataStoreConfig = SqlDataStoreConfig of cs : string  
+type SqlDataStoreConfig = SqlDataStoreConfig of cs : string
 with
-    member this.ConnectionString = match this with SqlDataStoreConfig(cs=x) -> x               
+    member this.ConnectionString = match this with SqlDataStoreConfig(cs=x) -> x
             
 
 module SqlDataStore =
@@ -135,6 +135,8 @@ module SqlDataStore =
                 items |> SqlProxyWriter.bulkInsert cs
 
             member this.ConnectionString = cs
+
+            member this.MetadataProvider = mdp
             
             
     type internal SqlDataStoreProvider () =
