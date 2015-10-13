@@ -72,7 +72,7 @@ module internal ClrProperty =
         
         let accessModifiers = p.ReadAccess.Value |> ClrAccessKind.getKeywords |> Array.map SF.Token
 
-        let typeName = SF.ParseTypeName(p.ValueType.SimpleName)
+        let typeName = SF.ParseTypeName(if p.ValueType.FullName |> Option.isSome then p.ValueType.FullName.Value else p.ValueType.SimpleName)
         SF.PropertyDeclaration(typeName, p.Name.Text) 
         |> addModifiers accessModifiers
         |> addAutoGetAccessor
@@ -98,9 +98,11 @@ module internal ClrMember=
             nosupport()
         
         
+        
 module internal ClrClass =
    let private addModifiers modifiers (syntax : ClassDeclarationSyntax) =
         syntax.AddModifiers(modifiers)   
+
    
    let private addMembers (members : MemberDeclarationSyntax seq) (syntax : ClassDeclarationSyntax) =
         syntax.AddMembers (members |> Array.ofSeq)
@@ -140,6 +142,37 @@ module internal CU =
         cu.AddMembers(
             types |> Seq.map(fun t -> t :> MemberDeclarationSyntax) 
                   |> Array.ofSeq)
+
+    let addNamespace (t : NamespaceDeclarationSyntax) (cu : CompilationUnitSyntax) =
+        cu.AddMembers([|t :> MemberDeclarationSyntax|])
+
+    let addNamespaces (namespaces : NamespaceDeclarationSyntax seq) (cu : CompilationUnitSyntax) =
+        cu.AddMembers(
+            namespaces |> Seq.map(fun t -> t :> MemberDeclarationSyntax) 
+                       |> Array.ofSeq
+        )
+    
+    
+module internal NS =
+    let create (name : string)  =
+        SF.NamespaceDeclaration(SF.IdentifierName(name))
+
+    let addType (t : TypeDeclarationSyntax) (ns : NamespaceDeclarationSyntax) =
+        ns.AddMembers([|t :> MemberDeclarationSyntax|])
+
+    let addTypes (types : TypeDeclarationSyntax seq) (ns : NamespaceDeclarationSyntax) =
+        ns.AddMembers(
+            types |> Seq.map(fun t -> t :> MemberDeclarationSyntax) 
+                  |> Array.ofSeq)
+           
+module internal PI =
+    let create(name) =
+        ProjectInfo.Create(ProjectId.CreateNewId(name), VersionStamp.Default, name, name, "C#", null, sprintf "%s.dll" name)
+
+module internal WS =
+    let create() = new AdhocWorkspace()     
+
+
                         
 module CSharpGenerator =
 
@@ -171,17 +204,30 @@ module CSharpGenerator =
     
 
     let genProject (dstFolder : string) (a : ClrAssembly) =
+        
+        let namespaces = a.Types |> List.groupBy(fun t -> t.TypeInfo.Namespace)
+                                 |> List.map(fun (nsname,types) ->
+                                                    nsname |> NS.create
+                                                           |> NS.addTypes(types |> List.map genType))
+        
         let cu = CU.create() |> CU.using "System"
                              |> CU.using "System.Collections.Generic" 
-                             |> CU.addTypes (a.Types |> List.map genType)
-        use workspace = new AdhocWorkspace()
-        //ProjectInfo.Create(ProjectId.CreateNewId("MyTestProjectId"), VersionStamp.Create(), "MyProject.dll", "C#");
+                             //|> CU.addTypes (a.Types |> List.map genType)
+                             |> CU.addNamespaces namespaces
+        
+        
+        use workspace = WS.create()        
+
         let format = Formatter.Format(cu, workspace)
         let sb = StringBuilder()
         let path = Path.Combine(dstFolder, "Gen.cs")
         use writer = new StreamWriter(path)
         format.WriteTo(writer)
         
+        let project = workspace.AddProject(a.Name.SimpleName, "C#")
+        
+        ()        
+
    
 
         

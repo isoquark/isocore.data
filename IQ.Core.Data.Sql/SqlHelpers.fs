@@ -10,6 +10,7 @@ open System.Reflection
 open System.Text
 open System.Data.SqlClient
 open System.Diagnostics
+open System.Collections.Generic
 
 open IQ.Core.Contracts
 open IQ.Core.Framework
@@ -106,3 +107,40 @@ module internal SqlDataReader =
         let description = t |> DataProxyMetadata.describeTableProxy
         let sql = sprintf "%s where %s" (SqlFormatter.formatTabularSelectT<'T>()) where
         sql |> selectFiltered cs description.DataElement  |> toPocos<'T>
+
+module ConnectionString =
+    let decode(cs) =
+       [for c in cs |> Txt.split ";" do
+            let param = c |> Txt.split "="
+            if param.Length = 2 then
+                yield param.[0], param.[1]
+       ] |> dict
+
+    let encode(parameters : IDictionary<string,string>) =
+        let sb = StringBuilder();
+        parameters |> Seq.iter(fun item ->
+            sb.AppendFormat("{0}={1};", item.Key, item.Value) |> ignore
+        )
+        sb.ToString()
+    
+    let setParameter name value cs =
+        let parameters = cs |> decode
+        parameters.[name] <- value
+        parameters |> encode
+
+type SqlConnectionString(value) =
+    let parameters = value |> ConnectionString.decode
+    
+    member this.Value = parameters |> ConnectionString.encode
+
+    override this.ToString() =
+        this.Value
+
+    member this.SetCommandTimeout(timeout : int) =
+        parameters.["CommandTimeout"] <- sprintf "%i" timeout
+
+    member this.CommandTimeout = 
+        if parameters.ContainsKey("CommandTimeout") then
+            parameters.["CommandTimeout"] |> Int32.Parse
+        else
+            0
