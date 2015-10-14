@@ -639,6 +639,7 @@ type SequenceDescription = {
     MinimumValue : NumericValue
     /// The inclusive upper bound of the sequence
     MaximumValue : NumericValue 
+    /// The sequence value data type
     DataType : DataTypeReference
     /// The current value of the sequence
     CurrentValue : NumericValue
@@ -785,7 +786,6 @@ type SequenceMetadataQuery =
     | FindSequencesBySchema of schemaName : string
 
 type SqlMetadataQuery =
-    | FindSchemas of SchemaMetadataQuery
     | FindViews of ViewMetadataQuery
     | FindTables of TableMetadataQuery
     | FindProcedures of ProcedureMetadataQuery
@@ -819,6 +819,22 @@ type ISqlMetadataProvider =
     /// Describes the tables in an identified schema
     /// </summary>
     abstract DescribeTablesInSchema:string->TableDescription list
+
+    /// <summary>
+    /// Describes the data types in an identified schema
+    /// </summary>
+    abstract DescribeDataTypesInSchema:string -> DataTypeDescription list
+
+    /// <summary>
+    /// Describes all available data types
+    /// </summary>
+    abstract DescribeDataTypes:unit->DataTypeDescription list
+
+    /// <summary>
+    /// Describes all available data types
+    /// </summary>
+    abstract DescribeDataType:DataObjectName->DataTypeDescription
+
 
     /// <summary>
     /// Describes all views that are visible to the metadata provider

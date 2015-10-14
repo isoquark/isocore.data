@@ -39,7 +39,7 @@ module internal MetadataExensions =
         member this.ParentObjectName = DataObjectName(this.ParentSchemaName, this.ProcedureName)
           
 
-type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =            
+type internal SqlMetadataReader(config : SqlMetadataProviderConfig) as self =            
     
     let dataTypes = Dictionary<DataObjectName, DataTypeDescription>()        
     let columns = Dictionary<DataObjectName, ColumnDescription ResizeArray>()
@@ -47,9 +47,44 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
     let views = Dictionary<string, ViewDescription ResizeArray>()
     let schemas = Dictionary<string, SchemaDescription>()
     let procs = Dictionary<string, RoutineDescription ResizeArray>()
+    let sequences = Dictionary<string, SequenceDescription ResizeArray>()
+    let allObjects = Dictionary<DataObjectName, DataObjectDescription>()
+    let mutable catalog = Unchecked.defaultof<SqlMetadataCatalog>
+
+    let unbracket name =
+        name |> Txt.removeChar '[' |> Txt.removeChar ']'
+    
+    let getObjectKind objectName =
+        if (allObjects.ContainsKey(objectName)) then
+            Nullable<DataElementKind>(allObjects.[objectName].ElementKind)
+        else
+            Nullable<DataElementKind>();                    
+    
+    
+    
+    do
+        self.Refresh()
+    
+           
    
     member private this.GetMetadataView<'T when 'T :> IMetadataView>() =
         config |> MetadataUtil.getMetadataView<'T>
+
+    member private this.ClearIndex() =
+        dataTypes.Clear()
+        columns.Clear()
+        tables.Clear()
+        views.Clear()
+        schemas.Clear()
+        procs.Clear()
+        allObjects.Clear()
+
+    member private this.IndexAllObjects() =
+        [for x in tables.Values do yield! x] |> List.iter(fun x -> allObjects.Add(x.Name, x |> TableDescription))
+        [for x in views.Values do yield! x] |> List.iter(fun x -> allObjects.Add(x.Name, x |> ViewDescription))
+        [for x in procs.Values do yield! x] |> List.iter(fun x -> allObjects.Add(x.Name, x |> RoutineDescription))
+        [for x in sequences.Values do yield! x] |> List.iter(fun x -> allObjects.Add(x.Name, x |> SequenceDescription))
+        dataTypes.Values |> Seq.iter(fun x -> allObjects.Add(x.Name, x |> DataTypeDescription))
 
     member private this.CreateTypeDescription(item : vDataType, columns) =
             {
@@ -89,7 +124,6 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
             dataTypes.Add(description.Name, description)
                
             
-
     member private this.GetIntrinsicTypeReference(dataTypeName : DataObjectName, maxlen, precision, scale) =
        match dataTypeName.LocalName with
         | SqlDataTypeNames.bigint ->
@@ -190,8 +224,18 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
                         nosupport()
             else
                 nosupport()
-    
-            
+
+    member private this.IndexSequences() =
+        ()
+//        let items = this.GetMetadataView<vSequence>()
+//        for item in items do
+//            let dataType = this.GetDataTypeReference(DataObjectName("sys", item.DataTypeName), 0, 0uy, 0uy)
+//            let description = {
+//                SequenceDescription.CacheSize = item.CacheSize
+//                Name = DataObjectName(item.SchemaName, item.SequenceName)
+//                Documentation = item.Description
+//            }
+                
     member private this.IndexColumns() =
                 
         let items = this.GetMetadataView<vColumn>()
@@ -283,11 +327,7 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
                 procs.[proc.SchemaName].Add(description)
             else
                 procs.Add(proc.SchemaName, ResizeArray([description]))
-            
-            
-        ()
-
-
+           
     member private this.IndexSchemas() =
 
         for schema in this.GetMetadataView<vSchema>() do            
@@ -315,196 +355,133 @@ type internal SqlMetadataReader(config : SqlMetadataProviderConfig) =
             )
 
     
-    member this.ReadCatalog() =
+    member private this.Refresh() =
+        this.ClearIndex()
+
         this.IndexSimpleDataTypes()
+        this.IndexSequences()
         this.IndexColumns()
         this.IndexComplexDataTypes()
         this.IndexTables()
         this.IndexViews()
         this.IndexProcedures()                    
         this.IndexSchemas()
+        this.IndexAllObjects()
         
-        {
-            SqlMetadataCatalog.CatalogName = (SqlConnectionStringBuilder(config.ConnectionString).InitialCatalog)
-            Schemas = schemas.Values |> List.ofSeq
-        }
+        catalog <-         
+            {
+                SqlMetadataCatalog.CatalogName = (SqlConnectionStringBuilder(config.ConnectionString).InitialCatalog)
+                Schemas = schemas.Values |> List.ofSeq
+            }
 
+
+    member private this.ReadCatalog() =
+        catalog
+
+    member private this.DescribeTable(tableName : DataObjectName) =
+        tables.[tableName.SchemaName] |> Seq.find(fun x -> x.Name = tableName)
+
+    member private this.DescribeView(viewName : DataObjectName) =
+        views.[viewName.SchemaName] |> Seq.find(fun x -> x.Name = viewName)
+
+    member private this.DescribeTables() =
+        [for t in tables.Values do yield! t] 
+
+    member private this.DescribeViews() = 
+        [for t in views.Values do yield! t] 
+
+    member private this.DescribeProcedures() =
+        [for p in procs.Values do yield! p]
+
+    member private this.DescribeTablesInSchema(schemaName: string) = 
+        tables.[schemaName |> unbracket] |> List.ofSeq
+
+    member private this.DescribeViewsInSchema(schemaName: string) = 
+        views.[schemaName |> unbracket] |> List.ofSeq
+
+    member private this.DescribeProceduresInSchema(schemaName: string) = 
+        procs.[schemaName |> unbracket] |> List.ofSeq
+
+    member private this.DescribeDataTypes() =
+        dataTypes.Values |> List.ofSeq
     
+    member private this.DescribeDataType(name : DataObjectName) =
+        dataTypes.[name]
+
+    member private this.DescribeDataTypesInSchema(schemaName : string) =
+        dataTypes.Values |> Seq.filter(fun x -> x.Name.SchemaName = schemaName) |> List.ofSeq
 
 
+    interface ISqlMetadataProvider with
+        member this.RefreshCache() = this.Refresh()
+        member this.DescribeTables() =  this.DescribeTables()                        
+        member this.DescribeViews() =  this.DescribeViews()            
+        member this.DescribeTablesInSchema(schemaName: string) = schemaName |> this.DescribeTablesInSchema            
+        member this.DescribeViewsInSchema(schemaName: string) = schemaName |> this.DescribeViewsInSchema            
+        member this.DescribeSchemas() = schemas.Values |> List.ofSeq            
+        member this.DescribeTable(tableName) = tableName |> this.DescribeTable
+        member this.DescribeView(viewName) = viewName |> this.DescribeView   
+        member this.DescribeDataType(name) = name |> this.DescribeDataType
+        member this.DescribeDataTypes() = this.DescribeDataTypes()  
+        member this.DescribeDataTypesInSchema(schemaName : string) = schemaName |> this.DescribeDataTypesInSchema       
 
-module SqlMetadataProvider =
-    let private unbracket name =
-        name |> Txt.removeChar '[' |> Txt.removeChar ']'
+        member this.DescribeDataMatrix(objectName) =
+            let kind = objectName |> getObjectKind 
 
-    let private badargs() =
-        ArgumentException() |> raise
-    
-
-    type private Realization(config : SqlMetadataProviderConfig) =
-        let tables  = Dictionary<string, ResizeArray<TableDescription>>()        
-        let views = Dictionary<string, ResizeArray<ViewDescription>>()
-        let procedures = Dictionary<string, ResizeArray<RoutineDescription>>()
-        let sequences = Dictionary<string, SequenceDescription>()
-        let tableFunctions = Dictionary<string, ResizeArray<RoutineDescription>>()
-        let dataTypes = Dictionary<string, ResizeArray<DataTypeDescription>>()
-        let allObjects = Dictionary<DataObjectName, IDataObjectDescription>()
-        
-        let refresh() =
-            tables.Clear()
-            views.Clear()
-            procedures.Clear()
-            sequences.Clear()
-            tableFunctions.Clear()
-            dataTypes.Clear()
-            allObjects.Clear()        
-            let reader = SqlMetadataReader(config)
-            let catalog = reader.ReadCatalog()
-            for schema in catalog.Schemas do
-                let schemaName = schema.Name
-                for o in schema.Objects do
-                    
-                    allObjects.Add(o.ObjectName, o)
-                    match o with
-                    | TableDescription(x) -> 
-                        if tables.ContainsKey(schemaName) then
-                            tables.[schemaName].Add(x)
-                        else
-                            tables.[schemaName] <- ResizeArray[x]
-                    | ViewDescription(x) -> 
-                        if views.ContainsKey(schemaName) then
-                            views.[schemaName].Add(x)
-                        else
-                            views.[schemaName] <- ResizeArray[x]
-                    | RoutineDescription(x) -> 
-                        if x.RoutineKind = DataElementKind.Procedure then
-                            if(procedures.ContainsKey(schemaName)) then
-                                procedures.[schemaName].Add(x)  
-                            else
-                                procedures.[schemaName] <- ResizeArray[x]
-                            
-                        else if x.RoutineKind = DataElementKind.TableFunction then
-                        
-                            if(tableFunctions.ContainsKey(schemaName)) then
-                                tableFunctions.[schemaName].Add(x)  
-                            else
-                                tableFunctions.[schemaName] <- ResizeArray[x]
-                        
-                        else
-                            nosupport()
-                            
-                    | DataTypeDescription(x) ->
-                        if dataTypes.ContainsKey(x.Name.SchemaName) then
-                            dataTypes.[x.Name.SchemaName].Add(x)
-                        else
-                            dataTypes.[x.Name.SchemaName] <- ResizeArray[x]
-                        
-
-                    | SequenceDescription(x) -> 
-                        sequences.Add(schemaName, x)
-
-        let getObjectKind objectName =
-            if (allObjects.ContainsKey(objectName)) then
-                Nullable<DataElementKind>(allObjects.[objectName].ElementKind)
+            if kind.HasValue then
+                match kind.Value with
+                | DataElementKind.Table -> 
+                    let dtable = objectName |> this.DescribeTable 
+                    DataMatrixDescription(dtable.Name, dtable.Columns)
+                | DataElementKind.View -> 
+                    let dview = objectName |> this.DescribeView
+                    DataMatrixDescription(dview.Name, dview.Columns)
+                | _ -> nosupport()
             else
-                Nullable<DataElementKind>();                    
-        do
-            refresh()
-
-        let describeTable (tableName : DataObjectName) = 
-            tables.[tableName.SchemaName |> unbracket]  |> Seq.find(fun x -> x.Name = tableName)
-
-        let describeView (viewName : DataObjectName) =
-            views.[viewName.SchemaName |> unbracket] |> Seq.find(fun x -> x.Name = viewName)            
-        
-        interface ISqlMetadataProvider with
-            member this.RefreshCache() =
-                refresh()
-            member this.DescribeTables() = 
-                [for t in tables.Values do yield! t] 
-            
-            member this.DescribeViews() = 
-                [for t in views.Values do yield! t] 
-            
-            member this.DescribeTablesInSchema(schemaName: string) = 
-                tables.[schemaName |> unbracket] |> List.ofSeq
-            
-            member this.DescribeViewsInSchema(schemaName: string) = 
-                views.[schemaName |> unbracket] |> List.ofSeq
-            
-            member this.DescribeSchemas() = 
-                failwith "Not implemented yet"
-            
-            member this.DescribeTable(tableName) =
-                tableName |> describeTable
-
-            member this.DescribeView(viewName) =
-                viewName |> describeView
-
-            member this.DescribeDataMatrix(objectName) =
-                let kind = objectName |> getObjectKind 
-
-                if kind.HasValue then
-                    match kind.Value with
-                    | DataElementKind.Table -> 
-                        let dtable = objectName |> describeTable 
-                        DataMatrixDescription(dtable.Name, dtable.Columns)
-                    | DataElementKind.View -> 
-                        let dview = objectName |> describeView
-                        DataMatrixDescription(dview.Name, dview.Columns)
-                    | _ -> nosupport()
-                else
-                    nosupport()
+                nosupport()
                     
             
-            member this.ObjectExists(objectName) =
-                allObjects.ContainsKey(objectName)
+        member this.ObjectExists(objectName) =
+            allObjects.ContainsKey(objectName)
 
-            member this.GetObjectKind(objectName) =
-                objectName |> getObjectKind
+        member this.GetObjectKind(objectName) =
+            objectName |> getObjectKind
                 
-            member this.Describe q = 
+        member this.Describe q = 
+            match q with
+            | FindTables(q) ->
+                match q  with
+                | FindAllTables ->
+                    this.DescribeTables() |> List.map(TableDescription)
+                | FindUserTables ->
+                    nosupport()
+                | FindTablesBySchema(schemaName) ->
+                    this.DescribeTablesInSchema(schemaName) |> List.map(TableDescription)
+            | FindViews(q) -> 
                 match q with
-                | FindTables(q) ->
-                    match q  with
-                    | FindAllTables ->
-                        [
-                            for tableList in tables.Values do
-                                for t in tableList do
-                                    yield t |> TableDescription
-                               
-                        ]
-                    | FindUserTables ->
-                        nosupport()
-                    | FindTablesBySchema(schemaName) ->
-                        nosupport()
-                | FindSchemas(q) -> 
-                    match q with
-                    | FindAllSchemas ->
-                        nosupport() 
-                | FindViews(q) -> 
-                    match q with
-                    | FindAllViews -> 
-                        nosupport()
-                    | FindUserViews ->
-                        nosupport()
-                    | FindViewsBySchema(schemaName) ->
-                        nosupport()
-                | FindProcedures(q) -> 
-                    match q with
-                    | FindAllProcedures -> 
-                        nosupport()
-                    | FindProceduresBySchema(schemaName) ->
-                        nosupport()
-                | FindSequences(q) -> 
-                    match q with
-                    | FindAllSequences -> 
-                        nosupport()
-                    | FindSequencesBySchema(schemaName) ->
-                        nosupport()
-
+                | FindAllViews -> 
+                    this.DescribeViews() |> List.map(ViewDescription)
+                | FindUserViews ->
+                    nosupport()
+                | FindViewsBySchema(schemaName) ->
+                    this.DescribeViewsInSchema(schemaName) |> List.map(ViewDescription)
+            | FindProcedures(q) -> 
+                match q with
+                | FindAllProcedures -> 
+                    this.DescribeProcedures() |> List.map(RoutineDescription)
+                | FindProceduresBySchema(schemaName) ->
+                    this.DescribeProceduresInSchema(schemaName) |> List.map(RoutineDescription)
+            | FindSequences(q) -> 
+                match q with
+                | FindAllSequences -> 
+                    nosupport()
+                | FindSequencesBySchema(schemaName) ->
+                    nosupport()
+        
+    
+module SqlMetadataProvider =
     let private providers = ConcurrentDictionary<SqlMetadataProviderConfig, ISqlMetadataProvider>()
         
     let get(config : SqlMetadataProviderConfig) =
-        providers.GetOrAdd(config, fun config -> config |> Realization :> ISqlMetadataProvider)
+        providers.GetOrAdd(config, fun config -> config |> SqlMetadataReader :> ISqlMetadataProvider)
 

@@ -123,5 +123,25 @@ module internal Metadata =
             member this.IsUserDefined = this.IsUserDefined
             member this.Documentation = this.Description
         
+    type vSequence() =
+        member val CatalogName = String.Empty with get, set
+        member val SchemaName = String.Empty with get, set
+        member val SequenceName = String.Empty with get, set
+        member val IsUserDefined = false with get, set
+        member val Description = String.Empty with get, set
+        member val StartValue = null with get, set
+        member val Increment = null with get, set
+        member val MinimumValue = null with get, set
+        member val MaximumValue = null with get, set
+        member val IsCycling = false with get, set
+        member val IsCached = false with get, set
+        member val CacheSize = 0 with get, set
+        member val DataTypeName = String.Empty with get, set
+        member val CurrentValue = null with get, set
+        member val IsExhausted = false with get, set
+    with
+        interface IMetadataView with
+            member this.IsUserDefined = this.IsUserDefined
+            member this.Documentation = this.Description
 
 

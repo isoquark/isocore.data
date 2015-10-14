@@ -18,21 +18,13 @@ module SqlMetadataProvider =
         inherit ProjectTestContainer(ctx,log)
 
         let mdp = ctx.Store.GetMetadataProvider()
-        let idx =
-            let reader = 
-                {
-                    ConnectionString = ctx.ConnectionString
-                    IgnoreSystemObjects = true
-                } |> SqlMetadataReader
-            let catalog = reader.ReadCatalog()
-            SqlMetadataIndex(catalog)
             
 
         [<Fact>]
         let ``Discovered Tables``() =
-            let tables = [for t in idx.GetSchemaTables("SqlTest") -> t.Name, t ] |> dict
+            let tables = [for t in mdp.DescribeTablesInSchema("SqlTest") -> t.Name, t ] |> dict
 
-            let table = idx.GetTable(objectname<Table01>)          
+            let table = mdp.DescribeTable(objectname<Table01>)          
             table.["Col01"].DataKind |> Claim.equal DataKind.Int32
             table.["Col01"].DataType |> Claim.equal Int32DataType
             
@@ -54,7 +46,7 @@ module SqlMetadataProvider =
 
         [<Fact>]
         let ``Discovered Data Types``() =            
-            let dataTypes = [for t in idx.GetSchemaDataTypes("SqlTest") -> t.Name, t ] |> dict            
+            let dataTypes = [for t in mdp.DescribeDataTypesInSchema("SqlTest") -> t.Name, t ] |> dict            
 
             let name = objectname<TableType01>
             name  |> Claim.containsKey dataTypes            

@@ -53,7 +53,6 @@
     <Compile Include="SqlHelpers.fs" />
     <Compile Include="SqlMetadataProxies.fs" />
     <Compile Include="SqlService.fs" />
-    <Compile Include="SqlMetadataIndex.fs" />
     <Compile Include="SqlMetadataProvider.fs" />
     <Compile Include="SqlDataStore.fs" />
     <Compile Include="SqlExtensions.fs" />
