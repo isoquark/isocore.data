@@ -3,6 +3,7 @@
 namespace IQ.Core.MetaCode.Shell
 
 open System
+open System.IO
 
 open IQ.Core.Data
 open IQ.Core.MetaCode
@@ -14,77 +15,50 @@ type CodeGenerationContext() =
 
 module Main = 
 
-    let rec getMappedTypeName (dataType : DataTypeReference) =
+    type PlaceholderType() = class end
+
+    let rec getMappedType (dataType : DataTypeReference) =
         match dataType with
-        | BitDataType -> typeof<Boolean>.FullName
-        | UInt8DataType -> typeof<Byte>.FullName
-        | UInt16DataType -> typeof<UInt16>.FullName
-        | UInt32DataType -> typeof<UInt32>.FullName
-        | UInt64DataType -> typeof<UInt64>.FullName
-        | Int8DataType -> typeof<SByte>.FullName
-        | Int16DataType -> typeof<Int16>.FullName
-        | Int32DataType -> typeof<Int32>.FullName
-        | Int64DataType -> typeof<Int64>.FullName
-        | BinaryFixedDataType(len) -> typeof<Byte>.FullName + "[]"
-        | BinaryVariableDataType(maxlen) -> typeof<Byte>.FullName + "[]"
-        | BinaryMaxDataType -> typeof<Byte>.FullName + "[]"
-        | AnsiTextFixedDataType(len) -> typeof<string>.FullName
-        | AnsiTextVariableDataType(maxlen) -> typeof<string>.FullName
-        | AnsiTextMaxDataType -> typeof<string>.FullName
-        | UnicodeTextFixedDataType(len) -> typeof<string>.FullName
-        | UnicodeTextVariableDataType(maxlen) -> typeof<string>.FullName
-        | UnicodeTextMaxDataType  -> typeof<string>.FullName
-        | DateTimeDataType(p,s) -> typeof<BclDateTime>.FullName
-        | DateTimeOffsetDataType -> typeof<BclDateTimeOffset>.FullName
-        | TimeOfDayDataType(p,s) -> typeof<UInt64>.FullName
-        | DurationDataType -> typeof<UInt64>.FullName 
-        | RowversionDataType-> typeof<Byte>.FullName + "[]"
-        | DateDataType -> typeof<BclDateTime>.FullName
-        | Float32DataType -> typeof<float32>.FullName
-        | Float64DataType -> typeof<float>.FullName
-        | DecimalDataType(p,s) -> typeof<Decimal>.FullName
-        | MoneyDataType(p,s)  -> typeof<Decimal>.FullName
-        | GuidDataType -> typeof<Guid>.FullName
-        | XmlDataType(schema) -> typeof<string>.FullName
-        | JsonDataType -> typeof<string>.FullName
-        | VariantDataType -> typeof<Object>.FullName
-        | TableDataType(name) -> name.LocalName
-        | ObjectDataType(name, clrTypeName) -> clrTypeName
-        | CustomPrimitiveDataType(name, baseType) -> baseType |> getMappedTypeName
-        | TypedDocumentDataType(doctype) -> doctype.FullName
-        
-        
-    let inferProxyDescription (context : CodeGenerationContext) (table : TableDescription) =
-        let typeName = ClrTypeName(table.Name.LocalName, Some(sprintf "%s.%s" table.Name.SchemaName table.Name.LocalName), None)
-        
-        let typeAttributions = 
-                         TableAttribute(table.Name.SchemaName, table.Name.LocalName) :> Attribute 
-                         |> Seq.singleton
-                         |> ClrAttribution.create (typeName |> TypeElementName)
+        | BitDataType -> typeof<Boolean>
+        | UInt8DataType -> typeof<Byte>
+        | UInt16DataType -> typeof<UInt16>
+        | UInt32DataType -> typeof<UInt32>
+        | UInt64DataType -> typeof<UInt64>
+        | Int8DataType -> typeof<SByte>
+        | Int16DataType -> typeof<Int16>
+        | Int32DataType -> typeof<Int32>
+        | Int64DataType -> typeof<Int64>
+        | BinaryFixedDataType(len) -> typeof<Byte[]>
+        | BinaryVariableDataType(maxlen) -> typeof<Byte>
+        | BinaryMaxDataType -> typeof<Byte[]>
+        | AnsiTextFixedDataType(len) -> typeof<string>
+        | AnsiTextVariableDataType(maxlen) -> typeof<string>
+        | AnsiTextMaxDataType -> typeof<string>
+        | UnicodeTextFixedDataType(len) -> typeof<string>
+        | UnicodeTextVariableDataType(maxlen) -> typeof<string>
+        | UnicodeTextMaxDataType  -> typeof<string>
+        | DateTimeDataType(p,s) -> typeof<BclDateTime>
+        | DateTimeOffsetDataType -> typeof<BclDateTimeOffset>
+        | TimeOfDayDataType(p,s) -> typeof<UInt64>
+        | DurationDataType -> typeof<UInt64>
+        | RowversionDataType-> typeof<Byte[]>
+        | DateDataType -> typeof<BclDateTime>
+        | Float32DataType -> typeof<float32>
+        | Float64DataType -> typeof<float>
+        | DecimalDataType(p,s) -> typeof<Decimal>
+        | MoneyDataType(p,s)  -> typeof<Decimal>
+        | GuidDataType -> typeof<Guid>
+        | XmlDataType(schema) -> typeof<string>
+        | JsonDataType -> typeof<string>
+        | VariantDataType -> typeof<Object>
+        | TableDataType(name) -> typeof<PlaceholderType>
+        | ObjectDataType(name, clrTypeName) -> typeof<PlaceholderType>
+        | CustomPrimitiveDataType(name, baseType) -> baseType |> getMappedType
+        | TypedDocumentDataType(doctype) -> doctype
 
-        
 
-        let members = [for col in table.Columns ->
-                            let valueTypeName = ClrTypeName(String.Empty, Some(col.DataType |> getMappedTypeName), None)
-                            {
-                                ClrProperty.Name = col.Name |> ClrMemberName
-                                Position = col.Position
-                                ReflectedElement = None
-                                Attributes = []
-                                GetMethodAttributes = []
-                                SetMethodAttributes = []
-                                DeclaringType = typeName
-                                ValueType = valueTypeName
-                                IsOptional = false
-                                IsNullable = false
-                                CanRead = true
-                                CanWrite = true
-                                ReadAccess = ClrAccessKind.Public |> Some
-                                WriteAccess = ClrAccessKind.Public |> Some
-                                IsStatic = false
-                            } |> PropertyMember
-                         ]
-        
+
+    let defineClassType typeNamespace typeName  members attributions =
         let typeInfo = {
             ClrTypeInfo.Access = ClrAccessKind.Public
             Name = typeName
@@ -95,74 +69,114 @@ module Main =
             IsOptionType = false
             Members = members
             IsStatic = false
-            Attributes = typeAttributions
+            Attributes = attributions
             ItemValueType = typeName
-            Namespace = sprintf "%s.%s" context.Namespace table.Name.SchemaName
+            Namespace =  typeNamespace
             DeclaredTypes = []
         }
         ClrClass(typeInfo) |> ClassType
+
+    let defineColumnMember typeName (col : ColumnDescription) =
+        let mappedType = col.DataType |> getMappedType
+        {
+            ClrProperty.Name = col.Name |> ClrMemberName
+            Position = col.Position
+            ReflectedElement = None
+            Attributes = []
+            GetMethodAttributes = []
+            SetMethodAttributes = []
+            DeclaringType = typeName
+            ValueType = mappedType.TypeName
+            IsOptional = false
+            IsNullable = (col.Nullable && mappedType.IsValueType)
+            CanRead = true
+            CanWrite = true
+            ReadAccess = ClrAccessKind.Public |> Some
+            WriteAccess = ClrAccessKind.Public |> Some
+            IsStatic = false
+        } |> PropertyMember
+        
+    let defineTypeName (context : CodeGenerationContext) (dataobject : IDataObjectDescription) =
+        ClrTypeName(dataobject.ObjectName.LocalName, Some(sprintf "%s.%s" dataobject.ObjectName.SchemaName dataobject.ObjectName.LocalName), None)
+        
+    let ExcludedColumnNames = ["DbCreateUser"; "DbCreateTime"; "DbUpdateUser"; "DbUpdateTime"]
+
+    let isColumnExcluded colName =
+        ExcludedColumnNames |>List.exists(fun c -> c = colName)
+
+    let isColumnIncluded colName =
+        colName |> isColumnExcluded |> not
+
+    let defineColumnMembers typeName (dataobject : ITabularDescription) =
+        dataobject.Columns |> List.filter(fun c -> c.Name |> isColumnIncluded) 
+                           |>  List.map(fun c -> c |> defineColumnMember typeName)
+        
+    let defineTableTypeProxy (context : CodeGenerationContext) (dataobject : ITabularDescription) =
+        let typeName = dataobject |> defineTypeName context
+        let attributions = 
+                         TableTypeAttribute(dataobject.ObjectName.SchemaName, dataobject.ObjectName.LocalName) :> Attribute 
+                         |> Seq.singleton
+                         |> ClrAttribution.create (typeName |> TypeElementName)
+        let members = dataobject |> defineColumnMembers typeName
+        defineClassType context.Namespace typeName members attributions 
+        
+    let defineTableProxy (context : CodeGenerationContext) (dataobject : ITabularDescription) =
+        let typeName = dataobject |> defineTypeName context
+        let attributions = 
+                         TableAttribute(dataobject.ObjectName.SchemaName, dataobject.ObjectName.LocalName) :> Attribute 
+                         |> Seq.singleton
+                         |> ClrAttribution.create (typeName |> TypeElementName)
+        
+        let members = dataobject |> defineColumnMembers typeName
+        defineClassType context.Namespace typeName members attributions
     
+    let defineViewProxy (context : CodeGenerationContext) (dataobject : ITabularDescription) =
+        let typeName = dataobject |> defineTypeName context
+        let attributions = 
+                         ViewAttribute(dataobject.ObjectName.SchemaName, dataobject.ObjectName.LocalName) :> Attribute 
+                         |> Seq.singleton
+                         |> ClrAttribution.create (typeName |> TypeElementName)
+        
+        let members = dataobject |> defineColumnMembers typeName
+        defineClassType context.Namespace typeName members attributions
+
     
+    let buildSchemaProxies outdir (metadata : ISqlMetadataProvider) schemaName =
+        let context = CodeGenerationContext(Namespace= sprintf "DataMaster.DataProxies.%s" schemaName)
+
+        let tableProxies = schemaName 
+                         |> metadata.DescribeTablesInSchema 
+                         |>List.map(fun x -> x |> defineTableProxy context)
+        let tableTypeProxies = schemaName 
+                            |> metadata.DescribeDataTypesInSchema |> List.filter(fun x -> x.IsTableType)
+                            |>List.map(fun x -> x |> defineTableTypeProxy context)
+        let viewProxies = schemaName 
+                         |> metadata.DescribeViewsInSchema 
+                         |> List.map(fun x -> x |> defineViewProxy context)
+
+        let proxies = tableTypeProxies 
+                    |> List.append tableProxies 
+                    |> List.append viewProxies
+                    |> List.sortBy(fun x -> x.Name.SimpleName)
+                
+        let filename = sprintf "%sStructures.cs" schemaName 
+        let filepath = Path.Combine(outdir, filename)
+        proxies |> CSharpGenerator.genFile filepath
+        
+
     [<EntryPoint>]
     let main argv = 
+        let cs = "Data Source=DBSERVER;Integrated Security=True;Pooling=False; Initial Catalog=DBNAME"
+        let outdir = @"C:\OUTDIR"
         use context = new ShellContext()
-        let cs = "csSqlDataStore" |> context.ConfigurationManager.GetValue 
-
         let dsProvider = context.AppContext.Resolve<IDataStoreProvider>()
         let store = dsProvider.GetDataStore<ISqlDataStore>(cs)
         let metadata = store.MetadataProvider
+        let build = buildSchemaProxies outdir metadata
 
-        let context = CodeGenerationContext(Namespace="MyNamespace")
-
-        let table = metadata.DescribeTable(DataObjectName("SqlTest", "Table02"))
-        let tableProxy = table |> inferProxyDescription context
-
-//        let prop = {
-//            Name = ClrMemberName("Prop1")
-//            Position = 0
-//            ReflectedElement = None
-//            Attributes = []
-//            GetMethodAttributes = []
-//            SetMethodAttributes = []
-//            DeclaringType = ClrTypeName("MyClass1", None, None)
-//            ValueType = ClrTypeName("Int32", Some("System.Int32"), None)
-//            IsOptional = false
-//            IsNullable = false
-//            CanRead = true
-//            ReadAccess = ClrAccessKind.Public |> Some
-//            CanWrite = true
-//            WriteAccess = ClrAccessKind.Public |> Some
-//            IsStatic = false
-//        }
-//
-//        let info = {
-//            Name = ClrTypeName("MyClass1", None, None)
-//            Position = 0
-//            ReflectedElement = None
-//            DeclaringType = None
-//            DeclaredTypes = []
-//            Kind = ClrTypeKind.Class
-//            IsOptionType = false
-//            Members = [prop |> PropertyMember]
-//            Access = ClrAccessKind.Public
-//            IsStatic = false
-//            Attributes = []
-//            ItemValueType = ClrTypeName("MyClass1", None, None)
-//            Namespace = "IQ.Types"
-//        }
-
-
-
-        let assembly = 
-            {
-                Name = ClrAssemblyName("IQ.Types", None)
-                ReflectedElement = None
-                Position = 0
-                Types = [tableProxy]
-                Attributes = []
-                References = []
-            }
-
-        assembly |> CSharpGenerator.genProject @"C:\Temp"
+        "JhaEtl" |> build
+        "JhaStage" |> build
+        "Core" |> build
+        
 
         0 

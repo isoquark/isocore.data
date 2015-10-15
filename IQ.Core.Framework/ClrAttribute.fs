@@ -74,17 +74,18 @@ module ClrAttribution =
         
         [for attribute in attributes do
             let attribType = attribute.GetType()
+            let properties = attribType.GetProperties() |> Array.filter(fun p -> p.DeclaringType <> typeof<System.Attribute>)
             yield 
                 {
                     ClrAttribution.AttributeName =  attribType.TypeName
                     Target = target
-                    AppliedValues = attribType.GetProperties() 
+                    AppliedValues = properties
                                   |> Array.filter(fun p -> p.CanRead)
                                   |> Array.mapi( fun i p -> ValueIndexKey(p.Name, i),  p |> getValue attribute  ) 
                                   |>List.ofArray 
                                   |> ValueIndex
                     AttributeInstance = attribute |> Some
-                }            
+                }
         ]
 
 [<AutoOpen>]

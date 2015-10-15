@@ -71,8 +71,18 @@ module internal ClrProperty =
             nosupport() 
         
         let accessModifiers = p.ReadAccess.Value |> ClrAccessKind.getKeywords |> Array.map SF.Token
+        
+        let nameText = 
+            if p.ValueType.FullName |> Option.isSome then 
+                p.ValueType.FullName.Value 
+            else 
+                p.ValueType.SimpleName
 
-        let typeName = SF.ParseTypeName(if p.ValueType.FullName |> Option.isSome then p.ValueType.FullName.Value else p.ValueType.SimpleName)
+        let typeName = if p.IsNullable then 
+                            SF.NullableType(SF.ParseTypeName(nameText)) :> TypeSyntax 
+                       else 
+                            SF.ParseTypeName(nameText) 
+        
         SF.PropertyDeclaration(typeName, p.Name.Text) 
         |> addModifiers accessModifiers
         |> addAutoGetAccessor
@@ -96,23 +106,46 @@ module internal ClrMember=
         
         | ConstructorMember(m) ->
             nosupport()
+
+//See this: http://roslynquoter.azurewebsites.net/
         
+module internal ClrAttribution =
+    let private arg(value : obj) = 
+        SF.AttributeArgument(SF.LiteralExpression(SyntaxKind.StringLiteralExpression, SF.Literal(value :?> string)))
+    
+    let declare (a : ClrAttribution) =
+       let argValues = match a.AppliedValues with | ValueIndex (x) -> x
+       let args = argValues 
+                |> List.sortBy(fun (x,y) -> x.Position) 
+                |> List.map(fun (x,y) -> arg(y))
+       let argList = SF.SeparatedList<AttributeArgumentSyntax>(args) |> SF.AttributeArgumentList
+       SF.Attribute(SyntaxFactory.IdentifierName(a.AttributeName.SimpleName)).WithArgumentList(argList)
+       
         
         
 module internal ClrClass =
    let private addModifiers modifiers (syntax : ClassDeclarationSyntax) =
-        syntax.AddModifiers(modifiers)   
-
+        syntax.AddModifiers(modifiers)
    
    let private addMembers (members : MemberDeclarationSyntax seq) (syntax : ClassDeclarationSyntax) =
         syntax.AddMembers (members |> Array.ofSeq)
-    
+
+   let private addAttributes (attributions : ClrAttribution list) (syntax : ClassDeclarationSyntax) =
+        attributions |> List.map(ClrAttribution.declare) 
+                     |> SF.SeparatedList 
+                     |> SF.AttributeList 
+                     |> SF.SingletonList 
+                     |> syntax.WithAttributeLists
+       
+       
    let declare (c : ClrClass) =
         let accessModifiers = c.Access |> ClrAccessKind.getKeywords |> Array.map SF.Token
+        let partialModifier = SF.Token(SyntaxKind.PartialKeyword);
+        let modifiers = [|partialModifier|] |> Array.append accessModifiers
         SF.ClassDeclaration(c.Name.SimpleName)
-        |> addModifiers accessModifiers
+        |> addModifiers modifiers
+        |> addAttributes c.Info.Attributes
         |> addMembers (List.map ClrMember.declare <| c.Info.Members )
-
                              
 /// <summary>
 /// Model builder
@@ -130,7 +163,8 @@ module internal CU =
     type private SF = Microsoft.CodeAnalysis.CSharp.SyntaxFactory
 
     let create() = 
-        SF.CompilationUnit()
+        SF.CompilationUnit() 
+        
 
     let using (name : string) (cu : CompilationUnitSyntax) =
         cu.AddUsings([|name |> MB.using|])
@@ -170,7 +204,7 @@ module internal PI =
         ProjectInfo.Create(ProjectId.CreateNewId(name), VersionStamp.Default, name, name, "C#", null, sprintf "%s.dll" name)
 
 module internal WS =
-    let create() = new AdhocWorkspace()     
+    let create() = new AdhocWorkspace()
 
 
                         
@@ -203,6 +237,25 @@ module CSharpGenerator =
             nosupport()
     
 
+    let genFile (dstFile : string) (types : ClrType list) =
+        
+        let namespaces = types |> List.groupBy(fun t -> t.TypeInfo.Namespace)
+                               |> List.map(fun (nsname,types) ->
+                                                    nsname |> NS.create
+                                                           |> NS.addTypes(types |> List.map genType))
+        
+        let cu = CU.create() |> CU.using "System"
+                             |> CU.using "System.Collections.Generic" 
+                             |> CU.using "IQ.Core.Data.Contracts"
+                             |> CU.addNamespaces namespaces
+                
+        use workspace = WS.create()
+
+        let format = Formatter.Format(cu, workspace)
+        let sb = StringBuilder()
+        use writer = new StreamWriter(dstFile)
+        format.WriteTo(writer)
+
     let genProject (dstFolder : string) (a : ClrAssembly) =
         
         let namespaces = a.Types |> List.groupBy(fun t -> t.TypeInfo.Namespace)
@@ -216,7 +269,7 @@ module CSharpGenerator =
                              |> CU.addNamespaces namespaces
         
         
-        use workspace = WS.create()        
+        use workspace = WS.create()
 
         let format = Formatter.Format(cu, workspace)
         let sb = StringBuilder()

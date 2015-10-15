@@ -117,7 +117,7 @@ module internal SqlService =
                         let itemValueType = proxyDescription.ProxyElement.ReflectedElement.Value.ParameterType.ItemValueType 
                         let itemProxyDesc = itemValueType |> ClrMetadata().FindType |>  DataProxyMetadata.describeTableProxy 
                         let tableParamValue = values |> BclDataTable.fromProxyValues itemProxyDesc
-                        SqlParameter(elementDescription.Name, tableParamValue)                                                
+                        SqlParameter(elementDescription.Name, tableParamValue)
                     | _ ->
                         SqlParameter(elementDescription.Name |> SqlFormatter.formatParameterName, value)
                 else if elementDescription.Direction = RoutineParameterDirection.Output then
@@ -129,7 +129,7 @@ module internal SqlService =
             | TableDataType(name) ->
                 p.SqlDbType <- SqlDbType.Structured
             | _ ->
-                p.SqlDbType <- elementDescription.DataType |> DataType.toSqlDbType   
+                p.SqlDbType <- elementDescription.DataType |> DataType.toSqlDbType
         command.Parameters.Add(p) |> ignore
 
 
@@ -147,12 +147,12 @@ module internal SqlService =
         proc.CallProxy.Parameters |> Seq.iter (fun x -> x |> addParameter command paramValues)
         command.ExecuteNonQuery() |> ignore
         [for i in [0..command.Parameters.Count-1] do
-            let parameter = command.Parameters.[i]  
+            let parameter = command.Parameters.[i]
             if  parameter.Direction = System.Data.ParameterDirection.InputOutput || 
                 parameter.Direction = System.Data.ParameterDirection.Output || 
                 parameter.Direction = System.Data.ParameterDirection.ReturnValue then
                 yield parameter.ParameterName, i, parameter.Value
-        ]|>ValueIndex.create                
+        ]|>ValueIndex.create
 
     /// <summary>
     /// Executes a stored procedure that returns a result set

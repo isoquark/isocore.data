@@ -12,6 +12,51 @@ open IQ.Core.Data
 open OfficeOpenXml
 open OfficeOpenXml.Table
 
+(**
+    class Program
+    {
+        static string CSTemplate = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0};Extended Properties='Excel 8.0;HDR=Yes'";
+
+        static void ADO()
+        {
+            var wbpath = @"W:\filestage\PropertySetting\2015-10-08.JhaPropertySettings.xlsx";
+            var cs = String.Format(CSTemplate, wbpath);
+
+            using (var connection = new OleDbConnection(cs))
+            {
+                connection.Open();
+                var tables = connection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
+                var columns = connection.GetOleDbSchemaTable(OleDbSchemaGuid.Columns, null);
+                var y = connection.GetOleDbSchemaTable(OleDbSchemaGuid.DbInfoLiterals, null);
+
+                using (var command = new OleDbCommand("select * from [Sheet1$]", connection))
+                {
+                    using (var adapter = new OleDbDataAdapter(command))
+                    {
+                        var table = new DataTable();
+                        adapter.Fill(table);
+                    }
+                }
+            }
+        }
+
+
+        static void Main(string[] args)
+        {
+            var sw = Stopwatch.StartNew();            
+            ADO();
+            Console.WriteLine($"ADO {sw.ElapsedMilliseconds}");
+
+            sw.Restart();
+            var wb = new XLWorkbook(@"W:\filestage\PropertySetting\2015-10-08.JhaPropertySettings.xlsx");
+            var ws = wb.Worksheet(1);
+            var rows = ws.RowsUsed();
+            Console.WriteLine($"ClosedXml {sw.ElapsedMilliseconds}");
+
+
+        }
+    }
+*)
 
 [<AutoOpen>]
 module DataMatrixExtensions =

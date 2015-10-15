@@ -18,7 +18,20 @@ open IQ.Core.Data
 
 
             
-        
+type internal SqlCommandBuilder(cmdText) =
+    let mutable timeout = 60
+    let mutable connection  = Unchecked.defaultof<SqlConnection>
+    let mutable isProcedure = false
+
+    member this.Build() = 
+        let command = new SqlCommand(cmdText)
+        command.CommandType <- if isProcedure then CommandType.StoredProcedure else CommandType.Text
+        command.CommandTimeout <- timeout
+        command
+
+    member this.WithTimeout(value) = timeout <- value
+    member this.Procedure(value) = isProcedure <- value
+                
 
 
 module internal SqlCommand =

@@ -348,6 +348,7 @@ type IDataObjectDescription =
     inherit IDataElementDescription
     abstract ObjectName : DataObjectName
 
+
 /// <summary>
 /// Describes a column in a table or view
 /// </summary>
@@ -383,6 +384,12 @@ with
         member this.Name = this.Name
         member this.Documentation = this.Documentation
 
+/// <summary>
+/// Defines common contract for data elements that own/parent a collection of columns
+/// </summary>
+type ITabularDescription =
+    inherit IDataObjectDescription
+    abstract Columns : ColumnDescription list
 
 /// <summary>
 /// Describes a data type definition
@@ -423,11 +430,12 @@ with
     /// </summary>
     override this.ToString() = this.Name.Text
 
-    interface IDataObjectDescription with
+    interface ITabularDescription with
         member this.ElementKind = DataElementKind.DataType
         member this.ObjectName = this.Name
         member this.Name = this.Name.Text
         member this.Documentation = this.Documentation
+        member this.Columns = this.Columns
 
 
 /// <summary>
@@ -500,12 +508,6 @@ with
         member this.Name = this.Name
         member this.Documentation = this.Documentation
 
-/// <summary>
-/// Defines common contract for data elements that own/parent a collection of columns
-/// </summary>
-type ITabularDescription =
-    inherit IDataObjectDescription
-    abstract Columns : ColumnDescription list
 
 
 /// <summary>
@@ -876,7 +878,7 @@ type ISqlMetadataProvider =
 /// data source characteristics that cannot otherwise be inferred
 /// </summary>
 [<AutoOpen>]
-module private DataAttributeConstants =    
+module private DataAttributeConstants =
     [<Literal>]
     let UnspecifiedName = ""
     [<Literal>]
@@ -914,8 +916,8 @@ type DataElementAttribute(name) =
     /// <summary>
     /// Gets the local name of the element, if specified
     /// </summary>
-    member this.Name = 
-        if name = String.Empty then None else Some(name)
+    member this.Name = name
+        //if name = String.Empty then None else Some(name)
     
 /// <summary>
 /// Base type for attributes that identify data objects
@@ -934,16 +936,16 @@ type DataObjectAttribute(schemaName, localName) =
     /// <summary>
     /// Gets the name of the schema in which the object resides, if specified
     /// </summary>
-    member this.SchemaName = 
-        if schemaName = String.Empty then None else Some(schemaName)
+    member this.SchemaName = schemaName
+        //if schemaName = String.Empty then None else Some(schemaName)
+        
 
 /// <summary>
 /// Identifies a schema
 /// </summary>
 type SchemaAttribute(schemaName) =
-    inherit DataElementAttribute(schemaName)        
-
-    
+    inherit DataElementAttribute(schemaName)
+        
 /// <summary>
 /// Identifies a table when applied
 /// </summary>

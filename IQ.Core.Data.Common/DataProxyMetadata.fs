@@ -209,7 +209,7 @@ module DataProxyMetadata =
     /// Infers the name of the schema in which the element lives or represents
     /// </summary>
     /// <param name="clrElement">The element from which to infer the schema name</param>
-    let inferSchemaName(description: ClrElement) =              
+    let inferSchemaName(description: ClrElement) =
         let inferFromDeclaringType() =
                 match description.DeclaringType with
                 | Some(t) ->
@@ -217,49 +217,52 @@ module DataProxyMetadata =
                    
                     match description |> ClrElement.tryGetAttributeT<SchemaAttribute>  with
                     | Some(a) ->
-                        match a.Name with
-                        | Some(n) ->
-                            n
-                        | None ->
-                            t.SimpleName
+                        if String.IsNullOrWhiteSpace(a.Name) then t.SimpleName else a.Name
+//                        match a.Name with
+//                        | Some(n) ->
+//                            n
+//                        | None ->
+//                            t.SimpleName
                     | None ->
                         t.SimpleName
                 | None ->
-                    nosupport()                    
+                    nosupport()
         
-        match description |> ClrElement.tryGetAttributeT<SchemaAttribute> with        
+        match description |> ClrElement.tryGetAttributeT<SchemaAttribute> with
         | Some(a) ->
-            match a.Name with
-            | Some(name) -> 
-                name
-            | None -> 
-                inferFromDeclaringType()
+            if String.IsNullOrWhiteSpace(a.Name) then inferFromDeclaringType() else a.Name
+//            match a.Name with
+//            | Some(name) -> 
+//                name
+//            | None -> 
+//                inferFromDeclaringType()
 
         | None ->
-            match description |> ClrElement.tryGetAttributeT<DataObjectAttribute> with        
+            match description |> ClrElement.tryGetAttributeT<DataObjectAttribute> with
             | Some(a) ->
-                match a.SchemaName with
-                | Some(schemaName) -> 
-                    schemaName
-                | None -> 
-                    inferFromDeclaringType()
-            | None ->                                
+                if String.IsNullOrWhiteSpace(a.SchemaName) then inferFromDeclaringType() else a.SchemaName
+//                match a.SchemaName with
+//                | Some(schemaName) -> 
+//                    schemaName
+//                | None -> 
+//                    inferFromDeclaringType()
+            | None ->
                 inferFromDeclaringType()
         
     /// <summary>
     /// Infers a <see cref="DataObjectName"/> from a CLR element
     /// </summary>
     /// <param name="clrElement">The CLR element from which the object name will be inferred</param>
-    let inferDataObjectName(description : ClrElement) =        
+    let inferDataObjectName(description : ClrElement) =
         match description |> ClrElement.tryGetAttributeT<DataObjectAttribute> with
         | Some(a) -> 
             let schemaName = description |> inferSchemaName
-            let localName = 
-                match a.Name with
-                | Some(x) -> 
-                    x
-                | None ->
-                    description.Name.SimpleName
+            let localName = if String.IsNullOrWhiteSpace(a.Name) then description.Name.SimpleName else a.Name
+//                match a.Name with
+//                | Some(x) -> 
+//                    x
+//                | None ->
+//                    description.Name.SimpleName
             DataObjectName(schemaName, localName)
                     
         | None ->
@@ -498,11 +501,12 @@ module DataProxyMetadata =
             match description |> ParameterElement |> ClrElement.tryGetAttributeT<RoutineParameterAttribute> with
             | Some(attrib) ->
                 let position =  match attrib.Position with |Some(p) -> p |None -> description.Position
-                match attrib.Name with
-                |Some(name) ->
-                    name, attrib.Direction, position
-                | None ->
-                    description.Name.Text, attrib.Direction, position                
+                if String.IsNullOrWhiteSpace(attrib.Name) then description.Name.Text, attrib.Direction, position else attrib.Name, attrib.Direction, position
+//                match attrib.Name with
+//                |Some(name) ->
+//                    name, attrib.Direction, position
+//                | None ->
+//                    description.Name.Text, attrib.Direction, position
             | None ->
                 (description.Name.Text, RoutineParameterDirection.Input, description.Position)
         {
@@ -528,7 +532,7 @@ module DataProxyMetadata =
             let attrib = attrib.AttributeInstance |> Option.get :?> RoutineParameterAttribute
             let position =  match attrib.Position with |Some(p) -> p |None -> -1
             {
-                RoutineParameterDescription.Name = attrib.Name |> Option.get                   
+                RoutineParameterDescription.Name = attrib.Name
                 Direction = RoutineParameterDirection.Output //Must always be output so value in attribute can be ignored
                 DataType = storageType
                 Position = position
