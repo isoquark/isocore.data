@@ -166,8 +166,8 @@ module Main =
 
     [<EntryPoint>]
     let main argv = 
-        let cs = "Data Source=DBSERVER;Integrated Security=True;Pooling=False; Initial Catalog=DBNAME"
-        let outdir = @"C:\OUTDIR"
+        let cs = "Data Source=localhost;Integrated Security=True;Pooling=False; Initial Catalog=BillingMaster.Recon.Dev"
+        let outdir = @"C:\Dev\RealPage\RP\Development\PaymentsWB\BillingMaster\DataMaster.Components\DataProxies\"
         use context = new ShellContext()
         let dsProvider = context.AppContext.Resolve<IDataStoreProvider>()
         let store = dsProvider.GetDataStore<ISqlDataStore>(cs)
@@ -177,6 +177,7 @@ module Main =
         "JhaEtl" |> build
         "JhaStage" |> build
         "Core" |> build
+        "JhaDw" |> build
         
 
         0 

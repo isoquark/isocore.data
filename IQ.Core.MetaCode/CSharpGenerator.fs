@@ -122,6 +122,11 @@ module internal ClrAttribution =
        SF.Attribute(SyntaxFactory.IdentifierName(a.AttributeName.SimpleName)).WithArgumentList(argList)
        
         
+module internal Comment =
+    let createToken syntaxKind text  =
+        let format = sprintf "//%s" text
+        let c = SF.TriviaList(SF.Comment(format))
+        SF.Token(c, syntaxKind, SF.TriviaList())
         
 module internal ClrClass =
    let private addModifiers modifiers (syntax : ClassDeclarationSyntax) =
@@ -130,13 +135,20 @@ module internal ClrClass =
    let private addMembers (members : MemberDeclarationSyntax seq) (syntax : ClassDeclarationSyntax) =
         syntax.AddMembers (members |> Array.ofSeq)
 
+   let private createSummaryComment text =
+        let format = sprintf "/// <summary> %s </summary>\r\n" text
+        format |> SF.Comment |> SF.TriviaList
+
    let private addAttributes (attributions : ClrAttribution list) (syntax : ClassDeclarationSyntax) =
-        attributions |> List.map(ClrAttribution.declare) 
-                     |> SF.SeparatedList 
-                     |> SF.AttributeList 
-                     |> SF.SingletonList 
+        attributions |> List.map(ClrAttribution.declare)
+                     |> SF.SeparatedList  
+                     |> SF.AttributeList //|> fun x -> x.WithLeadingTrivia (createSummaryComment "test") 
+                     |> SF.SingletonList                     
                      |> syntax.WithAttributeLists
        
+
+   let private addComments text (syntax : ClassDeclarationSyntax) =
+        text |> createSummaryComment |> syntax.WithLeadingTrivia
        
    let declare (c : ClrClass) =
         let accessModifiers = c.Access |> ClrAccessKind.getKeywords |> Array.map SF.Token
@@ -163,10 +175,13 @@ module internal CU =
     type private SF = Microsoft.CodeAnalysis.CSharp.SyntaxFactory
 
     let create() = 
-        SF.CompilationUnit() 
+        SF.CompilationUnit()
         
-
+    let comment (text : string) (cu : CompilationUnitSyntax) =
+      text |> Comment.createToken SyntaxKind.EndOfFileToken |> cu.WithEndOfFileToken
+               
     let using (name : string) (cu : CompilationUnitSyntax) =
+    
         cu.AddUsings([|name |> MB.using|])
 
     let addType (t : TypeDeclarationSyntax) (cu : CompilationUnitSyntax) =
@@ -243,8 +258,10 @@ module CSharpGenerator =
                                |> List.map(fun (nsname,types) ->
                                                     nsname |> NS.create
                                                            |> NS.addTypes(types |> List.map genType))
-        
-        let cu = CU.create() |> CU.using "System"
+                
+        let cu = CU.create() 
+                             |> CU.comment (sprintf "Proxies generated on %O" BclDateTime.Now)
+                             |> CU.using "System"
                              |> CU.using "System.Collections.Generic" 
                              |> CU.using "IQ.Core.Data.Contracts"
                              |> CU.addNamespaces namespaces
