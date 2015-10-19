@@ -166,18 +166,13 @@ module Main =
 
     [<EntryPoint>]
     let main argv = 
-        let cs = "Data Source=localhost;Integrated Security=True;Pooling=False; Initial Catalog=BillingMaster.Recon.Dev"
-        let outdir = @"C:\Dev\RealPage\RP\Development\PaymentsWB\BillingMaster\DataMaster.Components\DataProxies\"
+        let cs = "Data Source={0};Integrated Security=True;Pooling=False; Initial Catalog={1}"
+        let outdir = @""
+        let schemas = ["Core"]
         use context = new ShellContext()
         let dsProvider = context.AppContext.Resolve<IDataStoreProvider>()
         let store = dsProvider.GetDataStore<ISqlDataStore>(cs)
         let metadata = store.MetadataProvider
         let build = buildSchemaProxies outdir metadata
-
-        "JhaEtl" |> build
-        "JhaStage" |> build
-        "Core" |> build
-        "JhaDw" |> build
-        
-
+        schemas |> List.iter build
         0 
