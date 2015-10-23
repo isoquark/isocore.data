@@ -208,6 +208,7 @@ module internal ClrProperty =
         {
             ClrProperty.Name = p.Name |> ClrMemberName 
             Position = pos
+            Documentation = String.Empty
             DeclaringType  = p.DeclaringType.TypeName
             ValueType = p.PropertyType.TypeName
             IsOptional = p.PropertyType |> Option.isOptionType
@@ -237,6 +238,7 @@ module internal ClrMethod =
         {
             ClrMethodParameter.Name = p.ParameterName
             Position = pos
+            Documentation = String.Empty
             ReflectedElement = p |> Some
             Attributes = p.UserAttributions
             CanOmit = (p.IsOptional || p.IsDefined(typeof<OptionalArgumentAttribute>))
@@ -251,10 +253,11 @@ module internal ClrMethod =
                     |> Array.mapi(fun pos p -> p |> describeParameter pos) 
                     |>List.ofArray
           
-          if m.ReturnType <> typeof<Void> then            
+          if m.ReturnType <> typeof<Void> then
               yield {
                     ClrMethodParameter.Name = ClrParameterName(String.Empty)
                     Position = -1
+                    Documentation = String.Empty
                     ReflectedElement = None
                     Attributes = m.UserReturnAttributions
                     CanOmit = false
@@ -268,6 +271,7 @@ module internal ClrMethod =
         {
             ClrConstructor.Name = c.MemberName
             Position = pos
+            Documentation = String.Empty
             ReflectedElement = c |> Some
             Access = c.Access
             IsStatic = c.IsStatic
@@ -279,6 +283,7 @@ module internal ClrMethod =
     let describe pos (m : MethodInfo) = {
         ClrMethod.Name = m.Name |> ClrMemberName
         Position = pos
+        Documentation = String.Empty
         ReflectedElement = m |> Some
         Access = m.Access
         IsStatic = m.IsStatic
@@ -303,6 +308,7 @@ module internal ClrField =
         {
             ClrField.Name = f.Name |> ClrMemberName
             Position = pos
+            Documentation = String.Empty
             ReflectedElement = f |> Some
             Access = f.Access
             IsStatic = f.IsStatic
@@ -326,6 +332,7 @@ module internal ClrEvent =
         {
             ClrEvent.Name = e.MemberName
             Position = pos
+            Documentation = String.Empty
             ReflectedElement = e |> Some                
             Attributes = e.UserAttributions
             DeclaringType = e.DeclaringType.TypeName
@@ -354,6 +361,7 @@ module internal ClrType =
             {
                 ClrTypeInfo.Name = t.TypeName
                 Position = pos
+                Documentation = String.Empty
                 DeclaringType = if t.DeclaringType <> null then 
                                     t.DeclaringType.TypeName |> Some 
                                 else 

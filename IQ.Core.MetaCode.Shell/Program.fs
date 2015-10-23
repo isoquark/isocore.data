@@ -58,11 +58,12 @@ module Main =
 
 
 
-    let defineClassType typeNamespace typeName  members attributions =
+    let defineClassType typeNamespace typeName  members attributions documentation =
         let typeInfo = {
             ClrTypeInfo.Access = ClrAccessKind.Public
             Name = typeName
             Position = 0
+            Documentation = documentation
             ReflectedElement = None
             DeclaringType = None
             Kind = ClrTypeKind.Class
@@ -81,6 +82,7 @@ module Main =
         {
             ClrProperty.Name = col.Name |> ClrMemberName
             Position = col.Position
+            Documentation = col.Documentation
             ReflectedElement = None
             Attributes = []
             GetMethodAttributes = []
@@ -118,7 +120,7 @@ module Main =
                          |> Seq.singleton
                          |> ClrAttribution.create (typeName |> TypeElementName)
         let members = dataobject |> defineColumnMembers typeName
-        defineClassType context.Namespace typeName members attributions 
+        defineClassType context.Namespace typeName members attributions dataobject.Documentation
         
     let defineTableProxy (context : CodeGenerationContext) (dataobject : ITabularDescription) =
         let typeName = dataobject |> defineTypeName context
@@ -128,7 +130,7 @@ module Main =
                          |> ClrAttribution.create (typeName |> TypeElementName)
         
         let members = dataobject |> defineColumnMembers typeName
-        defineClassType context.Namespace typeName members attributions
+        defineClassType context.Namespace typeName members attributions dataobject.Documentation
     
     let defineViewProxy (context : CodeGenerationContext) (dataobject : ITabularDescription) =
         let typeName = dataobject |> defineTypeName context
@@ -138,7 +140,7 @@ module Main =
                          |> ClrAttribution.create (typeName |> TypeElementName)
         
         let members = dataobject |> defineColumnMembers typeName
-        defineClassType context.Namespace typeName members attributions
+        defineClassType context.Namespace typeName members attributions dataobject.Documentation
 
     
     let buildSchemaProxies outdir (metadata : ISqlMetadataProvider) schemaName =

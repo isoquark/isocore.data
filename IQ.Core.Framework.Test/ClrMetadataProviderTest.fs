@@ -186,6 +186,7 @@ module ClrMetadataProvider =
                 {
                     Name = p1Name
                     Position = 0
+                    Documentation = String.Empty
                     DeclaringType = typeof<ClassA>.TypeName
                     ValueType = typeof<BclDateTime>.TypeName
                     IsOptional = false
@@ -207,6 +208,7 @@ module ClrMetadataProvider =
             let p2Expect = {
                 Name = p2Info.Name |> ClrMemberName
                 Position = 1
+                Documentation = String.Empty
                 DeclaringType = typeof<ClassA>.TypeName
                 ValueType = typeof<int>.TypeName
                 IsOptional = false
@@ -228,6 +230,7 @@ module ClrMetadataProvider =
                 {
                     Name = p3Name
                     Position = 2
+                    Documentation = String.Empty
                     DeclaringType = typeof<ClassA>.TypeName
                     ValueType = typeof<option<int64>>.TypeName
                     IsOptional = true

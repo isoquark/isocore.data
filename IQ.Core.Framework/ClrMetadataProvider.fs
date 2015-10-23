@@ -40,6 +40,7 @@ module ClrMetadataProvider =
             {
                 Name = ClrAssemblyName(corlib.SimpleName, corlib.FullName |> Some)
                 Position = 0
+                Documentation = String.Empty
                 Types = [
                             typeof<Byte>; typeof<Int32>; typeof<Int16>
                             typeof<Int64>; typeof<UInt16>; typeof<UInt32>; typeof<UInt64>
@@ -56,6 +57,7 @@ module ClrMetadataProvider =
             {
                 Name = ClrAssemblyName(a.SimpleName, a.FullName |> Some)
                 Position = 0
+                Documentation = String.Empty
                 Types = a.GetTypes() |> Array.mapi(fun pos t -> ClrType.describe pos t) |> List.ofArray
                 ReflectedElement = a |> Some
                 Attributes = a.GetCustomAttributes() |> ClrAttribution.create a.ElementName

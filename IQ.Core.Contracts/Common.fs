@@ -109,7 +109,7 @@ type IAppContext =
 /// <summary>
 /// Defines the contract for the composition root in the DI pattern
 /// </summary>
-type ICompositionRoot =        
+type ICompositionRoot =
     inherit IDisposable
     inherit ICompositionRegistry
     
@@ -207,7 +207,7 @@ type ClrElementKind =
     /// <summary>
     /// Classifies a CLR element as a constructor
     /// </summary>
-    | Constructor = 5        
+    | Constructor = 5
     /// <summary>
     /// Classifies a CLR element as a type 
     /// </summary>
@@ -296,7 +296,7 @@ with
 
 /// <summary>
 /// Represents the name of a member
-/// </summary>    
+/// </summary>
 [<DebuggerDisplay("{ToString(),nq}")>]
 type ClrMemberName = ClrMemberName of string
 with
@@ -307,7 +307,7 @@ with
     
 /// <summary>
 /// Represents the name of a parameter
-/// </summary>    
+/// </summary>
 [<DebuggerDisplay("{ToString(),nq}")>]
 type ClrParameterName = ClrParameterName of string
 with
@@ -360,11 +360,13 @@ type ClrAttribution = {
 /// </summary>
 type ClrProperty = {
     /// The name of the property 
-    Name : ClrMemberName        
+    Name : ClrMemberName
     /// The position of the property
-    Position : int         
+    Position : int
+    /// Describes the purpose/meaning of the property
+    Documentation : string
     /// The reflected property, if applicable
-    ReflectedElement : PropertyInfo option        
+    ReflectedElement : PropertyInfo option
     /// The attributes applied directly to the property
     Attributes : ClrAttribution list
     /// The attributes applied directly to the get method, if applicable
@@ -372,7 +374,7 @@ type ClrProperty = {
     /// The attributes applied directly to the set method, if applicable
     SetMethodAttributes : ClrAttribution list
     /// The name of the type that declares the property
-    DeclaringType : ClrTypeName           
+    DeclaringType : ClrTypeName
     /// The type of the property value
     ValueType : ClrTypeName
     /// Specifies whether the property is of option<> type
@@ -382,11 +384,11 @@ type ClrProperty = {
     /// Specifies whether the property has a get accessor
     CanRead : bool
     /// The access specifier of the get accessor if one exists
-    ReadAccess : ClrAccessKind option      
+    ReadAccess : ClrAccessKind option
     /// Specifies whether the property has a set accessor
     CanWrite : bool
     /// The access specifier of the set accessor if one exists
-    WriteAccess : ClrAccessKind option        
+    WriteAccess : ClrAccessKind option
     /// Specifies whether the property is static
     IsStatic : bool
 }
@@ -402,11 +404,13 @@ with
 /// </summary>
 type ClrField = {
     /// The name of the property 
-    Name : ClrMemberName        
+    Name : ClrMemberName
+    /// The position of the property
+    Position : int 
+    /// Describes the purpose/meaning of the field
+    Documentation : string
     /// The reflected property, if applicable
     ReflectedElement : FieldInfo option
-    /// The position of the property
-    Position : int            
     /// The attributes applied to the field
     Attributes : ClrAttribution list
     /// The field's access specifier
@@ -416,11 +420,11 @@ type ClrField = {
     /// Specifies the name of the field type
     FieldType : ClrTypeName
     /// The name of the type that declares the field
-    DeclaringType : ClrTypeName   
+    DeclaringType : ClrTypeName
     /// Specifies whether the field is a literal value
     IsLiteral : bool
     /// The value of the literal
-    LiteralValue : obj option        
+    LiteralValue : obj option
 }
 with
     /// <summary>
@@ -436,15 +440,17 @@ type ClrMethodParameter = {
     /// The name of the parameter
     Name : ClrParameterName
     /// The position of the parameter
-    Position : int    
-    /// The reflected method, if applicable                
+    Position : int
+    /// Describes the purpose/meaning of the parameter
+    Documentation : string
+    /// The reflected method, if applicable
     ReflectedElement : ParameterInfo option
     /// The attributes applied to the parameter
     Attributes : ClrAttribution list
     /// Specifies whether the parameter is required
-    CanOmit : bool   
+    CanOmit : bool
     /// Specifies the name of the parameter type
-    ParameterType : ClrTypeName    
+    ParameterType : ClrTypeName
     /// The name of the method that declares the parameter
     DeclaringMethod : ClrMemberName
     /// Specifies whether the parameter represents a return
@@ -464,10 +470,12 @@ with
 type ClrMethod = {
     /// The name of the method
     Name : ClrMemberName
-    /// The reflected method, if applicable        
-    ReflectedElement : MethodInfo option
     /// The position of the method
-    Position : int            
+    Position : int
+    /// Describes the purpose/meaning of the method
+    Documentation : string
+    /// The reflected method, if applicable
+    ReflectedElement : MethodInfo option
     /// The attributes applied to the method
     Attributes : ClrAttribution list
     /// The method's access specifier
@@ -482,7 +490,7 @@ type ClrMethod = {
     /// TODO: calculate this from the return parameter attributes
     ReturnAttributes : ClrAttribution list
     /// The name of the type that declares the method
-    DeclaringType : ClrTypeName           
+    DeclaringType : ClrTypeName
 }
 with
     /// <summary>
@@ -496,14 +504,16 @@ with
 /// Represents a constructor
 /// </summary>
 type ClrConstructor = {
-    /// The name of the constructor    
+    /// The name of the constructor
     Name : ClrMemberName
-    /// The reflected constructor, if applicable        
-    ReflectedElement : ConstructorInfo option
     /// The position of the property
-    Position : int            
+    Position : int
+    /// Describes the constructor
+    Documentation : string
+    /// The reflected constructor, if applicable
+    ReflectedElement : ConstructorInfo option
     /// The attributes applied to the constructor
-    Attributes : ClrAttribution list        
+    Attributes : ClrAttribution list
     /// The constructor's access specifier
     Access : ClrAccessKind
     /// Specifies whether the constructor is static
@@ -511,7 +521,7 @@ type ClrConstructor = {
     /// The constructor parameters
     Parameters : ClrMethodParameter list
     /// The name of the type that declares the constructor
-    DeclaringType : ClrTypeName           
+    DeclaringType : ClrTypeName
 }
 
 /// <summary>
@@ -520,14 +530,16 @@ type ClrConstructor = {
 type ClrEvent = {
     /// The name of the event
     Name : ClrMemberName
-    /// The reflected event, if applicable        
-    ReflectedElement : EventInfo option
     /// The position of the event
-    Position : int                
+    Position : int
+    /// Describes the purpose/meaning of the event
+    Documentation : string
+    /// The reflected event, if applicable
+    ReflectedElement : EventInfo option
     /// The attributes applied to the event
     Attributes : ClrAttribution list
     /// The name of the type that declares the event
-    DeclaringType : ClrTypeName           
+    DeclaringType : ClrTypeName
 }
 
 /// <summary>
@@ -537,11 +549,13 @@ type ClrUnionCase = {
     /// The name of the type
     Name : ClrMemberName
     /// The position of the type
-    Position : int    
+    Position : int
+    /// Describes the purpose/meaning of the case
+    Documentation : string
     /// The attributes applied to the case
     Attributes : ClrAttribution list
     /// The name of the type that declares the case
-    DeclaringType : ClrTypeName           
+    DeclaringType : ClrTypeName
     /// The reflected case, if applicable
     ReflectedElement : UnionCaseInfo option
 }
@@ -567,6 +581,16 @@ with
         | MethodMember(m) -> m.ToString()
         | EventMember(m) -> m.ToString()
         | ConstructorMember(m) -> m.ToString()
+    /// <summary>
+    /// Describes the member
+    /// </summary>
+    member this.Documentation =
+        match this with
+        | PropertyMember(m) -> m.Documentation
+        | FieldMember(m) -> m.Documentation
+        | MethodMember(m) -> m.Documentation
+        | EventMember(m) -> m.Documentation
+        | ConstructorMember(m) -> m.Documentation
                                                             
 
 type ClrTypeInfo = {
@@ -574,7 +598,9 @@ type ClrTypeInfo = {
     Name : ClrTypeName
     /// The position of the type
     Position : int
-    /// The reflected type, if applicable        
+    /// Describes the type
+    Documentation : string
+    /// The reflected type, if applicable
     ReflectedElement : Type option
     /// The name of the type that declares the type, if any
     DeclaringType : ClrTypeName option
@@ -802,10 +828,12 @@ with
 type ClrAssembly = {
     /// The name of the assembly
     Name : ClrAssemblyName
-    /// The reflected assembly, if applicable                
-    ReflectedElement : Assembly option
     /// The position of the assembly relative to its specification/reflection context
     Position : int
+    /// Describes the assembly
+    Documentation : string
+    /// The reflected assembly, if applicable
+    ReflectedElement : Assembly option
     /// The types defined in the assembly
     Types : ClrType list
     /// The attributes applied to the assembly
@@ -893,7 +921,7 @@ type IClrMetadataProvider =
     abstract FindProperties:ClrPropertyQuery->ClrProperty list
     /// <summary>
     /// Find elements accessible to the provider
-    /// </summary>        
+    /// </summary>
     abstract FindElements:ClrElementQuery->ClrElement list
 
 /// <summary>
@@ -914,7 +942,7 @@ type ITransformer =
     /// </summary>
     /// <param name="dstType">The destination type</param>
     /// <param name="srcValue">The value to convert</param>
-    abstract Transform: dstType : Type -> srcValue : obj -> obj        
+    abstract Transform: dstType : Type -> srcValue : obj -> obj
         
     /// <summary>
     /// Converts a sequence of supplied values to the destination type
@@ -932,7 +960,7 @@ type ITransformer =
     /// <summary>
     /// Gets the conversions supported by the converter
     /// </summary>
-    abstract GetKnownTransformations: unit->TransformationIdentifier list        
+    abstract GetKnownTransformations: unit->TransformationIdentifier list
         
     /// <summary>
     /// Determines whether the transformer can project an instace of the source type onto the destination type
@@ -971,11 +999,11 @@ and
         /// </summary>
         /// <param name="srcType">The source type</param>
         abstract GetTargetTypes<'TSrc> : category : string -> Type list
-        
+                
         /// <summary>
         /// Gets the conversions supported by the converter
         /// </summary>
-        abstract GetKnownTransformations: unit->TransformationIdentifier list        
+        abstract GetKnownTransformations: unit->TransformationIdentifier list
 
         /// <summary>
         /// Determines whether the transformer can project an instace of the source type onto the destination type

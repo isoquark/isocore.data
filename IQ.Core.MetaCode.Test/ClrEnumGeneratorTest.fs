@@ -28,8 +28,9 @@ module ClrEnumGenerator =
         let describeAssembly simpleName types =
                 {
                     Name = ClrAssemblyName(simpleName, None)
-                    ReflectedElement = None
                     Position = 0
+                    Documentation = String.Empty
+                    ReflectedElement = None
                     Types = types
                     Attributes = []
                     References = []
@@ -47,7 +48,7 @@ module ClrEnumGenerator =
             | (EnumType(input), EnumType(output)) ->
                 output.NumericType |> Claim.equal input.NumericType
             | _ -> 
-                Claim.assertFalse()                                              
+                Claim.assertFalse()
             
 
 
