@@ -50,20 +50,17 @@ module SqlDataStore =
                 let q = match DynamicQueryBuilder.WithDefaults(mdp, q) with 
                         | DynamicStoreQuery(q) -> q | _ -> nosupport()
                 let sql = q |> SqlFormatter.formatTabularQuery
-                use command = new SqlCommand(sql, connection)
-                command.CommandType <- CommandType.Text
+                use command = SqlCommandFactory(sql, connection).Build()
                 command
             | DirectStoreQuery(sql) ->
-                use command = new SqlCommand(sql, connection)
-                command.CommandType <- CommandType.Text
+                use command = SqlCommandFactory(sql, connection).Build()
                 command
             | TableFunctionQuery(x) ->
                 nosupport()
             | ProcedureQuery(q) ->
                 match q with
                 | RoutineQuery(routineName, parameters) ->
-                    use command = new SqlCommand(routineName, connection)
-                    command.CommandType <- CommandType.StoredProcedure
+                    use command = SqlCommandFactory(routineName, connection).Procedure(true).Build()
                     parameters |> List.iter(fun parameter -> 
                         match parameter with 
                             | QueryParameter(name,value) ->
@@ -86,12 +83,11 @@ module SqlDataStore =
             | ProcedureQuery(q) ->
                 match q with
                 | RoutineQuery(routineName, parameters) ->
-                    command |> executeQueryCommand                    
+                    command |> executeQueryCommand
 
         let selectFiltered cs (d : ITabularDescription) sql =
             use connection = createConnection()
-            use command = new SqlCommand(sql, connection)
-            command.CommandType <- CommandType.Text
+            use command = SqlCommandFactory(sql, connection).Build()
             command |> sqlService.ExecuteQueryCommand
     
         interface ISqlDataStore with
@@ -141,7 +137,7 @@ module SqlDataStore =
             
     type internal SqlDataStoreProvider () =
         inherit DataStoreProvider<SqlDataStoreQuery>(DataStoreKind.Sql,
-            fun cs -> SqlDataStoreRealization(SqlDataStoreConfig(cs)) :> IDataStore<SqlDataStoreQuery>)   
+            fun cs -> SqlDataStoreRealization(SqlDataStoreConfig(cs)) :> IDataStore<SqlDataStoreQuery>)
 
         static member GetProvider() =
             SqlDataStoreProvider() :> IDataStoreProvider

@@ -294,10 +294,8 @@ module CSharpGenerator =
         use writer = new StreamWriter(path)
         format.WriteTo(writer)
         
-        let project = workspace.AddProject(a.Name.SimpleName, "C#")
+        //let project = workspace.AddProject(a.Name.SimpleName, "C#")
         
-        ()        
-
    
 
         

@@ -18,19 +18,22 @@ open IQ.Core.Data
 
 
             
-type internal SqlCommandBuilder(cmdText) =
-    let mutable timeout = 60
-    let mutable connection  = Unchecked.defaultof<SqlConnection>
+type internal SqlCommandFactory(cmdText, connection) =
+    let mutable timeout = 1000
     let mutable isProcedure = false
 
     member this.Build() = 
-        let command = new SqlCommand(cmdText)
+        let command = new SqlCommand(cmdText, connection) 
         command.CommandType <- if isProcedure then CommandType.StoredProcedure else CommandType.Text
         command.CommandTimeout <- timeout
         command
 
-    member this.WithTimeout(value) = timeout <- value
-    member this.Procedure(value) = isProcedure <- value
+    member this.WithTimeout(value) = 
+        timeout <- value
+        this
+    member this.Procedure(value) = 
+        isProcedure <- value
+        this
                 
 
 
@@ -79,7 +82,7 @@ module internal SqlMatrixWriter =
         data.Rows |> Seq.iter(fun x ->table.LoadDataRow(x,true) |> ignore)
         use bcp = new SqlBulkCopy(cs, SqlBulkCopyOptions.CheckConstraints)
         bcp.DestinationTableName <- match data.Description with DataMatrixDescription(Name=x) -> x |> SqlFormatter.formatObjectName
-        bcp.WriteToServer(table)    
+        bcp.WriteToServer(table)
 
 [<AutoOpen>]
 module internal Extensisons =
@@ -91,8 +94,7 @@ module internal Extensisons =
 module internal SqlDataReader =
     let selectFiltered cs (d : ITabularDescription) sql =
         use connection = cs |> SqlConnection.create
-        use command = new SqlCommand(sql, connection)
-        command.CommandType <- CommandType.Text
+        use command = SqlCommandFactory(sql, connection).Build()
         command |> SqlCommand.executeQuery 
 
     let selectTable cs (d : ITabularDescription) =

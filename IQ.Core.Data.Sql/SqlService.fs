@@ -26,34 +26,26 @@ type internal ISqlService =
 
 module internal SqlStoreCommand =
     type private Marker = class end
-    
-    let private createSqlCommand cs sql=
-        let connection = cs |> SqlConnection.create
-        new SqlCommand(sql, connection)
-    
-    let private executeSqlCommand (cmd : SqlCommand) =
-        cmd.ExecuteNonQuery()
-
-    
+            
     let private executeSql cs sql =
         use connection = cs |> SqlConnection.create
-        use command = new SqlCommand(sql(), connection)
+        use command = SqlCommandFactory(sql(), connection).Build()
         command.ExecuteNonQuery() |> ignore
          
     [<SqlCommandHandler>]
     let getFileTableRoot cs (spec : GetFileTableRoot) =
         let sql = SqlFormatter.formatGetFileTableRoot()
         use connection = cs |> SqlConnection.create
-        use cmd = new SqlCommand(sql, connection)
+        use cmd = SqlCommandFactory(sql, connection).Build()
         cmd.ExecuteScalar() :?> string |> GetFileTableRootResult
     
     [<SqlCommandHandler>]
     let truncateTable cs (spec : TruncateTable)=
         match spec with 
             TruncateTable tableName ->
-            let sql = tableName |> SqlFormatter.formatTruncateTable                   
+            let sql = tableName |> SqlFormatter.formatTruncateTable
             use connection = cs |> SqlConnection.create
-            use sqlcommand = new SqlCommand(sql, connection)
+            use sqlcommand = SqlCommandFactory(sql, connection).Build()
             sqlcommand.ExecuteNonQuery() |> TruncateTableResult
     
     [<SqlCommandHandler>]
@@ -62,8 +54,7 @@ module internal SqlStoreCommand =
             AllocateSequenceRange(seqname,count) ->
             let sql = "sys.sp_sequence_get_range"
             use connection = cs |> SqlConnection.create
-            use sqlcommand = new SqlCommand(sql, connection)
-            sqlcommand.CommandType <- CommandType.StoredProcedure
+            use sqlcommand = SqlCommandFactory(sql, connection).Procedure(true).Build()
             sqlcommand.Parameters.AddWithValue("@sequence_name", seqname |> SqlFormatter.formatObjectName) |> ignore
             sqlcommand.Parameters.AddWithValue("@range_size", count) |> ignore
             let firstValParam = SqlParameter(@"range_first_value", SqlDbType.Variant)
@@ -75,7 +66,7 @@ module internal SqlStoreCommand =
     [<SqlCommandHandler>]
     let createTable cs (spec : CreateTable) =
         match spec with
-            CreateTable description ->    
+            CreateTable description ->
                 executeSql cs (fun () -> description |> SqlFormatter.formatTableCreate )
 
     [<SqlCommandHandler>]
@@ -141,8 +132,7 @@ module internal SqlService =
     /// <param name="proc">The procedure to execute</param>
     let private executeProcCommand cs (paramValues : RoutineParameterValue list) (proc : RoutineProxyDescription) =
         use connection = cs |> SqlConnection.create
-        use command = new SqlCommand(proc.DataElement.Name |> SqlFormatter.formatObjectName, connection)
-        command.CommandType <- CommandType.StoredProcedure
+        use command = SqlCommandFactory(proc.DataElement.Name |> SqlFormatter.formatObjectName, connection).Procedure(true).Build()
         
         proc.CallProxy.Parameters |> Seq.iter (fun x -> x |> addParameter command paramValues)
         command.ExecuteNonQuery() |> ignore
@@ -162,8 +152,7 @@ module internal SqlService =
     /// <param name="proc">The proxy of the procedure to execute</param>
     let private executeProcQuery cs (paramValues : RoutineParameterValue list) (routine : RoutineProxyDescription) =
         use connection = cs |> SqlConnection.create
-        use command = new SqlCommand(routine.CallProxy.DataElement.Name |> SqlFormatter.formatObjectName, connection)
-        command.CommandType <- CommandType.StoredProcedure
+        use command = SqlCommandFactory(routine.CallProxy.DataElement.Name |> SqlFormatter.formatObjectName, connection).Procedure(true).Build()
         routine.CallProxy.Parameters |> Seq.iter (fun x ->x |> addParameter command paramValues)
         let result = command |> SqlCommand.executeQuery
         let typedesc = routine.ResultProxy.Value.ProxyElement
@@ -172,8 +161,8 @@ module internal SqlService =
             let itemType = typedesc.ReflectedElement.Value.ItemValueType
             let items = 
                 [for row in result -> PocoConverter().FromValueArray(row, itemType)]
-            items |> CollectionBuilder.create x.Kind itemType |> Some                    
-        | _ -> NotSupportedException() |> raise                                            
+            items |> CollectionBuilder.create x.Kind itemType |> Some
+        | _ -> NotSupportedException() |> raise
         
             
     /// <summary>
@@ -186,7 +175,7 @@ module internal SqlService =
     let private executeTableFunction cs (paramValues : RoutineParameterValue list) (f : RoutineProxyDescription) =
         use connection = cs |> SqlConnection.create
         let sql = f.DataElement |> SqlFormatter.formatTableFunctionSelect
-        use command = new SqlCommand(sql, connection)
+        use command = SqlCommandFactory(sql, connection).Build()
         f.CallProxy.Parameters |> Seq.iter (fun x ->x |> addParameter command paramValues)
         command |> SqlCommand.executeQuery 
                    
@@ -198,7 +187,7 @@ module internal SqlService =
         let describeProxy m  =
             proxies |> List.tryFind
                 (
-                    fun p -> match p.ProxyElement with                                
+                    fun p -> match p.ProxyElement with
                                 | MemberElement(x) -> 
                                     match x with
                                     | MethodMember(x) ->
@@ -314,7 +303,7 @@ module internal SqlService =
             
             member this.ExecuteQueryText text =
                 use con = new SqlConnection(cs)
-                use cmd = new SqlCommand(text, con)
+                use cmd = SqlCommandFactory(text, con).Build()
                 cmd |> (this :> ISqlService).ExecuteQueryCommand
 
             member this.BulkInsert data =
@@ -322,7 +311,7 @@ module internal SqlService =
                 data.Rows |> Seq.iter(fun x ->table.LoadDataRow(x,true) |> ignore)
                 use bcp = new SqlBulkCopy(cs, SqlBulkCopyOptions.CheckConstraints)
                 bcp.DestinationTableName <- match data.Description with DataMatrixDescription(Name=x) -> x |> SqlFormatter.formatObjectName
-                bcp.WriteToServer(table)    
+                bcp.WriteToServer(table)
 
             member this.GetContract()  =
                 createInvoker<'TContract,string>() |> DynamicContract.realize<'TContract,string> cs

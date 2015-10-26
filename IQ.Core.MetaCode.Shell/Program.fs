@@ -143,8 +143,8 @@ module Main =
         defineClassType context.Namespace typeName members attributions dataobject.Documentation
 
     
-    let buildSchemaProxies outdir (metadata : ISqlMetadataProvider) schemaName =
-        let context = CodeGenerationContext(Namespace= sprintf "DataMaster.DataProxies.%s" schemaName)
+    let buildSchemaProxies outdir (metadata : ISqlMetadataProvider) nsRoot schemaName  =
+        let context = CodeGenerationContext(Namespace= sprintf "%s.%s" nsRoot schemaName)
 
         let tableProxies = schemaName 
                          |> metadata.DescribeTablesInSchema 
@@ -166,15 +166,20 @@ module Main =
         proxies |> CSharpGenerator.genFile filepath
         
 
+    let csFmt = "Data Source={0};Integrated Security=True;Pooling=False; Initial Catalog={1}"
+
     [<EntryPoint>]
     let main argv = 
-        let cs = "Data Source={0};Integrated Security=True;Pooling=False; Initial Catalog={1}"
-        let outdir = @""
-        let schemas = ["Core"]
+        let cs = ""
+        let schemas = [""]
+        let outdir = ""
+        let nsRoot = ""
+
+        
         use context = new ShellContext()
         let dsProvider = context.AppContext.Resolve<IDataStoreProvider>()
         let store = dsProvider.GetDataStore<ISqlDataStore>(cs)
         let metadata = store.MetadataProvider
-        let build = buildSchemaProxies outdir metadata
-        schemas |> List.iter build
+        let build = buildSchemaProxies outdir metadata nsRoot
+        schemas |> List.iter build 
         0 
