@@ -36,7 +36,7 @@ type DynamicQueryBuilder(schemaName, localName) =
 
     member this.Columns(names : string seq) =
         columnNames.AddRange(names)
-        this        
+        this
 
     member this.Parameter(name, value) =
         queryParameters.Add(QueryParameter(name,value))
@@ -89,7 +89,7 @@ type DynamicQueryBuilder(schemaName, localName) =
     
     member this.OrEqual(colname, value) =
         filters.Add(OrFilter(Equal(colname,value)))
-        value
+        this
     
     member this.AndNotEqual(colname, value) = 
         filters.Add(AndFilter(NotEqual(colname,value)))
@@ -97,7 +97,7 @@ type DynamicQueryBuilder(schemaName, localName) =
     
     member this.OrNotEqual(colname, value) =
         filters.Add(OrFilter(NotEqual(colname,value)))
-        value
+        this
 
     member this.AndGreaterThan(colname, value) = 
         filters.Add(AndFilter(GreaterThan(colname,value)))
@@ -105,7 +105,7 @@ type DynamicQueryBuilder(schemaName, localName) =
     
     member this.OrGreaterThan(colname, value) =
         filters.Add(OrFilter(GreaterThan(colname,value)))
-        value
+        this
 
     member this.AndGreaterThanOrEqual(colname, value) = 
         filters.Add(AndFilter(GreaterThanOrEqual(colname,value)))
@@ -113,7 +113,7 @@ type DynamicQueryBuilder(schemaName, localName) =
     
     member this.OrGreaterThanOrEqual(colname, value) =
         filters.Add(OrFilter(GreaterThanOrEqual(colname,value)))
-        value
+        this
 
     member this.AndLessThan(colname, value) = 
         filters.Add(AndFilter(LessThan(colname,value)))
@@ -121,7 +121,7 @@ type DynamicQueryBuilder(schemaName, localName) =
     
     member this.OrLessThan(colname, value) =
         filters.Add(OrFilter(LessThan(colname,value)))
-        value
+        this
 
     member this.AndLessThanOrEqual(colname, value) = 
         filters.Add(AndFilter(LessThanOrEqual(colname,value)))
@@ -129,7 +129,7 @@ type DynamicQueryBuilder(schemaName, localName) =
     
     member this.OrLessThanOrEqual(colname, value) =
         filters.Add(OrFilter(LessThanOrEqual(colname,value)))
-        value
+        this
 
     member this.AndStartsWith(colname, value) = 
         filters.Add(AndFilter(StartsWith(colname,value)))
@@ -145,19 +145,19 @@ type DynamicQueryBuilder(schemaName, localName) =
     
     member this.OrContains(colname, value) =
         filters.Add(OrFilter(Contains(colname,value)))
-        value
+        this
 
-    member this.AndEndsWith(colname, value) = 
+    member this.AndEndsWith(colname, value) =
         filters.Add(AndFilter(EndsWith(colname,value)))
         this
     
     member this.OrEndsWith(colname, value) =
         filters.Add(OrFilter(EndsWith(colname,value)))
-        value
+        this
     
     member this.Build() =
             DynamicQuery( DataObjectName(schemaName, localName), 
-                          columnNames |> List.ofSeq,  
+                          columnNames |> List.ofSeq,
                           filters |> List.ofSeq,
                           sortCriteria |> List.ofSeq,
                           queryParameters |> List.ofSeq,
