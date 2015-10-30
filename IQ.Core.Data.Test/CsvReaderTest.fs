@@ -162,7 +162,7 @@ module CsvReader =
             let format = CsvReader.getDefaultFormat()
             expect |> CsvWriter.writeFile format path
 
-            let actual =  CsvReader.readFile<CsvTestCase2A> format path
+            let actual =  CsvReader.readFile<CsvTestCase2A> format path |> List.ofSeq
 
             actual |> Claim.equal expect
 
@@ -174,6 +174,6 @@ module CsvReader =
             let format = CsvReader.getDefaultFormat()
             expect |> CsvWriter.writeFile format path
 
-            let actual =  CsvReader.readFile<CsvTestCase2B> format path
+            let actual =  CsvReader.readFile<CsvTestCase2B> format path |> List.ofSeq
 
             actual |> Claim.equal expect

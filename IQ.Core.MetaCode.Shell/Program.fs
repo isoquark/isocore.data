@@ -9,6 +9,16 @@ open IQ.Core.Data
 open IQ.Core.MetaCode
 open IQ.Core.Framework;
 
+type DataProxyGenConfig = {
+
+    OutputDirectory : string
+    DbServer : string
+    DbName : string
+    SchemaNames : string list
+    RootNamespace : string
+    ExcludeAuditColumns : bool
+}
+
 
 type CodeGenerationContext() =
     member val Namespace = String.Empty with get, set
@@ -170,16 +180,20 @@ module Main =
 
     [<EntryPoint>]
     let main argv = 
-        let cs = ""
-        let schemas = [""]
-        let outdir = ""
-        let nsRoot = ""
-
+        let config = {
+            OutputDirectory = @"C:\dev\DataMaster\DataMaster.DataProxies\"
+            DbServer = "localhost"
+            DbName = "DataMaster.LocalDev"
+            SchemaNames = ["Core"; "JhaEtl"; "JhaStage"; "JhaDw"]
+            RootNamespace = "DataMaster.DataProxies"
+            ExcludeAuditColumns = true
+        }
+        let cs = String.Format(csFmt, config.DbServer, config.DbName)
         
         use context = new ShellContext()
         let dsProvider = context.AppContext.Resolve<IDataStoreProvider>()
         let store = dsProvider.GetDataStore<ISqlDataStore>(cs)
         let metadata = store.MetadataProvider
-        let build = buildSchemaProxies outdir metadata nsRoot
-        schemas |> List.iter build 
+        let build = buildSchemaProxies config.OutputDirectory metadata config.RootNamespace
+        config.SchemaNames |> List.iter build 
         0 

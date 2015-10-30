@@ -112,6 +112,8 @@
     <Build Include="Functions\fParameterDescription.sql" />
     <Build Include="Functions\fSchemaProperty.sql" />
     <Build Include="Functions\fGeneratePoco.sql" />
+    <Build Include="Tables\DataMatrix.sql" />
+    <Build Include="Tables\DataMatrixColumn.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">

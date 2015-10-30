@@ -89,7 +89,7 @@ module BclDataTable =
             [|for column in columns do 
                 yield valueidx.[column.ProxyElement.Name.Text] |> DataTypeConverter.toBclTransportValue column.DataElement.DataType
             |] |> table.Rows.Add |> ignore
-        table                
+        table
                 
 
     /// <summary>
@@ -110,7 +110,7 @@ module BclDataTable =
             items |> CollectionBuilder.create x.Kind itemType :?> IEnumerable
         | _ ->
             let items = 
-                [for row in dataTable.Rows ->                
+                [for row in dataTable.Rows ->
                     pocoConverter.FromValueArray(row.ItemArray, t.ReflectedElement.Value)] 
             let itemType = t.ReflectedElement.Value 
             items |> CollectionBuilder.create ClrCollectionKind.GenericList itemType :?> IEnumerable
@@ -121,7 +121,7 @@ module BclDataTable =
     /// </summary>
     /// <param name="t">The proxy type</param>
     /// <param name="dataTable">The data table</param>
-    let toProxyValuesT<'T>  (dataTable : DataTable) =        
+    let toProxyValuesT<'T>  (dataTable : DataTable) =
         let t = ClrMetadata().FindType<'T>()
         dataTable |> toProxyValues t :?> IEnumerable<'T>
 

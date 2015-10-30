@@ -129,10 +129,8 @@ namespace IQ.Core.Package
 
         static void Main(string[] args)
         {
-            //var config = CreateConfig("1.0.78", @"T:\lib\nuget\external", @"C:\Temp\isocore.data");
-            var config = CreateConfig("1.0.80", @"C:\Work\lib\packages", @"C:\Temp\isocore.data");
-            //var config = CreateConfig("1.0.72", @"C:\Work\lib\packages", @"C:\Temp\isocore.data");
-            //var config = CreateConfig("1.0.66", @"C:\Work\lib\packages", @"C:\Temp\isocore.data");
+            //var config = CreateConfig("1.0.84", @"T:\lib\nuget\external", @"C:\Temp\isocore.data");
+            var config = CreateConfig("1.0.86", @"C:\Work\lib\packages", @"C:\Temp\isocore.data");
 
             if (Directory.Exists(config.WorkingDirectory))
                 Directory.Delete(config.WorkingDirectory, true);

@@ -155,9 +155,20 @@ module CsvReader =
     /// </summary>
     /// <param name="format">The CSV format</param>
     /// <param name="path">The path to the CSV file</param>
-    let readFile<'T>(format : CsvFormat) (path : string) =
-        use file = CsvFile.Load(path, format.Separator, format.Quote, format.HasHeaders, false).Cache()
-        read<'T>  file        
+//    let readFile<'T>(format : CsvFormat) (path : string) =
+//        use file = CsvFile.Load(path, format.Separator, format.Quote, format.HasHeaders, false).Cache()
+//        read<'T>  file
+
+    let readFile<'T>(format : CsvFormat) (path : string) : IReadOnlyList<'T> =
+        use txtReader = new StreamReader(path)
+        use csvReader = new CsvReader(txtReader)
+        csvReader.Configuration.Delimiter <- format.Separator
+        csvReader.Configuration.HasHeaderRecord <- format.HasHeaders
+        csvReader.Configuration.Quote <- format.Quote
+        csvReader.GetRecords<'T>().ToList() :> IReadOnlyList<'T> 
+        
+
+
 
     let readTable (format : CsvFormat) (path : string) =
         use file = CsvFile.Load(path, format.Separator, format.Quote, format.HasHeaders, false).Cache()
@@ -180,43 +191,53 @@ module CsvReader =
 /// Defines operations for writing delimited text
 /// </summary>
 module CsvWriter =
+    let writeFile<'T> (format : CsvFormat) (path : string) (items : 'T seq) =
+        use txtWriter = new StreamWriter(path)
+        txtWriter.AutoFlush <- true
+        use csvWriter = new CsvWriter(txtWriter)
+        csvWriter.Configuration.Delimiter <- format.Separator
+        csvWriter.Configuration.HasHeaderRecord <- format.HasHeaders
+        csvWriter.Configuration.Quote <- format.Quote
+        csvWriter.WriteHeader(typeof<'T>);
+        csvWriter.WriteRecords(items);
+        
     /// <summary>
     /// Writes a sequence of records to a file in CSV format
     /// </summary>
-    let writeFile<'T> (format : CsvFormat) (path : string) (items : 'T seq) =        
-        let proxy = tableproxy<'T> |> TableProxy
-        let headerRow = 
-            proxy.Columns |> List.map(fun c -> c.DataElement.Name)  |> Txt.delimit format.Separator
-
-        //TODO: This is very crude; needs to escape quotes, for example
-        let formatValue (v : obj) =
-            let value = 
-                if v = null then
-                    null
-                else
-                    if v |> Option.isOptionValue then 
-                        match v |> Option.unwrapValue with
-                        | Some(x) -> x
-                        | None -> null
-                    else
-                        v
-            match value with
-            | :? string as x -> "\"" + x + "\""
-            | _ -> value.ToString()
-
-        use writer = new StreamWriter(path)
-        if format.HasHeaders then
-                proxy.Columns |> List.map(fun c -> c.DataElement.Name)
-                              |> Txt.delimit format.Separator 
-                              |> writer.WriteLine
-        
-        let pocoConverter =  PocoConverter.getDefault()
-        for item in items do
-             item |> pocoConverter.ToValueArray
-                  |> List.ofArray
-                  |> List.map formatValue 
-                  |> Txt.delimit format.Separator 
-                  |> writer.WriteLine
+//    let writeFile<'T> (format : CsvFormat) (path : string) (items : 'T seq) =        
+//        let proxy = tableproxy<'T> |> TableProxy
+//        let headerRow = 
+//            proxy.Columns |> List.map(fun c -> c.DataElement.Name)  |> Txt.delimit format.Separator
+//
+//        //TODO: This is very crude; needs to escape quotes, for example
+//        let formatValue (v : obj) =
+//            let value = 
+//                if v = null then
+//                    null
+//                else
+//                    if v |> Option.isOptionValue then 
+//                        match v |> Option.unwrapValue with
+//                        | Some(x) -> x
+//                        | None -> null
+//                    else
+//                        v
+//            match value with
+//            | :? string as x -> "\"" + x + "\""
+//            | _ -> value.ToString()
+//
+//        use writer = new StreamWriter(path)
+//        if format.HasHeaders then
+//                proxy.Columns |> List.map(fun c -> c.DataElement.Name)
+//                              |> Txt.delimit format.Separator 
+//                              |> writer.WriteLine
+//        
+//        let pocoConverter =  PocoConverter.getDefault()
+//        for item in items do
+//             item |> pocoConverter.ToValueArray
+//                  |> List.ofArray
+//                  |> List.map formatValue 
+//                  |> Txt.delimit format.Separator 
+//                  |> writer.WriteLine
                
 
 module CsvDataStore  =

@@ -5,6 +5,7 @@ open System.Collections.Generic
 open System.Data
 open System.IO
 open System.Linq
+open System.Data.OleDb;
 
 
 open IQ.Core.Data
@@ -12,51 +13,57 @@ open IQ.Core.Data
 open OfficeOpenXml
 open OfficeOpenXml.Table
 
-(**
-    class Program
-    {
-        static string CSTemplate = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0};Extended Properties='Excel 8.0;HDR=Yes'";
+module internal ExcelOleDb =
 
-        static void ADO()
-        {
-            var wbpath = @"W:\filestage\PropertySetting\2015-10-08.JhaPropertySettings.xlsx";
-            var cs = String.Format(CSTemplate, wbpath);
+    let ExcelConnectionStringTemlate = "Provider=Microsoft.ACE.OLEDB.12.0;Data Source={0};Extended Properties='Excel 8.0;HDR=Yes'";
 
-            using (var connection = new OleDbConnection(cs))
-            {
-                connection.Open();
-                var tables = connection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null);
-                var columns = connection.GetOleDbSchemaTable(OleDbSchemaGuid.Columns, null);
-                var y = connection.GetOleDbSchemaTable(OleDbSchemaGuid.DbInfoLiterals, null);
+    [<AbstractClass>]
+    type DataStoreConnection() =
+    
+        abstract member ReadTable:string->DataTable
+        abstract member Dispose:unit->unit
+        abstract member DescribeTables:unit -> TableDescription seq
+        interface IDisposable with
+            member this.Dispose() = this.Dispose()
 
-                using (var command = new OleDbCommand("select * from [Sheet1$]", connection))
-                {
-                    using (var adapter = new OleDbDataAdapter(command))
-                    {
-                        var table = new DataTable();
-                        adapter.Fill(table);
-                    }
-                }
-            }
-        }
+    type OleDbStoreConnection(connection : OleDbConnection) =
+        inherit DataStoreConnection()
 
+        do
+            connection.Open()
 
-        static void Main(string[] args)
-        {
-            var sw = Stopwatch.StartNew();            
-            ADO();
-            Console.WriteLine($"ADO {sw.ElapsedMilliseconds}");
+        new(cs : string) =
+            new OleDbStoreConnection(new OleDbConnection(cs))
 
-            sw.Restart();
-            var wb = new XLWorkbook(@"W:\filestage\PropertySetting\2015-10-08.JhaPropertySettings.xlsx");
-            var ws = wb.Worksheet(1);
-            var rows = ws.RowsUsed();
-            Console.WriteLine($"ClosedXml {sw.ElapsedMilliseconds}");
+        override this.Dispose() =
+            connection.Dispose()
 
+        override this.DescribeTables() =
+            let tables = connection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, null)
+            let columns = connection.GetOleDbSchemaTable(OleDbSchemaGuid.Columns, null) 
+            List<TableDescription>() :> IEnumerable<TableDescription>
+    
+        override this.ReadTable(tableName) =
+            use command = new OleDbCommand(sprintf "select * from [%s$]" tableName, connection)
+            use adapter = new OleDbDataAdapter(command)
+            let table = new DataTable()
+            adapter.Fill(table) |> ignore
+            table
 
-        }
-    }
-*)
+    type ExcelConnection(path : string) =
+        inherit OleDbStoreConnection(String.Format(ExcelConnectionStringTemlate, path))
+    
+    
+open ExcelOleDb
+module ExcelReader =
+    let readDataTable(wbpath : string, wsname : string) =
+        use c = new ExcelConnection(wbpath)
+        c.ReadTable(wsname)
+
+    let readWorksheet<'T>(wbpath : string, wsname : string) =
+        use t = readDataTable(wbpath, wsname)
+        t |> BclDataTable.toProxyValuesT<'T>
+    
 
 [<AutoOpen>]
 module DataMatrixExtensions =
@@ -66,8 +73,7 @@ module DataMatrixExtensions =
         member this.Columns = match this with | DataMatrixDescription(name,columns) -> columns
 
 module ExcelDataStore =
-    
-
+           
     let private hasValue (range : ExcelRange) =
         range <> null &&
         range.Value <> null &&
@@ -77,18 +83,6 @@ module ExcelDataStore =
         @"yyyy-mm-dd hh:mm:ss"
         @"yyyy\-mm\-dd\ hh:mm:ss"
     ]
-
-
-    let private getValue (cell : ExcelRange) =
-        match StandardDateFormats |> List.tryFind (fun x -> x = cell.Style.Numberformat.Format ) with
-        | Some(x) ->
-            DateTime.FromOADate(cell.Value :?> float) :> obj
-        | None ->
-            if cell.Value <> null && cell.Value.ToString().ToLower() = "null" then
-                null
-            else
-                cell.Value
-
 
     let private readWorksheetMatrix(worksheet : ExcelWorksheet) =
         //This assumes we have a header row
@@ -126,8 +120,8 @@ module ExcelDataStore =
             if isEmptyRow |> not then
                 rows.Add(row)
             
-            stop <- isEmptyRow            
-            j <- j+ 1                    
+            stop <- isEmptyRow
+            j <- j+ 1
                     
         DataMatrix(DataMatrixDescription(matrixName, columns), rows) :> IDataMatrix
 
@@ -170,7 +164,7 @@ module ExcelDataStore =
         //Apply global formatting options and create a table
         worksheet.Cells.AutoFitColumns()
         let tableRange = worksheet.Cells.[1,1, rowcount + 1, colcount]
-        let table = worksheet.Tables.Add(tableRange, "table_" + worksheet.Name)        
+        let table = worksheet.Tables.Add(tableRange, "table_" + worksheet.Name)
         table.ShowTotal <- false
         table.TableStyle <- TableStyles.Light9
 
@@ -180,14 +174,14 @@ module ExcelDataStore =
         let openPackage() =
             new OfficeOpenXml.ExcelPackage(new FileInfo(cs))
         
-        let readWorkbook() =        
+        let readWorkbook() =
             use workbook = openPackage()
             [for worksheet in workbook.Workbook.Worksheets ->
                 worksheet  |> readWorksheetMatrix ] |> Seq.ofList
 
 
         interface IExcelDataStore with
-            member this.SelectMatrix(q) =  
+            member this.SelectMatrix(q) =
                 match q with
                 | FindWorksheetByName(worksheetName) ->
                     use workbook = openPackage()
@@ -228,7 +222,7 @@ module ExcelDataStore =
                 nosupport()
                                             
             member this.Insert (items : seq<'T>) =
-                let converter = DataMatrix.getTypedConverter<'T>()                 
+                let converter = DataMatrix.getTypedConverter<'T>()
                 (this :> IExcelDataStore).InsertMatrix(items |> converter.FromProxyValues )
 
             member this.GetCommandContract() =
