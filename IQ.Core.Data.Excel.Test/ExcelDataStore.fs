@@ -40,7 +40,7 @@ module ExcelDataStore =
             let csvpath = thisAssembly() |> AssemblyResource.emit "WB01.WS01.csv" ctx.OutputDirectory
             let store = dsProvider.GetDataStore<IExcelDataStore>(xlspath)
             let matrix =  "WS01" |> FindWorksheetByName |> store.SelectMatrix 
-            let xlsProxies = matrix |> DataMatrix.toProxyValuesT<WB01.WS01> 
+            let xlsProxies = matrix |> DataMatrixOps.toProxyValuesT<WB01.WS01> 
             let csvTable = csvpath |> CsvReader.readTable (CsvReader.getDefaultFormat())
             let csvProxies = csvTable |> BclDataTable.toProxyValuesT<WB01.WS01> 
             Seq.zip xlsProxies csvProxies |> Seq.iter(fun (x,y) ->
@@ -53,7 +53,7 @@ module ExcelDataStore =
             let xlspath = thisAssembly() |> AssemblyResource.emit "WB03.xlsx" ctx.OutputDirectory
             let store = dsProvider.GetDataStore<IExcelDataStore>(xlspath)
             let matrix = "WS01" |> FindWorksheetByName |> store.SelectMatrix
-            let proxies = matrix |> DataMatrix.toProxyValuesT<WB03.WS01> |> List.ofSeq
+            let proxies = matrix |> DataMatrixOps.toProxyValuesT<WB03.WS01> |> List.ofSeq
 
             proxies.[0].Col01 |> Claim.equal "ABC"
             proxies.[0].Col02 |> Claim.equal 5
@@ -75,7 +75,7 @@ module ExcelDataStore =
 
         [<Fact>]
         let ``Wrote data tables to Excel workbook - WB01``() =
-            let converter = DataMatrix.getTypedConverter<WB01.WS01>()
+            let converter = DataMatrixOps.getTypedConverter<WB01.WS01>()
             
             let t0_in = new DataTable("WS01")
             t0_in.Columns.Add("Col01", typeof<string>) |> ignore
@@ -85,7 +85,7 @@ module ExcelDataStore =
             t0_in.LoadDataRow([|"ABC" :> obj; 34:> obj; 59.8m :> obj;  BclDateTime(2003, 7, 15,0,0,0) :> obj|], true) |> ignore
             t0_in.LoadDataRow([|"DEF" :> obj; 13:> obj; 12.24m :> obj;  BclDateTime(2012, 12, 12,0,0,0) :> obj|], true) |> ignore
             t0_in.LoadDataRow([|"HIJ" :> obj; 11:> obj; 44.95m :> obj;  BclDateTime(2011, 2, 17,0,0,0) :> obj|], true) |> ignore
-            let t0_in_matrix = t0_in |> DataMatrix.fromDataTable
+            let t0_in_matrix = t0_in |> DataMatrixOps.fromDataTable
 
             let t0_in_proxies = t0_in_matrix |> converter.ToProxyValues
 
@@ -95,7 +95,7 @@ module ExcelDataStore =
             t1.Columns.Add("Value", typeof<int>) |> ignore
             t1.LoadDataRow([|"This is the first name" :> obj; 15 :> obj|], true) |> ignore
             t1.LoadDataRow([|"This is the second name" :> obj; 17 :> obj|], true) |> ignore
-            let t1_matrix = t1 |> DataMatrix.fromDataTable
+            let t1_matrix = t1 |> DataMatrixOps.fromDataTable
 
             
             let xlspath = Path.Combine(ctx.OutputDirectory, "WB01_Generated.xlsx")

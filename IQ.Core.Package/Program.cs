@@ -126,11 +126,16 @@ namespace IQ.Core.Package
             p.WaitForExit();
         }
 
+        private static void PublishDacpac(PackageToolConfig config)
+        {
+
+        }
+
 
         static void Main(string[] args)
         {
             //var config = CreateConfig("1.0.84", @"T:\lib\nuget\external", @"C:\Temp\isocore.data");
-            var config = CreateConfig("1.0.86", @"C:\Work\lib\packages", @"C:\Temp\isocore.data");
+            var config = CreateConfig("1.0.101", @"C:\Work\lib\packages", @"C:\Temp\isocore.data");
 
             if (Directory.Exists(config.WorkingDirectory))
                 Directory.Delete(config.WorkingDirectory, true);
@@ -139,6 +144,7 @@ namespace IQ.Core.Package
 
             CreateIsocoreData(config);
             NupackIsocoreData(config);
+            PublishDacpac(config);
 
             
         }

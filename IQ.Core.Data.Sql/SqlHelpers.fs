@@ -79,7 +79,7 @@ module internal SqlProxyWriter =
 module internal SqlMatrixWriter =
     let bulkInsert cs (data : IDataMatrix) =
         use table = data.Description |> BclDataTable.fromMatrixDescription
-        data.Rows |> Seq.iter(fun x ->table.LoadDataRow(x,true) |> ignore)
+        data.RowData |> Seq.iter(fun x ->table.LoadDataRow(x,true) |> ignore)
         use bcp = new SqlBulkCopy(cs, SqlBulkCopyOptions.CheckConstraints)
         bcp.DestinationTableName <- match data.Description with DataMatrixDescription(Name=x) -> x |> SqlFormatter.formatObjectName
         bcp.WriteToServer(table)

@@ -12,8 +12,8 @@
     <OutputType>Database</OutputType>
     <RootPath>
     </RootPath>
-    <RootNamespace>IQ.Schemas.Metadata</RootNamespace>
-    <AssemblyName>IQ.Schemas.Metadata</AssemblyName>
+    <RootNamespace>IQ.Core.Data.Schemas</RootNamespace>
+    <AssemblyName>isocore.data.schemas</AssemblyName>
     <ModelCollation>1033, CI</ModelCollation>
     <DefaultFileStructure>BySchemaAndSchemaType</DefaultFileStructure>
     <DeployToDatabase>True</DeployToDatabase>
@@ -39,7 +39,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <OutputPath>..\build\targets\$(Platform)\</OutputPath>
+    <OutputPath>..\build\targets\AnyCPU</OutputPath>
     <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
     <IntermediateOutputPath>..\build\intermediate\$(MSBuildProjectName)\$(Platform)</IntermediateOutputPath>
     <BuildScriptName>$(MSBuildProjectName).sql</BuildScriptName>
@@ -51,6 +51,7 @@
     <DefineTrace>true</DefineTrace>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <SqlTargetName>isocore.data.schemas</SqlTargetName>
   </PropertyGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>

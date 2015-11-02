@@ -1,0 +1,8 @@
+{
+  "OutputDirectory": "C:\\dev\\DataMaster\\DataMaster.DataProxies",
+  "DbServer": "localhost",
+  "DbName": "DataMaster.LocalDev",
+  "SchemaNames": [ "App" ],
+  "RootNamespace": "DataMaster.DataProxies",
+  "ExcludeAuditColumns": true
+}

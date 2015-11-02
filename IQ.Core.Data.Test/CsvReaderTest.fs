@@ -42,7 +42,7 @@ module CsvReader =
         H : float option
         L : float option
         C : float option
-        V : int64 option    
+        V : int64 option
     }
 
     type CsvTestCase3 = {

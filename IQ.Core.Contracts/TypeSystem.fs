@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Framework.Contracts
+namespace IQ.Core.Contracts
 
 open System
 
@@ -19,7 +19,7 @@ module UniversalTypeSystem =
     /// <summary>
     /// Codifies a set of common facets
     /// </summary>
-    module StandardFacetNames =        
+    module StandardFacetNames =
         ///Specifes a code page for character data
         ///See: https://msdn.microsoft.com/en-us/library/windows/desktop/dd317756(v=vs.85).aspx
         [<Literal>]

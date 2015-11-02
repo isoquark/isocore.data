@@ -23,7 +23,7 @@ type ConversionException(dstType, srcValue, innerException) =
     override this.Message = 
         sprintf "Could not convert %O value to %s type" srcValue dstType.FullName
 
-module SmartConvert =    
+module SmartConvert =
     /// <summary>
     /// Converts a value to specified type
     /// </summary>
@@ -31,7 +31,7 @@ module SmartConvert =
     let convert (dstType : Type) (srcValue : obj) =
         try
             if srcValue = null then
-                null                   
+                null
             else if srcValue.GetType() = dstType then
                 srcValue
             else
@@ -62,7 +62,7 @@ module SmartConvert =
                                 //Should create the right type of nullable type instance but with a value
                                 Activator.CreateInstance(dstType, Convert.ChangeType(srcValue, dstValueType))
                         else
-                            Convert.ChangeType(srcValue, dstValueType)   
+                            Convert.ChangeType(srcValue, dstValueType)
         with
         | e  ->
             ConversionException(dstType, srcValue, e) |> raise
@@ -83,7 +83,7 @@ module SmartConvert =
 module SmartProject =
     let update dst src =
         let dstProps = dst.GetType().GetProperties() 
-                         |> Array.filter(fun p -> p.CanWrite)         
+                         |> Array.filter(fun p -> p.CanWrite)
         let srcProps = src.GetType().GetProperties()
                          |> Array.filter(fun p -> p.CanRead) 
                          |> Array.map(fun p -> p.Name, p)
@@ -148,11 +148,11 @@ module Transformer =
         //Create lambda function and compile into delegate
         Expression.Lambda<Func<obj,obj>>(result, input).Compile()
 
-    type private TransformationDelegate = Func<obj,obj>           
+    type private TransformationDelegate = Func<obj,obj>
     
     type private Key = uint64
     type private TransformationIndex = Dictionary<Key, TransformationDelegate>
-    let private createDelegateIndex() = TransformationIndex()    
+    let private createDelegateIndex() = TransformationIndex()
 
     let inline private createKey (srcType : Type) (dstType : Type)=
         let x = srcType.GetHashCode() |> uint64
@@ -160,7 +160,7 @@ module Transformer =
         let key = (x <<< 32) ||| y
         key
     
-    let inline private getTransformation  srcType dstType (idx : TransformationIndex) =  
+    let inline private getTransformation  srcType dstType (idx : TransformationIndex) =
         idx.[createKey srcType dstType]
     
     let inline private putTransformation key del (idx : TransformationIndex) = 
@@ -182,7 +182,7 @@ module Transformer =
                     if m.IsStatic then
                         match e |> ClrElement.tryGetAttributeT<TransformationAttribute> with
                         | Some(a) -> 
-                            if a.Category = category then                                
+                            if a.Category = category then
                                 let parameters = m.Parameters |>List.filter(fun p -> p.IsReturn = false)
                                 if parameters.Length <> 1 || m.ReflectedElement.Value.ReturnType = typeof<Void> then
                                     failwith (sprintf "Method %s incorrectly identified as a conversion function" m.Name.Text)
@@ -197,7 +197,7 @@ module Transformer =
                     
                                 TransformationIdentifier(a.Category, srcType.TypeName, dstType.TypeName) |> identifiers.Add
                         | None ->
-                            ()                                                               
+                            ()
                 | _ -> ()
             | _ -> ()
         
@@ -211,8 +211,8 @@ module Transformer =
         let category = match config.Category with | Some(c) -> c | None -> DefaultTransformerCategory
 
         let canTransform srcType dstType =
-            let key = dstType |> createKey srcType            
-            delegates |> hasTransformation key         
+            let key = dstType |> createKey srcType
+            delegates |> hasTransformation key
         
         let transform dstType (srcValue : obj) =
             if srcValue <> null then
@@ -226,7 +226,7 @@ module Transformer =
                 null
                                                             
         interface ITransformer with
-            member this.Transform dstType srcValue =               
+            member this.Transform dstType srcValue =
                 transform dstType srcValue
             
             member this.TransformMany dstType srcValues =
@@ -255,10 +255,10 @@ module Transformer =
                 value |> transform typeof<'TDst> :?> 'TDst
             
             member this.TransformMany values = 
-                nosupport()            
+                nosupport()
             
             member this.GetTargetTypes<'TSrc> category = 
-                nosupport()            
+                nosupport()
             
             member this.GetKnownTransformations() = 
                 identifiers
@@ -268,7 +268,7 @@ module Transformer =
             
             member this.AsUntyped() = this :> ITransformer
            
-    let get(config : TransformerConfig) =        
+    let get(config : TransformerConfig) =
         Realization(config) :> ITransformer
 
     let getDefault() =

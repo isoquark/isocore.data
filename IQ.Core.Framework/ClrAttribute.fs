@@ -10,6 +10,7 @@ open System.Linq
 open System.Runtime
 open System.Runtime.CompilerServices
 
+open IQ.Core.Contracts
 
 module internal ClrAttribute =
     let private filter (exclusions : Type seq) (input : Attribute seq) =
@@ -27,7 +28,7 @@ module internal ClrAttribute =
     //The intent here is to exclude attributes emitted by the compiler
     //Of course, this will not always work because any attributes filtered
     //out could be manually applied by a developer...
-    let getUserAttributes( reflectedElement : obj) =        
+    let getUserAttributes( reflectedElement : obj) =
         
         match reflectedElement with
         | :? Assembly as x -> 

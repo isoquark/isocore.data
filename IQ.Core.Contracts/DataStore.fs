@@ -8,9 +8,7 @@ open System.Collections.Generic
 open System.Runtime.CompilerServices
 open System.Linq
 
-open IQ.Core.Framework
-
-open IQ.Core.Framework.Contracts
+open IQ.Core.Contracts
 
 type IDataStoreCommon =
     abstract ConnectionString:string

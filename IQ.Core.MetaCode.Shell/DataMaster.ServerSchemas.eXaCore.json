@@ -1,0 +1,8 @@
+{
+  "OutputDirectory": "C:\\Work\\dev\\DataMaster\\DataMaster.DataProxies",
+  "DbServer": "eXaCore03",
+  "DbName": "DataMaster.LocalDev",
+  "SchemaNames": [ "Core", "JhaEtl", "JhaStage", "JhaDw" ],
+  "RootNamespace": "DataMaster.DataProxies",
+  "ExcludeAuditColumns": true
+}

@@ -116,7 +116,7 @@ module SqlDataStore =
                 use connection = createConnection()
                 use command = connection |> createQueryCommand q
                 command |> executeQueryCommand
-                        |> fun x -> x.Rows
+                        |> fun x -> x.RowData
                         |> SqlDataReader.toPocos<'T>
 
             member this.SelectAll()  =

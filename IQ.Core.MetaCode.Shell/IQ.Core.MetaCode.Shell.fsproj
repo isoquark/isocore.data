@@ -22,6 +22,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <Prefer32Bit>true</Prefer32Bit>
+    <StartArguments>DataMaster.AppSchemas.eXaCore.json DataMaster.ServerSchemas.eXaCore.json</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -96,6 +97,15 @@
     <Compile Include="ShellContext.fs" />
     <Compile Include="Program.fs" />
     <Content Include="packages.config" />
+    <None Include="DataMaster.AppSchemas.local.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="DataMaster.ServerSchemas.eXaCore.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="DataMaster.AppSchemas.eXaCore.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="mscorlib" />

@@ -8,9 +8,8 @@ open System.Collections.Generic
 open System.Runtime.CompilerServices
 open System.Collections
 
-open IQ.Core.Framework
 
-open IQ.Core.Framework.Contracts
+open IQ.Core.Contracts
 
 
     

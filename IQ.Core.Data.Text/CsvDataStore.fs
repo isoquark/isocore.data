@@ -15,8 +15,8 @@ open FSharp.Data
 
 open CsvHelper
 
-
-open IQ.Core.Data.Behavior
+open IQ.Core.Data
+//open IQ.Core.Data.Behavior
 open IQ.Core.Framework
 open IQ.Core.Data.Contracts
 
@@ -133,7 +133,7 @@ module CsvReader =
         let enumerator = lines.GetEnumerator()
         enumerator.MoveNext() |> ignore
         let colnames = enumerator.Current |> Txt.split format.Separator |> Array.map Txt.trim |> List.ofArray
-        {   CsvFileDescription.Filename = path     
+        {   CsvFileDescription.Filename = path
             RowCount = lines |> Seq.count
             ColNames = colnames
             Format = format
@@ -155,17 +155,17 @@ module CsvReader =
     /// </summary>
     /// <param name="format">The CSV format</param>
     /// <param name="path">The path to the CSV file</param>
-//    let readFile<'T>(format : CsvFormat) (path : string) =
-//        use file = CsvFile.Load(path, format.Separator, format.Quote, format.HasHeaders, false).Cache()
-//        read<'T>  file
+    let readFile<'T>(format : CsvFormat) (path : string) =
+        use file = CsvFile.Load(path, format.Separator, format.Quote, format.HasHeaders, false).Cache()
+        read<'T>  file
 
-    let readFile<'T>(format : CsvFormat) (path : string) : IReadOnlyList<'T> =
-        use txtReader = new StreamReader(path)
-        use csvReader = new CsvReader(txtReader)
-        csvReader.Configuration.Delimiter <- format.Separator
-        csvReader.Configuration.HasHeaderRecord <- format.HasHeaders
-        csvReader.Configuration.Quote <- format.Quote
-        csvReader.GetRecords<'T>().ToList() :> IReadOnlyList<'T> 
+//    let readFile<'T>(format : CsvFormat) (path : string) : IReadOnlyList<'T> =
+//        use txtReader = new StreamReader(path)
+//        use csvReader = new CsvReader(txtReader)
+//        csvReader.Configuration.Delimiter <- format.Separator
+//        csvReader.Configuration.HasHeaderRecord <- format.HasHeaders
+//        csvReader.Configuration.Quote <- format.Quote
+//        csvReader.GetRecords<'T>().ToList() :> IReadOnlyList<'T> 
         
 
 
@@ -285,7 +285,7 @@ module CsvDataStore  =
         let colCount = m.Description.Columns.Length
         for col in  m.Description.Columns do col.Name |> writer.WriteField
         writer.NextRecord()
-        for row in m.Rows do
+        for row in m.RowData do
             for i in 0..colCount-1 do
                 writer.WriteField<obj>(row.[i])
             writer.NextRecord()
@@ -296,7 +296,7 @@ module CsvDataStore  =
                 Directory.CreateDirectory(cs) |> ignore
                 
         interface ICsvDataStore with
-            member this.SelectMatrix(q) =  
+            member this.SelectMatrix(q) =
                 match q with
                 | FindCsvByFilename(filename) -> 
                     Path.Combine(cs, filename) |> readMatrix 
@@ -311,7 +311,7 @@ module CsvDataStore  =
                 nosupport()
 
             member this.Select(q) =
-                let converter = DataMatrix.getTypedConverter<'T>()
+                let converter = DataMatrixOps.getTypedConverter<'T>()
                 let matrix = (this :> ICsvDataStore).Select(q)
                 if matrix.Count() <> 0 then
                     matrix |> Seq.exactlyOne |> converter.ToProxyValues
@@ -322,7 +322,7 @@ module CsvDataStore  =
                 nosupport()
                                             
             member this.Insert (items : seq<'T>) =
-                let converter = DataMatrix.getTypedConverter<'T>()                 
+                let converter = DataMatrixOps.getTypedConverter<'T>()                 
                 (this :> ICsvDataStore).Insert(items |> converter.FromProxyValues |> Seq.singleton)
 
             member this.GetCommandContract() =

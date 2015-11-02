@@ -198,13 +198,13 @@ module internal SqlService =
 
         match targetMethod |> describeProxy with
         | Some(x) -> x
-        | None -> NotImplementedException(sprintf "There is no implementation for the method %O" targetMethod.Name) |> raise  
+        | None -> NotImplementedException(sprintf "There is no implementation for the method %O" targetMethod.Name) |> raise
 
 
     type private MethodInvocationInfo = {
         ConnectionString : string
         Method : MethodInfo
-        MethodArgs : obj list       
+        MethodArgs : obj list
     }
    
     /// <summary>
@@ -222,12 +222,12 @@ module internal SqlService =
             
             [for p in proxy.CallProxy.Parameters do
                 let key = ValueIndexKey(p |> getMethodParameterName , p.ProxyParameterPosition)
-                match methodParameterValues |> ValueIndex.tryFindValue key  with
+                match key |> methodParameterValues.TryFindValue with
                 | Some(value) ->
                     yield RoutineParameterValue(p.DataElement.Name, p.DataElement.Position, value)
                 | None ->
                     ()
-            ]         
+            ]
         | TableFunctionProxy(proxy) -> 
              invokeInfo.MethodArgs |> List.zip proxy.CallProxy.Parameters
                             |> List.map (fun (param, value) -> 
@@ -253,15 +253,15 @@ module internal SqlService =
                 match proxy.ResultProxy with
                 | Some(resultProxy) ->
                     proxy |> executeProcQuery invokeInfo.ConnectionString routineArgs
-                | None ->                    
+                | None ->
                     let results = 
                         proxy |> executeProcCommand invokeInfo.ConnectionString routineArgs
                     let outputs = 
-                        proxy.CallProxy.Parameters |> List.filter(fun x -> x.DataElement.Direction = RoutineParameterDirection.Output)                
+                        proxy.CallProxy.Parameters |> List.filter(fun x -> x.DataElement.Direction = RoutineParameterDirection.Output)
                     if outputs.Length = 0 then
-                        results |> ValueIndex.tryFindNamedValue "Return"
+                        results.TryFindValue("Return")
                     else if outputs.Length = 1 then
-                        results |> ValueIndex.tryFindNamedValue outputs.Head.DataElement.Name
+                        outputs.Head.DataElement.Name |> results.TryFindValue 
                     else
                         NotSupportedException("Cannot yet support multiple output parameters") |> raise
             
@@ -273,12 +273,12 @@ module internal SqlService =
                     let itemType = typedesc.ReflectedElement.Value.ItemValueType
                     let items = 
                         [for row in result -> PocoConverter().FromValueArray(row, itemType)]
-                    items |> CollectionBuilder.create x.Kind itemType |> Some                    
-                | _ -> NotSupportedException() |> raise                                            
+                    items |> CollectionBuilder.create x.Kind itemType |> Some
+                | _ -> NotSupportedException() |> raise
             | _ -> nosupport()
             
-        //Note that this is the method being returned to the caller                
-        fun (cs : string) (targetMethod : MethodInfo) (args : obj[]) ->            
+        //Note that this is the method being returned to the caller
+        fun (cs : string) (targetMethod : MethodInfo) (args : obj[]) ->
             {
                 ConnectionString = cs
                 Method = targetMethod
@@ -308,7 +308,7 @@ module internal SqlService =
 
             member this.BulkInsert data =
                 use table = data.Description |> BclDataTable.fromMatrixDescription
-                data.Rows |> Seq.iter(fun x ->table.LoadDataRow(x,true) |> ignore)
+                data.RowData |> Seq.iter(fun x ->table.LoadDataRow(x,true) |> ignore)
                 use bcp = new SqlBulkCopy(cs, SqlBulkCopyOptions.CheckConstraints)
                 bcp.DestinationTableName <- match data.Description with DataMatrixDescription(Name=x) -> x |> SqlFormatter.formatObjectName
                 bcp.WriteToServer(table)

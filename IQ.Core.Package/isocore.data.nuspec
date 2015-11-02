@@ -20,6 +20,9 @@
         <dependency id="FSharp.Core" version="4.0.0.1" />
         <dependency id="FSharp.Data" version="2.2.5" />
         <dependency id="FSharp.Text.RegexProvider" version="0.0.7" />
+        <dependency id="ExcelDataReader" version="2.1.2.3" />
+        <dependency id="SharpZipLib" version="0.86.0" />
+        <dependency id="Newtonsoft.Json" version="7.0.1" />
       </group>
     </dependencies>
 

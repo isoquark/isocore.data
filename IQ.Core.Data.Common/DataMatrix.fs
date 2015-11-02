@@ -1,14 +1,54 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Data.Behavior
+namespace IQ.Core.Data
 
 open System
 open System.Collections
 open System.Reflection
 open System.Collections.Generic
 open System.Data
+open System.Runtime.CompilerServices
 
-module DataMatrix =
+open IQ.Core.Data.Behavior
+
+module internal DataMatrixInternals =
+    let pivot(rows : IReadOnlyList<obj[]>) =
+        let specimen = if rows.Count <> 0 then rows.[0] |> Some else None
+        let colcount = 
+            match specimen with
+            | Some(row) ->
+                row.Length
+            | None ->
+                0
+        let arrays = [|for i in 1..colcount -> Array.zeroCreate<obj> rows.Count|]
+        for colidx in 0..colcount-1 do
+            let colarray = arrays.[colidx]
+            for rowidx in 0..rows.Count-1 do
+                let value  = rows.[rowidx].[colidx]
+                colarray.[rowidx] <-value
+        arrays :> IReadOnlyList<obj[]>
+            
+
+/// <summary>
+/// Represents a rectangular array of data
+/// </summary>
+/// <remarks>
+/// The intent is for this type to serve as a lightweight data table
+///</remarks>
+type DataMatrix =  DataMatrix of Description : DataMatrixDescription * Rows : obj[] IReadOnlyList
+with
+    interface IDataMatrix with
+        member this.RowData = 
+            match this with DataMatrix(Rows=x) -> x
+        member this.ColData = 
+            match this with DataMatrix(Rows = x) -> x |> DataMatrixInternals.pivot
+        member this.Description = 
+            match this with DataMatrix(Description=x) -> x
+        member this.Item(row,col) = 
+            match this with DataMatrix(Rows=x) -> x.[row].[col]
+
+
+module DataMatrixOps =
     
     /// <summary>
     /// Creates a <see cref="System.Data.DataTable"/> from a sequence of proxy values
@@ -40,7 +80,7 @@ module DataMatrix =
             [|for column in columns do 
                 yield valueidx.[column.ProxyElement.Name.Text] |> DataTypeConverter.toBclTransportValue column.DataElement.DataType
             |] |> rows.Add
-        table :> IDataMatrix               
+        table :> IDataMatrix
     
     /// <summary>
     /// Creates a collection of proxies from rows in a data table
@@ -54,13 +94,13 @@ module DataMatrix =
         | CollectionType(x) ->
             let itemType = Type.GetType(x.ItemType.AssemblyQualifiedName |> Option.get)
             let items = 
-                [for row in dataTable.Rows ->
+                [for row in dataTable.RowData ->
                     pocoConverter.FromValueArray(row, itemType)
                     ]
             items |> CollectionBuilder.create x.Kind itemType :?> IEnumerable
         | _ ->
             let items = 
-                [for row in dataTable.Rows ->                
+                [for row in dataTable.RowData ->
                     pocoConverter.FromValueArray(row, t.ReflectedElement.Value)] 
             let itemType = t.ReflectedElement.Value 
             items |> CollectionBuilder.create ClrCollectionKind.GenericList itemType :?> IEnumerable
@@ -71,17 +111,17 @@ module DataMatrix =
     /// </summary>
     /// <param name="t">The proxy type</param>
     /// <param name="dataTable">The data table</param>
-    let toProxyValuesT<'T>  (dataTable : IDataMatrix) =        
+    let toProxyValuesT<'T>  (dataTable : IDataMatrix) =
         let t = ClrMetadata().FindType<'T>()
         dataTable |> toProxyValues t :?> IEnumerable<'T>
 
     let getUntypedConverter() =
         {new IDataMatrixConverter with
-            member this.ToProxyValues t matrix =                
+            member this.ToProxyValues t matrix =
                 let clrType = ClrMetadata().FindType(t) 
                 matrix |> toProxyValues clrType
             member this.FromProxyValues d values =
-                fromProxyValues d values        
+                fromProxyValues d values
         }
 
 
@@ -90,7 +130,7 @@ module DataMatrix =
             member this.ToProxyValues dataTable =
                 dataTable |> toProxyValuesT<'T>
             member this.FromProxyValues values =
-                values |> Seq.map(fun x -> x :> obj) |> fromProxyValues (tableproxy<'T> )    
+                values |> Seq.map(fun x -> x :> obj) |> fromProxyValues (tableproxy<'T> )
         }
 
 
@@ -98,13 +138,15 @@ module DataMatrix =
     /// Adapts a BCL <see cref="DataTable"/> to <see cref="IDataTable"/>
     /// </summary>
     /// <param name="dataTable">The BCL data table to adapt</param>
-    let fromDataTable (dataTable : DataTable) =        
+    let fromDataTable (dataTable : DataTable) =
                 
         let rowValues = [|for row in dataTable.Rows -> row.ItemArray|] :> IReadOnlyList<obj[]>
         let description = dataTable |> BclDataTable.describe
         {new IDataMatrix with
             member this.Description = description
             member this.Item(row,col) = dataTable.Rows.[row].[col]
-            member this.Rows = rowValues
+            member this.RowData = rowValues
+            member this.ColData = rowValues |> DataMatrixInternals.pivot
         
         }
+

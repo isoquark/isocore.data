@@ -180,20 +180,15 @@ module Main =
 
     [<EntryPoint>]
     let main argv = 
-        let config = {
-            OutputDirectory = @"C:\dev\DataMaster\DataMaster.DataProxies\"
-            DbServer = "localhost"
-            DbName = "DataMaster.LocalDev"
-            SchemaNames = ["Core"; "JhaEtl"; "JhaStage"; "JhaDw"]
-            RootNamespace = "DataMaster.DataProxies"
-            ExcludeAuditColumns = true
-        }
-        let cs = String.Format(csFmt, config.DbServer, config.DbName)
-        
-        use context = new ShellContext()
-        let dsProvider = context.AppContext.Resolve<IDataStoreProvider>()
-        let store = dsProvider.GetDataStore<ISqlDataStore>(cs)
-        let metadata = store.MetadataProvider
-        let build = buildSchemaProxies config.OutputDirectory metadata config.RootNamespace
-        config.SchemaNames |> List.iter build 
+        argv |> Array.iter(fun arg ->
+            let configData = File.ReadAllText(arg)
+            let config = JsonSerializer.get().Hydrate<DataProxyGenConfig>(configData)
+            let cs = String.Format(csFmt, config.DbServer, config.DbName)
+            use context = new ShellContext()
+            let dsProvider = context.AppContext.Resolve<IDataStoreProvider>()
+            let store = dsProvider.GetDataStore<ISqlDataStore>(cs)
+            let metadata = store.MetadataProvider
+            let build = buildSchemaProxies config.OutputDirectory metadata config.RootNamespace
+            config.SchemaNames |> List.iter build 
+        )
         0 

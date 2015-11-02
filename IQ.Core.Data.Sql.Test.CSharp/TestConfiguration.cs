@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using IQ.Core.Framework;
-using IQ.Core.Framework.Contracts;
+using IQ.Core.Contracts;
 
 using IQ.Core.Data;
 using IQ.Core.Data.Contracts;

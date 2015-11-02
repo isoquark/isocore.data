@@ -5,7 +5,7 @@ namespace IQ.Core.Math.Contracts
 open System
 open System.Numerics
 
-type Range<'T> = Range of MinValue : 'T * MaxValue : 'T    
+type Range<'T> = Range of MinValue : 'T * MaxValue : 'T
 
 /// <summary>
 /// Defines contract for primtive, non-parametrized calculator

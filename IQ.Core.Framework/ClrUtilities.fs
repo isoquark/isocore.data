@@ -14,10 +14,10 @@ open System.Runtime.CompilerServices
 open Microsoft.FSharp.Reflection
 open Microsoft.FSharp.Quotations.Patterns
 
-
+open IQ.Core.Contracts
 
 [<AutoOpen>]
-module ClrUtilityVocabulary =       
+module ClrUtilityVocabulary =
     /// <summary>
     /// Encapsulates (selected) field attributes
     /// </summary>

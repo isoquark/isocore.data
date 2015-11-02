@@ -39,6 +39,16 @@ module PocoConverter =
             valueArray |> config.Transformer.TransformArray types 
                        |> getRecordFactory(t)
 
+        let private fromPropertyBag (config : PocoConverterConfig) (bag : IDictionary<string,obj>) (t : Type) =
+            if t |> Type.isRecordType |> not then
+                argerrord "o" t "Not a record type"
+            
+            let properties = t |> ClrMetadata().FindType |> fun x -> x.Properties
+            let valueArray = properties |> List.map(fun p -> bag.[p.Name.Text]) |> Array.ofList
+            let types = [for property in properties -> property.ReflectedElement.Value.PropertyType] |> Array.ofList
+            valueArray |> config.Transformer.TransformArray types |> getRecordFactory(t)
+
+        
     
         /// <summary>
         /// Retrieves record field values indexed by field name
@@ -50,9 +60,9 @@ module PocoConverter =
                 argerrord "o" o "Not a record value"
             t |> ClrMetadata().FindType
               |> fun x -> x.Properties
-              |> List.map(fun field ->                 
+              |> List.map(fun field ->
                     let p = field.ReflectedElement |> Option.get
-                    field.Name.Text, field.Position, p.GetValue(o))                 
+                    field.Name.Text, field.Position, p.GetValue(o))
                     |> ValueIndex.create
 
         /// <summary>
@@ -101,9 +111,10 @@ module PocoConverter =
                 member this.ToValueArray record = record |> toValueArray config
                 member this.FromValueArray (valueArray, t) = fromValueArray config valueArray t
                 member this.FromValueIndex (idx, t) = fromValueIndex config idx t
+                member this.FromPropertyBag (bag, t) = fromPropertyBag config bag t
     
         let getPocoConverter(config) =
-            Realization(config) :> IPocoConverter    
+            Realization(config) :> IPocoConverter
     
     module private DataEntity =
         type private PocoConverter(config : PocoConverterConfig) =
@@ -111,10 +122,10 @@ module PocoConverter =
         
 
             let getProperties(t : Type) =
-                t |> ClrMetadata().FindType |> fun t -> t.Properties            
+                t |> ClrMetadata().FindType |> fun t -> t.Properties
 
             let getPropertyTypes (props : ClrProperty list) =
-                props |> List.map(fun p -> p.ReflectedElement.Value.PropertyType) |> Array.ofList                    
+                props |> List.map(fun p -> p.ReflectedElement.Value.PropertyType) |> Array.ofList
         
             /// <summary>
             /// Creates a list of field values, in declaration order, for a specified record value
@@ -128,7 +139,7 @@ module PocoConverter =
             interface IPocoConverter with
                 member this.FromValueArray(valueArray, t) =
                 
-                    let props = t |> getProperties                
+                    let props = t |> getProperties
                     let types =  props |> getPropertyTypes
                     let values = valueArray |> config.Transformer.TransformArray types 
                 
@@ -140,7 +151,7 @@ module PocoConverter =
                     o
 
                 member this.FromValueIndex(idx,t) = 
-                    let props = t |> getProperties                
+                    let props = t |> getProperties
                     let types =  props |> getPropertyTypes
                     let values = props |> List.map(fun p -> idx.[p.Name.Text]) 
                                        |> Array.ofList 
@@ -152,16 +163,29 @@ module PocoConverter =
                     ) 
 
                     o
-                               
-                
+
+                member this.FromPropertyBag(bag,t) =
+                    let props = t |> getProperties
+                    let types =  props |> getPropertyTypes
+                    let values = props |> List.map(fun p -> bag.[p.Name.Text]) 
+                                       |> Array.ofList 
+                                       |> config.Transformer.TransformArray types
+
+                    let o = Activator.CreateInstance(t);
+                    props |> List.iteri(fun i p ->
+                       p.ReflectedElement.Value.SetValue(o, values.[i])
+                    ) 
+
+                    o
+                                                                   
                 member this.ToValueArray(entity) = 
                     entity |> toValueArray
             
                 member this.ToValueIndex(entity) = 
                     entity.GetType() |> getProperties
-                    |> List.mapi(fun i field ->                 
+                    |> List.mapi(fun i field ->
                         let p = field.ReflectedElement |> Option.get
-                        p.Name, i, p.GetValue(entity))                 
+                        p.Name, i, p.GetValue(entity))
                         |> ValueIndex.create
                 
                 
@@ -181,7 +205,11 @@ module PocoConverter =
             member this.FromValueIndex(idx,t) = 
                     (if t |> Type.isRecordType then recordConverter.FromValueIndex
                                               else entityConverter.FromValueIndex)(idx, t)
-                                                
+            member this.FromPropertyBag(bag,t) =
+                    (if t |> Type.isRecordType then recordConverter.FromPropertyBag
+                                              else entityConverter.FromPropertyBag)(bag, t)
+                                                    
+            
             member this.ToValueArray(entity) = 
                     (if entity.GetType() |> Type.isRecordType then recordConverter.ToValueArray
                                               else entityConverter.ToValueArray)(entity)
@@ -189,6 +217,7 @@ module PocoConverter =
             member this.ToValueIndex(entity) = 
                     (if entity.GetType() |> Type.isRecordType then recordConverter.ToValueIndex
                                               else entityConverter.ToValueIndex)(entity)
+            
         
 
     let get(config : PocoConverterConfig) =

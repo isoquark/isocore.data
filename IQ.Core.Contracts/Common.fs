@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Chris Moore and eXaPhase Consulting LLC.  All Rights Reserved.  Licensed under 
 // the Apache License, Version 2.0.  See License.txt in the project root for license information.
-namespace IQ.Core.Framework.Contracts
+namespace IQ.Core.Contracts
 
 open System
 open System.Reflection
@@ -23,6 +23,83 @@ with
 /// Represents a collection of name-indexed or position-indexed values
 /// </summary>
 type ValueIndex = ValueIndex of (ValueIndexKey*obj) list
+with
+    /// <summary>
+    /// Gets tupled entries
+    /// </summary>
+    member this.Entries = match this with ValueIndex(m) -> m
+        
+    /// <summary>
+    /// Gets a value from the map that is identified by its name
+    /// </summary>
+    /// <param name="name">The name of the value</param>
+    member this.Item name = 
+        this.Entries |> List.find(fun (x,y) -> x.Name = name) |> snd
+
+    /// <summary>
+    /// Gets a value from the map that is identified by its position
+    /// </summary>
+    /// <param name="pos">The position of the value</param>
+    member this.Item pos =
+        this.Entries |> List.find(fun (x,y) -> x.Position = pos) |> snd
+
+    /// <summary>
+    /// Gets a value from the map that is identified by its key
+    /// </summary>
+    /// <param name="pos">The position of the value</param>
+    member this.Item key =
+        this.Entries |> List.find(fun (x,y) -> x = key) |> snd
+
+    /// <summary>
+    /// Gets the index keys
+    /// </summary>
+    member this.Keys = this.Entries |> List.map(fun (k,v) -> k)
+
+    /// <summary>
+    /// Gets the name keys
+    /// </summary>
+    member this.NameKeys = this.Entries |> List.map(fun (k,v) -> k.Name)
+
+    /// <summary>
+    /// Gets the position keys
+    /// </summary>
+    member this.PositionKeys = this.Entries |> List.map(fun (k,v) -> k.Name)
+
+    /// <summary>
+    /// Gets the indexed values
+    /// </summary>
+    member this.Values = this.Entries |> List.map(fun (k,v) -> v)
+
+    /// <summary>
+    /// Attempts to find a value identified by name
+    /// </summary>
+    /// <param name="name">The name of the value</param>
+    /// <param name="idx"></param>
+    member this.TryFindValue(name) =
+            match this.Entries |> List.tryFind(fun (x,y) -> x.Name = name) with
+            | Some(x) -> x |> snd |> Some
+            | None -> None
+    
+    /// <summary>
+    /// Attempts to find a value identified by position
+    /// </summary>
+    /// <param name="name">The name of the value</param>
+    /// <param name="idx"></param>
+    member this.TryFindValue(pos) =
+            match this.Entries |> List.tryFind(fun (x,y) -> x.Position = pos) with
+            | Some(x) -> x |> snd |> Some
+            | None -> None
+
+    /// <summary>
+    /// Attempts to find a value identified by a key
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="idx"></param>
+    member this.TryFindValue(key) = 
+        match this.Entries |> List.tryFind(fun (x,y) -> x = key) with
+        | Some(x) -> x |> snd |> Some
+        | None -> None
+
     
 type BinaryFunc<'T,'TResult> = Func<'T,'T,'TResult>
 type BinaryFunc<'T> = BinaryFunc<'T,'T>
@@ -1032,17 +1109,23 @@ type IPocoConverter =
     /// <param name="record">The record from which a value array will be created</param>
     abstract ToValueArray:obj->obj[]
     /// <summary>
-    /// Creates a record from an array of values that are specified in declaration order
+    /// Creates a poco from an array of values that are specified in declaration order
     /// </summary>
     /// <param name="valueArray">An array of values in declaration order</param>
     /// <param name="t">The record type</param>
     abstract FromValueArray:valueArray : obj[] * t : Type->obj
     /// <summary>
-    /// Creates a record from data supplied in a ValueIndex
+    /// Creates a poco from data supplied in a ValueIndex
     /// </summary>
     /// <param name="idx">The value index</param>
     /// <param name="t">The record type</param>
     abstract FromValueIndex: idx : ValueIndex * t : Type -> obj
+    /// <summary>
+    /// Creates a poco from data supplied in a property bag
+    /// </summary>
+    /// <param name="idx">The value index</param>
+    /// <param name="t">The record type</param>
+    abstract FromPropertyBag: bag : IDictionary<string,obj> * t : Type -> obj
 
 
 /// <summary>
@@ -1051,4 +1134,11 @@ type IPocoConverter =
 type PocoConverterConfig = PocoConverterConfig of transformer : ITransformer
 with
     member this.Transformer = match this with PocoConverterConfig(transformer=x) -> x
+
+/// <summary>
+/// Defines serialization contract
+/// </summary>
+type ISerializer<'TFormat> =
+    abstract Emit: 'TEntity->'TFormat
+    abstract Hydrate: 'TFormat->'TEntity
     

@@ -7,9 +7,7 @@ open System.Diagnostics
 open System.Collections.Generic
 open System.Runtime.CompilerServices
 
-open IQ.Core.Framework
-
-open IQ.Core.Framework.Contracts
+open IQ.Core.Contracts
 open IQ.Core.Math.Contracts
 
 /// <summary>
@@ -448,26 +446,28 @@ type DataMatrixDescription = DataMatrixDescription of Name : DataObjectName * Co
 /// Defines contract for a tabular data source
 /// </summary>
 type IDataMatrix =
+    
     /// <summary>
     /// Describes the encapsulated data
     /// </summary>
     abstract Description : DataMatrixDescription
+    
     /// <summary>
-    /// The encapsulared data
+    /// The encapsulated data by row
     /// </summary>
-    abstract Rows : IReadOnlyList<obj[]>
+    abstract RowData : IReadOnlyList<obj[]>
+
+    /// <summary>
+    /// The encapsulated data by column
+    /// </summary>
+    abstract ColData : IReadOnlyList<obj[]>
+    
     /// <summary>
     /// Gets the value at the intersection fo the specified (0-based) row and column
     /// </summary>
     abstract Item : row : int * col : int -> obj
 
-
-type DataMatrix =  DataMatrix of Description : DataMatrixDescription * Rows : obj[] IReadOnlyList
-with
-    interface IDataMatrix with
-        member this.Rows = match this with DataMatrix(Rows=x) -> x
-        member this.Description = match this with DataMatrix(Description=x) -> x
-        member this.Item(row,col) = match this with DataMatrix(Rows=x) -> x.[row].[col]
+    
 
 
 /// <summary>
