@@ -369,7 +369,14 @@ type ISqlDataStore =
     inherit IDataStore<SqlDataStoreQuery>
     /// <summary>
     /// Provides access to the store's underlying metadata provider
+    /// </summary>
     abstract MetadataProvider : ISqlMetadataProvider
+    
+    /// <summary>
+    /// Executes the (command) sql without interpetation
+    /// </summary>
+    abstract ExecuteSql:string->unit
+
             
 
 

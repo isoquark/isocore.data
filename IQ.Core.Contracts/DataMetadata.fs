@@ -455,12 +455,12 @@ type IDataMatrix =
     /// <summary>
     /// The encapsulated data by row
     /// </summary>
-    abstract RowData : IReadOnlyList<obj[]>
+    abstract Rows : IReadOnlyList<obj[]>
 
     /// <summary>
     /// The encapsulated data by column
     /// </summary>
-    abstract ColData : IReadOnlyList<obj[]>
+    abstract Columns : IReadOnlyList<obj[]>
     
     /// <summary>
     /// Gets the value at the intersection fo the specified (0-based) row and column

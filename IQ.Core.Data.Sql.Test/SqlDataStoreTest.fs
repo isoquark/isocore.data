@@ -40,9 +40,9 @@ module SqlDataStoreTest =
                         .Build() 
                         
             let result = q1 |> store.SelectMatrix
-            result.RowData.Count |> Claim.equal 10
-            for rowidx in 0..result.RowData.Count-1 do
-                let row = result.RowData.[rowidx]
+            result.Rows.Count |> Claim.equal 10
+            for rowidx in 0..result.Rows.Count-1 do
+                let row = result.Rows.[rowidx]
                 let rowid = row.[0] :?> int
                 let actual = row.[1]
                 let expect = col2Values.[rowid]

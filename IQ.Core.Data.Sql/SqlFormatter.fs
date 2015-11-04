@@ -315,7 +315,7 @@ module SqlFormatter =
         sb |> SB.appendLine1 "create table {0}(" tableName 
         let colcount = d.Columns.Length
         d.Columns |> Seq.iter(fun c ->
-           sb |> SB.appendFormat3 "{0} {1} {2}"  c.Name (formatDataTypeReference(c.DataType)) (if c.Nullable then "null" else "not null")
+           sb |> SB.appendFormat3 "[{0}] {1} {2}"  c.Name (formatDataTypeReference(c.DataType)) (if c.Nullable then "null" else "not null")
            let isLast = c.Position = d.Columns.Length - 1
            if isLast then
                 sb |> SB.appendLine ");"

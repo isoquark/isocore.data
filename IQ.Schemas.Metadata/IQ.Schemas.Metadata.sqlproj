@@ -113,8 +113,14 @@
     <Build Include="Functions\fParameterDescription.sql" />
     <Build Include="Functions\fSchemaProperty.sql" />
     <Build Include="Functions\fGeneratePoco.sql" />
-    <Build Include="Tables\DataMatrix.sql" />
-    <Build Include="Tables\DataMatrixColumn.sql" />
+    <Build Include="Tables\TabularFileColumn.sql" />
+    <Build Include="Tables\TabularFile.sql" />
+    <Build Include="Tables\TabularFileMatrix.sql" />
+    <Build Include="Tables\FileFormatType.sql" />
+    <Build Include="Tables\SemanticFileType.sql" />
+    <Build Include="Functions\fDataMatrixFromTable.sql" />
+    <Build Include="Functions\fTabularFileMatrix.sql" />
+    <Build Include="Views\vTabularFileMatrix.sql" />
   </ItemGroup>
   <ItemGroup>
     <ArtifactReference Include="$(DacPacRootPath)\Extensions\Microsoft\SQLDB\Extensions\SqlServer\110\SqlSchemas\master.dacpac">
@@ -129,6 +135,7 @@
     </None>
     <None Include="local.publish.xml" />
     <None Include="aw.publish.xml" />
+    <None Include="Data\FileFormatType.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="postdeploy.sql" />

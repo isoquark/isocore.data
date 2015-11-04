@@ -116,7 +116,7 @@ module SqlDataStore =
                 use connection = createConnection()
                 use command = connection |> createQueryCommand q
                 command |> executeQueryCommand
-                        |> fun x -> x.RowData
+                        |> fun x -> x.Rows
                         |> SqlDataReader.toPocos<'T>
 
             member this.SelectAll()  =
@@ -133,6 +133,11 @@ module SqlDataStore =
             member this.ConnectionString = cs
 
             member this.MetadataProvider = mdp
+
+            member this.ExecuteSql sql =
+                use connection = createConnection()
+                use command = new SqlCommand(sql, connection)
+                command.ExecuteNonQuery() |> ignore
             
             
     type internal SqlDataStoreProvider () =

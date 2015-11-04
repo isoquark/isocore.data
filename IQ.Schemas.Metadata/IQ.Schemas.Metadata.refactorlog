@@ -56,4 +56,53 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="CSharpKeyword" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="d93c7f9d-9685-4d8e-b386-e95b8623db86" ChangeDateTime="11/02/2015 15:33:30">
+    <Property Name="ElementName" Value="[Metadata].[FileType]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[Metadata]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="SemanticFileType" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c8af076e-0ed5-407c-8928-c847ecc71957" ChangeDateTime="11/02/2015 17:21:52">
+    <Property Name="ElementName" Value="[Metadata].[F_TabularFileMatrix_TabularFile]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[Metadata].[TabularFileMatrix]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FK_TabularFileMatrix_TabularFile" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2c59f285-c54d-4eec-b8d1-0e522dc95479" ChangeDateTime="11/02/2015 17:22:04">
+    <Property Name="ElementName" Value="[Metadata].[F_TabularFileMatrix_DatMatrix]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[Metadata].[TabularFileMatrix]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FK_TabularFileMatrix_DataMatrix" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="693d997b-626d-4e8f-a064-3924696f324d" ChangeDateTime="11/02/2015 17:37:40">
+    <Property Name="ElementName" Value="[Metadata].[DataMatrixColumn].[Position]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[Metadata].[DataMatrixColumn]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ColumnPosition" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="b378e69c-57bd-4c82-a1d9-3d5681002572" ChangeDateTime="11/02/2015 17:51:33">
+    <Property Name="ElementName" Value="[Metadata].[DataMatrixColumn].[ColumnName]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[Metadata].[DataMatrixColumn]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="TargetColumnName" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="3f3522c9-3ec8-4b02-8b19-78f24bfba1ef" ChangeDateTime="11/04/2015 00:16:07">
+    <Property Name="ElementName" Value="[Metadata].[DataMatrixColumn]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[Metadata]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="TabularFileColumn" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c99ebbc9-3b0e-40fb-ac72-cc2ae8eb63c9" ChangeDateTime="11/04/2015 00:54:30">
+    <Property Name="ElementName" Value="[Metadata].[fTabularFile]" />
+    <Property Name="ElementType" Value="SqlInlineTableValuedFunction" />
+    <Property Name="ParentElementName" Value="[Metadata]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[fTabularFileMatrix]" />
+  </Operation>
 </Operations>

@@ -285,7 +285,7 @@ module CsvDataStore  =
         let colCount = m.Description.Columns.Length
         for col in  m.Description.Columns do col.Name |> writer.WriteField
         writer.NextRecord()
-        for row in m.RowData do
+        for row in m.Rows do
             for i in 0..colCount-1 do
                 writer.WriteField<obj>(row.[i])
             writer.NextRecord()

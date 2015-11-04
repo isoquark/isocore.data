@@ -181,7 +181,7 @@ module ExcelDataStore =
 
     let private addWorksheet (workbook : ExcelWorkbook) (m : IDataMatrix) =
         let description = m.Description
-        let rowcount = m.RowData.Count
+        let rowcount = m.Rows.Count
         let colcount = description.Columns.Length
         let worksheet = workbook.Worksheets.Add(description.Name.LocalName)
         
@@ -201,7 +201,7 @@ module ExcelDataStore =
         //Emit data
         for rowidx in [2..rowcount+1] do
             for colidx in [1..colcount] do
-                let row = m.RowData.[rowidx - 2]
+                let row = m.Rows.[rowidx - 2]
                 let value = row.[colidx - 1] |> convertValue
                 let cell = worksheet.Cells.[rowidx,colidx]
                 cell.Value <- value

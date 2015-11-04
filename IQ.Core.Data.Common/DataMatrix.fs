@@ -38,14 +38,34 @@ module internal DataMatrixInternals =
 type DataMatrix =  DataMatrix of Description : DataMatrixDescription * Rows : obj[] IReadOnlyList
 with
     interface IDataMatrix with
-        member this.RowData = 
+        member this.Rows = 
             match this with DataMatrix(Rows=x) -> x
-        member this.ColData = 
+        member this.Columns = 
             match this with DataMatrix(Rows = x) -> x |> DataMatrixInternals.pivot
         member this.Description = 
             match this with DataMatrix(Description=x) -> x
         member this.Item(row,col) = 
             match this with DataMatrix(Rows=x) -> x.[row].[col]
+
+type DataMatrixBuilder(name : DataObjectName) =
+    let coldefs =  Dictionary<int, ColumnDescription>()
+    let rows = List<obj[]>();
+    member this.DefineColumn(column) =
+        coldefs.Add(column.Position, column)
+        this
+    member this.AddRow(row) =
+        rows.Add(row);
+        this
+    member this.Build() =
+        let coldata = rows |> DataMatrixInternals.pivot
+        let description = DataMatrixDescription(name, coldefs.Values |> Seq.sortBy(fun x -> x.Position) |> List.ofSeq)
+        {new IDataMatrix with
+            member this.Rows = rows :> IReadOnlyList<obj[]>
+            member this.Columns = coldata
+            member this.Item(row,col) = rows.[row].[col]
+            member this.Description = description
+        }
+
 
 
 module DataMatrixOps =
@@ -94,13 +114,13 @@ module DataMatrixOps =
         | CollectionType(x) ->
             let itemType = Type.GetType(x.ItemType.AssemblyQualifiedName |> Option.get)
             let items = 
-                [for row in dataTable.RowData ->
+                [for row in dataTable.Rows ->
                     pocoConverter.FromValueArray(row, itemType)
                     ]
             items |> CollectionBuilder.create x.Kind itemType :?> IEnumerable
         | _ ->
             let items = 
-                [for row in dataTable.RowData ->
+                [for row in dataTable.Rows ->
                     pocoConverter.FromValueArray(row, t.ReflectedElement.Value)] 
             let itemType = t.ReflectedElement.Value 
             items |> CollectionBuilder.create ClrCollectionKind.GenericList itemType :?> IEnumerable
@@ -145,8 +165,8 @@ module DataMatrixOps =
         {new IDataMatrix with
             member this.Description = description
             member this.Item(row,col) = dataTable.Rows.[row].[col]
-            member this.RowData = rowValues
-            member this.ColData = rowValues |> DataMatrixInternals.pivot
+            member this.Rows = rowValues
+            member this.Columns = rowValues |> DataMatrixInternals.pivot
         
         }
 
